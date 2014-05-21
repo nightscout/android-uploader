@@ -24,138 +24,133 @@ import java.io.ObjectInputStream;
 /* Main activity for the DexcomG4Activity program */
 public class DexcomG4Activity extends Activity {
 
+    private Handler mHandler = new Handler();
 
-	/**
-	 * The system's USB service.
-	 */
-	public UsbManager mUsbManager;
-	private Handler mHandler = new Handler();
+    private int maxRetries = 20;
+    private int retryCount = 0;
 
-	private int maxRetries = 999;
-	private int retryCount = 0;
+    private TextView mTitleTextView;
+    private TextView mDumpTextView;
+    private ScrollView mScrollView;
+    private Button b1;
 
-	private TextView mTitleTextView;
-	private TextView mDumpTextView;
-	private ScrollView mScrollView;
-	private Button b1;
 
-	
-	//All I'm really doing here is creating a simple activity to launch and maintain the service
-	private Runnable updateDataView = new Runnable() {
-		public void run() {
+    //All I'm really doing here is creating a simple activity to launch and maintain the service
+    private Runnable updateDataView = new Runnable() {
+        public void run() {
 
-			if (!isMyServiceRunning()) {
-				if (retryCount < maxRetries) {
-					startService(new Intent(DexcomG4Activity.this,
-							DexcomG4Service.class));
-					mTitleTextView.setTextColor(Color.YELLOW);
-					mTitleTextView.setText("Connecting...");
-					++retryCount;
-				} else {
-					mHandler.removeCallbacks(updateDataView);
-					finish();
-				}
-			} else {
-				mTitleTextView.setTextColor(Color.GREEN);
-				mTitleTextView.setText("CGM Service Started");
-				EGVRecord record = DexcomG4Activity.this
-						.loadClassFile(new File(getBaseContext().getFilesDir(),
-								"save.bin"));
-				mDumpTextView.setTextColor(Color.WHITE);
-				mDumpTextView.setText("\n" + record.displayTime + "\n"
-						+ record.bGValue + "\n" + record.trendArrow + "\n");
-			}
-			mHandler.postDelayed(updateDataView, 30000);
-		}
-	};
+            if (!isMyServiceRunning()) {
+                if (retryCount < maxRetries) {
+                    startService(new Intent(DexcomG4Activity.this,
+                            DexcomG4Service.class));
+                    mTitleTextView.setTextColor(Color.YELLOW);
+                    mTitleTextView.setText("Connecting...");
+                    ++retryCount;
+                } else {
+                    mHandler.removeCallbacks(updateDataView);
+                    finish();
+                }
+            } else {
+                mTitleTextView.setTextColor(Color.GREEN);
+                mTitleTextView.setText("CGM Service Started");
+                EGVRecord record = DexcomG4Activity.this
+                        .loadClassFile(new File(getBaseContext().getFilesDir(),
+                                "save.bin"));
+                mDumpTextView.setTextColor(Color.WHITE);
+                mDumpTextView.setText("\n" + record.displayTime + "\n"
+                        + record.bGValue + "\n" + record.trendArrow + "\n");
+            }
+            mHandler.postDelayed(updateDataView, 30000);
+        }
+    };
 
-	//Look for and launch the service, display status to user
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    //Look for and launch the service, display status to user
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         setContentView(R.layout.adb);
 
-		mTitleTextView = (TextView) findViewById(R.id.demoTitle);
-		mDumpTextView = (TextView) findViewById(R.id.demoText);
-		mScrollView = (ScrollView) findViewById(R.id.demoScroller);
+        mTitleTextView = (TextView) findViewById(R.id.demoTitle);
+        mDumpTextView = (TextView) findViewById(R.id.demoText);
+        mScrollView = (ScrollView) findViewById(R.id.demoScroller);
 
-		LinearLayout lnr = (LinearLayout) findViewById(R.id.container);
+        LinearLayout lnr = (LinearLayout) findViewById(R.id.container);
 
-		b1 = new Button(this);
+        b1 = new Button(this);
 
-		mHandler.post(updateDataView);
+        mHandler.post(updateDataView);
 
-		mTitleTextView.setTextColor(Color.YELLOW);
-		mTitleTextView.setText("CGM Service Pending");
+        mTitleTextView.setTextColor(Color.YELLOW);
+        mTitleTextView.setText("CGM Service Pending");
 
-		b1.setText("Stop Uploading CGM Data");
-		lnr.addView(b1);
+        b1.setText("Stop Uploading CGM Data");
+        lnr.addView(b1);
 
-		b1.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (b1.getText() == "Stop Uploading CGM Data") {
-					mHandler.removeCallbacks(updateDataView);
-					stopService(new Intent(DexcomG4Activity.this,
-							DexcomG4Service.class));
-					b1.setText("Start Uploading CGM Data");
-					mTitleTextView.setTextColor(Color.RED);
-					mTitleTextView.setText("CGM Service Stopped");
-					finish();
+        b1.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (b1.getText() == "Stop Uploading CGM Data") {
+                    mHandler.removeCallbacks(updateDataView);
+                    stopService(new Intent(DexcomG4Activity.this,
+                            DexcomG4Service.class));
+                    b1.setText("Start Uploading CGM Data");
+                    mTitleTextView.setTextColor(Color.RED);
+                    mTitleTextView.setText("CGM Service Stopped");
+                    finish();
 
-				} else {
-					mHandler.removeCallbacks(updateDataView);
-					mHandler.post(updateDataView);
-					b1.setText("Stop Uploading CGM Data");
-				}
-			}
-		});
+                } else {
+                    mHandler.removeCallbacks(updateDataView);
+                    mHandler.post(updateDataView);
+                    b1.setText("Stop Uploading CGM Data");
+                }
+            }
+        });
 
-	}
+    }
 
-	@Override
-	protected void onPause() {
-		super.onPause();
+    @Override
+    protected void onPause() {
+        super.onPause();
 
-	}
+    }
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		//Refresh the status
-		EGVRecord record = this.loadClassFile(new File(this.getFilesDir(),
-				"save.bin"));
-		mDumpTextView.setTextColor(Color.WHITE);
-		mDumpTextView.setText("\n" + record.displayTime + "\n" + record.bGValue
-				+ "\n" + record.trendArrow + "\n");
-	}
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //Refresh the status
+        EGVRecord record = this.loadClassFile(new File(this.getFilesDir(),
+                "save.bin"));
+        mDumpTextView.setTextColor(Color.WHITE);
+        mDumpTextView.setText("\n" + record.displayTime + "\n" + record.bGValue
+                + "\n" + record.trendArrow + "\n");
+    }
 
-	//Check to see if service is running
-	private boolean isMyServiceRunning() {
-		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-		for (RunningServiceInfo service : manager
-				.getRunningServices(Integer.MAX_VALUE)) {
-			if (DexcomG4Service.class.getName().equals(
-					service.service.getClassName())) {
-				return true;
-			}
-		}
-		return false;
-	}
+    //Check to see if service is running
+    private boolean isMyServiceRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (RunningServiceInfo service : manager
+                .getRunningServices(Integer.MAX_VALUE)) {
+            if (DexcomG4Service.class.getName().equals(
+                    service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	//Deserialize the EGVRecord (most recent) value
-	public EGVRecord loadClassFile(File f) {
-		try {
-			ObjectInputStream ois = new ObjectInputStream(
-					new FileInputStream(f));
-			Object o = ois.readObject();
-			return (EGVRecord) o;
-		} catch (Exception ex) {
+    //Deserialize the EGVRecord (most recent) value
+    public EGVRecord loadClassFile(File f) {
+        try {
+            ObjectInputStream ois = new ObjectInputStream(
+                    new FileInputStream(f));
+            Object o = ois.readObject();
+            return (EGVRecord) o;
+        } catch (Exception ex) {
 
-			ex.printStackTrace();
+            ex.printStackTrace();
 
-		}
-		return new EGVRecord();
-	}
+        }
+        return new EGVRecord();
+    }
 }
