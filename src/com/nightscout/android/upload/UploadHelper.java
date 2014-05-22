@@ -1,9 +1,11 @@
 package com.nightscout.android.upload;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 import com.nightscout.android.dexcom.EGVRecord;
+import android.preference.PreferenceManager;
 import com.mongodb.*;
 
 import java.text.SimpleDateFormat;
@@ -17,40 +19,50 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
         this.context = context;
     }
 
-    private String DB_URI = "";
-    private String DB_COLLECTION = "";
+    private String dbURI;
+    private String collectionName;
+    private Boolean switcher;
+    private SharedPreferences prefs;
 
     protected Long doInBackground(EGVRecord... data) {
-        try {
 
-            // connect to db
-            MongoClientURI uri  = new MongoClientURI(DB_URI);
-            MongoClient client = new MongoClient(uri);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
+        switcher = prefs.getBoolean("DatabaseSwitch", false);
+        dbURI = prefs.getString("MongoDB URI", null);
+        collectionName = prefs.getString("Collection Name", null);
 
-            // get db
-            DB db = client.getDB(uri.getDatabase());
+        if (switcher && dbURI != null && collectionName != null) {
+            try {
 
-            // get collection
-            DBCollection dexcomData = db.getCollection(DB_COLLECTION);
-            Log.i("Uploader", "The number of EGV records being sent to MongoDB is " + data.length);
-            for (int i = 0; i < data.length; i++) {
-                // make db object
-                BasicDBObject testData = new BasicDBObject();
-                testData.put("device", "dexcom");
-                SimpleDateFormat sdf  = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss aa");
-                Date date = sdf.parse(data[i].displayTime);
-                testData.put("date", date.getTime());
-                testData.put("dateString", data[i].displayTime);
-                testData.put("sgv", data[i].bGValue);
-                dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
+                // connect to db
+                MongoClientURI uri  = new MongoClientURI(dbURI);
+                MongoClient client = new MongoClient(uri);
+
+                // get db
+                DB db = client.getDB(uri.getDatabase());
+
+                // get collection
+                DBCollection dexcomData = db.getCollection(collectionName);
+                Log.i("Uploader", "The number of EGV records being sent to MongoDB is " + data.length);
+                for (int i = 0; i < data.length; i++) {
+                    // make db object
+                    BasicDBObject testData = new BasicDBObject();
+                    testData.put("device", "dexcom");
+                    SimpleDateFormat sdf  = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss aa");
+                    Date date = sdf.parse(data[i].displayTime);
+                    testData.put("date", date.getTime());
+                    testData.put("dateString", data[i].displayTime);
+                    testData.put("sgv", data[i].bGValue);
+                    dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
+                }
+
+                client.close();
             }
 
-            client.close();
-        }
-
-        catch(Exception ex)
-        {
-            ex.printStackTrace();
+            catch(Exception ex)
+            {
+                ex.printStackTrace();
+            }
         }
         return 1L;
     }

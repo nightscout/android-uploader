@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+            android:title="Database"
+            android:key="pref_database">
+        <SwitchPreference
+                android:title="Uploading"
+                android:key="DatabaseSwitch"
+                android:disableDependentsState="false">
+        </SwitchPreference>
+        <EditTextPreference
+                android:dependency="DatabaseSwitch"
+                android:title="MongoDB URI"
+                android:key="MongoDB URI"
+                android:dialogTitle="Enter MongoDB URI">
+        </EditTextPreference>
+        <EditTextPreference
+                android:dependency="DatabaseSwitch"
+                android:title="Collection Name"
+                android:key="Collection Name"
+                android:dialogTitle="Enter Collection Name">
+        </EditTextPreference>
+    </PreferenceCategory>
+</PreferenceScreen>

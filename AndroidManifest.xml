@@ -28,7 +28,11 @@
                     android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                     android:resource="@xml/device_filter" />
         </activity>
+        <activity android:name=".settings.SettingsActivity"
+                  android:icon="@drawable/icon96x96"
+                  android:label="Settings"/>
         <service android:name=".dexcom.DexcomG4Service" >
         </service>
+
     </application>
 </manifest>
