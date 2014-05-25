@@ -37,15 +37,12 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
         this.context = context;
     }
 
-    private Boolean enableRESTUpload;
-    private Boolean enableMongoUpload;
-    private SharedPreferences prefs;
 
     protected Long doInBackground(EGVRecord... records) {
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
-        enableRESTUpload = prefs.getBoolean("EnableRESTUpload", false);
-        enableMongoUpload = prefs.getBoolean("EnableMongoUpload", false);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
+        Boolean enableRESTUpload = prefs.getBoolean("EnableRESTUpload", false);
+        Boolean enableMongoUpload = prefs.getBoolean("EnableMongoUpload", false);
 
         if (enableRESTUpload) {
             doRESTUpload(prefs, records);
