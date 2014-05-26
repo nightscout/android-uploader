@@ -76,6 +76,7 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
             for (EGVRecord record : records) {
                 Date date = DATE_FORMAT.parse(record.displayTime);
                 JSONObject json = new JSONObject();
+                json.put("device", "dexcom");
                 json.put("timestamp", date.getTime());
                 json.put("bg", Integer.parseInt(record.bGValue));
                 json.put("direction", record.trend);
@@ -120,16 +121,16 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
 
                 // get collection
                 DBCollection dexcomData = db.getCollection(collectionName);
-                Log.i("Uploader", "The number of EGV records being sent to MongoDB is " + records.length);
+                Log.i(TAG, "The number of EGV records being sent to MongoDB is " + records.length);
                 for (EGVRecord record : records) {
                     // make db object
+                    Date date = DATE_FORMAT.parse(record.displayTime);
                     BasicDBObject testData = new BasicDBObject();
                     testData.put("device", "dexcom");
-                    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss aa");
-                    Date date = sdf.parse(record.displayTime);
                     testData.put("date", date.getTime());
                     testData.put("dateString", record.displayTime);
                     testData.put("sgv", record.bGValue);
+                    testData.put("direction", record.trend);
                     dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
                 }
                 client.close();

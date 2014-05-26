@@ -3,6 +3,7 @@ package com.nightscout.android.dexcom;
 import android.content.Context;
 import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
+import android.util.Log;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.USB.UsbSerialProber;
 
@@ -19,6 +20,8 @@ import java.util.*;
 
 public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
 
+    private static final String TAG = DexcomReader.class.getSimpleName();
+
     private UsbSerialDriver mSerialDevice;
     public String bGValue;
     public String displayTime;
@@ -26,13 +29,8 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
 
     public EGVRecord[] mRD;
 
-    public DexcomReader (UsbSerialDriver device)
-    {
+    public DexcomReader (UsbSerialDriver device) {
         mSerialDevice = device;
-    }
-    public DexcomReader ()
-    {
-
     }
 
     //The basic flow
@@ -64,8 +62,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
     //UI
     public void shutDownReceiver(Context context){
 
-        UsbManager manager = (UsbManager) context
-                .getSystemService(Context.USB_SERVICE);
+        UsbManager manager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
         UsbSerialDriver mSerialDevice = UsbSerialProber.acquire(manager);
         if (mSerialDevice != null) {
             try {
@@ -80,11 +77,10 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
                 try {
                     mSerialDevice.write(resetPacket, 200);
                 } catch (IOException e) {
-                    // mTitleTextView.setText("Error Writing.");
+                    Log.e(TAG, "unable to write to serial device", e);
                 }
-            } catch (IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
+            } catch (IOException e) {
+                Log.e(TAG, "unable to shutDownReceiver", e);
             }
 
         }
@@ -107,13 +103,13 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         try {
             rets[c++] = mSerialDevice.write(readEGVDataPageRange, 200);
         } catch (IOException e) {
-            //mTitleTextView.setText("Error Writing.");
+            Log.e(TAG, "unable to write to serial device", e);
         }
         byte[] dexcomPageRange = new byte[256];
         try {
             rets[c++] = mSerialDevice.read(dexcomPageRange, 200);
         } catch (IOException e) {
-            //mTitleTextView.setText("Error Writing.");
+            Log.e(TAG, "unable to read from serial device", e);
         }
         
         return dexcomPageRange;
@@ -149,15 +145,14 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         int getLastEGVCRC = calculateCRC16(getLastEGVPage, 0, 10);
         byte crcByte1 = (byte) (getLastEGVCRC & 0xff);
         byte crcByte2 = (byte) ((getLastEGVCRC >> 8) & 0xff);
-        
+
         getLastEGVPage[10] = crcByte1;
         getLastEGVPage[11] = crcByte2;
-                  
-        try {
 
+        try {
             rets[c++] = mSerialDevice.write(getLastEGVPage, 200);
         } catch (IOException e) {
-
+            Log.e(TAG, "unable to write to serial device", e);
         }
         
         //Get pages
@@ -165,9 +160,8 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
 
         try {
             rets[c++] = mSerialDevice.read(dexcomDatabasePages, 20000);
-
         } catch (IOException e) {
-
+            Log.e(TAG, "unable to read from serial device", e);
         }
 
        //Parse pages
@@ -216,6 +210,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
                 try {
                     d = f.parse(string_date);
                 } catch (ParseException e) {
+                    Log.e(TAG, "unable to parse date: " + string_date + ", using current time", e);
                     // TODO Auto-generated catch block
                     d = new Date();
                 }
@@ -278,7 +273,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
                 
                 this.trend = trend;
                 this.displayTime = new SimpleDateFormat("MM/dd/yyy hh:mm:ss aa").format(display);
-                this.bGValue = String.valueOf((int)bGValue);
+                this.bGValue = String.valueOf(bGValue);
 
                 EGVRecord record = new EGVRecord();
                 record.setBGValue(this.bGValue);
@@ -293,19 +288,17 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
 
     }
 
+    //TODO: why are we writing CSV?
     private void writeLocalCSV(EGVRecord[] mostRecentData, Context context) {
 
         //Write EGV Binary of last (most recent) data
-        try
-        {
+        try {
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(context.getFilesDir(), "save.bin"))); //Select where you wish to save the file...
             oos.writeObject(mostRecentData[mostRecentData.length - 1]); // write the class as an 'object'
             oos.flush(); // flush the stream to insure all of the information was written to 'save.bin'
             oos.close();// close the stream
-        }
-        catch(Exception ex)
-        {
-            ex.printStackTrace();
+        } catch(Exception e) {
+            Log.e(TAG, "write to OutputStream failed", e);
         }
         
         //Write CSV of EGV from last 4 pages
@@ -325,7 +318,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
 
             writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "write to CSV failed", e);
         }
     }
 

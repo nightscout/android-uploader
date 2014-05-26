@@ -55,6 +55,7 @@ public class DexcomG4Service extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.i(TAG, "onCreate called");
         wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
         mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         // connectToG4();
@@ -64,7 +65,7 @@ public class DexcomG4Service extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
+        Log.i(TAG, "onDestroy called, will we recover?");
         mHandler.removeCallbacks(readAndUpload);
         USBOn();
         doReadAndUpload();
@@ -76,7 +77,7 @@ public class DexcomG4Service extends Service {
             try {
                 mSerialDevice.close();
             } catch (IOException e) {
-                // Ignore.
+                Log.e(TAG, "Unable to close serial device", e);
             }
             mSerialDevice = null;
         }
@@ -101,7 +102,7 @@ public class DexcomG4Service extends Service {
                 } else {
                     USBOn();
                     USBOff();
-                    displayMessage("Upload Fail");
+                    displayMessage("Read from Dexcom or Upload failed");
                 }
 
             } catch (Exception e) {
@@ -109,7 +110,7 @@ public class DexcomG4Service extends Service {
                 // losing its shit.
                 USBOn();
                 USBOff();
-                e.printStackTrace();
+                Log.e(TAG, "Unable to read from dexcom or upload", e);
             }
             mHandler.postDelayed(readAndUpload, 45000);
         }
@@ -129,7 +130,7 @@ public class DexcomG4Service extends Service {
                 //Go get the data
                 DexcomReader dexcomReader = new DexcomReader(mSerialDevice);
 
-                if (initialRead == true) {
+                if (initialRead) {
                     // for first time on, read at least 2 days of data.  Each Dexcom read of EGV records
                     // is limited to 4 pages which is equivalent to 12 hours of contiguous data, so
                     // read 20 pages which is ~ 2.5 days.
@@ -164,13 +165,13 @@ public class DexcomG4Service extends Service {
                                 try {
                                     Thread.sleep(2500);
                                 } catch (InterruptedException e) {
-                                    e.printStackTrace();
+                                    Log.e(TAG, "Sleep after setWifiEnabled(false) interrupted", e);
                                 }
                                 wifiManager.setWifiEnabled(true);
                                 try {
                                     Thread.sleep(2500);
                                 } catch (InterruptedException e) {
-                                    e.printStackTrace();
+                                    Log.e(TAG, "Sleep after setWifiEnabled(true) interrupted", e);
                                 }
                             }
                         }
@@ -181,7 +182,7 @@ public class DexcomG4Service extends Service {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Unable to doReadAndUpload", e);
         }
 
     }
@@ -191,16 +192,19 @@ public class DexcomG4Service extends Service {
             try {
                 mSerialDevice.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Unable to close serial device", e);
             }
+
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Sleep after close interrupted", e);
             }
+
             USBPower.PowerOff();
             Log.i(TAG, "USB OFF");
         } else {
+            Log.i(TAG, "USBOff: Receiver Not Found");
             // displayMessage("Receiver Not Found");
             // android.os.Process.killProcess(android.os.Process.myPid());
         }
@@ -212,16 +216,20 @@ public class DexcomG4Service extends Service {
             try {
                 mSerialDevice.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Unable to close serial device", e);
             }
+
             USBPower.PowerOn();
+
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Sleep after close and PowerOn interrupted", e);
             }
+
             Log.i(TAG, "USB ON");
         } else {
+            Log.i(TAG, "USBOn: Receiver Not Found");
             // displayMessage("Receiver Not Found");
             // android.os.Process.killProcess(android.os.Process.myPid());
         }
@@ -233,7 +241,7 @@ public class DexcomG4Service extends Service {
         mSerialDevice = UsbSerialProber.acquire(mUsbManager);
         if (mSerialDevice == null) {
             //displayMessage("CGM Not Found...");
-            this.stopSelf();
+            //this.stopSelf();  //Jason: this was the main cause of instability in my initial setup and John confirmed that it was removed form his version also
             return false; // yeah, I know
         }
         return true;
@@ -250,8 +258,7 @@ public class DexcomG4Service extends Service {
     }
 
     private void displayMessage(String message) {
-        Toast toast = Toast.makeText(getBaseContext(), message,
-                Toast.LENGTH_LONG);
+        Toast toast = Toast.makeText(getBaseContext(), message, Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
         LinearLayout toastLayout = (LinearLayout) toast.getView();
         TextView toastTV = (TextView) toastLayout.getChildAt(0);
