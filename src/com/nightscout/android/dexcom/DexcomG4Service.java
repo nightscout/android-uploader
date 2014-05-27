@@ -3,6 +3,7 @@ package com.nightscout.android.dexcom;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.usb.UsbManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -10,6 +11,7 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask.Status;
 import android.os.Handler;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.LinearLayout;
@@ -23,6 +25,7 @@ import com.nightscout.android.upload.UploadHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DexcomG4Service extends Service {
@@ -91,18 +94,20 @@ public class DexcomG4Service extends Service {
 
             try {
                 uploader = new UploadHelper(getBaseContext());
-                if (isConnected() && isOnline()) {
+                boolean connected = isConnected();
+                if (connected && isOnline()) {
 
                     USBOn();
                     doReadAndUpload();
                     USBOff();
-
-                    //displayMessage("Upload Complete");
-
                 } else {
                     USBOn();
                     USBOff();
-                    displayMessage("Read from Dexcom or Upload failed");
+
+                    if (!connected)
+                        displayMessage("Dexcom connection error");
+                    else
+                        displayMessage("Network connection error");
                 }
 
             } catch (Exception e) {
@@ -118,73 +123,79 @@ public class DexcomG4Service extends Service {
 
     protected void doReadAndUpload() {
 
-        try {
+        mSerialDevice = null;
+        mSerialDevice = UsbSerialProber.acquire(mUsbManager);
 
-            mSerialDevice = null;
-            mSerialDevice = UsbSerialProber.acquire(mUsbManager);
-
-            if (mSerialDevice != null) {
-                startIoManager();
+        if (mSerialDevice != null) {
+            startIoManager();
+            try {
                 mSerialDevice.open();
-
-                //Go get the data
-                DexcomReader dexcomReader = new DexcomReader(mSerialDevice);
-
-                if (initialRead) {
-                    // for first time on, read at least 2 days of data.  Each Dexcom read of EGV records
-                    // is limited to 4 pages which is equivalent to 12 hours of contiguous data, so
-                    // read 20 pages which is ~ 2.5 days.
-                    List<EGVRecord> data = new ArrayList<EGVRecord>();
-                    for(int i = 1; i <= 5; i++) {
-                        dexcomReader.readFromReceiver(getBaseContext(), i);
-                        for(int j = 0; j < dexcomReader.mRD.length; j++) { data.add(dexcomReader.mRD[j]); }
-                    }
-                    EGVRecord[] dataRecords = new EGVRecord[data.size()];
-                    dataRecords = data.toArray(dataRecords);
-                    uploader.execute(dataRecords);
-                    initialRead = false;
-                } else {
-                    // just read most recent pages (consider only reading 1 page since only need latest value).
-                    dexcomReader.readFromReceiver(getBaseContext(), 1);
-                    uploader.execute(dexcomReader.mRD[dexcomReader.mRD.length - 1]);
-                }
-
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    //Interesting case: location with lousy wifi
-                    //toggle it off to use cellular
-                    //toggle back on for next try
-                    public void run() {
-                        Status dataUp = uploader.getStatus();
-                        if (dataUp == Status.RUNNING) {
-                            uploader.cancel(true);
-
-                            if (wifiManager.isWifiEnabled()) {
-                                wifiManager.setWifiEnabled(false);
-                                try {
-                                    Thread.sleep(2500);
-                                } catch (InterruptedException e) {
-                                    Log.e(TAG, "Sleep after setWifiEnabled(false) interrupted", e);
-                                }
-                                wifiManager.setWifiEnabled(true);
-                                try {
-                                    Thread.sleep(2500);
-                                } catch (InterruptedException e) {
-                                    Log.e(TAG, "Sleep after setWifiEnabled(true) interrupted", e);
-                                }
-                            }
-                        }
-
-                    }
-                }, 22500);
-
+            } catch (Exception e) {
+                Log.e(TAG, "Unable to open serial device", e);
             }
 
-        } catch (Exception e) {
-            Log.e(TAG, "Unable to doReadAndUpload", e);
+
+            //Go get the data
+            DexcomReader dexcomReader = new DexcomReader(mSerialDevice);
+
+            if (initialRead) {
+                // for first time on, read at least 2 days of data.  Each Dexcom read of EGV records
+                // is limited to 4 pages which is equivalent to 12 hours of contiguous data, so
+                // read 20 pages which is ~ 2.5 days.
+                List<EGVRecord> data = new ArrayList<EGVRecord>();
+                for(int i = 1; i <= 5; i++) {
+                    dexcomReader.readFromReceiver(getBaseContext(), i);
+                    Collections.addAll(data, dexcomReader.mRD);
+                }
+                EGVRecord[] dataRecords = new EGVRecord[data.size()];
+                dataRecords = data.toArray(dataRecords);
+                uploader.execute(dataRecords);
+                initialRead = false;
+            } else {
+                // just read most recent pages (consider only reading 1 page since only need latest value).
+                dexcomReader.readFromReceiver(getBaseContext(), 1);
+                uploader.execute(dexcomReader.mRD[dexcomReader.mRD.length - 1]);
+            }
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+            if (prefs.getBoolean("EnableWifiHack", false)) {
+                doWifiHack();
+            }
+
         }
 
+    }
+
+    private void doWifiHack() {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            //Interesting case: location with lousy wifi
+            //toggle it off to use cellular
+            //toggle back on for next try
+            public void run() {
+                Status dataUp = uploader.getStatus();
+                if (dataUp == Status.RUNNING) {
+                    uploader.cancel(true);
+
+                    if (wifiManager.isWifiEnabled()) {
+                        wifiManager.setWifiEnabled(false);
+                        try {
+                            Thread.sleep(2500);
+                        } catch (InterruptedException e) {
+                            Log.e(TAG, "Sleep after setWifiEnabled(false) interrupted", e);
+                        }
+                        wifiManager.setWifiEnabled(true);
+                        try {
+                            Thread.sleep(2500);
+                        } catch (InterruptedException e) {
+                            Log.e(TAG, "Sleep after setWifiEnabled(true) interrupted", e);
+                        }
+                    }
+                }
+
+            }
+        }, 22500);
     }
 
     private void USBOff() {
@@ -237,24 +248,14 @@ public class DexcomG4Service extends Service {
     }
 
     private boolean isConnected() {
-
         mSerialDevice = UsbSerialProber.acquire(mUsbManager);
-        if (mSerialDevice == null) {
-            //displayMessage("CGM Not Found...");
-            //this.stopSelf();  //Jason: this was the main cause of instability in my initial setup and John confirmed that it was removed form his version also
-            return false; // yeah, I know
-        }
-        return true;
-
+        return mSerialDevice == null;
     }
 
     private boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        if (netInfo != null && netInfo.isConnectedOrConnecting()) {
-            return true;
-        }
-        return false;
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
     private void displayMessage(String message) {
@@ -262,8 +263,10 @@ public class DexcomG4Service extends Service {
         toast.setGravity(Gravity.CENTER, 0, 0);
         LinearLayout toastLayout = (LinearLayout) toast.getView();
         TextView toastTV = (TextView) toastLayout.getChildAt(0);
-        toastTV.setTextSize(20);
-        toastTV.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+        if (toastTV != null) {
+            toastTV.setTextSize(20);
+            toastTV.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+        }
         toast.show();
 
     }

@@ -62,7 +62,10 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
     }
 
     private void doRESTUpload(SharedPreferences prefs, EGVRecord... records) {
-        String postURI = prefs.getString("POST URI", null);
+        String baseURL = prefs.getString("API Base URL", "");
+        Log.i(TAG, "baseURL: " + baseURL);
+        String postURL = baseURL + (baseURL.endsWith("/") ? "" : "/") + "entries";
+        Log.i(TAG, "postURL: " + postURL);
 
         try {
             HttpParams params = new BasicHttpParams();
@@ -71,7 +74,7 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
 
             DefaultHttpClient httpclient = new DefaultHttpClient(params);
 
-            HttpPost post = new HttpPost(postURI);
+            HttpPost post = new HttpPost(postURL);
 
             for (EGVRecord record : records) {
                 Date date = DATE_FORMAT.parse(record.displayTime);
