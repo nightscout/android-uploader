@@ -4,18 +4,19 @@
             android:title="Database"
             android:key="pref_database">
         <SwitchPreference
-                android:title="Enable REST Upload"
+                android:title="API Upload (REST)"
                 android:key="EnableRESTUpload"
                 android:disableDependentsState="false">
         </SwitchPreference>
         <EditTextPreference
                 android:dependency="EnableRESTUpload"
-                android:title="POST URI"
-                android:key="POST URI"
-                android:dialogTitle="Enter POST URI">
+                android:title="API Base URL"
+                android:key="API Base URL"
+                android:dialogTitle="Enter Base API URL"
+                android:defaultValue="http://{YOUR-API-SERVER}/api">
         </EditTextPreference>
         <SwitchPreference
-                android:title="Enable Mongo Upload"
+                android:title="MongoDB Upload"
                 android:key="EnableMongoUpload"
                 android:disableDependentsState="false">
         </SwitchPreference>
@@ -23,7 +24,8 @@
                 android:dependency="EnableMongoUpload"
                 android:title="MongoDB URI"
                 android:key="MongoDB URI"
-                android:dialogTitle="Enter MongoDB URI">
+                android:dialogTitle="Enter MongoDB URI"
+                android:defaultValue="mongodb://{user}:{password}@{host}.mongolab.com:11111/{database}">
         </EditTextPreference>
         <EditTextPreference
                 android:dependency="EnableMongoUpload"
@@ -31,5 +33,10 @@
                 android:key="Collection Name"
                 android:dialogTitle="Enter Collection Name">
         </EditTextPreference>
+        <SwitchPreference
+                android:title="Wifi Hack"
+                android:key="EnableWifiHack"
+                android:disableDependentsState="false">
+        </SwitchPreference>
     </PreferenceCategory>
 </PreferenceScreen>
