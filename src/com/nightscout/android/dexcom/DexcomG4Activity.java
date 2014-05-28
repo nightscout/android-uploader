@@ -48,10 +48,12 @@ public class DexcomG4Activity extends Activity {
                 startService(new Intent(DexcomG4Activity.this, DexcomG4Service.class));
                 mTitleTextView.setTextColor(Color.YELLOW);
                 mTitleTextView.setText("Connecting...");
+                Log.i(TAG, "Starting service " + retryCount + "/" + maxRetries);
                 ++retryCount;
             } else {
                 mHandler.removeCallbacks(updateDataView);
-                finish();
+                Log.i(TAG, "Unable to restart service, trying to recreate the activity");
+                recreate();
             }
         } else {
             mTitleTextView.setTextColor(Color.GREEN);
