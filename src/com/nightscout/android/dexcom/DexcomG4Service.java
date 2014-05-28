@@ -105,9 +105,9 @@ public class DexcomG4Service extends Service {
                     USBOff();
 
                     if (!connected)
-                        displayMessage("Dexcom connection error");
+                        displayMessage("CGM connection error");
                     else
-                        displayMessage("Network connection error");
+                        displayMessage("NET connection error");
                 }
 
             } catch (Exception e) {
@@ -249,7 +249,7 @@ public class DexcomG4Service extends Service {
 
     private boolean isConnected() {
         mSerialDevice = UsbSerialProber.acquire(mUsbManager);
-        return mSerialDevice == null;
+        return mSerialDevice != null;
     }
 
     private boolean isOnline() {
