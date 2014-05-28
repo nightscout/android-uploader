@@ -140,7 +140,7 @@ public class DexcomG4Activity extends Activity {
             Object o = ois.readObject();
             return (EGVRecord) o;
         } catch (Exception ex) {
-            Log.e(TAG, " unable to loadEGVRecord", ex);
+            Log.w(TAG, " unable to loadEGVRecord");
         }
         return new EGVRecord();
     }
