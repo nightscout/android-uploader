@@ -62,12 +62,11 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
     }
 
     private void doRESTUpload(SharedPreferences prefs, EGVRecord... records) {
-        String baseURL = prefs.getString("API Base URL", "");
-        Log.i(TAG, "baseURL: " + baseURL);
-        String postURL = baseURL + (baseURL.endsWith("/") ? "" : "/") + "entries";
-        Log.i(TAG, "postURL: " + postURL);
-
         try {
+            String baseURL = prefs.getString("API Base URL", "");
+            String postURL = baseURL + (baseURL.endsWith("/") ? "" : "/") + "entries";
+            Log.i(TAG, "postURL: " + postURL);
+
             HttpParams params = new BasicHttpParams();
             HttpConnectionParams.setSoTimeout(params, SOCKET_TIMEOUT);
             HttpConnectionParams.setConnectionTimeout(params, CONNECTION_TIMEOUT);
@@ -103,11 +102,9 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
         } catch (Exception e) {
             Log.e(TAG, "Unable to post data", e);
         }
-
     }
 
     private void doMongoUpload(SharedPreferences prefs, EGVRecord... records) {
-
 
         String dbURI = prefs.getString("MongoDB URI", null);
         String collectionName = prefs.getString("Collection Name", null);
