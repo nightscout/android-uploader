@@ -158,7 +158,7 @@ public class DexcomG4Service extends Service {
             }
 
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            if (prefs.getBoolean("EnableWifiHack", false)) {
+            if (prefs.getBoolean("EnableWifiHack", true)) {
                 doWifiHack();
             }
 
