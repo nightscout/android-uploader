@@ -121,10 +121,40 @@ public class DexcomG4Service extends Service {
         }
     };
 
+    private void acquireSerialDevice() {
+        mSerialDevice = UsbSerialProber.acquire(mUsbManager);
+        if (mSerialDevice == null) {
+
+            Log.i(TAG, "Unable to get the serial device, forcing USB PowerOn, and trying to get an updated USB Manager");
+
+            try {
+                USBPower.PowerOn();
+            } catch (Exception e) {
+                Log.w(TAG, "acquireSerialDevice: Unable to PowerOn", e);
+            }
+
+            try {
+                Thread.sleep(2500);
+            } catch (InterruptedException e) {
+                Log.w(TAG, "Interrupted during sleep after Power On", e);
+            }
+
+            mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+
+            try {
+                Thread.sleep(2500);
+            } catch (InterruptedException e) {
+                Log.w(TAG, "Interrupted during sleep after getting updated USB Manager", e);
+            }
+
+            mSerialDevice = UsbSerialProber.acquire(mUsbManager);
+        }
+    }
+
+
     protected void doReadAndUpload() {
 
-        mSerialDevice = null;
-        mSerialDevice = UsbSerialProber.acquire(mUsbManager);
+        acquireSerialDevice();
 
         if (mSerialDevice != null) {
             startIoManager();
@@ -223,6 +253,9 @@ public class DexcomG4Service extends Service {
     }
 
     private void USBOn() {
+
+        acquireSerialDevice();
+
         if (mSerialDevice != null) {
             try {
                 mSerialDevice.close();
@@ -248,7 +281,7 @@ public class DexcomG4Service extends Service {
     }
 
     private boolean isConnected() {
-        mSerialDevice = UsbSerialProber.acquire(mUsbManager);
+        acquireSerialDevice();
         return mSerialDevice != null;
     }
 
