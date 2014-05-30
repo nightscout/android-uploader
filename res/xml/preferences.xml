@@ -25,7 +25,8 @@
             android:title="MongoDB URI"
             android:key="MongoDB URI"
             android:dialogTitle="Enter MongoDB URI"
-            android:defaultValue="mongodb://{user}:{password}@{host}.mongolab.com:11111/{database}">
+            android:dialogMessage="Replace example values in {}'s with your correct values"
+            android:defaultValue="mongodb://{user}:{password}@{host}.mongolab.com:{11111}/{database}">
     </EditTextPreference>
     <EditTextPreference
             android:dependency="EnableMongoUpload"
@@ -38,7 +39,7 @@
             android:title="Wifi Hack"
             android:key="EnableWifiHack"
             android:disableDependentsState="false"
-            android:enabled="true"
+            android:defaultValue="true"
             android:summaryOn="Wifi will be disabled if there is a timeout (poor wifi signal/access point), this will allow mobile data to be used instead"
             android:summaryOff="The uploader won't try to disable Wifi even if there is a timeout"
             >

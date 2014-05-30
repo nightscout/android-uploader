@@ -30,7 +30,7 @@ import java.util.List;
 
 public class DexcomG4Service extends Service {
 
-    private final String TAG = DexcomG4Activity.class.getSimpleName();
+    private static final String TAG = DexcomG4Service.class.getSimpleName();
 
     private boolean initialRead = true;
 
@@ -65,10 +65,11 @@ public class DexcomG4Service extends Service {
         mHandler.removeCallbacks(readAndUpload);
         mHandler.post(readAndUpload);
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.i(TAG, "onDestroy called, will we recover?");
+        Log.i(TAG, "onDestroy called");
         mHandler.removeCallbacks(readAndUpload);
         USBOn();
         doReadAndUpload();

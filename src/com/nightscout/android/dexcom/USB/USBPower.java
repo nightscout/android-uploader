@@ -20,7 +20,7 @@ public class USBPower {
             runCommand(SET_POWER_SUSPEND_COMMAND_B);
             Log.i(TAG, "PowerOff USB complete");
         } catch (Exception e) {
-            Log.e(TAG, "Unable to PowerOff USB", e);
+            Log.e(TAG, "Unable to PowerOff USB");
         }
     }
 
@@ -29,7 +29,7 @@ public class USBPower {
             runCommand(SET_POWER_ON_COMMAND);
             Log.i(TAG, "PowerOn USB complete");
         } catch (Exception e) {
-            Log.e(TAG, "Unable to PowerOn USB", e);
+            Log.e(TAG, "Unable to PowerOn USB");
         }
     }
 
