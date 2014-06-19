@@ -44,4 +44,13 @@
             android:summaryOff="The uploader won't try to disable Wifi even if there is a timeout"
             >
     </SwitchPreference>
+    <SwitchPreference
+            android:title="2 Days at Startup"
+            android:key="InitialTwoDayUpload"
+            android:disableDependentsState="false"
+            android:defaultValue="true"
+            android:summaryOn="When the upload application first starts it will upload ~2.5 days of data"
+            android:summaryOff="The uploader won't try upload old data"
+            >
+    </SwitchPreference>
 </PreferenceScreen>
