@@ -124,6 +124,10 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         //ONLY interested in the last 4 pages of data for this app's requirements
         int endInt = toInt(endPage, 1);
         int lastFour = endInt - 4 * pageOffset + 1;
+
+        //support for a receiver without any old data
+        if (lastFour < 0) lastFour = 0;
+
         ByteBuffer b = ByteBuffer.allocate(4);
         b.putInt(lastFour);
         byte[] result = b.array();
