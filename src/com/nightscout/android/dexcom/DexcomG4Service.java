@@ -169,7 +169,9 @@ public class DexcomG4Service extends Service {
             //Go get the data
             DexcomReader dexcomReader = new DexcomReader(mSerialDevice);
 
-            if (initialRead) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+
+            if (initialRead && prefs.getBoolean("InitialTwoDayUpload", true)) {
                 // for first time on, read at least 2 days of data.  Each Dexcom read of EGV records
                 // is limited to 4 pages which is equivalent to 12 hours of contiguous data, so
                 // read 20 pages which is ~ 2.5 days.
@@ -181,14 +183,14 @@ public class DexcomG4Service extends Service {
                 EGVRecord[] dataRecords = new EGVRecord[data.size()];
                 dataRecords = data.toArray(dataRecords);
                 uploader.execute(dataRecords);
-                initialRead = false;
             } else {
                 // just read most recent pages (consider only reading 1 page since only need latest value).
                 dexcomReader.readFromReceiver(getBaseContext(), 1);
                 uploader.execute(dexcomReader.mRD[dexcomReader.mRD.length - 1]);
             }
 
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+            initialRead = false;
+
             if (prefs.getBoolean("EnableWifiHack", true)) {
                 doWifiHack();
             }
