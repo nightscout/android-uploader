@@ -84,16 +84,10 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
                 JSONObject json = new JSONObject();
 
                 try {
-                    switch (apiVersion) {
-                        case 1: // community API v1
-                            populateV1APIEntry(json, record);
-                            break;
-                        case 0: //legacy API (project-glu)
-                            //fall through
-                        default:
-                            populateLegacyAPIEntry(json, record);
-                            break;
-                    }
+                    if (apiVersion >= 1)
+                        populateV1APIEntry(json, record);
+                    else
+                        populateLegacyAPIEntry(json, record);
                 } catch (Exception e) {
                     Log.w(TAG, "Unable to populate entry, apiVersion: " + apiVersion, e);
                     continue;
