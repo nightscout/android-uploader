@@ -176,8 +176,7 @@ public class DexcomG4Service extends Service {
                 // is limited to 4 pages which is equivalent to 12 hours of contiguous data, so
                 // read 20 pages which is ~ 2.5 days.
                 List<EGVRecord> data = new ArrayList<EGVRecord>();
-                // TODO: this should go in reverse
-                for(int i = 1; i <= 5; i++) {
+                for(int i = 5; i >= 1; i--) {
                     dexcomReader.readFromReceiver(getBaseContext(), i);
                     Collections.addAll(data, dexcomReader.mRD);
                 }
