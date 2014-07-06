@@ -24,14 +24,17 @@ import com.nightscout.android.dexcom.USB.UsbSerialProber;
 import com.nightscout.android.upload.UploadHelper;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class DexcomG4Service extends Service {
 
     private static final String TAG = DexcomG4Service.class.getSimpleName();
-
+    private final int FIVE_MINS_MS = 300000;
+    private final int THREE_MINS_MS = 180000;
+    private final int UPLOAD_OFFSET_MS = 3000;
+    private long nextUploadTimer = THREE_MINS_MS;
     private boolean initialRead = true;
 
     /**
@@ -118,7 +121,7 @@ public class DexcomG4Service extends Service {
                 USBOff();
                 Log.e(TAG, "Unable to read from dexcom or upload", e);
             }
-            mHandler.postDelayed(readAndUpload, 45000);
+            mHandler.postDelayed(readAndUpload, nextUploadTimer);
         }
     };
 
@@ -165,7 +168,6 @@ public class DexcomG4Service extends Service {
                 Log.e(TAG, "Unable to open serial device", e);
             }
 
-
             //Go get the data
             DexcomReader dexcomReader = new DexcomReader(mSerialDevice);
 
@@ -191,12 +193,12 @@ public class DexcomG4Service extends Service {
 
             initialRead = false;
 
+            nextUploadTimer = getNextUploadTimer(dexcomReader);
+
             if (prefs.getBoolean("EnableWifiHack", true)) {
                 doWifiHack();
             }
-
         }
-
     }
 
     private void doWifiHack() {
@@ -323,4 +325,43 @@ public class DexcomG4Service extends Service {
         }
     }
 
+    // Get the devices display time and compare with its last upload time to determine
+    // when to poll for next reading, since readings are on 5 minute intervals
+    private long getNextUploadTimer(DexcomReader dexcomReader) {
+
+        long dexcomTime = dexcomReader.getDisplayTime().getTime();
+        long androidTime = Calendar.getInstance().getTime().getTime();
+        long dt = dexcomTime - androidTime;
+
+        if (Math.abs(dt) > FIVE_MINS_MS * 2) {
+            displayMessage("Dexcom's time is > 10 minutes different from Android, please check Dexcom's time.");
+        }
+
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
+        Date lastRecord;
+        long timeSinceLastRecord = -1;
+        try {
+            lastRecord = formatter.parse(dexcomReader.mRD[dexcomReader.mRD.length - 1].displayTime);
+            timeSinceLastRecord = dexcomTime - lastRecord.getTime();
+            Log.d(TAG, "The time since last record is: " + timeSinceLastRecord / 1000 + " secs");
+        } catch (ParseException e) {
+            Log.d(TAG, "Error parsing last record displayTime.");
+            e.printStackTrace();
+        }
+
+        if (timeSinceLastRecord < 0) {
+            displayMessage("Dexcom's time is less than current record time, possible time change.");
+            nextUploadTimer = THREE_MINS_MS;
+        }  else if (timeSinceLastRecord > FIVE_MINS_MS) {
+            // TODO: maybe less than 3 mins?
+            nextUploadTimer = THREE_MINS_MS;
+            // TODO: consider making UI display "???" for SG records since likely to be out of range
+        } else {
+            nextUploadTimer = FIVE_MINS_MS - timeSinceLastRecord;
+            nextUploadTimer += UPLOAD_OFFSET_MS;
+            Log.d(TAG, "Setting next upload time to: " + nextUploadTimer / 1000 + " secs");
+        }
+
+        return  nextUploadTimer;
+    }
 }
