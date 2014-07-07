@@ -121,6 +121,7 @@ public class DexcomG4Service extends Service {
                 USBOff();
                 Log.e(TAG, "Unable to read from dexcom or upload", e);
             }
+            mHandler.removeCallbacks(readAndUpload);
             mHandler.postDelayed(readAndUpload, nextUploadTimer);
         }
     };
