@@ -74,21 +74,17 @@ public class DexcomG4Service extends Service {
         super.onDestroy();
         Log.i(TAG, "onDestroy called");
         mHandler.removeCallbacks(readAndUpload);
-        USBOn();
-        doReadAndUpload();
-        USBOn();
-
         stopIoManager();
 
         if (mSerialDevice != null) {
             try {
+                Log.i(TAG, "Closing serial device...");
                 mSerialDevice.close();
             } catch (IOException e) {
-                Log.e(TAG, "Unable to close serial device", e);
+                Log.e(TAG, "Unable to close serial device.", e);
             }
             mSerialDevice = null;
         }
-
     }
 
     //get the data upload it
@@ -312,7 +308,7 @@ public class DexcomG4Service extends Service {
 
     private void stopIoManager() {
         if (mSerialIoManager != null) {
-            Log.i(TAG, "Stopping io manager ..");
+            Log.i(TAG, "Stopping io manager...");
             mSerialIoManager.stop();
             mSerialIoManager = null;
         }
@@ -320,7 +316,7 @@ public class DexcomG4Service extends Service {
 
     private void startIoManager() {
         if (mSerialDevice != null) {
-            Log.i(TAG, "Starting io manager ..");
+            Log.i(TAG, "Starting io manager...");
             mSerialIoManager = new SerialInputOutputManager(mSerialDevice);
             // mExecutor.submit(mSerialIoManager);
         }
