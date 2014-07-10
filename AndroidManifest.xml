@@ -12,8 +12,8 @@
     <application>
         <activity
                 android:name=".dexcom.DexcomG4Activity"
-                android:icon="@drawable/icon96x96"
-                android:label="CGM"
+                android:icon="@drawable/ic_launcher"
+                android:label="NightScout"
                 android:launchMode="singleTask" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,7 +29,7 @@
                     android:resource="@xml/device_filter" />
         </activity>
         <activity android:name=".settings.SettingsActivity"
-                  android:icon="@drawable/icon96x96"
+                  android:icon="@drawable/ic_launcher"
                   android:label="Settings"/>
         <service android:name=".dexcom.DexcomG4Service" >
         </service>
