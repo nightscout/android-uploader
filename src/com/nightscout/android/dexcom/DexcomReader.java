@@ -31,12 +31,6 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         mSerialDevice = device;
     }
 
-    //The basic flow
-    //for my requirements, I only care about the most recent data
-    //Dex grabs 4 pages of data at a time, so I parse the last 4 pages
-    //save the data to CSV and the most recent data to a serialized object for the
-    //gui to quickly ingest
-
     public void readFromReceiver(Context context, int pageOffset) {
 
         assert pageOffset < 1 : "Page offset must be greater than 1";
@@ -52,8 +46,8 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         mRD = mostRecentData;
 
         //save them to the android file system for later access
+        //TODO: should be removed?
         writeLocalCSV(mostRecentData, context);
-
     }
 
     //Not being used, but this is a nice to have if we want to kill the receiver, etc from
@@ -91,12 +85,12 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         try {
             epoch = f.parse(EPOCH);
         } catch (ParseException e) {
-            Log.e(TAG, "unable to parse date: " + EPOCH + ", using current time", e);
+            Log.e(TAG, "Unable to parse date: " + EPOCH + ", using current time", e);
             epoch = new Date();
         }
 
         long milliseconds = epoch.getTime();
-        long timeAdd = milliseconds + (1000L*dt);
+        long timeAdd = milliseconds + (1000L * dt);
         TimeZone tz = TimeZone.getDefault();
         if (tz.inDaylightTime(new Date())) timeAdd = timeAdd - 3600000L;
         Date displayTime = new Date(timeAdd);
@@ -119,14 +113,14 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         try {
             mSerialDevice.write(readSystemTime, 200);
         } catch (IOException e) {
-            Log.e(TAG, "unable to write to serial device", e);
+            Log.e(TAG, "Unable to write to serial device", e);
         }
 
         byte[] readData = new byte[256];
         try {
             mSerialDevice.read(readData, 200);
         } catch (IOException e) {
-            Log.e(TAG, "unable to read from serial device", e);
+            Log.e(TAG, "Unable to read from serial device", e);
         }
 
         int systemTime =  readData[4] & 0xFF |
@@ -152,17 +146,16 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         try {
             mSerialDevice.write(readDisplayTimeOffset, 200);
         } catch (IOException e) {
-            Log.e(TAG, "unable to write to serial device", e);
+            Log.e(TAG, "Unable to write to serial device", e);
         }
 
         byte[] readData = new byte[256];
         try {
             mSerialDevice.read(readData, 200);
         } catch (IOException e) {
-            Log.e(TAG, "unable to read from serial device", e);
+            Log.e(TAG, "Unable to read from serial device", e);
         }
 
-        // TODO: consider using binary buffer like below
         int displayTimeOffset =  readData[4] & 0xFF |
                 (readData[5] & 0xFF) << 8 |
                 (readData[6] & 0xFF) << 16 |
@@ -189,13 +182,13 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         try {
             rets[c++] = mSerialDevice.write(readEGVDataPageRange, 200);
         } catch (IOException e) {
-            Log.e(TAG, "unable to write to serial device", e);
+            Log.e(TAG, "Unable to write to serial device", e);
         }
         byte[] dexcomPageRange = new byte[256];
         try {
             rets[c++] = mSerialDevice.read(dexcomPageRange, 200);
         } catch (IOException e) {
-            Log.e(TAG, "unable to read from serial device", e);
+            Log.e(TAG, "Unable to read from serial device", e);
         }
         
         return dexcomPageRange;
@@ -242,7 +235,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         try {
             rets[c++] = mSerialDevice.write(getLastEGVPage, 200);
         } catch (IOException e) {
-            Log.e(TAG, "unable to write to serial device", e);
+            Log.e(TAG, "Unable to write to serial device", e);
         }
         
         //Get pages
@@ -251,7 +244,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         try {
             rets[c++] = mSerialDevice.read(dexcomDatabasePages, 20000);
         } catch (IOException e) {
-            Log.e(TAG, "unable to read from serial device", e);
+            Log.e(TAG, "Unable to read from serial device", e);
         }
 
        //Parse pages
@@ -299,8 +292,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
                 try {
                     d = f.parse(EPOCH);
                 } catch (ParseException e) {
-                    Log.e(TAG, "unable to parse date: " + EPOCH + ", using current time", e);
-                    // TODO Auto-generated catch block
+                    Log.e(TAG, "Unable to parse date: " + EPOCH + ", using current time", e);
                     d = new Date();
                 }
                 long milliseconds = d.getTime();
@@ -438,7 +430,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
             case 1: //BitConverter.FLAG_REVERSE:
                 return (int)(((b[3] & 0xff)<<24) | ((b[2] & 0xff)<<16) | ((b[1] & 0xff)<<8) | (b[0] & 0xff));
             default:
-                throw new IllegalArgumentException("BitConverter:toInt");
+                throw new IllegalArgumentException("BitConverter: toInt");
         }
     }
 
