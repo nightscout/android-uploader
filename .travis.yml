@@ -20,7 +20,6 @@ android:
 deploy:
   provider: releases
   file: "./app/build/outputs/apk/app-release-unsigned.apk"
-  release-number: dexcom-uploader-${BUILDTAG}-build${TRAVIS_BUILD_NUMBER}
   skip_cleanup: true
   api_key:
     secure: GApBOkQCA/Ikt2bkEtNJx8L8pJ2vxkvVUWx624x6pojGDIPVJWhMBf2WDEI7t90Rw6akH6jN+wLkIJCXQTpWPWWeUmH1s3pzyMJwQXfN8b3nuRn1pRjYYbiZs+GsM7CFFOG6rmkmRF+pgtKeneTDL0Kvxiv02RPL77zrA1Q/P4Y=
