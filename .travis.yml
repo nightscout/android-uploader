@@ -3,11 +3,11 @@ env:
   matrix:
   - ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
 before_install:
-- echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
-- emulator -avd test -no-skin -no-audio -no-window &
+  - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
+  - emulator -avd test -no-skin -no-audio -no-window &
 before_script:
-- "./ci/wait_for_emulator"
-- adb shell input keyevent 82 &
+  - "./ci/wait_for_emulator"
+  - adb shell input keyevent 82 &
 android:
   components:
   - build-tools-19.1.0
@@ -20,11 +20,11 @@ android:
 deploy:
   provider: releases
   file: "./app/build/outputs/apk/app-release-unsigned.apk"
-  release-number: dexcom-uploader-build${TRAVIS_BUILD_NUMBER}
+  release-number: dexcom-uploader-${BUILDTAG}-build${TRAVIS_BUILD_NUMBER}
   skip_cleanup: true
   api_key:
     secure: GApBOkQCA/Ikt2bkEtNJx8L8pJ2vxkvVUWx624x6pojGDIPVJWhMBf2WDEI7t90Rw6akH6jN+wLkIJCXQTpWPWWeUmH1s3pzyMJwQXfN8b3nuRn1pRjYYbiZs+GsM7CFFOG6rmkmRF+pgtKeneTDL0Kvxiv02RPL77zrA1Q/P4Y=
   on:
     repo: virmani/dexcom-uploader
     tags: true
-    all_branches: false
+    all_branches: true
