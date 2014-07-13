@@ -1,4 +1,7 @@
 language: android
 android:
-  components:
+components:
     - build-tools-19.1.0
+    - android-18
+  licenses:
+    - android-sdk-license-5be876d5 
