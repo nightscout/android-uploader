@@ -342,7 +342,7 @@ public class DexcomG4Service extends Service {
                     .setContentTitle("Devices time mismatch!")
                     .setStyle(new Notification.BigTextStyle()
                             .bigText("Receiver: " + formatter.format(dexcomTime) +
-                                    "\nAndroid: " + formatter.format(androidTime)))
+                                    "\nAndroid:  " + formatter.format(androidTime)))
                     .setContentText("Check that devices times match")
                     .setTicker("Devices time mismatch!")
                     .setSmallIcon(R.drawable.ic_action_warning)
