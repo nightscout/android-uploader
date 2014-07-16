@@ -20,7 +20,7 @@ import java.util.*;
 public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
 
     private static final String TAG = DexcomReader.class.getSimpleName();
-    private final String EPOCH = "1-January-2009";
+    private final String EPOCH = "01-01-2009";
     private UsbSerialDriver mSerialDevice;
     public String bGValue;
     public String displayTime;
@@ -79,7 +79,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
 
     public Date getDisplayTime() {
         int dt = getSystemTime() + getDisplayTimeOffset();
-        SimpleDateFormat f = new SimpleDateFormat("dd-MMM-yyyy");
+        SimpleDateFormat f = new SimpleDateFormat("dd-MM-yyyy");
         Date epoch;
 
         try {
@@ -89,6 +89,8 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
             epoch = new Date();
         }
 
+        // Epoch is PST, but but having epoch have user timezone added, then don't have to add to the
+        // display time
         long milliseconds = epoch.getTime();
         long timeAdd = milliseconds + (1000L * dt);
         TimeZone tz = TimeZone.getDefault();
@@ -285,9 +287,9 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
                 byte [] dateTime = new byte[]{tempRecord[7],tempRecord[6],tempRecord[5],tempRecord[4]};
 
                 ByteBuffer buffer = ByteBuffer.wrap(dateTime);
-                int dt = buffer.getInt();//*1000;
+                int dt = buffer.getInt();
 
-                SimpleDateFormat f = new SimpleDateFormat("dd-MMM-yyyy");
+                SimpleDateFormat f = new SimpleDateFormat("dd-MM-yyyy");
                 Date d;
                 try {
                     d = f.parse(EPOCH);
@@ -295,6 +297,9 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
                     Log.e(TAG, "Unable to parse date: " + EPOCH + ", using current time", e);
                     d = new Date();
                 }
+
+                // Epoch is PST, but but having epoch have user timezone added, then don't have to add to the
+                // display time
                 long milliseconds = d.getTime();
 
                 long timeAdd = milliseconds + (1000L*dt);
