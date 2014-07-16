@@ -4,6 +4,7 @@
     <uses-feature android:name="android.hardware.usb.host" />
     <uses-sdk android:minSdkVersion="12"/>
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.VIBRATE"></uses-permission>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission>
     <uses-permission android:name="android.permission.UPDATE_DEVICE_STATS"></uses-permission>
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"></uses-permission>
@@ -12,8 +13,8 @@
     <application>
         <activity
                 android:name=".dexcom.DexcomG4Activity"
-                android:icon="@drawable/icon96x96"
-                android:label="CGM"
+                android:icon="@drawable/ic_launcher"
+                android:label="NightScout"
                 android:launchMode="singleTask" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,7 +30,7 @@
                     android:resource="@xml/device_filter" />
         </activity>
         <activity android:name=".settings.SettingsActivity"
-                  android:icon="@drawable/icon96x96"
+                  android:icon="@drawable/ic_launcher"
                   android:label="Settings"/>
         <service android:name=".dexcom.DexcomG4Service" >
         </service>

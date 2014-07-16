@@ -1,9 +1,12 @@
 package com.nightscout.android.dexcom;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.hardware.usb.UsbManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,6 +20,7 @@ import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.nightscout.android.R;
 import com.nightscout.android.dexcom.USB.SerialInputOutputManager;
 import com.nightscout.android.dexcom.USB.USBPower;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
@@ -24,28 +28,24 @@ import com.nightscout.android.dexcom.USB.UsbSerialProber;
 import com.nightscout.android.upload.UploadHelper;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class DexcomG4Service extends Service {
 
-    private static final String TAG = DexcomG4Service.class.getSimpleName();
-
-    private boolean initialRead = true;
-
-    /**
-     * The device currently in use, or {@code null}.
-     */
-    private UsbSerialDriver mSerialDevice;
-
-    /**
-     * The system's USB service.
-     */
     public UsbManager mUsbManager;
+    private static final String TAG = DexcomG4Service.class.getSimpleName();
+    private Context mContext;
+    private NotificationManager NM;
+    private final int FIVE_MINS_MS = 300000;
+    private final int THREE_MINS_MS = 180000;
+    private final int UPLOAD_OFFSET_MS = 3000;
+    private long nextUploadTimer = THREE_MINS_MS;
+    private boolean initialRead = true;
+    private UsbSerialDriver mSerialDevice;
     private UploadHelper uploader;
     private Handler mHandler = new Handler();
-
     private SerialInputOutputManager mSerialIoManager;
     private WifiManager wifiManager;
 
@@ -59,6 +59,7 @@ public class DexcomG4Service extends Service {
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "onCreate called");
+        mContext = this.getBaseContext();
         wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
         mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         // connectToG4();
@@ -71,21 +72,22 @@ public class DexcomG4Service extends Service {
         super.onDestroy();
         Log.i(TAG, "onDestroy called");
         mHandler.removeCallbacks(readAndUpload);
-        USBOn();
-        doReadAndUpload();
-        USBOn();
-
         stopIoManager();
+
+        if (NM != null) {
+            NM.cancelAll();
+            NM = null;
+        }
 
         if (mSerialDevice != null) {
             try {
+                Log.i(TAG, "Closing serial device...");
                 mSerialDevice.close();
             } catch (IOException e) {
-                Log.e(TAG, "Unable to close serial device", e);
+                Log.e(TAG, "Unable to close serial device.", e);
             }
             mSerialDevice = null;
         }
-
     }
 
     //get the data upload it
@@ -118,7 +120,8 @@ public class DexcomG4Service extends Service {
                 USBOff();
                 Log.e(TAG, "Unable to read from dexcom or upload", e);
             }
-            mHandler.postDelayed(readAndUpload, 45000);
+            mHandler.removeCallbacks(readAndUpload);
+            mHandler.postDelayed(readAndUpload, nextUploadTimer);
         }
     };
 
@@ -165,7 +168,6 @@ public class DexcomG4Service extends Service {
                 Log.e(TAG, "Unable to open serial device", e);
             }
 
-
             //Go get the data
             DexcomReader dexcomReader = new DexcomReader(mSerialDevice);
 
@@ -176,7 +178,7 @@ public class DexcomG4Service extends Service {
                 // is limited to 4 pages which is equivalent to 12 hours of contiguous data, so
                 // read 20 pages which is ~ 2.5 days.
                 List<EGVRecord> data = new ArrayList<EGVRecord>();
-                for(int i = 1; i <= 5; i++) {
+                for(int i = 5; i >= 1; i--) {
                     dexcomReader.readFromReceiver(getBaseContext(), i);
                     Collections.addAll(data, dexcomReader.mRD);
                 }
@@ -191,12 +193,12 @@ public class DexcomG4Service extends Service {
 
             initialRead = false;
 
+            nextUploadTimer = getNextUploadTimer(dexcomReader);
+
             if (prefs.getBoolean("EnableWifiHack", true)) {
                 doWifiHack();
             }
-
         }
-
     }
 
     private void doWifiHack() {
@@ -309,7 +311,7 @@ public class DexcomG4Service extends Service {
 
     private void stopIoManager() {
         if (mSerialIoManager != null) {
-            Log.i(TAG, "Stopping io manager ..");
+            Log.i(TAG, "Stopping io manager...");
             mSerialIoManager.stop();
             mSerialIoManager = null;
         }
@@ -317,10 +319,61 @@ public class DexcomG4Service extends Service {
 
     private void startIoManager() {
         if (mSerialDevice != null) {
-            Log.i(TAG, "Starting io manager ..");
+            Log.i(TAG, "Starting io manager...");
             mSerialIoManager = new SerialInputOutputManager(mSerialDevice);
             // mExecutor.submit(mSerialIoManager);
         }
     }
 
+    // Get the devices display time and compare with its last upload time to determine
+    // when to poll for next reading, since readings are on 5 minute intervals
+    private long getNextUploadTimer(DexcomReader dexcomReader) {
+
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
+        Date dexcomTime = dexcomReader.getDisplayTime();
+        Date androidTime = Calendar.getInstance().getTime();
+        long dt = dexcomTime.getTime() - androidTime.getTime();
+
+        if (Math.abs(dt) > FIVE_MINS_MS * 2) {
+            // Use ContextText and bigText in case < 16 API
+            NM = (NotificationManager)mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            Notification n = new Notification.Builder(mContext)
+                    .setDefaults(Notification.DEFAULT_ALL)
+                    .setContentTitle("Devices time mismatch!")
+                    .setStyle(new Notification.BigTextStyle()
+                            .bigText("Receiver: " + formatter.format(dexcomTime) +
+                                    "\nAndroid:  " + formatter.format(androidTime)))
+                    .setContentText("Check that devices times match")
+                    .setTicker("Devices time mismatch!")
+                    .setSmallIcon(R.drawable.ic_action_warning)
+                    .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher))
+                    .getNotification();
+            NM.notify(R.string.app_name, n);
+        }
+
+        Date lastRecord;
+        long timeSinceLastRecord = -1;
+        try {
+            lastRecord = formatter.parse(dexcomReader.mRD[dexcomReader.mRD.length - 1].displayTime);
+            timeSinceLastRecord = dexcomTime.getTime() - lastRecord.getTime();
+            Log.d(TAG, "The time since last record is: " + timeSinceLastRecord / 1000 + " secs");
+        } catch (ParseException e) {
+            Log.d(TAG, "Error parsing last record displayTime.");
+            e.printStackTrace();
+        }
+
+        if (timeSinceLastRecord < 0) {
+            displayMessage("Dexcom's time is less than current record time, possible time change.");
+            nextUploadTimer = THREE_MINS_MS;
+        }  else if (timeSinceLastRecord > FIVE_MINS_MS) {
+            nextUploadTimer = THREE_MINS_MS;
+            // TODO: consider making UI display "???" for SG records since likely to be out of range
+        } else {
+            nextUploadTimer = FIVE_MINS_MS - timeSinceLastRecord;
+            nextUploadTimer += UPLOAD_OFFSET_MS;
+            Log.d(TAG, "Setting next upload time to: " + nextUploadTimer / 1000 + " secs");
+        }
+
+        return  nextUploadTimer;
+    }
 }
