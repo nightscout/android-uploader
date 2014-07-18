@@ -63,8 +63,13 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
 
     private void doRESTUpload(SharedPreferences prefs, EGVRecord... records) {
         try {
-            String baseURL = prefs.getString("API Base URL", "");
-            String postURL = baseURL + (baseURL.endsWith("/") ? "" : "/") + "entries";
+            String baseURLSetting = prefs.getString("API Base URL", "");
+            String baseURL = baseURLSetting + (baseURLSetting.endsWith("/") ? "" : "/");
+
+            int apiVersion = 0;
+            if (baseURL.endsWith("/v1/")) apiVersion = 1;
+
+            String postURL = baseURL + "entries";
             Log.i(TAG, "postURL: " + postURL);
 
             HttpParams params = new BasicHttpParams();
@@ -76,12 +81,17 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
             HttpPost post = new HttpPost(postURL);
 
             for (EGVRecord record : records) {
-                Date date = DATE_FORMAT.parse(record.displayTime);
                 JSONObject json = new JSONObject();
-                json.put("device", "dexcom");
-                json.put("timestamp", date.getTime());
-                json.put("bg", Integer.parseInt(record.bGValue));
-                json.put("direction", record.trend);
+
+                try {
+                    if (apiVersion >= 1)
+                        populateV1APIEntry(json, record);
+                    else
+                        populateLegacyAPIEntry(json, record);
+                } catch (Exception e) {
+                    Log.w(TAG, "Unable to populate entry, apiVersion: " + apiVersion, e);
+                    continue;
+                }
 
                 String jsonString = json.toString();
 
@@ -102,6 +112,22 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
         } catch (Exception e) {
             Log.e(TAG, "Unable to post data", e);
         }
+    }
+
+    private void populateV1APIEntry(JSONObject json, EGVRecord record) throws Exception {
+        Date date = DATE_FORMAT.parse(record.displayTime);
+        json.put("device", "dexcom");
+        json.put("timestamp", date.getTime());
+        json.put("sgv", Integer.parseInt(record.bGValue));
+        json.put("direction", record.trend);
+    }
+
+    private void populateLegacyAPIEntry(JSONObject json, EGVRecord record) throws Exception {
+        Date date = DATE_FORMAT.parse(record.displayTime);
+        json.put("device", "dexcom");
+        json.put("timestamp", date.getTime());
+        json.put("bg", Integer.parseInt(record.bGValue));
+        json.put("direction", record.trend);
     }
 
     private void doMongoUpload(SharedPreferences prefs, EGVRecord... records) {
