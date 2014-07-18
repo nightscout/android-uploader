@@ -87,7 +87,7 @@ public enum UsbSerialProber {
         }
     };*/
 
-    private static final String TAG = UsbSerialProber.class.getCanonicalName();
+    private static final String TAG = UsbSerialProber.class.getSimpleName();
 
     /**
      * Builds a new {@link UsbSerialDriver} instance from the raw device, or
