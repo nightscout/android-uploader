@@ -87,6 +87,8 @@ public enum UsbSerialProber {
         }
     };*/
 
+    private static final String TAG = UsbSerialProber.class.getCanonicalName();
+
     /**
      * Builds a new {@link UsbSerialDriver} instance from the raw device, or
      * returns <code>null</code> if it could not be built (for example, if the
@@ -130,7 +132,7 @@ public enum UsbSerialProber {
      */
     public static UsbSerialDriver acquire(final UsbManager usbManager, final UsbDevice usbDevice) {
         if (!usbManager.hasPermission(usbDevice)) {
-            Log.i("Prober", "No permission for " + usbDevice.getVendorId() + " " + usbDevice.getProductId());
+            Log.i(TAG, "No permission for " + usbDevice.getVendorId() + " " + usbDevice.getProductId());
             return null;
         }
         for (final UsbSerialProber prober : values()) {
