@@ -23,6 +23,7 @@ package com.nightscout.android.dexcom.USB;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
+import android.util.Log;
 
 import java.util.Map;
 
@@ -128,6 +129,10 @@ public enum UsbSerialProber {
      *         could be acquired
      */
     public static UsbSerialDriver acquire(final UsbManager usbManager, final UsbDevice usbDevice) {
+        if (!usbManager.hasPermission(usbDevice)) {
+            Log.i("Prober", "No permission for " + usbDevice.getVendorId() + " " + usbDevice.getProductId());
+            return null;
+        }
         for (final UsbSerialProber prober : values()) {
             final UsbSerialDriver probedDevice = prober.getDevice(usbManager, usbDevice);
             if (probedDevice != null) {
