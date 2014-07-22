@@ -2,9 +2,6 @@ package com.nightscout.android.dexcom;
 
 public class Constants {
 
-    public final static int DEXCOM_G4_USB_VENDOR = 0x22a3;
-    public final static int DEXCOM_G4_USB_PRODUCT = 0x0047;
-
     public final static int NULL = 0;
     public final static int ACK = 1;
     public final static int NAK = 2;
@@ -48,46 +45,76 @@ public class Constants {
     public final static int READ_SETUP_WIZARD_STATE = 57;
     public final static int MAX_COMMAND = 59;
     public final static int MAX_POSSIBLE_COMMAND = 255;
-
     public final static int EGV_VALUE_MASK = 1023;
     public final static int EGV_DISPLAY_ONLY_MASK = 32768;
     public final static int EGV_TREND_ARROW_MASK = 15;
+    public final String EPOCH = "01-01-2009";
 
-    public final static String[] BATTERY_STATES = {
-            "NONE",
-            "CHARGING",
-            "NOT_CHARGING",
-            "NTC_FAULT",
-            "BAD_BATTERY"
-    };
+    public enum BATTERY_STATES {
+        NONE,
+        CHARGING,
+        NOT_CHARGING,
+        NTC_FAULT,
+        BAD_BATTERY
+    }
 
-    public final static String[] RECORD_TYPES = {
-            "MANUFACTURING_DATA",
-            "FIRMWARE_PARAMETER_DATA",
-            "PC_SOFTWARE_PARAMETER",
-            "SENSOR_DATA",
-            "EGV_DATA",
-            "CAL_SET",
-            "DEVIATION",
-            "INSERTION_TIME",
-            "RECEIVER_LOG_DATA",
-            "RECEIVER_ERROR_DATA",
-            "METER_DATA",
-            "USER_EVENT_DATA",
-            "USER_SETTING_DATA",
-            "MAX_VALUE"
-    };
+    public enum RECORD_TYPES {
+        MANUFACTURING_DATA,
+        FIRMWARE_PARAMETER_DATA,
+        PC_SOFTWARE_PARAMETER,
+        SENSOR_DATA,
+        EGV_DATA,
+        CAL_SET,
+        DEVIATION,
+        INSERTION_TIME,
+        RECEIVER_LOG_DATA,
+        RECEIVER_ERROR_DATA,
+        METER_DATA,
+        USER_EVENT_DATA,
+        USER_SETTING_DATA,
+        MAX_VALUE
+    }
 
-    public final static String[] TREND_ARROW_VALUES = {
-            "NONE",
-            "DOUBLE_UP",
-            "SINGLE_UP",
-            "45_UP",
-            "FLAT",
-            "45_DOWN",
-            "SINGLE_DOWN",
-            "DOUBLE_DOWN",
-            "NOT_COMPUTABLE",
-            "OUT_OF_RANGE"
-    };
+    public enum TREND_ARROW_VALUES {
+        NONE,
+        DOUBLE_UP("\u21C8", "DoubleUp"),
+        SINGLE_UP("\u2191", "SingleUp"),
+        UP_45("\u2197", "FortyFifeUp"),
+        FLAT("\u2192", "Flat"),
+        DOWN_45("\u2198", "FortyFiveDown"),
+        SINGLE_DOWN("\u2193", "SingleDown"),
+        DOUBLE_DOWN("\u21CA", "DoubleDown"),
+        NOT_COMPUTABLE,
+        OUT_OF_RANGE;
+
+        private String arrowSymbol;
+        private String trendName;
+
+        TREND_ARROW_VALUES(String a, String t) {
+            arrowSymbol = a;
+            trendName = t;
+        }
+
+        TREND_ARROW_VALUES() {
+            this(null, null);
+        }
+
+        public String Symbol() {
+            if (arrowSymbol == null) {
+                return "\u2194";
+            } else {
+                return arrowSymbol;
+            }
+        }
+
+        public String friendlyTrendName() {
+            if (trendName == null) {
+                return this.name().replace("_", " ");
+            } else {
+                return this.trendName;
+            }
+        }
+
+    }
+
 }
