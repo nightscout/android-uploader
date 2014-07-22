@@ -6,14 +6,10 @@ import android.os.AsyncTask;
 import android.util.Log;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.USB.UsbSerialProber;
-import com.nightscout.android.dexcom.Constants;
-import com.nightscout.android.dexcom.DexcomPacket;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.sql.Array;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.nio.ByteOrder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -60,7 +56,8 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         if (mSerialDevice != null) {
             try {
                 mSerialDevice.open();
-                DexcomPacket p = new DexcomPacket(Constants.SHUTDOWN_RECEIVER);
+                mSerialDevice.setParameters(115200, 8, 0, 1);
+                DexcomCommandPacket p = new DexcomCommandPacket(Constants.SHUTDOWN_RECEIVER);
                 try {
                     mSerialDevice.write(p.Compose(), 200);
                 } catch (IOException e) {
@@ -98,7 +95,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
     }
 
     private int getSystemTime() {
-        DexcomPacket p = new DexcomPacket(Constants.READ_SYSTEM_TIME);
+        DexcomCommandPacket p = new DexcomCommandPacket(Constants.READ_SYSTEM_TIME);
 
         try {
             mSerialDevice.write(p.Compose(), 200);
@@ -125,14 +122,20 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
     }
 
     private int getDisplayTimeOffset() {
-        DexcomPacket p = new DexcomPacket(Constants.READ_DISPLAY_TIME_OFFSET);
+        DexcomCommandPacket p = new DexcomCommandPacket(Constants.READ_DISPLAY_TIME_OFFSET);
 
         try {
             mSerialDevice.write(p.Compose(), 200);
         } catch (IOException e) {
             Log.e(TAG, "Unable to write to serial device", e);
         }
-
+readPacket();
+        Log.i(TAG, "JLKSDJFLKDSJFKDLSJFSKDLFJKLSD");
+        try {
+            mSerialDevice.write(p.Compose(), 200);
+        } catch (IOException e) {
+            Log.e(TAG, "Unable to write to serial device", e);
+        }
         byte[] readData = new byte[256];
         try {
             mSerialDevice.read(readData, 200);
@@ -140,6 +143,9 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
             Log.e(TAG, "Unable to read from serial device", e);
         }
 
+        for (int j=0; j<readData.length; j++) {
+            Log.i(TAG, j+" readdata " + Byte.valueOf(readData[j]).intValue());
+        }
         int displayTimeOffset =  readData[4] & 0xFF |
                 (readData[5] & 0xFF) << 8 |
                 (readData[6] & 0xFF) << 16 |
@@ -153,26 +159,17 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
     private byte[] getEGVDataPageRange(){
         int[] rets = new int[24];
         int c = 0;
-        
-        //EGVData page range read command
-        byte[] readEGVDataPageRange = new byte[7];
-        readEGVDataPageRange[0] = 0x01;
-        readEGVDataPageRange[1] = 0x07;
-        readEGVDataPageRange[3] = 0x10;
-        readEGVDataPageRange[4] = 0x04;
-        readEGVDataPageRange[5] = (byte)0x8b;
-        readEGVDataPageRange[6] = (byte)0xb8;
-        DexcomPacket p = new DexcomPacket(Constants.READ_DATABASE_PAGE_RANGE);
+
+        DexcomCommandPacket p = new DexcomCommandPacket(Constants.READ_DATABASE_PAGE_RANGE);
         ArrayList<Byte> dat = new ArrayList<Byte>();
 
+        Log.i(TAG, "Looking up page range for " + Constants.RECORD_TYPES.EGV_DATA.ordinal());
         dat.add((byte)Constants.RECORD_TYPES.EGV_DATA.ordinal());
+        p.setPayload(dat);
 
-        byte[] z = p.Compose(dat);
 
-        Log.i(TAG, (z == readEGVDataPageRange) + "ok?");
-    
         try {
-            rets[c++] = mSerialDevice.write(z, 200);
+            rets[c++] = mSerialDevice.write(p.Compose(), 200);
         } catch (IOException e) {
             Log.e(TAG, "Unable to write to serial device", e);
         }
@@ -337,6 +334,70 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         }
         crc &= 0xffff;
         return crc;
+
+    }
+
+    public void readPacket() {
+        byte[] initialData = new byte[4];
+        try {
+            Log.i(TAG, "Read: " + mSerialDevice.read(initialData, 20000));
+        } catch (IOException e) {
+            Log.i(TAG, "Failed to read initial packet data");
+        }
+        if (initialData[0] == (byte)1) {
+
+        } else {
+            Log.i(TAG, "Invalid initial packet header!");
+        }
+        for (int y = 0; y<initialData.length; y++) {
+            Log.i(TAG, y + " initial data " + Byte.valueOf(initialData[y]).intValue());
+        }
+        int packetCommand = initialData[3];
+
+        ByteBuffer q = ByteBuffer.wrap(initialData, 1, 2);
+        q.order(ByteOrder.LITTLE_ENDIAN);
+        int dataNumber = q.getShort();
+        Log.i(TAG, "Data number is " + dataNumber);
+        byte[] remainingData;
+        if (dataNumber > 6) {
+            int remainingRead = Math.abs(dataNumber - 8);
+            remainingData = new byte[remainingRead];
+            try {
+                Log.i(TAG, "remaining read of " + remainingRead);
+                Log.i(TAG, "read " + mSerialDevice.read(remainingData, 20000));
+            } catch (IOException e) {
+                Log.i(TAG, "Failed to read remaining packet data");
+            }
+        } else {
+            remainingData = new byte[0];
+        }
+        byte[] suffixArray = new byte[2];
+
+        try {
+            mSerialDevice.read(suffixArray, 20000);
+        } catch (IOException e) {
+            Log.i(TAG, "Failed to read suffix packet data");
+        }
+        for (int i=0; i<suffixArray.length; i++) {
+            Log.i(TAG, i + " suffix " + Byte.valueOf(suffixArray[i]).intValue());
+        }
+        ByteBuffer suffixBuffer = ByteBuffer.wrap(suffixArray);
+        suffixBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        byte[] allDataArray = new byte[initialData.length + remainingData.length];
+        for (int i=0; i<initialData.length; i++) {
+            allDataArray[i] = initialData[i];
+        }
+        for (int i=0; i<remainingData.length; i++) {
+            allDataArray[i+initialData.length] = remainingData[i];
+        }
+
+        short dataCrc = (short)calculateCRC16(allDataArray, 0, allDataArray.length);
+        short readCrc = suffixBuffer.getShort();
+        if (dataCrc == readCrc) {
+            Log.i(TAG, "CRC matches!");
+        } else {
+            Log.e(TAG, "CRC mismatch! " + readCrc + " vs " + dataCrc);
+        }
 
     }
     
