@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.mongodb.*;
+import com.nightscout.android.dexcom.DexcomG4Activity;
 import com.nightscout.android.dexcom.EGVRecord;
 
 import org.apache.http.client.ResponseHandler;
@@ -131,6 +132,7 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
                     testData.put("dateString", record.displayTime);
                     testData.put("sgv", record.bGValue);
                     testData.put("direction", record.trend);
+                    testData.put("battery", DexcomG4Activity.batLevel);
                     dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
                 }
                 client.close();
