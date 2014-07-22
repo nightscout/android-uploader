@@ -76,6 +76,7 @@ public class DexcomG4Activity extends Activity {
             Intent batteryIntent=registerReceiver(mArrow,mIntentFilter);
             //batteryLevel = getBatteryLevel(batteryIntent);
             //batLevel = String.format("%s",(int)batteryLevel);
+
         mHandler.postDelayed(updateDataView, 30000);
         }
     };
