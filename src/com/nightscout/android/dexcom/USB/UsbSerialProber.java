@@ -132,7 +132,7 @@ public enum UsbSerialProber {
      */
     public static UsbSerialDriver acquire(final UsbManager usbManager, final UsbDevice usbDevice) {
         if (!usbManager.hasPermission(usbDevice)) {
-            Log.i("Prober", "No permission for " + usbDevice.getVendorId() + " " + usbDevice.getProductId());
+            Log.i(TAG, "No permission for " + usbDevice.getVendorId() + " " + usbDevice.getProductId());
             return null;
         }
         for (final UsbSerialProber prober : values()) {
