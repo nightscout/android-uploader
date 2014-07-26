@@ -194,14 +194,14 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
             try {
 
                 // connect to db
-                MongoClientURI uri = new MongoClientURI(dbURI);
+                MongoClientURI uri = new MongoClientURI(dbURI.trim());
                 MongoClient client = new MongoClient(uri);
 
                 // get db
                 DB db = client.getDB(uri.getDatabase());
 
                 // get collection
-                DBCollection dexcomData = db.getCollection(collectionName);
+                DBCollection dexcomData = db.getCollection(collectionName.trim());
                 Log.i(TAG, "The number of EGV records being sent to MongoDB is " + records.length);
                 for (EGVRecord record : records) {
                     // make db object
