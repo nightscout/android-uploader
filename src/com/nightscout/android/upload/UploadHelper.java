@@ -20,7 +20,9 @@ import org.apache.http.params.HttpParams;
 
 import org.json.JSONObject;
 
+import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
@@ -62,12 +64,48 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
     }
 
     private void doRESTUpload(SharedPreferences prefs, EGVRecord... records) {
-        try {
-            String baseURLSetting = prefs.getString("API Base URL", "");
-            String baseURL = baseURLSetting + (baseURLSetting.endsWith("/") ? "" : "/");
+        String baseURLSettings = prefs.getString("API Base URL", "");
+        ArrayList<String> baseURIs = new ArrayList<String>();
 
+        try {
+            for (String baseURLSetting : baseURLSettings.split(" ")) {
+                String baseURL = baseURLSetting.trim();
+                if (baseURL.isEmpty()) continue;
+                baseURIs.add(baseURL + (baseURL.endsWith("/") ? "" : "/"));
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Unable to process API Base URL setting: " + baseURLSettings, e);
+            return;
+        }
+
+        for (String baseURI : baseURIs) {
+            try {
+                doRESTUploadTo(baseURI, records);
+            } catch (Exception e) {
+                Log.e(TAG, "Unable to do REST API Upload to: " + baseURI, e);
+            }
+        }
+    }
+
+    private void doRESTUploadTo(String baseURI, EGVRecord[] records) {
+        try {
             int apiVersion = 0;
-            if (baseURL.endsWith("/v1/")) apiVersion = 1;
+            if (baseURI.endsWith("/v1/")) apiVersion = 1;
+
+            String baseURL = null;
+            String secret = null;
+            String[] uriParts = baseURI.split("@");
+
+            if (uriParts.length == 1 && apiVersion == 0) {
+                baseURL = uriParts[0];
+            } else if (uriParts.length == 1 && apiVersion > 0) {
+                throw new Exception("Starting with API v1, a pass phase is required");
+            } else if (uriParts.length == 2 && apiVersion > 0) {
+                secret = uriParts[0];
+                baseURL = uriParts[1];
+            } else {
+                throw new Exception(String.format("Unexpected baseURI: %s, uriParts.length: %s, apiVersion: %s", baseURI, uriParts.length, apiVersion));
+            }
 
             String postURL = baseURL + "entries";
             Log.i(TAG, "postURL: " + postURL);
@@ -79,6 +117,23 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
             DefaultHttpClient httpclient = new DefaultHttpClient(params);
 
             HttpPost post = new HttpPost(postURL);
+
+            if (apiVersion > 0) {
+                if (secret == null || secret.isEmpty()) {
+                    throw new Exception("Starting with API v1, a pass phase is required");
+                } else {
+                    MessageDigest digest = MessageDigest.getInstance("SHA-1");
+                    byte[] bytes = secret.getBytes("UTF-8");
+                    digest.update(bytes, 0, bytes.length);
+                    bytes = digest.digest();
+                    StringBuilder sb = new StringBuilder(bytes.length * 2);
+                    for (byte b: bytes) {
+                        sb.append(String.format("%02x", b & 0xff));
+                    }
+                    String token = sb.toString();
+                    post.setHeader("API_SECRET", token);
+                }
+            }
 
             for (EGVRecord record : records) {
                 JSONObject json = new JSONObject();
