@@ -47,11 +47,17 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
         Boolean enableMongoUpload = prefs.getBoolean("EnableMongoUpload", false);
 
         if (enableRESTUpload) {
+            long start = System.currentTimeMillis();
+            Log.i(TAG, String.format("Starting upload of %s record using a REST API", records.length));
             doRESTUpload(prefs, records);
+            Log.i(TAG, String.format("Finished upload of %s record using a REST API in %s ms", records.length, System.currentTimeMillis() - start));
         }
 
         if (enableMongoUpload) {
+            long start = System.currentTimeMillis();
+            Log.i(TAG, String.format("Starting upload of %s record using a Mongo", records.length));
             doMongoUpload(prefs, records);
+            Log.i(TAG, String.format("Finished upload of %s record using a Mongo in %s ms", records.length, System.currentTimeMillis() - start));
         }
 
         return 1L;
