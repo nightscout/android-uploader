@@ -1,4 +1,4 @@
-dexcom-uploader
+android-uploader
 ====================
 
 A community maintained fork of original android uploader.
