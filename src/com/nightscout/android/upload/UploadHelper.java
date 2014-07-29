@@ -137,7 +137,7 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
                         sb.append(String.format("%02x", b & 0xff));
                     }
                     String token = sb.toString();
-                    post.setHeader("API_SECRET", token);
+                    post.setHeader("api-secret", token);
                 }
             }
 
