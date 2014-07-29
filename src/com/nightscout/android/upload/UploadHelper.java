@@ -178,7 +178,7 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
     private void populateV1APIEntry(JSONObject json, EGVRecord record) throws Exception {
         Date date = DATE_FORMAT.parse(record.displayTime);
         json.put("device", "dexcom");
-        json.put("timestamp", date.getTime());
+        json.put("date", date.getTime());
         json.put("sgv", Integer.parseInt(record.bGValue));
         json.put("direction", record.trend);
     }
