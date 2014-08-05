@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <SwitchPreference
+            android:title="I UNDERSTAND"
+            android:key="IUNDERSTAND"
+            android:disableDependentsState="false"
+            android:switchTextOn="YES"
+            android:switchTextOff="NO"
+            android:summary="Nightscout should not be used to make medical decisions. There is no support or any warranty of any kind. The quality and performance of the project is with you. This is a project that was created and is supported completely by volunteers.">
+    </SwitchPreference>
+    <SwitchPreference
+            android:dependency="IUNDERSTAND"
             android:title="API Upload (REST)"
             android:key="EnableRESTUpload"
             android:disableDependentsState="false"
@@ -15,6 +24,7 @@
             android:dialogMessage="This only the base URL, the uploader will automatically append /entries for the POST">
     </EditTextPreference>
     <SwitchPreference
+            android:dependency="IUNDERSTAND"
             android:title="MongoDB Upload"
             android:key="EnableMongoUpload"
             android:disableDependentsState="false"
