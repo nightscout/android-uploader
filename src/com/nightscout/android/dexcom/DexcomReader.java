@@ -9,6 +9,7 @@ import com.nightscout.android.dexcom.USB.UsbSerialProber;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -44,10 +45,6 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
 
         // make first read public
         mRD = mostRecentData;
-
-        //save them to the android file system for later access
-        //TODO: should be removed?
-        writeLocalCSV(mostRecentData, context);
     }
 
     //Not being used, but this is a nice to have if we want to kill the receiver, etc from
@@ -59,15 +56,10 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         if (mSerialDevice != null) {
             try {
                 mSerialDevice.open();
-                // EGVData page range read command
-                byte[] resetPacket = new byte[6];
-                resetPacket[0] = 0x01;
-                resetPacket[1] = 0x06;
-                resetPacket[3] = 0x2e;
-                resetPacket[4] = (byte) 0xb8;
-                resetPacket[5] = (byte) 0x01;
+                mSerialDevice.setParameters(115200, 8, 0, 1);
+                DexcomCommandPacket p = new DexcomCommandPacket(Constants.SHUTDOWN_RECEIVER);
                 try {
-                    mSerialDevice.write(resetPacket, 200);
+                    mSerialDevice.write(p.Compose(), 200);
                 } catch (IOException e) {
                     Log.e(TAG, "unable to write to serial device", e);
                 }
@@ -103,17 +95,11 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
     }
 
     private int getSystemTime() {
-
-        byte[] readSystemTime = new byte[6];
-        readSystemTime[0] = 0x01;
-        readSystemTime[1] = 0x06;
-        readSystemTime[2] = 0x00;
-        readSystemTime[3] = 0x22;
-        readSystemTime[4] = 0x34;
-        readSystemTime[5] = (byte)0xc0;
+        DexcomCommandPacket p = new DexcomCommandPacket(Constants.READ_SYSTEM_TIME);
 
         try {
-            mSerialDevice.write(readSystemTime, 200);
+            mSerialDevice.write(p.Compose(), 200);
+
         } catch (IOException e) {
             Log.e(TAG, "Unable to write to serial device", e);
         }
@@ -136,21 +122,20 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
     }
 
     private int getDisplayTimeOffset() {
-
-        byte[] readDisplayTimeOffset = new byte[6];
-        readDisplayTimeOffset[0] = 0x01;
-        readDisplayTimeOffset[1] = 0x06;
-        readDisplayTimeOffset[2] = 0x00;
-        readDisplayTimeOffset[3] = 0x1d;
-        readDisplayTimeOffset[4] = (byte)0x88;
-        readDisplayTimeOffset[5] = 0x07;
+        DexcomCommandPacket p = new DexcomCommandPacket(Constants.READ_DISPLAY_TIME_OFFSET);
 
         try {
-            mSerialDevice.write(readDisplayTimeOffset, 200);
+            mSerialDevice.write(p.Compose(), 200);
         } catch (IOException e) {
             Log.e(TAG, "Unable to write to serial device", e);
         }
-
+readPacket();
+        Log.i(TAG, "JLKSDJFLKDSJFKDLSJFSKDLFJKLSD");
+        try {
+            mSerialDevice.write(p.Compose(), 200);
+        } catch (IOException e) {
+            Log.e(TAG, "Unable to write to serial device", e);
+        }
         byte[] readData = new byte[256];
         try {
             mSerialDevice.read(readData, 200);
@@ -158,6 +143,9 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
             Log.e(TAG, "Unable to read from serial device", e);
         }
 
+        for (int j=0; j<readData.length; j++) {
+            Log.i(TAG, j+" readdata " + Byte.valueOf(readData[j]).intValue());
+        }
         int displayTimeOffset =  readData[4] & 0xFF |
                 (readData[5] & 0xFF) << 8 |
                 (readData[6] & 0xFF) << 16 |
@@ -171,18 +159,17 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
     private byte[] getEGVDataPageRange(){
         int[] rets = new int[24];
         int c = 0;
-        
-        //EGVData page range read command
-        byte[] readEGVDataPageRange = new byte[7];
-        readEGVDataPageRange[0] = 0x01;
-        readEGVDataPageRange[1] = 0x07;
-        readEGVDataPageRange[3] = 0x10;
-        readEGVDataPageRange[4] = 0x04;
-        readEGVDataPageRange[5] = (byte)0x8b;
-        readEGVDataPageRange[6] = (byte)0xb8;
-    
+
+        DexcomCommandPacket p = new DexcomCommandPacket(Constants.READ_DATABASE_PAGE_RANGE);
+        ArrayList<Byte> dat = new ArrayList<Byte>();
+
+        Log.i(TAG, "Looking up page range for " + Constants.RECORD_TYPES.EGV_DATA.ordinal());
+        dat.add((byte)Constants.RECORD_TYPES.EGV_DATA.ordinal());
+        p.setPayload(dat);
+
+
         try {
-            rets[c++] = mSerialDevice.write(readEGVDataPageRange, 200);
+            rets[c++] = mSerialDevice.write(p.Compose(), 200);
         } catch (IOException e) {
             Log.e(TAG, "Unable to write to serial device", e);
         }
@@ -310,102 +297,25 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
 
                 Date display = new Date(timeAdd);
                 byte trendArrow = (byte) (tempRecord[10] & (byte)15);
-                String trend = "Not Calculated";
-                String trendA = "--X";
 
-                switch (trendArrow) {
+                Constants.TREND_ARROW_VALUES arrow = Constants.TREND_ARROW_VALUES.values()[trendArrow];
 
-                case (0):
-                    trendA = "\u2194";
-                    trend = "NONE";
-                    break;
-                case (1):
-                    trendA = "\u21C8";
-                    trend = "DoubleUp";
-                    break;
-                case (2):
-                    trendA = "\u2191";
-                    trend = "SingleUp";
-                    break;
-                case (3):
-                    trendA = "\u2197";
-                    trend = "FortyFiveUp";
-                    break;
-                case (4):
-                    trendA = "\u2192";
-                    trend = "Flat";
-                    break;
-                case (5):
-                    trendA = "\u2198";
-                    trend = "FortyFiveDown";
-                    break;
-                case (6):
-                    trendA = "\u2193";
-                    trend = "SingleDown";
-                    break;
-                case (7):
-                    trendA = "\u21CA";
-                    trend = "DoubleDown";
-                    break;
-                case (8):
-                    trendA = "\u2194";
-                    trend = "NOT COMPUTABLE";
-                    break;
-                case (9):
-                    trendA = "\u2194";
-                    trend = "RATE OUT OF RANGE";
-                    break;
-                }
                 
-                this.trend = trend;
+                this.trend = arrow.friendlyTrendName();
                 this.displayTime = new SimpleDateFormat("MM/dd/yyy hh:mm:ss aa").format(display);
                 this.bGValue = String.valueOf(bGValue);
 
                 EGVRecord record = new EGVRecord();
                 record.setBGValue(this.bGValue);
                 record.setDisplayTime(this.displayTime);
-                record.setTrend(this.trend);
-                record.setTrendArrow(trendA);
+                record.setTrend(arrow.friendlyTrendName());
+                record.setTrendArrow(arrow.Symbol());
 
                 recordsToReturn[k++] = record;
             }
         }       
         return recordsToReturn;
 
-    }
-
-    //TODO: why are we writing CSV?
-    private void writeLocalCSV(EGVRecord[] mostRecentData, Context context) {
-
-        //Write EGV Binary of last (most recent) data
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(context.getFilesDir(), "save.bin"))); //Select where you wish to save the file...
-            oos.writeObject(mostRecentData[mostRecentData.length - 1]); // write the class as an 'object'
-            oos.flush(); // flush the stream to insure all of the information was written to 'save.bin'
-            oos.close();// close the stream
-        } catch(Exception e) {
-            Log.e(TAG, "write to OutputStream failed", e);
-        }
-        
-        //Write CSV of EGV from last 4 pages
-        CSVWriter writer;
-        try {
-
-            writer = new CSVWriter(new FileWriter(new File(context.getFilesDir(), "hayden.csv")),',', CSVWriter.NO_QUOTE_CHARACTER);
-            List<String[]> data = new ArrayList<String[]>();
-            data.add(new String[] {"GlucoseValue","DisplayTime"});
-
-            for (int i = 0; i < mostRecentData.length; i++)
-            {
-                data.add(new String[] {mostRecentData[i].bGValue, mostRecentData[i].displayTime});
-            }
-
-            writer.writeAll(data);
-
-            writer.close();
-        } catch (IOException e) {
-            Log.e(TAG, "write to CSV failed", e);
-        }
     }
 
     //CRC methods
@@ -426,6 +336,70 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         return crc;
 
     }
+
+    public void readPacket() {
+        byte[] initialData = new byte[4];
+        try {
+            Log.i(TAG, "Read: " + mSerialDevice.read(initialData, 20000));
+        } catch (IOException e) {
+            Log.i(TAG, "Failed to read initial packet data");
+        }
+        if (initialData[0] == (byte)1) {
+
+        } else {
+            Log.i(TAG, "Invalid initial packet header!");
+        }
+        for (int y = 0; y<initialData.length; y++) {
+            Log.i(TAG, y + " initial data " + Byte.valueOf(initialData[y]).intValue());
+        }
+        int packetCommand = initialData[3];
+
+        ByteBuffer q = ByteBuffer.wrap(initialData, 1, 2);
+        q.order(ByteOrder.LITTLE_ENDIAN);
+        int dataNumber = q.getShort();
+        Log.i(TAG, "Data number is " + dataNumber);
+        byte[] remainingData;
+        if (dataNumber > 6) {
+            int remainingRead = Math.abs(dataNumber - 8);
+            remainingData = new byte[remainingRead];
+            try {
+                Log.i(TAG, "remaining read of " + remainingRead);
+                Log.i(TAG, "read " + mSerialDevice.read(remainingData, 20000));
+            } catch (IOException e) {
+                Log.i(TAG, "Failed to read remaining packet data");
+            }
+        } else {
+            remainingData = new byte[0];
+        }
+        byte[] suffixArray = new byte[2];
+
+        try {
+            mSerialDevice.read(suffixArray, 20000);
+        } catch (IOException e) {
+            Log.i(TAG, "Failed to read suffix packet data");
+        }
+        for (int i=0; i<suffixArray.length; i++) {
+            Log.i(TAG, i + " suffix " + Byte.valueOf(suffixArray[i]).intValue());
+        }
+        ByteBuffer suffixBuffer = ByteBuffer.wrap(suffixArray);
+        suffixBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        byte[] allDataArray = new byte[initialData.length + remainingData.length];
+        for (int i=0; i<initialData.length; i++) {
+            allDataArray[i] = initialData[i];
+        }
+        for (int i=0; i<remainingData.length; i++) {
+            allDataArray[i+initialData.length] = remainingData[i];
+        }
+
+        short dataCrc = (short)calculateCRC16(allDataArray, 0, allDataArray.length);
+        short readCrc = suffixBuffer.getShort();
+        if (dataCrc == readCrc) {
+            Log.i(TAG, "CRC matches!");
+        } else {
+            Log.e(TAG, "CRC mismatch! " + readCrc + " vs " + dataCrc);
+        }
+
+    }
     
     //Convert the packet data
     public static int toInt(byte[] b, int flag) {
@@ -437,27 +411,6 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
             default:
                 throw new IllegalArgumentException("BitConverter: toInt");
         }
-    }
-
-    public static byte[] getBytes(int i, int flag) {
-        byte[] b = new byte[4];
-        switch (flag) {
-        case 0:
-            b[0] = (byte) ((i >> 24) & 0xff);
-            b[1] = (byte) ((i >> 16) & 0xff);
-            b[2] = (byte) ((i >> 8) & 0xff);
-            b[3] = (byte) (i & 0xff);
-            break;
-        case 1:
-            b[3] = (byte) ((i >> 24) & 0xff);
-            b[2] = (byte) ((i >> 16) & 0xff);
-            b[1] = (byte) ((i >> 8) & 0xff);
-            b[0] = (byte) (i & 0xff);
-            break;
-        default:
-            break;
-        }
-        return b;
     }
 
     @Override
