@@ -1,9 +1,10 @@
 package com.nightscout.android.dexcom.records;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class MeterRecord {
+public class MeterRecord  implements Serializable {
     private int systemTime;
     private int displayTime;
     private int meterBG;
