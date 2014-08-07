@@ -12,6 +12,7 @@ public class ReadPacket {
     public ReadPacket(byte[] readPacket) {
         this.command = readPacket[OFFSET_CMD];
         this.data = Arrays.copyOfRange(readPacket, OFFSET_DATA, readPacket.length - CRC_LEN);
+        //TODO: check CRC
     }
 
     public int getCommand() {
