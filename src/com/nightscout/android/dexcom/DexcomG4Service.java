@@ -195,7 +195,7 @@ public class DexcomG4Service extends Service {
 
             nextUploadTimer = getNextUploadTimer(dexcomReader);
 
-            if (prefs.getBoolean("EnableWifiHack", true)) {
+            if (prefs.getBoolean("EnableWifiHack", false)) {
                 doWifiHack();
             }
         }

@@ -49,7 +49,7 @@
             android:title="Wifi Hack"
             android:key="EnableWifiHack"
             android:disableDependentsState="false"
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:summaryOn="Wifi will be disabled if there is a timeout (poor wifi signal/access point), this will allow mobile data to be used instead"
             android:summaryOff="The uploader won't try to disable Wifi even if there is a timeout"
             >
