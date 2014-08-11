@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.records.EGRecord;
+import com.nightscout.android.dexcom.records.GenericXMLRecord;
 import com.nightscout.android.dexcom.records.MeterRecord;
 
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class ReadData extends AsyncTask<UsbSerialDriver, Object, Object> {
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt(4);
     }
 
-    public <T> T readDataBasePage(int recordType, int page) {
+    private <T> T readDataBasePage(int recordType, int page) {
         byte numOfPages = 1;
         ArrayList<Byte> payload = new ArrayList<Byte>();
         payload.add((byte) recordType);
@@ -112,6 +113,9 @@ public class ReadData extends AsyncTask<UsbSerialDriver, Object, Object> {
                     meterRecords[i] = new MeterRecord(Arrays.copyOfRange(data, startIdx, startIdx + rec_len - 1));
                 }
                 return (T) meterRecords;
+            case MANUFACTURING_DATA:
+                GenericXMLRecord xmlRecord = new GenericXMLRecord(data);
+                return (T) xmlRecord;
             default:
                 // Throw error "Database record not supported"
                 break;
