@@ -6,6 +6,7 @@ import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.records.EGRecord;
 import com.nightscout.android.dexcom.records.GenericXMLRecord;
 import com.nightscout.android.dexcom.records.MeterRecord;
+import org.w3c.dom.Element;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -27,6 +28,12 @@ public class ReadData extends AsyncTask<UsbSerialDriver, Object, Object> {
     public boolean ping() {
         writeCommand(Constants.PING);
         return read(MIN_LEN).getCommand() == Constants.ACK;
+    }
+
+    public String readSerialNumber() {
+        byte[] readData = readDataBasePage(Constants.RECORD_TYPES.MANUFACTURING_DATA.ordinal(), 0);
+        Element md = ParsePage(readData, Constants.RECORD_TYPES.MANUFACTURING_DATA.ordinal());
+        return md.getAttribute("SerialNumber");
     }
 
     public long readDisplayTimeOffset() {
