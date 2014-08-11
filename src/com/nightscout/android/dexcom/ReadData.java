@@ -31,7 +31,8 @@ public class ReadData extends AsyncTask<UsbSerialDriver, Object, Object> {
     }
 
     public String readSerialNumber() {
-        byte[] readData = readDataBasePage(Constants.RECORD_TYPES.MANUFACTURING_DATA.ordinal(), 0);
+        int PAGE_OFFSET = 0;
+        byte[] readData = readDataBasePage(Constants.RECORD_TYPES.MANUFACTURING_DATA.ordinal(), PAGE_OFFSET);
         Element md = ParsePage(readData, Constants.RECORD_TYPES.MANUFACTURING_DATA.ordinal());
         return md.getAttribute("SerialNumber");
     }
