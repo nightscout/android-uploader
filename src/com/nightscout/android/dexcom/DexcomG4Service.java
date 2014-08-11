@@ -191,6 +191,11 @@ public class DexcomG4Service extends Service {
                 uploader.execute(dexcomReader.mRD[dexcomReader.mRD.length - 1]);
             }
 
+            ReadData r = new ReadData(mSerialDevice);
+//            r.readDataBasePage(Constants.RECORD_TYPES.EGV_DATA.ordinal(), 1536);
+            r.readDataBasePageRange(Constants.RECORD_TYPES.MANUFACTURING_DATA.ordinal());
+            String sn = r.readSerialNumber();
+
             initialRead = false;
 
             nextUploadTimer = getNextUploadTimer(dexcomReader);

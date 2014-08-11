@@ -97,7 +97,7 @@ public class ReadData extends AsyncTask<UsbSerialDriver, Object, Object> {
         return new ReadPacket(data);
     }
 
-    // TODO: not sure if I want to use generics or just separate methods, hmmm
+    // TODO: not sure if I want to use generics or just separate methods, hmmm make it private in casec
     private <T> T ParsePage(byte[] data, int recordType) {
         int HEADER_LEN = 28;
         int NUM_REC_OFFSET = 4;
