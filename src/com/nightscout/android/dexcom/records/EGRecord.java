@@ -10,7 +10,7 @@ public class EGRecord implements Serializable {
 
     private int displayTime;
     private int bGValue;
-    private String trend = "---";
+    private String trend;
 
     public EGRecord(byte[] packet) {
         // uint, uint, ushort, byte, ushort
@@ -19,7 +19,8 @@ public class EGRecord implements Serializable {
         displayTime = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(4);
         int eGValue = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8);
         bGValue = eGValue & Constants.EGV_VALUE_MASK;
-//        trend = Constants.TREND_ARROW_VALUES.values()[ByteBuffer.wrap(packet).get(10)].friendlyTrendName();
+        int trendValue = ByteBuffer.wrap(packet).get(10) & Constants.EGV_TREND_ARROW_MASK;
+        trend = Constants.TREND_ARROW_VALUES.values()[trendValue].friendlyTrendName();
     }
 
     public int getDisplayTime() {
