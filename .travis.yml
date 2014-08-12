@@ -1,0 +1,29 @@
+language: android
+env:
+  matrix:
+  - ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
+before_install:
+- echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
+- emulator -avd test -no-skin -no-audio -no-window &
+before_script:
+- "./ci/wait_for_emulator"
+- adb shell input keyevent 82 &
+android:
+  components:
+  - build-tools-19.1.0
+  - android-19
+  - sysimg-19
+  - extra-android-support
+  licenses:
+  - android-sdk-license-5be876d5
+  - ".*intel.+"
+deploy:
+  provider: releases
+  file: "./app/build/outputs/apk/app-release-unsigned.apk"
+  skip_cleanup: true
+  api_key:
+    secure: FCiDUD4Q3rdvYp0K65zSwJMYCVnCBhEqZSu4qUepW28gWt9rt3hd1wBcVCe3h0qa488EOZ+u32wz5WLR6yIQpHOyohDKuxEu3g6I0Dlh5h9aFlyRdkxJ8YA9iWjjUe5BBTJiyddt3Lm4O4/q0VtQ9DCgiw9SAf7A+RtRRfFEaIg=
+  on:
+    repo: virmani/android-uploader
+    tags: true
+    all_branches: true
