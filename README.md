@@ -1,5 +1,6 @@
 android-uploader
 ====================
+[![Build Status](https://travis-ci.org/nightscout/cgm-remote-monitor.png)](https://travis-ci.org/nightscout/android-uploader)
 
 A community maintained fork of original android uploader.
 
