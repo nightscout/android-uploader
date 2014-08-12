@@ -3,14 +3,15 @@ package com.nightscout.android.dexcom.records;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 
-public class MeterRecord  implements Serializable {
-    private int systemTime;
-    private int displayTime;
+public class MeterRecord extends GenericTimestampRecord implements Serializable {
+
     private int meterBG;
     private int meterTime;
 
     public MeterRecord(byte[] packet) {
+        super(Arrays.copyOfRange(packet, 0, 7));
         meterBG = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8);
         meterTime = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(10);
     }
