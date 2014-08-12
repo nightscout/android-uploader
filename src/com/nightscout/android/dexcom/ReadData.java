@@ -122,7 +122,7 @@ public class ReadData extends AsyncTask<UsbSerialDriver, Object, Object> {
                 }
                 return (T) meterRecords;
             case MANUFACTURING_DATA:
-                GenericXMLRecord xmlRecord = new GenericXMLRecord(data);
+                GenericXMLRecord xmlRecord = new GenericXMLRecord(Arrays.copyOfRange(data, HEADER_LEN, data.length - 1));
                 return (T) xmlRecord;
             default:
                 // Throw error "Database record not supported"

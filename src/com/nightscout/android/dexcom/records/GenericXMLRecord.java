@@ -10,14 +10,16 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.util.Arrays;
 
-public class GenericXMLRecord implements Serializable {
-    int XML_START = 36;
+public class GenericXMLRecord extends GenericTimestampRecord implements Serializable {
+    int XML_START = 8;
     int XML_END = 241;
 
     private Element xmlElement;
 
     public GenericXMLRecord(byte[] packet) {
+        super(Arrays.copyOfRange(packet, 0, 7));
         Document document;
+        // TODO: it would be best if we could just remove /x00 character and read till end
         String xml = new String(Arrays.copyOfRange(packet, XML_START, XML_END));
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder;
