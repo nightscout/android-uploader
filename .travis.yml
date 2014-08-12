@@ -22,8 +22,8 @@ deploy:
   file: "./app/build/outputs/apk/app-release-unsigned.apk"
   skip_cleanup: true
   api_key:
-    secure: FCiDUD4Q3rdvYp0K65zSwJMYCVnCBhEqZSu4qUepW28gWt9rt3hd1wBcVCe3h0qa488EOZ+u32wz5WLR6yIQpHOyohDKuxEu3g6I0Dlh5h9aFlyRdkxJ8YA9iWjjUe5BBTJiyddt3Lm4O4/q0VtQ9DCgiw9SAf7A+RtRRfFEaIg=
+    secure: "Add encrypted github token with public_repo scope here"
   on:
-    repo: virmani/android-uploader
+    repo: nightscout/android-uploader
     tags: true
     all_branches: true
