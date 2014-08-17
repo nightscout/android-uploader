@@ -4,7 +4,8 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.*;
-import android.util.Log;
+import android.widget.BaseAdapter;
+
 import com.nightscout.android.R;
 
 public class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
@@ -41,14 +42,31 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 
     // iterate through all preferences and update to saved value
     private void initSummary(Preference p) {
-        if (p instanceof PreferenceCategory) {
-            PreferenceCategory pCat = (PreferenceCategory) p;
-            for (int i = 0; i < pCat.getPreferenceCount(); i++) {
-                initSummary(pCat.getPreference(i));
+        // PreferenceGroup covers PreferenceCategory and PreferenceScreen
+        if (p instanceof PreferenceGroup) {
+            PreferenceGroup group = (PreferenceGroup) p;
+            for (int i = 0; i < group.getPreferenceCount(); i++) {
+                initSummary(group.getPreference(i));
             }
         } else {
             updatePrefSummary(p);
         }
+    }
+
+    private PreferenceScreen getParentScreen(Preference childPref) {
+        for (int i = 0; i < getPreferenceScreen().getPreferenceCount(); i++) {
+            Preference p = getPreferenceScreen().getPreference(i);
+
+            if (p instanceof PreferenceScreen) {
+                PreferenceScreen screen = (PreferenceScreen)p;
+
+                if (screen.findPreference(childPref.getKey()) != null) {
+                    return screen;
+                }
+            }
+        }
+
+        return null;
     }
 
     // update preference summary
@@ -64,6 +82,18 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         if (p instanceof MultiSelectListPreference) {
             EditTextPreference editTextPref = (EditTextPreference) p;
             p.setSummary(editTextPref.getText());
+        }
+        if (p instanceof CheckBoxPreference) {
+            PreferenceScreen parentScreen = getParentScreen(p);
+
+            if (parentScreen != null) {
+                parentScreen.setSummary(((CheckBoxPreference)p).isChecked() ? "Enabled" : "Disabled");
+
+                // Without this, the parent activity's PreferenceScreen item won't update when the user changes
+                // the checkbox preference.
+                // http://stackoverflow.com/questions/2625246/update-existing-preference-item-in-a-preferenceactivity-upon-returning-from-a-s
+                ((BaseAdapter)parentScreen.getRootAdapter()).notifyDataSetChanged();
+            }
         }
     }
 }
