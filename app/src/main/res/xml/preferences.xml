@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <SwitchPreference
-            android:title="I UNDERSTAND"
-            android:key="IUNDERSTAND"
-            android:disableDependentsState="false"
-            android:switchTextOn="YES"
-            android:switchTextOff="NO"
-            android:summary="Nightscout should not be used to make medical decisions. There is no support or any warranty of any kind. The quality and performance of the project is with you. This is a project that was created and is supported completely by volunteers.">
-    </SwitchPreference>
-    <SwitchPreference
-            android:dependency="IUNDERSTAND"
             android:title="API Upload (REST)"
             android:key="EnableRESTUpload"
             android:disableDependentsState="false"
@@ -24,7 +15,6 @@
             android:dialogMessage="This only the base URL, the uploader will automatically append /entries for the POST">
     </EditTextPreference>
     <SwitchPreference
-            android:dependency="IUNDERSTAND"
             android:title="MongoDB Upload"
             android:key="EnableMongoUpload"
             android:disableDependentsState="false"
@@ -49,7 +39,7 @@
             android:title="Wifi Hack"
             android:key="EnableWifiHack"
             android:disableDependentsState="false"
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:summaryOn="Wifi will be disabled if there is a timeout (poor wifi signal/access point), this will allow mobile data to be used instead"
             android:summaryOff="The uploader won't try to disable Wifi even if there is a timeout"
             >
@@ -63,4 +53,100 @@
             android:summaryOff="The uploader won't try upload old data"
             >
     </SwitchPreference>
+    <SwitchPreference
+            android:title="Clickatell SMS Enabled"
+            android:key="SMS_ENABLE"
+            android:disableDependentsState="false"
+            android:defaultValue="false"
+            android:summaryOn="The uploader will send SMS messages"
+            android:summaryOff="The uploader won't send SMS messages"
+            >
+    </SwitchPreference>
+
+    <EditTextPreference
+            android:dependency="SMS_ENABLE"
+            android:title="Your Clickatell username"
+            android:key="CLICKATELL_USERNAME"
+            android:persistent="true"
+            />
+    <EditTextPreference
+            android:dependency="SMS_ENABLE"
+            android:title="Your Clickatell password"
+            android:key="CLICKATELL_PASSWORD"
+            android:inputType="textPassword"
+            android:persistent="true"
+            />
+    <EditTextPreference
+            android:dependency="SMS_ENABLE"
+            android:title="Your Cilckatell API ID"
+            android:key="CLICKATELL_APIID"
+            android:persistent="true"
+            />
+    <EditTextPreference
+            android:dependency="SMS_ENABLE"
+            android:title="Your Clickatell Phone Number"
+    		android:inputType="number" 
+    		android:digits="0123456789"
+            android:key="SMS_SENDER"
+            android:persistent="true"
+            />
+        <EditTextPreference
+            android:dependency="SMS_ENABLE"
+            android:title="Recipients"
+            android:dialogMessage="One or more recipients separated by commas. e.g.,  12123456789,12129998877"
+            android:key="SMS_RECEIVER"
+            android:inputType="number" 
+            android:digits="0123456789,"
+            android:persistent="true"
+            />
+    
+            <EditTextPreference
+            android:dependency="SMS_ENABLE"
+            android:title="BG too high threshold"
+            android:key="SMSBgHigh"
+            android:defaultValue="120"
+            android:persistent="true"
+    		android:inputType="number" 
+            />
+            <EditTextPreference
+            android:dependency="SMS_ENABLE"
+            android:title="BG too low threshold"
+            android:key="SMSBgLow"
+            android:defaultValue="85"
+            android:persistent="true"
+    		android:inputType="number" 
+            />
+    <EditTextPreference
+            android:dependency="SMS_ENABLE"
+            android:title="Out of range SMS Interval"
+            android:key="DATA_POINT_SMS_INTERVAL"
+            android:defaultValue="3"
+            android:persistent="true"
+    		android:inputType="number" 
+    		android:dialogMessage="Set the interval at which an SMS should be sent when a data point is out of range"
+            />
+    <EditTextPreference
+            android:dependency="SMS_ENABLE"
+            android:title="Within Range SMS Interval"
+            android:key="IN_RANGE_INTERVAL"
+            android:defaultValue="3"
+            android:persistent="true"
+    		android:inputType="number" 
+    		android:dialogMessage="Set the interval at which an SMS should be sent when a data point is within range"
+            />
+    <EditTextPreference
+            android:dependency="SMS_ENABLE"
+            android:title="No Data SMS Interval"
+            android:key="NO_DATA_INTERVAL"
+            android:defaultValue="3"
+            android:persistent="true"
+    		android:inputType="number" 
+    		android:dialogMessage="Set the interval at which an SMS should be sent when not data is recieved"
+            />
+    
+
+    private static final Integer SMSBgHigh = 120; // Will send text when above this value
+    private static final Integer SMSBgLow = 85; // Will send text when below this value
+    
+    
 </PreferenceScreen>
