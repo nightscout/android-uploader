@@ -42,12 +42,15 @@ public class DexcomG4Service extends Service {
     private final int THREE_MINS_MS = 180000;
     private final int UPLOAD_OFFSET_MS = 3000;
     private long nextUploadTimer = THREE_MINS_MS;
-    private boolean initialRead = true;
+    private static boolean initialRead = true;
     private UsbSerialDriver mSerialDevice;
     private UploadHelper uploader;
     private Handler mHandler = new Handler();
     private SerialInputOutputManager mSerialIoManager;
     private WifiManager wifiManager;
+    private static int CGMConnected = 0;
+    private static int CGMConnectError = 0;
+
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -103,21 +106,38 @@ public class DexcomG4Service extends Service {
                     USBOn();
                     doReadAndUpload();
                     USBOff();
+
+                    if (CGMConnected == 0) {
+                        UploadHelper.sendSMSHttpAsync(mContext, "Connected and awaiting first reading in 5 minutes...");
+                        CGMConnected = 1; // Prevent further notifications
+                    }
+
+                    // Restored connection: Reset CGMConnectError
+                    CGMConnectError = 0;
+
                 } else {
                     USBOn();
                     USBOff();
 
-                    if (!connected)
-                        displayMessage("CGM connection error");
-                    else
+                    // Lost connection: Reset CGMConnected
+                    CGMConnected = 0;
+
+                    if (!connected){
+                        if (CGMConnectError == 0) {
+                            displayMessage("CGM connection error");
+                            CGMConnectError = 1; // Prevent further notifications
+                        }
+                    }else{
                         displayMessage("NET connection error");
+                    }
                 }
 
             } catch (Exception e) {
-                // ignore... for now - simply prevent service and activity from
-                // losing its shit.
+                // ignore... for now
                 USBOn();
                 USBOff();
+                UploadHelper.sendSMSHttpAsync(mContext,"No Data");
+            	
                 Log.e(TAG, "Unable to read from dexcom or upload", e);
             }
             mHandler.removeCallbacks(readAndUpload);
@@ -195,7 +215,7 @@ public class DexcomG4Service extends Service {
 
             nextUploadTimer = getNextUploadTimer(dexcomReader);
 
-            if (prefs.getBoolean("EnableWifiHack", false)) {
+            if (prefs.getBoolean("EnableWifiHack", true)) {
                 doWifiHack();
             }
         }
@@ -375,5 +395,8 @@ public class DexcomG4Service extends Service {
         }
 
         return  nextUploadTimer;
+    }
+    public static boolean isInitialRead(){
+    	return initialRead;
     }
 }

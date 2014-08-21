@@ -14,5 +14,5 @@
      limitations under the License.
 -->
 <resources>
-    <usb-device vendor-id="8867" product-id="71" class="2" subclass="0" protocol="0" />
+    <usb-device class="2" subclass="0" protocol="0" />
 </resources>

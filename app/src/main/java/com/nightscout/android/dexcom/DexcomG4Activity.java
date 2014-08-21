@@ -20,10 +20,16 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import com.nightscout.android.R;
 import com.nightscout.android.settings.SettingsActivity;
+import com.nightscout.android.upload.UploadHelper;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 
 /* Main activity for the DexcomG4Activity program */
 public class DexcomG4Activity extends Activity {
@@ -47,7 +53,7 @@ public class DexcomG4Activity extends Activity {
             if (retryCount < maxRetries) {
                 startService(new Intent(DexcomG4Activity.this, DexcomG4Service.class));
                 mTitleTextView.setTextColor(Color.YELLOW);
-                mTitleTextView.setText("Connecting...");
+                mTitleTextView.setText("Connecting to Dexcom...");
                 Log.i(TAG, "Starting service " + retryCount + "/" + maxRetries);
                 ++retryCount;
             } else {
@@ -57,7 +63,7 @@ public class DexcomG4Activity extends Activity {
             }
         } else {
             mTitleTextView.setTextColor(Color.GREEN);
-            mTitleTextView.setText("CGM Service Started");
+            mTitleTextView.setText("CGM+SMS v1.2 Started");
             EGVRecord record = DexcomG4Activity.this.loadClassFile(new File(getBaseContext().getFilesDir(), "save.bin"));
             mDumpTextView.setTextColor(Color.WHITE);
             mDumpTextView.setText("\n" + record.displayTime + "\n" + record.bGValue + "\n" + record.trendArrow + "\n");
@@ -70,9 +76,10 @@ public class DexcomG4Activity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.adb);
-
+        clearSavedEGV();
+        clearSavedCSV();
+        
         mTitleTextView = (TextView) findViewById(R.id.demoTitle);
         mDumpTextView = (TextView) findViewById(R.id.demoText);
 
@@ -163,5 +170,26 @@ public class DexcomG4Activity extends Activity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+    
+    private void clearSavedEGV(){
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(getFilesDir(), "save.bin"))); 
+            oos.writeObject(new EGVRecord()); // write the class as an 'object'
+            oos.flush(); // flush the stream to insure all of the information was written to 'save.bin'
+            oos.close();// close the stream
+        } catch(Exception e) {
+            Log.e(TAG, "write to OutputStream failed", e);
+        }
+    }
+    private void clearSavedCSV(){
+		try {
+			CSVWriter writer = new CSVWriter(new FileWriter(new File(getFilesDir(), "hayden.csv")),',', CSVWriter.NO_QUOTE_CHARACTER);
+	        writer.writeAll(new ArrayList<String[]>());
+	        writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }
