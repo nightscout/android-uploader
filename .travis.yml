@@ -1,0 +1,29 @@
+language: android
+env:
+  matrix:
+  - ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
+before_install:
+- echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
+- emulator -avd test -no-skin -no-audio -no-window &
+before_script:
+- "./ci/wait_for_emulator"
+- adb shell input keyevent 82 &
+android:
+  components:
+  - build-tools-19.1.0
+  - android-19
+  - sysimg-19
+  - extra-android-support
+  licenses:
+  - android-sdk-license-5be876d5
+  - ".*intel.+"
+deploy:
+  provider: releases
+  file: "./app/build/outputs/apk/app-release-unsigned.apk"
+  skip_cleanup: true
+  api_key:
+    secure: Yv7qc91hNpvFZVjnl1fjA53SfH5kXyJPCabR6IIz2SbExDpstxStSQiUZydIgwrwtXtxliG8irhBdQSfYoYrHREbIZBCX0RkY1QxFpI7r3eLwIUW3SDjfvmbU7HwtYqHqG5gpr1qe81PEj5gFi49YsJYODw9WyaYiRqgE3JFUTs=
+  on:
+    repo: nightscout/android-uploader
+    tags: true
+    all_branches: true
