@@ -9,13 +9,15 @@ import java.util.TimeZone;
 public class GenericTimestampRecord {
 
     public final Date EPOCH = new GregorianCalendar(2009, 0, 1).getTime();
+    private final int OFFSET_SYS_TIME = 0;
+    private final int OFFSET_DISPLAY_TIME = 4;
     private Date systemTime;
     private Date displayTime;
 
     public GenericTimestampRecord(byte[] packet) {
-        int st = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(0);
+        int st = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(OFFSET_SYS_TIME);
         systemTime = getDate(st);
-        int dt = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(4);
+        int dt = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(OFFSET_DISPLAY_TIME);
         displayTime = getDate(dt);
     }
 

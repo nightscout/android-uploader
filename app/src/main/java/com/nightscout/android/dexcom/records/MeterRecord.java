@@ -11,7 +11,7 @@ public class MeterRecord extends GenericTimestampRecord implements Serializable 
     private int meterTime;
 
     public MeterRecord(byte[] packet) {
-        super(Arrays.copyOfRange(packet, 0, 7));
+        super(packet);
         meterBG = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8);
         meterTime = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(10);
     }

@@ -14,7 +14,7 @@ public class EGRecord extends GenericTimestampRecord implements Serializable {
 
     public EGRecord(byte[] packet) {
         // system_time (UInt), display_time (UInt), glucose (UShort), trend_arrow (Byte), crc (UShort))
-        super(Arrays.copyOfRange(packet, 0, 7));
+        super(packet);
         int eGValue = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8);
         bGValue = eGValue & Constants.EGV_VALUE_MASK;
         int trendValue = ByteBuffer.wrap(packet).get(10) & Constants.EGV_TREND_ARROW_MASK;

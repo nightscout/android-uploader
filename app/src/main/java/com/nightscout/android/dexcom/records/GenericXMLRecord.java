@@ -17,7 +17,7 @@ public class GenericXMLRecord extends GenericTimestampRecord implements Serializ
     private Element xmlElement;
 
     public GenericXMLRecord(byte[] packet) {
-        super(Arrays.copyOfRange(packet, 0, 7));
+        super(packet);
         Document document;
         // TODO: it would be best if we could just remove /x00 characters and read till end
         String xml = new String(Arrays.copyOfRange(packet, XML_START, XML_END));
