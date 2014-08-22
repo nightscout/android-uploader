@@ -246,8 +246,8 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
 
         String apiToken = prefs.getString("PushoverAPIToken", null);
         String userKey = prefs.getString("PushoverUserKey", null);
-        int lowThreshold = Integer.valueOf(prefs.getString("PushoverHighThreshold", "-1"));
-        int highThreshold = Integer.valueOf(prefs.getString("PushoverLowThreshold", "-1"));
+        int lowThreshold = Integer.valueOf(prefs.getString("PushoverLowThreshold", "-1"));
+        int highThreshold = Integer.valueOf(prefs.getString("PushoverHighThreshold", "-1"));
         Boolean alertProblems = prefs.getBoolean("PushoverAlertProblems", false);
         int priority = prefs.getBoolean("PushoverContinuous", false) ? 2 : 1;
 
