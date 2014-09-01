@@ -3,12 +3,17 @@ package com.nightscout.android.dexcom;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
+import android.hardware.usb.UsbManager;
+import android.util.Log;
+
+import com.nightscout.android.dexcom.USB.UsbSerialDriver;
+import com.nightscout.android.dexcom.USB.UsbSerialProber;
+
+import java.io.IOException;
 
 /**
- * An {@link IntentService} subclass for handling asynchronous Dexcom downloads and cloud upload
+ * An {@link IntentService} subclass for handling asynchronous Dexcom downloads and cloud uploads
  * requests in a service on a separate handler thread.
- * <p>
- * helper methods.
  */
 public class SyncingService extends IntentService {
 
@@ -16,6 +21,11 @@ public class SyncingService extends IntentService {
 
     private static final String EXTRA_PARAM1 = "com.nightscout.android.dexcom.extra.2DAY";
     private static final String EXTRA_PARAM2 = "com.nightscout.android.dexcom.extra.SINGLE";
+
+    private final String TAG = SyncingService.class.getSimpleName();
+
+    private UsbManager mUsbManager;
+    private UsbSerialDriver mSerialDevice;
 
     /**
      * Starts this service to perform action Foo with the given parameters. If
@@ -50,8 +60,23 @@ public class SyncingService extends IntentService {
      * parameters.
      */
     private void handleActionSync(String param1) {
-        // TODO: Handle action Sync
-        throw new UnsupportedOperationException("Not yet implemented");
+        acquireSerialDevice();
+        ReadData readData = new ReadData(mSerialDevice);
+        boolean test = readData.ping();
+    }
+
+    private void acquireSerialDevice() {
+        mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        mSerialDevice = UsbSerialProber.acquire(mUsbManager);
+        if (mSerialDevice != null) {
+            try {
+                mSerialDevice.open();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.d(TAG, "Unable to acquire USB device from manager.");
+        }
     }
 
 }
