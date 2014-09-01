@@ -11,6 +11,8 @@ public class GenericTimestampRecord {
     public final Date EPOCH = new GregorianCalendar(2009, 0, 1).getTime();
     private final int OFFSET_SYS_TIME = 0;
     private final int OFFSET_DISPLAY_TIME = 4;
+    private int currentTZOffset = TimeZone.getDefault().getRawOffset();
+    private long epochMS = 1230768000000L;
     private Date systemTime;
     private Date displayTime;
 
@@ -31,10 +33,8 @@ public class GenericTimestampRecord {
 
     // TODO: this will be used in 1 other place, thus might be best to get in a utilities class
     private Date getDate(int receiverTime) {
-        // Epoch is PST, but but having epoch have user timezone added, then don't have to add to the
-        // display time
         // TODO: probably best to do this Adriens way, TBD
-        long milliseconds = EPOCH.getTime();
+        long milliseconds = epochMS - currentTZOffset;
         long timeAdd = milliseconds + (1000L * receiverTime);
         TimeZone tz = TimeZone.getDefault();
         if (tz.inDaylightTime(new Date())) timeAdd = timeAdd - 3600000L;
