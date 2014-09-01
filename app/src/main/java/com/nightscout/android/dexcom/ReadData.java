@@ -14,7 +14,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ReadData extends AsyncTask<UsbSerialDriver, Object, Object> {
+public class ReadData {
 
     private static final String TAG = ReadData.class.getSimpleName();
     private static final int IO_TIMEOUT = 200;
@@ -23,6 +23,12 @@ public class ReadData extends AsyncTask<UsbSerialDriver, Object, Object> {
 
     public ReadData(UsbSerialDriver device) {
         mSerialDevice = device;
+    }
+
+    public EGRecord[] getRecentEGVs() {
+        int recordType = Constants.RECORD_TYPES.EGV_DATA.ordinal();
+        int endPage = readDataBasePageRange(recordType);
+        return readDataBasePage(recordType, endPage);
     }
 
     public boolean ping() {
@@ -130,11 +136,5 @@ public class ReadData extends AsyncTask<UsbSerialDriver, Object, Object> {
         }
 
         return (T) null;
-    }
-
-    @Override
-    protected Object doInBackground(UsbSerialDriver... params) {
-        // TODO Auto-generated method stub
-        return null;
     }
 }
