@@ -248,6 +248,7 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
                 //Uploading devicestatus
                 BasicDBObject devicestatus = new BasicDBObject();
                 devicestatus.put("uploaderBattery", DexcomG4Activity.batLevel);
+                devicestatus.put("created_at", new Date());
                 dsCollection.insert(devicestatus, WriteConcern.UNACKNOWLEDGED);
                 
                 client.close();
