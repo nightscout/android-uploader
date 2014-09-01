@@ -11,6 +11,7 @@ public class EGRecord extends GenericTimestampRecord implements Serializable {
 
     private int bGValue;
     private String trend;
+    private String trendSymbol;
 
     public EGRecord(byte[] packet) {
         // system_time (UInt), display_time (UInt), glucose (UShort), trend_arrow (Byte), crc (UShort))
@@ -19,6 +20,7 @@ public class EGRecord extends GenericTimestampRecord implements Serializable {
         bGValue = eGValue & Constants.EGV_VALUE_MASK;
         int trendValue = ByteBuffer.wrap(packet).get(10) & Constants.EGV_TREND_ARROW_MASK;
         trend = Constants.TREND_ARROW_VALUES.values()[trendValue].friendlyTrendName();
+        trendSymbol = Constants.TREND_ARROW_VALUES.values()[trendValue].Symbol();
     }
 
     public int getBGValue() {
@@ -27,5 +29,9 @@ public class EGRecord extends GenericTimestampRecord implements Serializable {
 
     public String getTrend() {
         return trend;
+    }
+
+    public String getTrendSymbol() {
+        return trendSymbol;
     }
 }
