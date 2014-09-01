@@ -21,6 +21,10 @@ import android.widget.TextView;
 import com.nightscout.android.R;
 import com.nightscout.android.settings.SettingsActivity;
 
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
+import android.os.BatteryManager;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
@@ -38,6 +42,8 @@ public class DexcomG4Activity extends Activity {
     private TextView mTitleTextView;
     private TextView mDumpTextView;
     private Button b1;
+    public static String batLevel = "0";
+    BatteryReceiver mArrow;
 
 
     //All I'm really doing here is creating a simple activity to launch and maintain the service
@@ -62,9 +68,27 @@ public class DexcomG4Activity extends Activity {
             mDumpTextView.setTextColor(Color.WHITE);
             mDumpTextView.setText("\n" + record.displayTime + "\n" + record.bGValue + "\n" + record.trendArrow + "\n");
         }
+            mArrow = new BatteryReceiver();
+            IntentFilter mIntentFilter = new IntentFilter();
+            mIntentFilter.addAction(Intent.ACTION_BATTERY_LOW);
+            mIntentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
+            mIntentFilter.addAction(Intent.ACTION_BATTERY_OKAY);
+            Intent batteryIntent=registerReceiver(mArrow,mIntentFilter);
+
         mHandler.postDelayed(updateDataView, 30000);
         }
     };
+
+    private class  BatteryReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context arg0, Intent arg1) {
+           if (arg1.getAction().equalsIgnoreCase(Intent.ACTION_BATTERY_LOW)
+                    || arg1.getAction().equalsIgnoreCase(Intent.ACTION_BATTERY_CHANGED)
+                   || arg1.getAction().equalsIgnoreCase(Intent.ACTION_BATTERY_OKAY)) {
+                   batLevel =String.format("%s", arg1.getIntExtra("level", 0));
+            }
+        }
+    }
 
     //Look for and launch the service, display status to user
     @Override

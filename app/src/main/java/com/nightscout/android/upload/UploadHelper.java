@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.mongodb.*;
+import com.nightscout.android.dexcom.DexcomG4Activity;
 import com.nightscout.android.dexcom.EGVRecord;
 
 import org.apache.http.client.ResponseHandler;
@@ -220,6 +221,12 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
                     testData.put("direction", record.trend);
                     dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
                 }
+                //Uploading Settings Data
+                BasicDBObject SettingsData = new BasicDBObject();
+                SettingsData.put("type","settings");
+                SettingsData.put("battery", DexcomG4Activity.batLevel);
+                dexcomData.update(SettingsData, SettingsData, true, false, WriteConcern.UNACKNOWLEDGED);
+                
                 client.close();
             } catch (Exception e) {
                 Log.e(TAG, "Unable to upload data to mongo", e);
