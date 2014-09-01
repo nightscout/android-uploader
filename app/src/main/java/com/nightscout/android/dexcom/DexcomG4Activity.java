@@ -42,7 +42,7 @@ public class DexcomG4Activity extends Activity {
     private TextView mTitleTextView;
     private TextView mDumpTextView;
     private Button b1;
-    public static String batLevel = "0";
+    public static int batLevel = 0;
     BatteryReceiver mArrow;
 
 
@@ -83,9 +83,9 @@ public class DexcomG4Activity extends Activity {
         @Override
         public void onReceive(Context arg0, Intent arg1) {
            if (arg1.getAction().equalsIgnoreCase(Intent.ACTION_BATTERY_LOW)
-                    || arg1.getAction().equalsIgnoreCase(Intent.ACTION_BATTERY_CHANGED)
+                   || arg1.getAction().equalsIgnoreCase(Intent.ACTION_BATTERY_CHANGED)
                    || arg1.getAction().equalsIgnoreCase(Intent.ACTION_BATTERY_OKAY)) {
-                   batLevel =String.format("%s", arg1.getIntExtra("level", 0));
+                   batLevel = arg1.getIntExtra("level", 0);
             }
         }
     }

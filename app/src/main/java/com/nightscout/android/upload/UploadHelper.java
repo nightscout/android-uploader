@@ -19,6 +19,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.security.MessageDigest;
@@ -171,9 +172,30 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
                     Log.w(TAG, "Unable to post data to: '" + post.getURI().toString() + "'", e);
                 }
             }
+
+            postDeviceStatus(baseURL, httpclient);
+
         } catch (Exception e) {
             Log.e(TAG, "Unable to post data", e);
         }
+    }
+
+    private void postDeviceStatus(String baseURL, DefaultHttpClient httpclient) throws Exception {
+        String devicestatusURL = baseURL + "devicestatus";
+        Log.i(TAG, "devicestatusURL: " + devicestatusURL);
+
+        JSONObject json = new JSONObject();
+        json.put("uploaderBattery", DexcomG4Activity.batLevel);
+        String jsonString = json.toString();
+
+        HttpPost post = new HttpPost(devicestatusURL);
+        StringEntity se = new StringEntity(jsonString);
+        post.setEntity(se);
+        post.setHeader("Accept", "application/json");
+        post.setHeader("Content-type", "application/json");
+
+        ResponseHandler responseHandler = new BasicResponseHandler();
+        httpclient.execute(post, responseHandler);
     }
 
     private void populateV1APIEntry(JSONObject json, EGVRecord record) throws Exception {
@@ -221,11 +243,12 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
                     testData.put("direction", record.trend);
                     dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
                 }
-                //Uploading Settings Data
-                BasicDBObject SettingsData = new BasicDBObject();
-                SettingsData.put("type","settings");
-                SettingsData.put("battery", DexcomG4Activity.batLevel);
-                dexcomData.update(SettingsData, SettingsData, true, false, WriteConcern.UNACKNOWLEDGED);
+
+                DBCollection dsCollection = db.getCollection("devicestatus");
+                //Uploading devicestatus
+                BasicDBObject devicestatus = new BasicDBObject();
+                devicestatus.put("uploaderBattery", DexcomG4Activity.batLevel);
+                dsCollection.insert(devicestatus, WriteConcern.UNACKNOWLEDGED);
                 
                 client.close();
             } catch (Exception e) {
