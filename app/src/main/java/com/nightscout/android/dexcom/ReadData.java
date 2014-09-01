@@ -31,6 +31,12 @@ public class ReadData {
         return readDataBasePage(recordType, endPage);
     }
 
+    public MeterRecord[] getRecentMeterRecords() {
+        int recordType = Constants.RECORD_TYPES.METER_DATA.ordinal();
+        int endPage = readDataBasePageRange(recordType);
+        return readDataBasePage(recordType, endPage);
+    }
+
     public boolean ping() {
         writeCommand(Constants.PING);
         return read(MIN_LEN).getCommand() == Constants.ACK;
