@@ -5,6 +5,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.settings.SettingsActivity;
@@ -45,6 +48,12 @@ public class MainActivity extends Activity {
 
         context = getApplicationContext();
         intent = new Intent(this, SyncingService.class);
+
+        // Register USB attached/detached intents
+        IntentFilter usbFilter = new IntentFilter();
+        usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+        usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+        registerReceiver(mUsbReceiver, usbFilter);
 
         // Register Broadcast Receiver for response messages from intent service
         receiver = new CGMStatusReceiver();
@@ -120,6 +129,23 @@ public class MainActivity extends Activity {
             mHandler.postDelayed(syncCGM, responseNextUploadTime);
         }
     }
+
+    BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
+                Toast.makeText(getApplicationContext(), "USB detached broadcast", Toast.LENGTH_SHORT).show();
+//                UsbDevice device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+//                if (device != null) {
+//                    // call your method that cleans up and closes communication with the device
+//                }
+            } else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
+                Toast.makeText(getApplicationContext(), "USB attached broadcast", Toast.LENGTH_SHORT).show();
+                //TODO: consider getting permission programmatically instead of user prompted
+                //if decided to need to add android.permission.USB_PERMISSION in manifest
+            }
+        }
+    };
 
     public Runnable syncCGM = new Runnable() {
         public void run() {
