@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nightscout.android.dexcom.SyncingService;
@@ -30,6 +31,7 @@ public class MainActivity extends Activity {
     private TextView mTextSGV;
     private TextView mTextTimestamp;
     private Button mButton;
+    private ImageView mImageViewUSB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,7 @@ public class MainActivity extends Activity {
         mTextSGV = (TextView) findViewById(R.id.sgValue);
         mTextTimestamp = (TextView) findViewById(R.id.timeAgo);
         mButton = (Button)findViewById(R.id.stopSyncingButton);
+        mImageViewUSB = (ImageView) findViewById(R.id.imageViewUSB);
 
         context = getApplicationContext();
         intent = new Intent(this, SyncingService.class);
@@ -104,6 +107,13 @@ public class MainActivity extends Activity {
             // Update with latest record
             mTextSGV.setText(responseString);
             mTextTimestamp.setText(responseMessage);
+
+            // Add status icon for usb connected
+            if (responseString.equals("---")) {
+                mImageViewUSB.setImageResource(R.drawable.usb_disconnected);
+            } else {
+                mImageViewUSB.setImageResource(R.drawable.usb_connected);
+            }
 
             Log.d(TAG, "Setting next upload time to: " + responseNextUploadTime);
             mHandler.removeCallbacks(syncCGM);
