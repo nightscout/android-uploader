@@ -21,8 +21,10 @@ import java.io.IOException;
  */
 public class SyncingService extends IntentService {
 
+    // Action for intent
     private static final String ACTION_SYNC = "com.nightscout.android.dexcom.action.SYNC";
 
+    // Parameters for intent
     private static final String TWO_DAY = "com.nightscout.android.dexcom.extra.2DAY";
     private static final String SINGLE = "com.nightscout.android.dexcom.extra.SINGLE";
 
@@ -32,13 +34,12 @@ public class SyncingService extends IntentService {
     public static final String RESPONSE_NEXT_UPLOAD_TIME = "myUploadTime";
 
     private final String TAG = SyncingService.class.getSimpleName();
-
     private Context mContext;
     private UsbManager mUsbManager;
     private UsbSerialDriver mSerialDevice;
 
     /**
-     * Starts this service to perform action Foo with the given parameters. If
+     * Starts this service to perform action Sync with the given parameters. If
      * the service is already performing a task this action will be queued.
      *
      * @see IntentService
@@ -71,23 +72,19 @@ public class SyncingService extends IntentService {
      * parameters.
      */
     private void handleActionSync(String param1) {
-        acquireSerialDevice();
-        ReadData readData = new ReadData(mSerialDevice);
-        EGRecord[] recentRecords = readData.getRecentEGVs();
-        MeterRecord[] meterRecords = readData.getRecentMeterRecords();
-        Uploader uploader = new Uploader(mContext);
-        uploader.upload(recentRecords, meterRecords);
+        if (acquireSerialDevice()) {
+            ReadData readData = new ReadData(mSerialDevice);
+            EGRecord[] recentRecords = readData.getRecentEGVs();
+            MeterRecord[] meterRecords = readData.getRecentMeterRecords();
+            Uploader uploader = new Uploader(mContext);
+            uploader.upload(recentRecords, meterRecords);
 
-        EGRecord recentEGV = recentRecords[recentRecords.length - 1];
-        MeterRecord recentMeterBG = meterRecords[meterRecords.length - 1];
-        Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
-        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.putExtra(RESPONSE_SGV, String.valueOf(recentEGV.getBGValue()) + " "
-                + recentEGV.getTrendSymbol());
-        broadcastIntent.putExtra(RESPONSE_TIMESTAMP, recentEGV.getDisplayTime().toString());
-        broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, 60000*2.5);
-        sendBroadcast(broadcastIntent);
+            EGRecord recentEGV = recentRecords[recentRecords.length - 1];
+            broadcastSGVToUI(recentEGV);
+        } else {
+            // Not connect to serial device
+            broadcastSGVToUI();
+        }
     }
 
     // TODO: this needs to be more robust as before, but will clean up it and implement here, this
@@ -106,6 +103,27 @@ public class SyncingService extends IntentService {
             Log.d(TAG, "Unable to acquire USB device from manager.");
         }
         return false;
+    }
+
+    private void broadcastSGVToUI(EGRecord egRecord) {
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
+        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        broadcastIntent.putExtra(RESPONSE_SGV, String.valueOf(egRecord.getBGValue()) + " "
+                                               + egRecord.getTrendSymbol());
+        broadcastIntent.putExtra(RESPONSE_TIMESTAMP, egRecord.getDisplayTime().toString());
+        broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, 60000*2.5);
+        sendBroadcast(broadcastIntent);
+    }
+
+    private void broadcastSGVToUI() {
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
+        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        broadcastIntent.putExtra(RESPONSE_SGV, "---");
+        broadcastIntent.putExtra(RESPONSE_TIMESTAMP, "---");
+        broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, 60000);
+        sendBroadcast(broadcastIntent);
     }
 
 }
