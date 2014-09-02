@@ -86,7 +86,7 @@ public class SyncingService extends IntentService {
         broadcastIntent.putExtra(RESPONSE_SGV, String.valueOf(recentEGV.getBGValue()) + " "
                 + recentEGV.getTrendSymbol());
         broadcastIntent.putExtra(RESPONSE_TIMESTAMP, recentEGV.getDisplayTime().toString());
-        broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, 60000);
+        broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, 60000*2.5);
         sendBroadcast(broadcastIntent);
     }
 
