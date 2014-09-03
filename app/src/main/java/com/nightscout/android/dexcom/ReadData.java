@@ -55,7 +55,7 @@ public class ReadData {
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt() & 0xffffffffL;
     }
 
-    public int readDataBasePageRange(int recordType) {
+    private int readDataBasePageRange(int recordType) {
         ArrayList<Byte> payload = new ArrayList<Byte>();
         payload.add((byte) recordType);
         writeCommand(Constants.READ_DATABASE_PAGE_RANGE, payload);
