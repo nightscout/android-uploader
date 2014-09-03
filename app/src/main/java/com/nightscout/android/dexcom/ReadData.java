@@ -31,6 +31,24 @@ public class ReadData {
         return readDataBasePage(recordType, endPage);
     }
 
+    public EGRecord[] getRecentEGVsPages(int numOfRecentPages) {
+        if (numOfRecentPages < 1) {
+            throw new IllegalArgumentException("Number of pages must be greater than 1.");
+        }
+        int recordType = Constants.RECORD_TYPES.EGV_DATA.ordinal();
+        int endPage = readDataBasePageRange(recordType);
+        numOfRecentPages = numOfRecentPages - 1;
+        EGRecord[] allPages = new EGRecord[0];
+        for (int i = numOfRecentPages; i >= 0; i--) {
+            int nextPage = endPage - i;
+            EGRecord[] ithEGRecordPage = readDataBasePage(recordType, nextPage);
+            EGRecord[] result = Arrays.copyOf(allPages, allPages.length + ithEGRecordPage.length);
+            System.arraycopy(ithEGRecordPage, 0, result, allPages.length, ithEGRecordPage.length);
+            allPages = result;
+        }
+        return allPages;
+    }
+
     public MeterRecord[] getRecentMeterRecords() {
         int recordType = Constants.RECORD_TYPES.METER_DATA.ordinal();
         int endPage = readDataBasePageRange(recordType);
