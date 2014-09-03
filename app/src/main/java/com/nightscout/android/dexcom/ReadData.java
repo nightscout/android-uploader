@@ -81,25 +81,30 @@ public class ReadData {
 
     private void writeCommand(int command, ArrayList<Byte> payload) {
         byte[] packet = new PacketBuilder(command, payload).compose();
-        try {
-            mSerialDevice.write(packet, IO_TIMEOUT);
-        } catch (IOException e) {
-            Log.e(TAG, "Unable to write to serial device.", e);
+        if (mSerialDevice != null) {
+            try {
+                mSerialDevice.write(packet, IO_TIMEOUT);
+            } catch (IOException e) {
+                Log.e(TAG, "Unable to write to serial device.", e);
+            }
         }
     }
 
     private void writeCommand(int command) {
         byte[] packet = new PacketBuilder(command).compose();
-        try {
-            mSerialDevice.write(packet, IO_TIMEOUT);
-        } catch (IOException e) {
-            Log.e(TAG, "Unable to write to serial device.", e);
+        if (mSerialDevice != null) {
+            try {
+                mSerialDevice.write(packet, IO_TIMEOUT);
+            } catch (IOException e) {
+                Log.e(TAG, "Unable to write to serial device.", e);
+            }
         }
     }
 
     private ReadPacket read(int numOfBytes) {
         byte[] readData = new byte[numOfBytes];
         int len = 0;
+        // TODO: need to handle case when mSerialDevice == null
         try {
             len = mSerialDevice.read(readData, IO_TIMEOUT);
         } catch (IOException e) {
