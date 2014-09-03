@@ -31,7 +31,6 @@ public class MainActivity extends Activity {
     private CGMStatusReceiver mCGMStatusReceiver;
     private Handler mHandler = new Handler();
     private Context mContext;
-    private Intent mSyncingServiceIntent;
 
     // UI components
     private TextView mTextSGV;
@@ -51,7 +50,6 @@ public class MainActivity extends Activity {
         mImageViewUSB = (ImageView) findViewById(R.id.imageViewUSB);
 
         mContext = getApplicationContext();
-        mSyncingServiceIntent = new Intent(this, SyncingService.class);
 
         // Register USB attached/detached intents
         IntentFilter usbFilter = new IntentFilter();
@@ -65,15 +63,15 @@ public class MainActivity extends Activity {
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(mCGMStatusReceiver, filter);
 
-        // If app started due to android.hardware.usb.action.USB_DEVICE_ATTACHED mSyncingServiceIntent, start syncing
+        // If app started due to android.hardware.usb.action.USB_DEVICE_ATTACHED intent, start syncing
         Intent startIntent = getIntent();
         String action = startIntent.getAction();
         if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
             mImageViewUSB.setImageResource(R.drawable.usb_connected);
             mImageViewUSB.setTag(R.drawable.usb_connected);
             Log.d(TAG, "Starting syncing in OnCreate...");
-            SyncingService.startActionSync(mContext, "test", "test");
-            startService(mSyncingServiceIntent);
+            // TODO: 2nd parameter should be static constant from intent service
+            SyncingService.startActionSingleSync(mContext, 1);
         } else {
             mImageViewUSB.setTag(R.drawable.usb_disconnected);
         }
@@ -81,17 +79,10 @@ public class MainActivity extends Activity {
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                CharSequence test = mButton.getText();
-//                if (mButton.getText().equals("Start Syncing")) {
-//                    Log.d(TAG, "Starting syncing...");
-//                    SyncingService.startActionSync(mContext, "test", "test");
-//                    startService(mSyncingServiceIntent);
-//                    mButton.setText("Stop Syncing");
-//                } else if (mButton.getText().equals("Stop Syncing")) {
-//                    Log.d(TAG, "Stopping syncing and removing callbacks.");
-//                    mHandler.removeCallbacks(syncCGM);
-//                    mButton.setText("Start Syncing");
-//                }
+                mHandler.removeCallbacks(syncCGM);
+                Log.d(TAG, "Starting 2 day syncing onClick...");
+                // TODO: 2nd parameter should be static constant from intent service
+                SyncingService.startActionSingleSync(mContext, 20);
             }
         });
     }
@@ -155,8 +146,8 @@ public class MainActivity extends Activity {
                 mImageViewUSB.setImageResource(R.drawable.usb_connected);
                 mImageViewUSB.setTag(R.drawable.usb_connected);
                 Log.d(TAG, "Starting syncing on USB attached...");
-                SyncingService.startActionSync(mContext, "test", "test");
-                startService(intent);
+                // TODO: 2nd parameter should be static constant from intent service
+                SyncingService.startActionSingleSync(mContext, 1);
                 //TODO: consider getting permission programmatically instead of user prompted
                 //if decided to need to add android.permission.USB_PERMISSION in manifest
             }
@@ -167,8 +158,8 @@ public class MainActivity extends Activity {
     public Runnable syncCGM = new Runnable() {
         public void run() {
             final Context context = getApplicationContext();
-            SyncingService.startActionSync(context, "test", "test");
-            startService(mSyncingServiceIntent);
+            // TODO: 2nd parameter should be static constant from intent service
+            SyncingService.startActionSingleSync(context, 1);
         }
     };
 

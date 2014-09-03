@@ -16,7 +16,7 @@ import com.nightscout.android.upload.Uploader;
 import java.io.IOException;
 
 /**
- * An {@link IntentService} subclass for handling asynchronous Dexcom downloads and cloud uploads
+ * An {@link IntentService} subclass for handling asynchronous CGM Receiver downloads and cloud uploads
  * requests in a service on a separate handler thread.
  */
 public class SyncingService extends IntentService {
@@ -25,8 +25,7 @@ public class SyncingService extends IntentService {
     private static final String ACTION_SYNC = "com.nightscout.android.dexcom.action.SYNC";
 
     // Parameters for intent
-    private static final String TWO_DAY = "com.nightscout.android.dexcom.extra.2DAY";
-    private static final String SINGLE = "com.nightscout.android.dexcom.extra.SINGLE";
+    private static final String SYNC_PERIOD = "com.nightscout.android.dexcom.extra.SYNC_PERIOD";
 
     // Response to broadcast to activity
     public static final String RESPONSE_SGV = "mySGV";
@@ -39,15 +38,15 @@ public class SyncingService extends IntentService {
     private UsbSerialDriver mSerialDevice;
 
     /**
-     * Starts this service to perform action Sync with the given parameters. If
+     * Starts this service to perform action Single Sync with the given parameters. If
      * the service is already performing a task this action will be queued.
      *
      * @see IntentService
      */
-    public static void startActionSync(Context context, String param1, String param2) {
+    public static void startActionSingleSync(Context context, int numOfPages) {
         Intent intent = new Intent(context, SyncingService.class);
         intent.setAction(ACTION_SYNC);
-        intent.putExtra(SINGLE, param1);
+        intent.putExtra(SYNC_PERIOD, numOfPages);
         context.startService(intent);
     }
 
@@ -61,7 +60,7 @@ public class SyncingService extends IntentService {
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_SYNC.equals(action)) {
-                final String param1 = intent.getStringExtra(TWO_DAY);
+                final int param1 = intent.getIntExtra(SYNC_PERIOD, 1);
                 handleActionSync(param1);
             }
         }
@@ -71,16 +70,24 @@ public class SyncingService extends IntentService {
      * Handle action Sync in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionSync(String param1) {
+    private void handleActionSync(int numOfPages) {
         if (acquireSerialDevice()) {
             ReadData readData = new ReadData(mSerialDevice);
-            EGRecord[] recentRecords = readData.getRecentEGVs();
+            EGRecord[] recentRecords = readData.getRecentEGVsPages(numOfPages);
             MeterRecord[] meterRecords = readData.getRecentMeterRecords();
             Uploader uploader = new Uploader(mContext);
             uploader.upload(recentRecords, meterRecords);
 
             EGRecord recentEGV = recentRecords[recentRecords.length - 1];
             broadcastSGVToUI(recentEGV);
+
+            // Close serial
+            try {
+                mSerialDevice.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         } else {
             // Not connect to serial device
             broadcastSGVToUI();
@@ -112,7 +119,7 @@ public class SyncingService extends IntentService {
         broadcastIntent.putExtra(RESPONSE_SGV, String.valueOf(egRecord.getBGValue()) + " "
                                                + egRecord.getTrendSymbol());
         broadcastIntent.putExtra(RESPONSE_TIMESTAMP, egRecord.getDisplayTime().toString());
-        broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, 60000*2.5);
+        broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, 60000*3);
         sendBroadcast(broadcastIntent);
     }
 
