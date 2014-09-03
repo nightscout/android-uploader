@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,7 +15,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.settings.SettingsActivity;
@@ -25,10 +23,15 @@ import com.nightscout.android.settings.SettingsActivity;
 public class MainActivity extends Activity {
 
     private final String TAG = MainActivity.class.getSimpleName();
-    private CGMStatusReceiver receiver;
+
+    // Constants
+    private final int DEFAULT_SYNC_INTERVAL = 180000;
+
+    // Member components
+    private CGMStatusReceiver mCGMStatusReceiver;
     private Handler mHandler = new Handler();
-    private Context context;
-    private Intent intent;
+    private Context mContext;
+    private Intent mSyncingServiceIntent;
 
     // UI components
     private TextView mTextSGV;
@@ -40,14 +43,15 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Setup UI components
         setContentView(R.layout.activity_main);
         mTextSGV = (TextView) findViewById(R.id.sgValue);
         mTextTimestamp = (TextView) findViewById(R.id.timeAgo);
         mButton = (Button)findViewById(R.id.stopSyncingButton);
         mImageViewUSB = (ImageView) findViewById(R.id.imageViewUSB);
 
-        context = getApplicationContext();
-        intent = new Intent(this, SyncingService.class);
+        mContext = getApplicationContext();
+        mSyncingServiceIntent = new Intent(this, SyncingService.class);
 
         // Register USB attached/detached intents
         IntentFilter usbFilter = new IntentFilter();
@@ -55,27 +59,39 @@ public class MainActivity extends Activity {
         usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         registerReceiver(mUsbReceiver, usbFilter);
 
-        // Register Broadcast Receiver for response messages from intent service
-        receiver = new CGMStatusReceiver();
+        // Register Broadcast Receiver for response messages from mSyncingServiceIntent service
+        mCGMStatusReceiver = new CGMStatusReceiver();
         IntentFilter filter = new IntentFilter(CGMStatusReceiver.PROCESS_RESPONSE);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(receiver, filter);
+        registerReceiver(mCGMStatusReceiver, filter);
+
+        // If app started due to android.hardware.usb.action.USB_DEVICE_ATTACHED mSyncingServiceIntent, start syncing
+        Intent startIntent = getIntent();
+        String action = startIntent.getAction();
+        if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
+            mImageViewUSB.setImageResource(R.drawable.usb_connected);
+            mImageViewUSB.setTag(R.drawable.usb_connected);
+            Log.d(TAG, "Starting syncing in OnCreate...");
+            SyncingService.startActionSync(mContext, "test", "test");
+            startService(mSyncingServiceIntent);
+        } else {
+            mImageViewUSB.setTag(R.drawable.usb_disconnected);
+        }
 
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: use constants for text value changes
-                CharSequence test = mButton.getText();
-                if (mButton.getText().equals("Start Syncing")) {
-                    Log.d(TAG, "Starting syncing...");
-                    SyncingService.startActionSync(context, "test", "test");
-                    startService(intent);
-                    mButton.setText("Stop Syncing");
-                } else if (mButton.getText().equals("Stop Syncing")) {
-                    Log.d(TAG, "Stopping syncing and removing callbacks.");
-                    mHandler.removeCallbacks(syncCGM);
-                    mButton.setText("Start Syncing");
-                }
+//                CharSequence test = mButton.getText();
+//                if (mButton.getText().equals("Start Syncing")) {
+//                    Log.d(TAG, "Starting syncing...");
+//                    SyncingService.startActionSync(mContext, "test", "test");
+//                    startService(mSyncingServiceIntent);
+//                    mButton.setText("Stop Syncing");
+//                } else if (mButton.getText().equals("Stop Syncing")) {
+//                    Log.d(TAG, "Stopping syncing and removing callbacks.");
+//                    mHandler.removeCallbacks(syncCGM);
+//                    mButton.setText("Start Syncing");
+//                }
             }
         });
     }
@@ -84,7 +100,8 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         Log.d(TAG, "onDestroy called.");
         super.onDestroy();
-        unregisterReceiver(receiver);
+        unregisterReceiver(mCGMStatusReceiver);
+        unregisterReceiver(mUsbReceiver);
         mHandler.removeCallbacks(syncCGM);
     }
 
@@ -94,6 +111,7 @@ public class MainActivity extends Activity {
         outState.putString("saveTextSGV", mTextSGV.getText().toString());
         outState.putString("saveTextTimestamp", mTextTimestamp.getText().toString());
         outState.putString("saveTextButton", mButton.getText().toString());
+        outState.putInt("saveImageViewUSB", (Integer) mImageViewUSB.getTag());
     }
 
     @Override
@@ -102,27 +120,23 @@ public class MainActivity extends Activity {
         mTextSGV.setText(savedInstanceState.getString("saveTextSGV"));
         mTextTimestamp.setText(savedInstanceState.getString("saveTextTimestamp"));
         mButton.setText(savedInstanceState.getString("saveTextButton"));
+        mImageViewUSB.setImageResource(savedInstanceState.getInt("saveImageViewUSB"));
+        mImageViewUSB.setTag(savedInstanceState.getInt("saveImageViewUSB"));
     }
 
     public class CGMStatusReceiver extends BroadcastReceiver {
-        public static final String PROCESS_RESPONSE = "com.intent.action.PROCESS_RESPONSE";
+        public static final String PROCESS_RESPONSE = "com.mSyncingServiceIntent.action.PROCESS_RESPONSE";
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            // Get response messages from broadcast
             String responseString = intent.getStringExtra(SyncingService.RESPONSE_SGV);
             String responseMessage = intent.getStringExtra(SyncingService.RESPONSE_TIMESTAMP);
-            int responseNextUploadTime = intent.getIntExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, 180000);
+            int responseNextUploadTime = intent.getIntExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, DEFAULT_SYNC_INTERVAL);
 
-            // Update with latest record
+            // Update UI with latest record information
             mTextSGV.setText(responseString);
             mTextTimestamp.setText(responseMessage);
-
-            // Add status icon for usb connected
-            if (responseString.equals("---")) {
-                mImageViewUSB.setImageResource(R.drawable.usb_disconnected);
-            } else {
-                mImageViewUSB.setImageResource(R.drawable.usb_connected);
-            }
 
             Log.d(TAG, "Setting next upload time to: " + responseNextUploadTime);
             mHandler.removeCallbacks(syncCGM);
@@ -134,24 +148,27 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
-                Toast.makeText(getApplicationContext(), "USB detached broadcast", Toast.LENGTH_SHORT).show();
-//                UsbDevice device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-//                if (device != null) {
-//                    // call your method that cleans up and closes communication with the device
-//                }
+                mImageViewUSB.setImageResource(R.drawable.usb_disconnected);
+                mImageViewUSB.setTag(R.drawable.usb_disconnected);
+                mHandler.removeCallbacks(syncCGM);
             } else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
-                Toast.makeText(getApplicationContext(), "USB attached broadcast", Toast.LENGTH_SHORT).show();
+                mImageViewUSB.setImageResource(R.drawable.usb_connected);
+                mImageViewUSB.setTag(R.drawable.usb_connected);
+                Log.d(TAG, "Starting syncing on USB attached...");
+                SyncingService.startActionSync(mContext, "test", "test");
+                startService(intent);
                 //TODO: consider getting permission programmatically instead of user prompted
                 //if decided to need to add android.permission.USB_PERMISSION in manifest
             }
         }
     };
 
+    // Runnable to start service as needed to sync with mCGMStatusReceiver and cloud
     public Runnable syncCGM = new Runnable() {
         public void run() {
             final Context context = getApplicationContext();
             SyncingService.startActionSync(context, "test", "test");
-            startService(intent);
+            startService(mSyncingServiceIntent);
         }
     };
 
