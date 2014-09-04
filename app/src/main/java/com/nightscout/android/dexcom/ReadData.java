@@ -72,16 +72,16 @@ public class ReadData {
         return Utils.receiverTimeToDate(readSystemTime() + readDisplayTimeOffset());
     }
 
-    public int readSystemTime() {
+    public long readSystemTime() {
         writeCommand(Constants.READ_SYSTEM_TIME);
         byte[] readData = read(MIN_LEN).getData();
-        return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt() & 0xffffffff;
+        return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt() & 0xffffffffL;
     }
 
-    public int readDisplayTimeOffset() {
+    public long readDisplayTimeOffset() {
         writeCommand(Constants.READ_DISPLAY_TIME_OFFSET);
         byte[] readData = read(MIN_LEN).getData();
-        return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt() & 0xffffffff;
+        return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt() & 0xffffffffL;
     }
 
     private int readDataBasePageRange(int recordType) {

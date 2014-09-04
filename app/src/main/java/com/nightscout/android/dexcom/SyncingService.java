@@ -78,8 +78,6 @@ public class SyncingService extends IntentService {
             MeterRecord[] meterRecords = readData.getRecentMeterRecords();
             Uploader uploader = new Uploader(mContext);
             uploader.upload(recentRecords, meterRecords);
-            Date test = readData.readDisplayTime();
-            Date t = new Date(10000000000000L);
 
             EGRecord recentEGV = recentRecords[recentRecords.length - 1];
             broadcastSGVToUI(recentEGV);
