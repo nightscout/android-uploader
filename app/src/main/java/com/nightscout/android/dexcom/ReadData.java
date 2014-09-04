@@ -67,6 +67,12 @@ public class ReadData {
         return md.getAttribute("SerialNumber");
     }
 
+    public long readSystemTime() {
+        writeCommand(Constants.READ_SYSTEM_TIM);
+        byte[] readData = read(MIN_LEN).getData();
+        return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt() & 0xffffffffL;
+    }
+
     public long readDisplayTimeOffset() {
         writeCommand(Constants.READ_DISPLAY_TIME_OFFSET);
         byte[] readData = read(MIN_LEN).getData();
