@@ -5,7 +5,7 @@ import java.util.TimeZone;
 
 public class Utils {
 
-    public static Date receiverTimeToDate(int delta) {
+    public static Date receiverTimeToDate(long delta) {
         int currentTZOffset = TimeZone.getDefault().getRawOffset();
         long epochMS = 1230768000000L;  // Jan 01, 2009 00:00 in UTC
         long milliseconds = epochMS - currentTZOffset;
