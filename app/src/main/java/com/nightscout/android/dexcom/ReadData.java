@@ -68,7 +68,7 @@ public class ReadData {
     }
 
     public long readSystemTime() {
-        writeCommand(Constants.READ_SYSTEM_TIM);
+        writeCommand(Constants.READ_SYSTEM_TIME);
         byte[] readData = read(MIN_LEN).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt() & 0xffffffffL;
     }
