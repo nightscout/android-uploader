@@ -13,6 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 
 public class ReadData {
 
@@ -67,16 +68,20 @@ public class ReadData {
         return md.getAttribute("SerialNumber");
     }
 
-    public long readSystemTime() {
-        writeCommand(Constants.READ_SYSTEM_TIME);
-        byte[] readData = read(MIN_LEN).getData();
-        return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt() & 0xffffffffL;
+    public Date readDisplayTime() {
+        return Utils.receiverTimeToDate(readSystemTime() + readDisplayTimeOffset());
     }
 
-    public long readDisplayTimeOffset() {
+    public int readSystemTime() {
+        writeCommand(Constants.READ_SYSTEM_TIME);
+        byte[] readData = read(MIN_LEN).getData();
+        return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt() & 0xffffffff;
+    }
+
+    public int readDisplayTimeOffset() {
         writeCommand(Constants.READ_DISPLAY_TIME_OFFSET);
         byte[] readData = read(MIN_LEN).getData();
-        return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt() & 0xffffffffL;
+        return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt() & 0xffffffff;
     }
 
     private int readDataBasePageRange(int recordType) {
