@@ -23,5 +23,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="unknown_values">---</string>
+    <string name="crash_toast_text">Capturing crash</string>
 
 </resources>

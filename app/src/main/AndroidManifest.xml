@@ -16,6 +16,7 @@
 
     <application
         android:icon="@drawable/ic_launcher"
+        android:name=".Nightscout"
         android:label="@string/title_activity_main" >
         <activity
             android:name=".MainActivity"
