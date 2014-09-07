@@ -170,17 +170,15 @@ public class Uploader {
     }
 
     private void populateV1APIEntry(JSONObject json, EGRecord record) throws Exception {
-        Date date = DATE_FORMAT.parse(record.getDisplayTime().toString());
         json.put("device", "dexcom");
-        json.put("date", date.getTime());
+        json.put("date", record.getDisplayTime().getTime());
         json.put("sgv", Integer.parseInt(String.valueOf(record.getBGValue())));
         json.put("direction", record.getTrend());
     }
 
     private void populateLegacyAPIEntry(JSONObject json, EGRecord record) throws Exception {
-        Date date = DATE_FORMAT.parse(record.getDisplayTime().toString());
         json.put("device", "dexcom");
-        json.put("date", date.getTime());
+        json.put("date", record.getDisplayTime().getTime());
         json.put("sgv", Integer.parseInt(String.valueOf(record.getBGValue())));
         json.put("direction", record.getTrend());
     }
