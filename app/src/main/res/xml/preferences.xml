@@ -43,7 +43,16 @@
             android:title="Collection Name"
             android:key="Collection Name"
             android:dialogTitle="Enter Collection Name"
-            android:dialogMessage="This is the name of the collection where the CGM data will be stored">
+            android:dialogMessage="This is the name of the collection where the CGM data will be stored"
+            android:defaultValue="entries">
+    </EditTextPreference>
+    <EditTextPreference
+        android:dependency="EnableMongoUpload"
+        android:title="DeviceStatus Collection Name"
+        android:key="DeviceStatus Collection Name"
+        android:dialogTitle="Enter DeviceStatus Collection Name"
+        android:dialogMessage="This is the name of the collection where the battery and other device data will be stored"
+        android:defaultValue="devicestatus">
     </EditTextPreference>
     <SwitchPreference
             android:title="Wifi Hack"

@@ -217,7 +217,8 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
     private void doMongoUpload(SharedPreferences prefs, EGVRecord... records) {
 
         String dbURI = prefs.getString("MongoDB URI", null);
-        String collectionName = prefs.getString("Collection Name", null);
+        String collectionName = prefs.getString("Collection Name", "entries");
+        String dsCollectionName = prefs.getString("DeviceStatus Collection Name", "devicestatus");
 
         if (dbURI != null && collectionName != null) {
             try {
@@ -244,7 +245,7 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
                     dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
                 }
 
-                DBCollection dsCollection = db.getCollection("devicestatus");
+                DBCollection dsCollection = db.getCollection(dsCollectionName);
                 //Uploading devicestatus
                 BasicDBObject devicestatus = new BasicDBObject();
                 devicestatus.put("uploaderBattery", DexcomG4Activity.batLevel);
