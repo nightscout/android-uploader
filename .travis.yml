@@ -17,9 +17,10 @@ android:
   licenses:
   - android-sdk-license-5be876d5
   - ".*intel.+"
+script: TERM=dumb ./gradlew assembleDebug
 deploy:
   provider: releases
-  file: "./app/build/outputs/apk/app-release-unsigned.apk"
+  file: "./app/build/outputs/apk/app-debug.apk"
   skip_cleanup: true
   api_key:
     secure: Yv7qc91hNpvFZVjnl1fjA53SfH5kXyJPCabR6IIz2SbExDpstxStSQiUZydIgwrwtXtxliG8irhBdQSfYoYrHREbIZBCX0RkY1QxFpI7r3eLwIUW3SDjfvmbU7HwtYqHqG5gpr1qe81PEj5gFi49YsJYODw9WyaYiRqgE3JFUTs=
