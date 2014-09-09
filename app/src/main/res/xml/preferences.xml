@@ -20,8 +20,8 @@
             android:title="API Base URL"
             android:key="API Base URL"
             android:dialogTitle="Enter Base API URL"
-            android:defaultValue="http://{YOUR-API-SERVER}/api"
-            android:dialogMessage="This only the base URL, the uploader will automatically append /entries for the POST">
+            android:defaultValue="yourpassphrase@https://{YOUR-SITE}.azurewebsites.net/api/v1"
+            android:dialogMessage="This only the base URL, the uploader will automatically append /entries for the POST.  API_SECRET on the server should match yourpassphrase in this setting.">
     </EditTextPreference>
     <SwitchPreference
             android:dependency="IUNDERSTAND"
