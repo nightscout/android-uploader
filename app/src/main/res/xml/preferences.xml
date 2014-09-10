@@ -8,43 +8,111 @@
             android:switchTextOff="NO"
             android:summary="Nightscout should not be used to make medical decisions. There is no support or any warranty of any kind. The quality and performance of the project is with you. This is a project that was created and is supported completely by volunteers.">
     </SwitchPreference>
-    <SwitchPreference
+    <PreferenceScreen
+            android:key="RESTScreen"
             android:dependency="IUNDERSTAND"
-            android:title="API Upload (REST)"
-            android:key="EnableRESTUpload"
-            android:disableDependentsState="false"
-            android:summary="The REST API is an alternative to direct mongodb upload">
-    </SwitchPreference>
-    <EditTextPreference
-            android:dependency="EnableRESTUpload"
-            android:title="API Base URL"
-            android:key="API Base URL"
-            android:dialogTitle="Enter Base API URL"
-            android:defaultValue="http://{YOUR-API-SERVER}/api"
-            android:dialogMessage="This only the base URL, the uploader will automatically append /entries for the POST">
-    </EditTextPreference>
-    <SwitchPreference
+            android:title="API Upload (REST)">
+        <CheckBoxPreference
+                android:title="Enabled"
+                android:key="EnableRESTUpload"
+                android:disableDependentsState="false"
+                android:summary="The REST API is an alternative to direct mongodb upload">
+        </CheckBoxPreference>
+        <EditTextPreference
+                android:dependency="EnableRESTUpload"
+                android:title="API Base URL"
+                android:key="API Base URL"
+                android:dialogTitle="Enter Base API URL"
+                android:defaultValue="http://{YOUR-API-SERVER}/api"
+                android:dialogMessage="This only the base URL, the uploader will automatically append /entries for the POST">
+        </EditTextPreference>
+    </PreferenceScreen>
+    <PreferenceScreen
+            android:key="MongoScreen"
             android:dependency="IUNDERSTAND"
-            android:title="MongoDB Upload"
-            android:key="EnableMongoUpload"
-            android:disableDependentsState="false"
-            android:summary="If you're using MongoLab and Azure this should be enabled">
-    </SwitchPreference>
-    <EditTextPreference
-            android:dependency="EnableMongoUpload"
-            android:title="MongoDB URI"
-            android:key="MongoDB URI"
-            android:dialogTitle="Enter MongoDB URI"
-            android:dialogMessage="Replace example values in {}'s with your correct values"
-            android:defaultValue="mongodb://{user}:{password}@{host}.mongolab.com:{11111}/{database}">
-    </EditTextPreference>
-    <EditTextPreference
-            android:dependency="EnableMongoUpload"
-            android:title="Collection Name"
-            android:key="Collection Name"
-            android:dialogTitle="Enter Collection Name"
-            android:dialogMessage="This is the name of the collection where the CGM data will be stored">
-    </EditTextPreference>
+            android:title="MongoDB Upload">
+        <CheckBoxPreference
+                android:title="Enabled"
+                android:key="EnableMongoUpload"
+                android:disableDependentsState="false"
+                android:summary="If you're using MongoLab and Azure this should be enabled">
+        </CheckBoxPreference>
+        <EditTextPreference
+                android:dependency="EnableMongoUpload"
+                android:title="MongoDB URI"
+                android:key="MongoDB URI"
+                android:dialogTitle="Enter MongoDB URI"
+                android:dialogMessage="Replace example values in {}'s with your correct values"
+                android:defaultValue="mongodb://{user}:{password}@{host}.mongolab.com:{11111}/{database}">
+        </EditTextPreference>
+        <EditTextPreference
+                android:dependency="EnableMongoUpload"
+                android:title="Collection Name"
+                android:key="Collection Name"
+                android:dialogTitle="Enter Collection Name"
+                android:dialogMessage="This is the name of the collection where the CGM data will be stored">
+        </EditTextPreference>
+    </PreferenceScreen>
+    <PreferenceScreen
+            android:key="PushoverScreen"
+            android:title="Push Notifications"
+            android:dependency="IUNDERSTAND">
+        <CheckBoxPreference
+                android:title="Enabled"
+                android:key="EnablePushover"
+                android:disableDependentsState="false"
+                android:summary="Send push notifications to devices with Pushover installed.">
+        </CheckBoxPreference>
+        <EditTextPreference
+                android:dependency="EnablePushover"
+                android:title="Pushover API Token"
+                android:key="PushoverAPIToken"
+                android:dialogTitle="Enter Pushover API Token"
+                android:dialogMessage="The API Token of your Pushover application.  This token is CASE-SENSITIVE.">
+        </EditTextPreference>
+        <EditTextPreference
+                android:dependency="EnablePushover"
+                android:title="User/Group Key"
+                android:key="PushoverUserKey"
+                android:dialogTitle="Enter User/Group Key"
+                android:dialogMessage="The user or group key that will receive Pushover notifications.  This key is CASE-SENSITIVE.">
+        </EditTextPreference>
+        <EditTextPreference
+                android:dependency="EnablePushover"
+                android:title="Low Threshold"
+                android:key="PushoverLowThreshold"
+                android:dialogTitle="Enter Pushover Low Threshold"
+                android:dialogMessage="Glucose readings under this value will trigger a Pushover notification."
+                android:inputType="number"
+                android:defaultValue="80">
+        </EditTextPreference>
+        <EditTextPreference
+                android:dependency="EnablePushover"
+                android:title="High Threshold"
+                android:key="PushoverHighThreshold"
+                android:dialogTitle="Enter Pushover High Threshold"
+                android:dialogMessage="Glucose readings over this value will trigger a Pushover notification."
+                android:summary=""
+                android:inputType="number"
+                android:defaultValue="180">
+        </EditTextPreference>
+        <SwitchPreference
+                android:dependency="EnablePushover"
+                android:title="Alert Problems"
+                android:key="PushoverAlertProblems"
+                android:disableDependentsState="false"
+                android:summary="Send a push notification when the CGM malfunctions (hourglass or ???).">
+        </SwitchPreference>
+        <SwitchPreference
+                android:dependency="EnablePushover"
+                android:title="Continuous Alerts"
+                android:key="PushoverContinuous"
+                android:disableDependentsState="false"
+                android:summaryOn="Continuously send notifications until the user acknowledges them.  Very annoying but less likely to be overlooked."
+                android:summaryOff="Only send one notification.  Less annoying but more likely to be overlooked."
+                android:defaultValue="false">
+        </SwitchPreference>
+    </PreferenceScreen>
     <SwitchPreference
             android:title="Wifi Hack"
             android:key="EnableWifiHack"

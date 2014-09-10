@@ -5,4 +5,28 @@
             android:orderInCategory="100"
             android:title="Preferences">
     </item>
+    <item
+            android:id="@+id/menu_triggerhigh"
+            android:orderInCategory="500"
+            android:title="Trigger High bGV"
+            android:visible="false">
+    </item>
+    <item
+        android:id="@+id/menu_triggerlow"
+        android:orderInCategory="510"
+        android:title="Trigger Low bGV"
+        android:visible="false">
+    </item>
+    <item
+        android:id="@+id/menu_triggerquestion"
+        android:orderInCategory="520"
+        android:title="Trigger ???"
+        android:visible="false">
+    </item>
+    <item
+        android:id="@+id/menu_triggerhourglass"
+        android:orderInCategory="530"
+        android:title="Trigger Hourglass"
+        android:visible="false">
+    </item>
 </menu>

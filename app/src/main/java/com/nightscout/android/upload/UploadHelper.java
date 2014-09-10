@@ -32,6 +32,9 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss aa");
     private static final int SOCKET_TIMEOUT = 60 * 1000;
     private static final int CONNECTION_TIMEOUT = 30 * 1000;
+    private static final int BGV_MAGIC_HOURGLASS = 9;
+    private static final int BGV_MAGIC_QUESTION = 10;
+    private static final int BGV_MAGIC_TEST = 14;
 
     Context context;
 
@@ -39,12 +42,12 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
         this.context = context;
     }
 
-
     protected Long doInBackground(EGVRecord... records) {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
         Boolean enableRESTUpload = prefs.getBoolean("EnableRESTUpload", false);
         Boolean enableMongoUpload = prefs.getBoolean("EnableMongoUpload", false);
+        Boolean enablePushover = prefs.getBoolean("EnablePushover", false);
 
         if (enableRESTUpload) {
             long start = System.currentTimeMillis();
@@ -58,6 +61,13 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
             Log.i(TAG, String.format("Starting upload of %s record using a Mongo", records.length));
             doMongoUpload(prefs, records);
             Log.i(TAG, String.format("Finished upload of %s record using a Mongo in %s ms", records.length, System.currentTimeMillis() - start));
+        }
+
+        if (enablePushover) {
+            long start = System.currentTimeMillis();
+            Log.i(TAG, String.format("Starting Pushover notification of %s record", records.length));
+            doPushoverNotification(prefs, records);
+            Log.i(TAG, String.format("Finished Pushover notification of %s in %s ms", records.length, System.currentTimeMillis() - start));
         }
 
         return 1L;
@@ -98,7 +108,7 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
             int apiVersion = 0;
             if (baseURI.endsWith("/v1/")) apiVersion = 1;
 
-            String baseURL = null;
+            String baseURL;
             String secret = null;
             String[] uriParts = baseURI.split("@");
 
@@ -223,6 +233,73 @@ public class UploadHelper extends AsyncTask<EGVRecord, Integer, Long> {
                 client.close();
             } catch (Exception e) {
                 Log.e(TAG, "Unable to upload data to mongo", e);
+            }
+        }
+
+    }
+
+    private void handlePushoverError(Exception e, String message) {
+        Log.e(TAG, message, e);
+    }
+
+    private void doPushoverNotification(SharedPreferences prefs, EGVRecord... records) {
+
+        String apiToken = prefs.getString("PushoverAPIToken", null);
+        String userKey = prefs.getString("PushoverUserKey", null);
+        int lowThreshold = Integer.valueOf(prefs.getString("PushoverLowThreshold", "-1"));
+        int highThreshold = Integer.valueOf(prefs.getString("PushoverHighThreshold", "-1"));
+        Boolean alertProblems = prefs.getBoolean("PushoverAlertProblems", false);
+        int priority = prefs.getBoolean("PushoverContinuous", false) ? 2 : 1;
+
+        String title;
+        String message;
+
+        if (apiToken != null && userKey != null && lowThreshold != -1 && highThreshold != -1) {
+            Pushover push = new Pushover(apiToken, userKey);
+
+            for (EGVRecord record : records) {
+                title = null;
+                message = null;
+
+                try {
+                    int bGValue = Integer.parseInt(record.bGValue);
+
+                    switch (bGValue) {
+                        case BGV_MAGIC_HOURGLASS:
+                        case BGV_MAGIC_QUESTION:
+                            if (alertProblems) {
+                                title = (bGValue == BGV_MAGIC_HOURGLASS ? "Hourglass" : "???") + " Detected";
+                                message = "Please check your GCM for connectivity issues.";
+                            }
+                            break;
+                        case BGV_MAGIC_TEST:
+                            title = "Nightscout Test Notification";
+                            message = "It works!";
+                            break;
+                        default:
+                            if (bGValue <= lowThreshold) {
+                                title = "Low Glucose Reading";
+                            } else if (bGValue >= highThreshold) {
+                                title = "High Glucose Reading";
+                            }
+
+                            message =  record.trendArrow + " A blood glucose value of " + record.bGValue + " was logged at " + record.displayTime + ".";
+                    }
+
+
+                    if (title != null) {
+                        PushoverResponse response = push.sendMessage(message, title, priority);
+
+                        if (response.getStatus() != 1) {
+                            for (String error : response.getErrors()) {
+                                handlePushoverError(null, "An error was returned by Pushover API: " + error);
+                            }
+                        }
+                    }
+
+                } catch (Exception e) {
+                    handlePushoverError(e, "Error sending Pushover notification");
+                }
             }
         }
 

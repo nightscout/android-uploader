@@ -3,11 +3,15 @@ package com.nightscout.android.dexcom;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,19 +20,24 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
+
+import com.nightscout.android.BuildConfig;
 import com.nightscout.android.R;
 import com.nightscout.android.settings.SettingsActivity;
+import com.nightscout.android.upload.UploadHelper;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /* Main activity for the DexcomG4Activity program */
 public class DexcomG4Activity extends Activity {
 
     private static final String TAG = DexcomG4Activity.class.getSimpleName();
+    private static final int REQUEST_CODE_SETTINGS = 1;
 
     private Handler mHandler = new Handler();
 
@@ -147,9 +156,47 @@ public class DexcomG4Activity extends Activity {
         return new EGVRecord();
     }
 
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == REQUEST_CODE_SETTINGS) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+
+            if (prefs.getBoolean("EnablePushover", false)) {
+                new AlertDialog.Builder(this)
+                    .setTitle("Push Notifications Enabled")
+                    .setMessage("Would you like to send a test notification now to confirm that Pushover is configured correctly?")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            try {
+                                UploadHelper uploader = new UploadHelper(getBaseContext());
+
+                                EGVRecord record = new EGVRecord();
+                                record.setBGValue("14"); // Test notification
+                                record.setDisplayTime(new SimpleDateFormat("MM/dd/yyy hh:mm:ss aa").format(new Date()));
+
+                                uploader.execute(record);
+                            } catch (Exception ex) {
+                                new AlertDialog.Builder(getBaseContext())
+                                    .setMessage("An error occurred sending test notification.")
+                                    .show();
+                            }
+                        }})
+                    .setNegativeButton(android.R.string.no, null).show();
+            }
+        }
+    }
+
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
+
+        if (BuildConfig.DEBUG) {
+            menu.findItem(R.id.menu_triggerhigh).setVisible(true);
+            menu.findItem(R.id.menu_triggerlow).setVisible(true);
+            menu.findItem(R.id.menu_triggerquestion).setVisible(true);
+            menu.findItem(R.id.menu_triggerhourglass).setVisible(true);
+        }
+
         return true;
     }
 
@@ -158,10 +205,33 @@ public class DexcomG4Activity extends Activity {
         switch (item.getItemId()) {
             case R.id.menu_settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
-            default:
+                startActivityForResult(intent, REQUEST_CODE_SETTINGS);
+                break;
+            case R.id.menu_triggerhigh:
+                triggerReading(200);
+                break;
+            case R.id.menu_triggerlow:
+                triggerReading(60);
+                break;
+            case R.id.menu_triggerquestion:
+                triggerReading(10);
+                break;
+            case R.id.menu_triggerhourglass:
+                triggerReading(9);
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void triggerReading(int bGV) {
+        UploadHelper uploader = new UploadHelper(getBaseContext());
+
+        EGVRecord record = new EGVRecord();
+        record.setBGValue(String.valueOf(bGV));
+        record.setDisplayTime(new SimpleDateFormat("MM/dd/yyy hh:mm:ss aa").format(new Date()));
+        record.setTrend("SingleUp");
+        record.setTrendArrow("↑");
+
+        uploader.execute(record);
     }
 }
