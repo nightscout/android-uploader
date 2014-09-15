@@ -19,6 +19,11 @@ import android.widget.TextView;
 import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.settings.SettingsActivity;
 
+import org.acra.ACRA;
+import org.acra.ACRAConfiguration;
+import org.acra.ACRAConfigurationException;
+import org.acra.ReportingInteractionMode;
+
 
 public class MainActivity extends Activity {
 
@@ -179,7 +184,27 @@ public class MainActivity extends Activity {
         if (id == R.id.menu_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
+        } else if (id == R.id.feedback_settings) {
+            ACRAConfiguration acraConfiguration = ACRA.getConfig();
+            // Set to dialog to get user comments
+            try {
+                acraConfiguration.setMode(ReportingInteractionMode.DIALOG);
+                acraConfiguration.setResToastText(0);
+            } catch (ACRAConfigurationException e) {
+                e.printStackTrace();
+            }
+            ACRA.getErrorReporter().handleException(null);
+            // Reset back to toast
+            try {
+                acraConfiguration.setResToastText(R.string.crash_toast_text);
+                acraConfiguration.setMode(ReportingInteractionMode.TOAST);
+            } catch (ACRAConfigurationException e) {
+                e.printStackTrace();
+            }
+        } else if (id == R.id.close_settings) {
+            finish();
         }
+
         return super.onOptionsItemSelected(item);
     }
 }

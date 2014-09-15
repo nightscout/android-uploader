@@ -5,4 +5,14 @@
             android:orderInCategory="100"
             android:title="Preferences">
     </item>
+    <item
+        android:id="@+id/feedback_settings"
+        android:orderInCategory="100"
+        android:title="Feedback">
+    </item>
+    <item
+        android:id="@+id/close_settings"
+        android:orderInCategory="100"
+        android:title="Close">
+    </item>
 </menu>
