@@ -101,7 +101,6 @@ public class MainActivity extends Activity {
         super.onDestroy();
         unregisterReceiver(mCGMStatusReceiver);
         unregisterReceiver(mUsbReceiver);
-        mHandler.removeCallbacks(syncCGM);
     }
 
     @Override
@@ -218,6 +217,7 @@ public class MainActivity extends Activity {
                 e.printStackTrace();
             }
         } else if (id == R.id.close_settings) {
+            mHandler.removeCallbacks(syncCGM);
             finish();
         }
 
