@@ -171,7 +171,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
     private byte[] getEGVDataPageRange(){
         int[] rets = new int[24];
         int c = 0;
-        
+
         //EGVData page range read command
         byte[] readEGVDataPageRange = new byte[7];
         readEGVDataPageRange[0] = 0x01;
@@ -180,7 +180,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         readEGVDataPageRange[4] = 0x04;
         readEGVDataPageRange[5] = (byte)0x8b;
         readEGVDataPageRange[6] = (byte)0xb8;
-    
+
         try {
             rets[c++] = mSerialDevice.write(readEGVDataPageRange, 200);
         } catch (IOException e) {
@@ -192,7 +192,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         } catch (IOException e) {
             Log.e(TAG, "Unable to read from serial device", e);
         }
-        
+
         return dexcomPageRange;
     }
 
@@ -212,7 +212,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         ByteBuffer b = ByteBuffer.allocate(4);
         b.putInt(lastFour);
         byte[] result = b.array();
-          
+
         //Build get page (EGV) command
         byte [] getLastEGVPage = new byte[636];
         getLastEGVPage[0] = 0x01;
@@ -225,7 +225,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         getLastEGVPage[7] = result[1];
         getLastEGVPage[8] = result[0];
         getLastEGVPage[9] = 0x04;
-   
+
         //Get checksum
         int getLastEGVCRC = calculateCRC16(getLastEGVPage, 0, 10);
         byte crcByte1 = (byte) (getLastEGVCRC & 0xff);
@@ -239,7 +239,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         } catch (IOException e) {
             Log.e(TAG, "Unable to write to serial device", e);
         }
-        
+
         //Get pages
         byte[] dexcomDatabasePages = new byte[2122];
 
@@ -249,10 +249,10 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
             Log.e(TAG, "Unable to read from serial device", e);
         }
 
-       //Parse pages
+        //Parse pages
         byte [] databasePages = new byte[2112];
         System.arraycopy(dexcomDatabasePages, 4, databasePages, 0, 2112);
-        return databasePages;        
+        return databasePages;
     }
 
     private EGVRecord[] parseDatabasePages(byte[] databasePages) {
@@ -260,7 +260,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         byte [][] fourPages = new byte[4][528];
         int [] recordCounts = new int[4];
         int totalRecordCount = 0;
-        
+
         //we parse 4 pages at a time, calculate total record count while we do this
         for (int i = 0; i < 4; i++)
         {
@@ -268,10 +268,10 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
             recordCounts[i] = fourPages[i][4];
             totalRecordCount = totalRecordCount + recordCounts[i];
         }
-        
+
         EGVRecord[] recordsToReturn = new EGVRecord[totalRecordCount];
         int k = 0;
-        
+
         //parse each record, plenty of room for improvement
         byte [] tempRecord = new byte[13];
         for (int i = 0; i < 4; i++)
@@ -315,48 +315,48 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
 
                 switch (trendArrow) {
 
-                case (0):
-                    trendA = "\u2194";
-                    trend = "NONE";
-                    break;
-                case (1):
-                    trendA = "\u21C8";
-                    trend = "DoubleUp";
-                    break;
-                case (2):
-                    trendA = "\u2191";
-                    trend = "SingleUp";
-                    break;
-                case (3):
-                    trendA = "\u2197";
-                    trend = "FortyFiveUp";
-                    break;
-                case (4):
-                    trendA = "\u2192";
-                    trend = "Flat";
-                    break;
-                case (5):
-                    trendA = "\u2198";
-                    trend = "FortyFiveDown";
-                    break;
-                case (6):
-                    trendA = "\u2193";
-                    trend = "SingleDown";
-                    break;
-                case (7):
-                    trendA = "\u21CA";
-                    trend = "DoubleDown";
-                    break;
-                case (8):
-                    trendA = "\u2194";
-                    trend = "NOT COMPUTABLE";
-                    break;
-                case (9):
-                    trendA = "\u2194";
-                    trend = "RATE OUT OF RANGE";
-                    break;
+                    case (0):
+                        trendA = "\u2194";
+                        trend = "NONE";
+                        break;
+                    case (1):
+                        trendA = "\u21C8";
+                        trend = "DoubleUp";
+                        break;
+                    case (2):
+                        trendA = "\u2191";
+                        trend = "SingleUp";
+                        break;
+                    case (3):
+                        trendA = "\u2197";
+                        trend = "FortyFiveUp";
+                        break;
+                    case (4):
+                        trendA = "\u2192";
+                        trend = "Flat";
+                        break;
+                    case (5):
+                        trendA = "\u2198";
+                        trend = "FortyFiveDown";
+                        break;
+                    case (6):
+                        trendA = "\u2193";
+                        trend = "SingleDown";
+                        break;
+                    case (7):
+                        trendA = "\u21CA";
+                        trend = "DoubleDown";
+                        break;
+                    case (8):
+                        trendA = "\u2194";
+                        trend = "NOT COMPUTABLE";
+                        break;
+                    case (9):
+                        trendA = "\u2194";
+                        trend = "RATE OUT OF RANGE";
+                        break;
                 }
-                
+
                 this.trend = trend;
                 this.displayTime = new SimpleDateFormat("MM/dd/yyy hh:mm:ss aa").format(display);
                 this.bGValue = String.valueOf(bGValue);
@@ -369,7 +369,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
 
                 recordsToReturn[k++] = record;
             }
-        }       
+        }
         return recordsToReturn;
 
     }
@@ -386,7 +386,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         } catch(Exception e) {
             Log.e(TAG, "write to OutputStream failed", e);
         }
-        
+
         //Write CSV of EGV from last 4 pages
         CSVWriter writer;
         try {
@@ -426,7 +426,7 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
         return crc;
 
     }
-    
+
     //Convert the packet data
     public static int toInt(byte[] b, int flag) {
         switch(flag){
@@ -442,20 +442,20 @@ public class DexcomReader extends AsyncTask<UsbSerialDriver, Object, Object>{
     public static byte[] getBytes(int i, int flag) {
         byte[] b = new byte[4];
         switch (flag) {
-        case 0:
-            b[0] = (byte) ((i >> 24) & 0xff);
-            b[1] = (byte) ((i >> 16) & 0xff);
-            b[2] = (byte) ((i >> 8) & 0xff);
-            b[3] = (byte) (i & 0xff);
-            break;
-        case 1:
-            b[3] = (byte) ((i >> 24) & 0xff);
-            b[2] = (byte) ((i >> 16) & 0xff);
-            b[1] = (byte) ((i >> 8) & 0xff);
-            b[0] = (byte) (i & 0xff);
-            break;
-        default:
-            break;
+            case 0:
+                b[0] = (byte) ((i >> 24) & 0xff);
+                b[1] = (byte) ((i >> 16) & 0xff);
+                b[2] = (byte) ((i >> 8) & 0xff);
+                b[3] = (byte) (i & 0xff);
+                break;
+            case 1:
+                b[3] = (byte) ((i >> 24) & 0xff);
+                b[2] = (byte) ((i >> 16) & 0xff);
+                b[1] = (byte) ((i >> 8) & 0xff);
+                b[0] = (byte) (i & 0xff);
+                break;
+            default:
+                break;
         }
         return b;
     }

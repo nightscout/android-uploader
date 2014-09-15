@@ -4,18 +4,31 @@
     <string name="hello">Hello World, DemoActivity!</string>
     <string name="app_name">G4 Connector</string>
     <string name="self_destruct">Close It</string>
+
     <style name="ButtonText">
-    <item name="android:layout_width">fill_parent</item>
-    <item name="android:layout_height">wrap_content</item>
-    <item name="android:textColor">#ffffff</item>
-    <item name="android:gravity">center</item>
-    <item name="android:layout_margin">3dp</item>
-    <item name="android:textSize">30dp</item>
-    <item name="android:textStyle">bold</item>
-    <item name="android:shadowColor">#000000</item>
-    <item name="android:shadowDx">1</item>
-    <item name="android:shadowDy">1</item>
-    <item name="android:shadowRadius">2</item>
-</style>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_margin">3dp</item>
+        <item name="android:textSize">30dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:shadowColor">#000000</item>
+        <item name="android:shadowDx">1</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">2</item>
+    </style>
+
+    <string name="title_activity_main">Nightscout</string>
+    <string name="action_settings">Settings</string>
+    <string name="unknown_values">---</string>
+
+
+    <string name="crash_toast_text">Oops! A crash has occurred and is being reported to nightscout so it can be fixed!</string>
+    <string name="feedback_dialog_title">Nightscout feedback</string>
+    <string name="feebback_dialog_text">Please let us know what you think.</string>
+    <string name="feedback_dialog_comment_prompt">Please add your comments below:</string>
+    <string name="feedback_dialog_ok_toast">Thank you!</string>
+    <string name="feedback_toast_text"></string>
 
 </resources>
