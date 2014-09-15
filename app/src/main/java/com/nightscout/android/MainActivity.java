@@ -177,9 +177,8 @@ public class MainActivity extends Activity {
     // Runnable to start service as needed to sync with mCGMStatusReceiver and cloud
     public Runnable syncCGM = new Runnable() {
         public void run() {
-            final Context context = getApplicationContext();
             // TODO: 2nd parameter should be static constant from intent service
-            SyncingService.startActionSingleSync(context, 1);
+            SyncingService.startActionSingleSync(mContext, 1);
         }
     };
 
