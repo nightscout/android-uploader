@@ -40,8 +40,8 @@ public class Uploader {
     public Uploader(Context context) {
         mContext = context;
         prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        enableRESTUpload = prefs.getBoolean("EnableRESTUpload", false);
-        enableMongoUpload = prefs.getBoolean("EnableMongoUpload", false);
+        enableRESTUpload = prefs.getBoolean("cloud_storage_api_enable", false);
+        enableMongoUpload = prefs.getBoolean("cloud_storage_mongodb_enable", false);
     }
 
     public boolean upload(EGRecord[] egRecords, MeterRecord[] meterRecords) {
@@ -62,7 +62,7 @@ public class Uploader {
     }
 
     private void doRESTUpload(SharedPreferences prefs, EGRecord... records) {
-        String baseURLSettings = prefs.getString("API Base URL", "");
+        String baseURLSettings = prefs.getString("cloud_storage_api_base_api", "");
         ArrayList<String> baseURIs = new ArrayList<String>();
 
         try {
@@ -183,8 +183,8 @@ public class Uploader {
 
     private void doMongoUpload(SharedPreferences prefs, EGRecord[] egRecords, MeterRecord[] meterRecords) {
 
-        String dbURI = prefs.getString("MongoDB URI", null);
-        String collectionName = prefs.getString("Collection Name", null);
+        String dbURI = prefs.getString("cloud_storage_mongodb_uri", null);
+        String collectionName = prefs.getString("cloud_storage_mongodb_collection", null);
 
         if (dbURI != null && collectionName != null) {
             try {
