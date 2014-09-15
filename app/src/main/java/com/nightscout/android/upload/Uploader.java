@@ -11,6 +11,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.WriteConcern;
+
 import com.nightscout.android.dexcom.records.EGRecord;
 import com.nightscout.android.dexcom.records.MeterRecord;
 
@@ -25,15 +26,12 @@ import org.apache.http.params.HttpParams;
 import org.json.JSONObject;
 
 import java.security.MessageDigest;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class Uploader {
     private static final String TAG = Uploader.class.getSimpleName();
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss aa");
-    private static final int SOCKET_TIMEOUT = 60 * 1000;
-    private static final int CONNECTION_TIMEOUT = 30 * 1000;
+    private static final int SOCKET_TIMEOUT = 60000;
+    private static final int CONNECTION_TIMEOUT = 30000;
     private Context mContext;
     private Boolean enableRESTUpload;
     private Boolean enableMongoUpload;
@@ -211,6 +209,7 @@ public class Uploader {
                     testData.put("direction", record.getTrend());
                     dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
                 }
+
                 Log.i(TAG, "The number of MBG records being sent to MongoDB is " + meterRecords.length);
                 for (MeterRecord meterRecord : meterRecords) {
                     // make db object
