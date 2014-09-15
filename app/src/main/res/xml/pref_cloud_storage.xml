@@ -60,7 +60,7 @@
         <EditTextPreference
             android:dependency="cloud_storage_api_enable"
             android:title="@string/pref_title_api_url"
-            android:key="cloud_storage_api_base_api"
+            android:key="cloud_storage_api_base"
             android:dialogTitle="@string/pref_dialog_api_url"
             android:dialogMessage="@string/pref_message_api_url"
             android:defaultValue="@string/pref_default_api_url">

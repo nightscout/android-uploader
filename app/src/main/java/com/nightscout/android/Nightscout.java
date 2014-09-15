@@ -19,6 +19,7 @@ import org.acra.annotation.*;
         resDialogTitle = R.string.feedback_dialog_title,
         resDialogCommentPrompt = R.string.feedback_dialog_comment_prompt,
         resDialogOkToast = R.string.feedback_dialog_ok_toast,
+        excludeMatchingSharedPreferencesKeys= {"cloud_storage_mongodb_uri", "cloud_storage_api_base"},
         mode = ReportingInteractionMode.TOAST
 )
 
