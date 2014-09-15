@@ -7,6 +7,7 @@ import android.hardware.usb.UsbManager;
 import android.util.Log;
 
 import com.nightscout.android.MainActivity;
+import com.nightscout.android.dexcom.USB.USBPower;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.USB.UsbSerialProber;
 import com.nightscout.android.dexcom.records.EGRecord;
@@ -85,6 +86,8 @@ public class SyncingService extends IntentService {
             // Close serial
             try {
                 mSerialDevice.close();
+                // Try powering off, will only work if rooted
+                USBPower.PowerOff();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -102,6 +105,8 @@ public class SyncingService extends IntentService {
         mSerialDevice = UsbSerialProber.acquire(mUsbManager);
         if (mSerialDevice != null) {
             try {
+                // Try powering on, will only work if rooted
+                USBPower.PowerOn();
                 mSerialDevice.open();
                 return true;
             } catch (IOException e) {
