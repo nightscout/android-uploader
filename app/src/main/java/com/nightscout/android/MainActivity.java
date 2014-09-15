@@ -41,6 +41,7 @@ public class MainActivity extends Activity {
     private TextView mTextTimestamp;
     private Button mButton;
     private ImageView mImageViewUSB;
+    private ImageView mImageViewUpload;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,9 @@ public class MainActivity extends Activity {
         mTextTimestamp = (TextView) findViewById(R.id.timeAgo);
         mButton = (Button)findViewById(R.id.stopSyncingButton);
         mImageViewUSB = (ImageView) findViewById(R.id.imageViewUSB);
+        mImageViewUpload = (ImageView) findViewById(R.id.imageViewUploadStatus);
+        mImageViewUpload.setImageResource(R.drawable.ic_upload_fail);
+        mImageViewUpload.setTag(R.drawable.ic_upload_fail);
 
         mContext = getApplicationContext();
 
@@ -71,13 +75,13 @@ public class MainActivity extends Activity {
         Intent startIntent = getIntent();
         String action = startIntent.getAction();
         if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
-            mImageViewUSB.setImageResource(R.drawable.usb_connected);
-            mImageViewUSB.setTag(R.drawable.usb_connected);
+            mImageViewUSB.setImageResource(R.drawable.ic_usb_connected);
+            mImageViewUSB.setTag(R.drawable.ic_usb_connected);
             Log.d(TAG, "Starting syncing in OnCreate...");
             // TODO: 2nd parameter should be static constant from intent service
             SyncingService.startActionSingleSync(mContext, 1);
         } else {
-            mImageViewUSB.setTag(R.drawable.usb_disconnected);
+            mImageViewUSB.setTag(R.drawable.ic_usb_disconnected);
         }
 
         mButton.setOnClickListener(new View.OnClickListener() {
@@ -107,6 +111,7 @@ public class MainActivity extends Activity {
         outState.putString("saveTextTimestamp", mTextTimestamp.getText().toString());
         outState.putString("saveTextButton", mButton.getText().toString());
         outState.putInt("saveImageViewUSB", (Integer) mImageViewUSB.getTag());
+        outState.putInt("saveImageViewUpload", (Integer) mImageViewUpload.getTag());
     }
 
     @Override
@@ -117,6 +122,8 @@ public class MainActivity extends Activity {
         mButton.setText(savedInstanceState.getString("saveTextButton"));
         mImageViewUSB.setImageResource(savedInstanceState.getInt("saveImageViewUSB"));
         mImageViewUSB.setTag(savedInstanceState.getInt("saveImageViewUSB"));
+        mImageViewUpload.setImageResource(savedInstanceState.getInt("saveImageViewUpload"));
+        mImageViewUpload.setTag(savedInstanceState.getInt("saveImageViewUpload"));
     }
 
     public class CGMStatusReceiver extends BroadcastReceiver {
@@ -127,8 +134,16 @@ public class MainActivity extends Activity {
             // Get response messages from broadcast
             String responseString = intent.getStringExtra(SyncingService.RESPONSE_SGV);
             String responseMessage = intent.getStringExtra(SyncingService.RESPONSE_TIMESTAMP);
+            boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
             int responseNextUploadTime = intent.getIntExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, DEFAULT_SYNC_INTERVAL);
 
+            if (responseUploadStatus) {
+                mImageViewUpload.setImageResource(R.drawable.ic_upload_success);
+                mImageViewUpload.setTag(R.drawable.ic_upload_success);
+            } else {
+                mImageViewUpload.setImageResource(R.drawable.ic_upload_fail);
+                mImageViewUpload.setTag(R.drawable.ic_upload_fail);
+            }
             // Update UI with latest record information
             mTextSGV.setText(responseString);
             mTextTimestamp.setText(responseMessage);
@@ -143,12 +158,14 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
-                mImageViewUSB.setImageResource(R.drawable.usb_disconnected);
-                mImageViewUSB.setTag(R.drawable.usb_disconnected);
+                mImageViewUSB.setImageResource(R.drawable.ic_usb_disconnected);
+                mImageViewUSB.setTag(R.drawable.ic_usb_disconnected);
+                mImageViewUpload.setImageResource(R.drawable.ic_upload_fail);
+                mImageViewUpload.setTag(R.drawable.ic_upload_fail);
                 mHandler.removeCallbacks(syncCGM);
             } else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
-                mImageViewUSB.setImageResource(R.drawable.usb_connected);
-                mImageViewUSB.setTag(R.drawable.usb_connected);
+                mImageViewUSB.setImageResource(R.drawable.ic_usb_connected);
+                mImageViewUSB.setTag(R.drawable.ic_usb_connected);
                 Log.d(TAG, "Starting syncing on USB attached...");
                 // TODO: 2nd parameter should be static constant from intent service
                 SyncingService.startActionSingleSync(mContext, 1);

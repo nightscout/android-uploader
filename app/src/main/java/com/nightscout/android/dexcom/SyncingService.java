@@ -33,6 +33,7 @@ public class SyncingService extends IntentService {
     public static final String RESPONSE_SGV = "mySGV";
     public static final String RESPONSE_TIMESTAMP = "myTimestamp";
     public static final String RESPONSE_NEXT_UPLOAD_TIME = "myUploadTime";
+    public static final String RESPONSE_UPLOAD_STATUS = "myUploadStatus";
 
     private final String TAG = SyncingService.class.getSimpleName();
     private Context mContext;
@@ -81,7 +82,7 @@ public class SyncingService extends IntentService {
             uploader.upload(recentRecords, meterRecords);
 
             EGRecord recentEGV = recentRecords[recentRecords.length - 1];
-            broadcastSGVToUI(recentEGV);
+            broadcastSGVToUI(recentEGV, true);
 
             // Close serial
             try {
@@ -93,7 +94,7 @@ public class SyncingService extends IntentService {
             }
 
         } else {
-            // Not connect to serial device
+            // Not connected to serial device
             broadcastSGVToUI();
         }
     }
@@ -118,7 +119,7 @@ public class SyncingService extends IntentService {
         return false;
     }
 
-    private void broadcastSGVToUI(EGRecord egRecord) {
+    private void broadcastSGVToUI(EGRecord egRecord, boolean uploadStatus) {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -126,6 +127,7 @@ public class SyncingService extends IntentService {
                                                + egRecord.getTrendSymbol());
         broadcastIntent.putExtra(RESPONSE_TIMESTAMP, egRecord.getDisplayTime().toString());
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, 60000*3);
+        broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, uploadStatus);
         sendBroadcast(broadcastIntent);
     }
 
