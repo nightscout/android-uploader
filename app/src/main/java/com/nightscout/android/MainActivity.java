@@ -43,6 +43,11 @@ public class MainActivity extends Activity {
     private ImageView mImageViewUSB;
     private ImageView mImageViewUpload;
 
+    // TODO: this is port from the main and needs to be merge to mUsbReceiver
+    // TODO: should try and avoid use static
+    public static int batLevel = 0;
+    BatteryReceiver mArrow;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,6 +98,14 @@ public class MainActivity extends Activity {
                 SyncingService.startActionSingleSync(mContext, 20);
             }
         });
+
+        // TODO: this is port from the main and needs to be merge to mUsbReceiver
+        mArrow = new BatteryReceiver();
+        IntentFilter mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(Intent.ACTION_BATTERY_LOW);
+        mIntentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        mIntentFilter.addAction(Intent.ACTION_BATTERY_OKAY);
+        registerReceiver(mArrow,mIntentFilter);
     }
 
     @Override
@@ -101,6 +114,8 @@ public class MainActivity extends Activity {
         super.onDestroy();
         unregisterReceiver(mCGMStatusReceiver);
         unregisterReceiver(mUsbReceiver);
+        // TODO: this should be deleted when merged with usb receiver
+        unregisterReceiver(mArrow);
     }
 
     @Override
@@ -150,6 +165,18 @@ public class MainActivity extends Activity {
             Log.d(TAG, "Setting next upload time to: " + responseNextUploadTime);
             mHandler.removeCallbacks(syncCGM);
             mHandler.postDelayed(syncCGM, responseNextUploadTime);
+        }
+    }
+
+    // TODO: this is port from the main and needs to be merge to mUsbReceiver
+    private class  BatteryReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context arg0, Intent arg1) {
+            if (arg1.getAction().equalsIgnoreCase(Intent.ACTION_BATTERY_LOW)
+                    || arg1.getAction().equalsIgnoreCase(Intent.ACTION_BATTERY_CHANGED)
+                    || arg1.getAction().equalsIgnoreCase(Intent.ACTION_BATTERY_OKAY)) {
+                batLevel = arg1.getIntExtra("level", 0);
+            }
         }
     }
 

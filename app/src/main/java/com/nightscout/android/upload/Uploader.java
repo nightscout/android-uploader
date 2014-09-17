@@ -12,6 +12,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.WriteConcern;
 
+import com.nightscout.android.MainActivity;
 import com.nightscout.android.dexcom.records.EGRecord;
 import com.nightscout.android.dexcom.records.MeterRecord;
 
@@ -27,6 +28,7 @@ import org.json.JSONObject;
 
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Uploader {
     private static final String TAG = Uploader.class.getSimpleName();
@@ -162,6 +164,10 @@ public class Uploader {
                     Log.w(TAG, "Unable to post data to: '" + post.getURI().toString() + "'", e);
                 }
             }
+
+            // TODO: this is a quick port from the original code and needs to be checked before release
+            postDeviceStatus(baseURL, httpclient);
+
         } catch (Exception e) {
             Log.e(TAG, "Unable to post data", e);
         }
@@ -181,10 +187,30 @@ public class Uploader {
         json.put("direction", record.getTrend());
     }
 
+    // TODO: this is a quick port from original code and needs to be refactored before release
+    private void postDeviceStatus(String baseURL, DefaultHttpClient httpclient) throws Exception {
+        String devicestatusURL = baseURL + "devicestatus";
+        Log.i(TAG, "devicestatusURL: " + devicestatusURL);
+
+        JSONObject json = new JSONObject();
+        json.put("uploaderBattery", MainActivity.batLevel);
+        String jsonString = json.toString();
+
+        HttpPost post = new HttpPost(devicestatusURL);
+        StringEntity se = new StringEntity(jsonString);
+        post.setEntity(se);
+        post.setHeader("Accept", "application/json");
+        post.setHeader("Content-type", "application/json");
+
+        ResponseHandler responseHandler = new BasicResponseHandler();
+        httpclient.execute(post, responseHandler);
+    }
+
     private void doMongoUpload(SharedPreferences prefs, EGRecord[] egRecords, MeterRecord[] meterRecords) {
 
         String dbURI = prefs.getString("cloud_storage_mongodb_uri", null);
         String collectionName = prefs.getString("cloud_storage_mongodb_collection", null);
+        String dsCollectionName = prefs.getString("cloud_storage_mongodb_device_status_collection", "devicestatus");
 
         if (dbURI != null && collectionName != null) {
             try {
@@ -220,7 +246,17 @@ public class Uploader {
                     testData.put("mbg", meterRecord.getMeterBG());
                     dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
                 }
+
+                // TODO: quick port from original code, revisit before release
+                DBCollection dsCollection = db.getCollection(dsCollectionName);
+                //Uploading devicestatus
+                BasicDBObject devicestatus = new BasicDBObject();
+                devicestatus.put("uploaderBattery", MainActivity.batLevel);
+                devicestatus.put("created_at", new Date());
+                dsCollection.insert(devicestatus, WriteConcern.UNACKNOWLEDGED);
+
                 client.close();
+
             } catch (Exception e) {
                 Log.e(TAG, "Unable to upload data to mongo", e);
             }
