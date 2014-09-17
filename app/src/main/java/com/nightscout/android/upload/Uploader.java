@@ -13,7 +13,7 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.WriteConcern;
 
 import com.nightscout.android.MainActivity;
-import com.nightscout.android.dexcom.records.EGRecord;
+import com.nightscout.android.dexcom.records.EGVRecord;
 import com.nightscout.android.dexcom.records.MeterRecord;
 
 import org.apache.http.client.ResponseHandler;
@@ -46,24 +46,24 @@ public class Uploader {
         enableMongoUpload = prefs.getBoolean("cloud_storage_mongodb_enable", false);
     }
 
-    public boolean upload(EGRecord[] egRecords, MeterRecord[] meterRecords) {
+    public boolean upload(EGVRecord[] egvRecords, MeterRecord[] meterRecords) {
         if (enableRESTUpload) {
             long start = System.currentTimeMillis();
-            Log.i(TAG, String.format("Starting upload of %s record using a REST API", egRecords.length));
-            doRESTUpload(prefs, egRecords);
-            Log.i(TAG, String.format("Finished upload of %s record using a REST API in %s ms", egRecords.length, System.currentTimeMillis() - start));
+            Log.i(TAG, String.format("Starting upload of %s record using a REST API", egvRecords.length));
+            doRESTUpload(prefs, egvRecords);
+            Log.i(TAG, String.format("Finished upload of %s record using a REST API in %s ms", egvRecords.length, System.currentTimeMillis() - start));
         }
 
         if (enableMongoUpload) {
             long start = System.currentTimeMillis();
-            Log.i(TAG, String.format("Starting upload of %s record using a Mongo", egRecords.length));
-            doMongoUpload(prefs, egRecords, meterRecords);
-            Log.i(TAG, String.format("Finished upload of %s record using a Mongo in %s ms", egRecords.length + meterRecords.length, System.currentTimeMillis() - start));
+            Log.i(TAG, String.format("Starting upload of %s record using a Mongo", egvRecords.length));
+            doMongoUpload(prefs, egvRecords, meterRecords);
+            Log.i(TAG, String.format("Finished upload of %s record using a Mongo in %s ms", egvRecords.length + meterRecords.length, System.currentTimeMillis() - start));
         }
         return true;
     }
 
-    private void doRESTUpload(SharedPreferences prefs, EGRecord... records) {
+    private void doRESTUpload(SharedPreferences prefs, EGVRecord... records) {
         String baseURLSettings = prefs.getString("cloud_storage_api_base_api", "");
         ArrayList<String> baseURIs = new ArrayList<String>();
 
@@ -87,7 +87,7 @@ public class Uploader {
         }
     }
 
-    private void doRESTUploadTo(String baseURI, EGRecord[] records) {
+    private void doRESTUploadTo(String baseURI, EGVRecord[] records) {
         try {
             int apiVersion = 0;
             if (baseURI.endsWith("/v1/")) apiVersion = 1;
@@ -135,7 +135,7 @@ public class Uploader {
                 }
             }
 
-            for (EGRecord record : records) {
+            for (EGVRecord record : records) {
                 JSONObject json = new JSONObject();
 
                 try {
@@ -173,14 +173,14 @@ public class Uploader {
         }
     }
 
-    private void populateV1APIEntry(JSONObject json, EGRecord record) throws Exception {
+    private void populateV1APIEntry(JSONObject json, EGVRecord record) throws Exception {
         json.put("device", "dexcom");
         json.put("date", record.getDisplayTime().getTime());
         json.put("sgv", Integer.parseInt(String.valueOf(record.getBGValue())));
         json.put("direction", record.getTrend());
     }
 
-    private void populateLegacyAPIEntry(JSONObject json, EGRecord record) throws Exception {
+    private void populateLegacyAPIEntry(JSONObject json, EGVRecord record) throws Exception {
         json.put("device", "dexcom");
         json.put("date", record.getDisplayTime().getTime());
         json.put("sgv", Integer.parseInt(String.valueOf(record.getBGValue())));
@@ -206,7 +206,7 @@ public class Uploader {
         httpclient.execute(post, responseHandler);
     }
 
-    private void doMongoUpload(SharedPreferences prefs, EGRecord[] egRecords, MeterRecord[] meterRecords) {
+    private void doMongoUpload(SharedPreferences prefs, EGVRecord[] egvRecords, MeterRecord[] meterRecords) {
 
         String dbURI = prefs.getString("cloud_storage_mongodb_uri", null);
         String collectionName = prefs.getString("cloud_storage_mongodb_collection", null);
@@ -224,8 +224,8 @@ public class Uploader {
 
                 // get collection
                 DBCollection dexcomData = db.getCollection(collectionName.trim());
-                Log.i(TAG, "The number of EGV records being sent to MongoDB is " + egRecords.length);
-                for (EGRecord record : egRecords) {
+                Log.i(TAG, "The number of EGV records being sent to MongoDB is " + egvRecords.length);
+                for (EGVRecord record : egvRecords) {
                     // make db object
                     BasicDBObject testData = new BasicDBObject();
                     testData.put("device", "dexcom");

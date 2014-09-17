@@ -7,13 +7,13 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
-public class EGRecord extends GenericTimestampRecord implements Serializable {
+public class EGVRecord extends GenericTimestampRecord implements Serializable {
 
     private int bGValue;
     private String trend;
     private String trendSymbol;
 
-    public EGRecord(byte[] packet) {
+    public EGVRecord(byte[] packet) {
         // system_time (UInt), display_time (UInt), glucose (UShort), trend_arrow (Byte), crc (UShort))
         super(packet);
         int eGValue = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8);

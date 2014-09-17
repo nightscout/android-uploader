@@ -1,9 +1,8 @@
 package com.nightscout.android.dexcom;
 
-import android.os.AsyncTask;
 import android.util.Log;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
-import com.nightscout.android.dexcom.records.EGRecord;
+import com.nightscout.android.dexcom.records.EGVRecord;
 import com.nightscout.android.dexcom.records.GenericXMLRecord;
 import com.nightscout.android.dexcom.records.MeterRecord;
 import org.w3c.dom.Element;
@@ -26,25 +25,25 @@ public class ReadData {
         mSerialDevice = device;
     }
 
-    public EGRecord[] getRecentEGVs() {
+    public EGVRecord[] getRecentEGVs() {
         int recordType = Constants.RECORD_TYPES.EGV_DATA.ordinal();
         int endPage = readDataBasePageRange(recordType);
         return readDataBasePage(recordType, endPage);
     }
 
-    public EGRecord[] getRecentEGVsPages(int numOfRecentPages) {
+    public EGVRecord[] getRecentEGVsPages(int numOfRecentPages) {
         if (numOfRecentPages < 1) {
             throw new IllegalArgumentException("Number of pages must be greater than 1.");
         }
         int recordType = Constants.RECORD_TYPES.EGV_DATA.ordinal();
         int endPage = readDataBasePageRange(recordType);
         numOfRecentPages = numOfRecentPages - 1;
-        EGRecord[] allPages = new EGRecord[0];
+        EGVRecord[] allPages = new EGVRecord[0];
         for (int i = numOfRecentPages; i >= 0; i--) {
             int nextPage = endPage - i;
-            EGRecord[] ithEGRecordPage = readDataBasePage(recordType, nextPage);
-            EGRecord[] result = Arrays.copyOf(allPages, allPages.length + ithEGRecordPage.length);
-            System.arraycopy(ithEGRecordPage, 0, result, allPages.length, ithEGRecordPage.length);
+            EGVRecord[] ithEGVRecordPage = readDataBasePage(recordType, nextPage);
+            EGVRecord[] result = Arrays.copyOf(allPages, allPages.length + ithEGVRecordPage.length);
+            System.arraycopy(ithEGVRecordPage, 0, result, allPages.length, ithEGVRecordPage.length);
             allPages = result;
         }
         return allPages;
@@ -153,12 +152,12 @@ public class ReadData {
         switch (Constants.RECORD_TYPES.values()[recordType]) {
             case EGV_DATA:
                 rec_len = 13;
-                EGRecord[] egRecords = new EGRecord[numRec];
+                EGVRecord[] egvRecords = new EGVRecord[numRec];
                 for (int i = 0; i < numRec; i++) {
                     int startIdx = HEADER_LEN + rec_len * i;
-                    egRecords[i] = new EGRecord(Arrays.copyOfRange(data, startIdx, startIdx + rec_len - 1));
+                    egvRecords[i] = new EGVRecord(Arrays.copyOfRange(data, startIdx, startIdx + rec_len - 1));
                 }
-                return (T) egRecords;
+                return (T) egvRecords;
             case METER_DATA:
                 rec_len = 16;
                 MeterRecord[] meterRecords = new MeterRecord[numRec];
