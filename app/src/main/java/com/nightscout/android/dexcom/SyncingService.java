@@ -12,6 +12,7 @@ import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.USB.UsbSerialProber;
 import com.nightscout.android.dexcom.records.EGVRecord;
 import com.nightscout.android.dexcom.records.MeterRecord;
+import com.nightscout.android.TimeConstants;
 import com.nightscout.android.upload.Uploader;
 
 import java.io.IOException;
@@ -73,15 +74,21 @@ public class SyncingService extends IntentService {
      * parameters.
      */
     private void handleActionSync(int numOfPages) {
+
         if (acquireSerialDevice()) {
+
             ReadData readData = new ReadData(mSerialDevice);
             EGVRecord[] recentRecords = readData.getRecentEGVsPages(numOfPages);
             MeterRecord[] meterRecords = readData.getRecentMeterRecords();
+
+            int timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
+            int nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
+
             Uploader uploader = new Uploader(mContext);
             uploader.upload(recentRecords, meterRecords);
 
             EGVRecord recentEGV = recentRecords[recentRecords.length - 1];
-            broadcastSGVToUI(recentEGV, true);
+            broadcastSGVToUI(recentEGV, true, nextUploadTime);
 
             // Close serial
             try {
@@ -118,14 +125,14 @@ public class SyncingService extends IntentService {
         return false;
     }
 
-    private void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus) {
+    private void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus, int nextUploadTime) {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
         broadcastIntent.putExtra(RESPONSE_SGV, String.valueOf(egvRecord.getBGValue()) + " "
                                                + egvRecord.getTrendSymbol());
         broadcastIntent.putExtra(RESPONSE_TIMESTAMP, egvRecord.getDisplayTime().toString());
-        broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, 60000*3);
+        broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, nextUploadTime);
         broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, uploadStatus);
         sendBroadcast(broadcastIntent);
     }
@@ -136,7 +143,7 @@ public class SyncingService extends IntentService {
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
         broadcastIntent.putExtra(RESPONSE_SGV, "---");
         broadcastIntent.putExtra(RESPONSE_TIMESTAMP, "---");
-        broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, 60000);
+        broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, TimeConstants.FIVE_MINUTES_MS);
         sendBroadcast(broadcastIntent);
     }
 

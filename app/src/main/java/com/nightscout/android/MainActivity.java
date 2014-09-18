@@ -23,13 +23,9 @@ import org.acra.ACRAConfiguration;
 import org.acra.ACRAConfigurationException;
 import org.acra.ReportingInteractionMode;
 
-
 public class MainActivity extends Activity {
 
     private final String TAG = MainActivity.class.getSimpleName();
-
-    // Constants
-    private final int DEFAULT_SYNC_INTERVAL = 180000;
 
     // Member components
     private CGMStatusReceiver mCGMStatusReceiver;
@@ -149,7 +145,7 @@ public class MainActivity extends Activity {
             String responseString = intent.getStringExtra(SyncingService.RESPONSE_SGV);
             String responseMessage = intent.getStringExtra(SyncingService.RESPONSE_TIMESTAMP);
             boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
-            int responseNextUploadTime = intent.getIntExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, DEFAULT_SYNC_INTERVAL);
+            int responseNextUploadTime = intent.getIntExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
 
             if (responseUploadStatus) {
                 mImageViewUpload.setImageResource(R.drawable.ic_upload_success);
@@ -162,9 +158,19 @@ public class MainActivity extends Activity {
             mTextSGV.setText(responseString);
             mTextTimestamp.setText(responseMessage);
 
-            Log.d(TAG, "Setting next upload time to: " + responseNextUploadTime);
+            int nextUploadTime = TimeConstants.FIVE_MINUTES_MS;
+
+            if (responseNextUploadTime > TimeConstants.FIVE_MINUTES_MS) {
+                Log.d(TAG, "Receiver's time is less than current record time, possible time change.");
+            } else if (responseNextUploadTime > 0) {
+                Log.d(TAG, "Setting next upload time to: " + responseNextUploadTime);
+                nextUploadTime = responseNextUploadTime;
+            } else {
+                Log.d(TAG, "OUT OF RANGE: Setting next upload time to: " + nextUploadTime + " ms.");
+            }
+
             mHandler.removeCallbacks(syncCGM);
-            mHandler.postDelayed(syncCGM, responseNextUploadTime);
+            mHandler.postDelayed(syncCGM, nextUploadTime);
         }
     }
 
@@ -218,9 +224,6 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.menu_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
