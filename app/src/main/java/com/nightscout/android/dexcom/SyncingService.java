@@ -83,12 +83,13 @@ public class SyncingService extends IntentService {
 
             int timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
             int nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
+            int offset = 3000;
 
             Uploader uploader = new Uploader(mContext);
             uploader.upload(recentRecords, meterRecords);
 
             EGVRecord recentEGV = recentRecords[recentRecords.length - 1];
-            broadcastSGVToUI(recentEGV, true, nextUploadTime);
+            broadcastSGVToUI(recentEGV, true, nextUploadTime + offset);
 
             // Close serial
             try {
