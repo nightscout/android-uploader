@@ -5,6 +5,8 @@ import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.records.EGVRecord;
 import com.nightscout.android.dexcom.records.GenericXMLRecord;
 import com.nightscout.android.dexcom.records.MeterRecord;
+import com.nightscout.android.dexcom.records.SensorRecord;
+
 import org.w3c.dom.Element;
 
 import java.io.IOException;
@@ -55,6 +57,12 @@ public class ReadData {
 
     public MeterRecord[] getRecentMeterRecords() {
         int recordType = Constants.RECORD_TYPES.METER_DATA.ordinal();
+        int endPage = readDataBasePageRange(recordType);
+        return readDataBasePage(recordType, endPage);
+    }
+
+    public SensorRecord[] getRecentSensorRecords() {
+        int recordType = Constants.RECORD_TYPES.SENSOR_DATA.ordinal();
         int endPage = readDataBasePageRange(recordType);
         return readDataBasePage(recordType, endPage);
     }
@@ -146,7 +154,7 @@ public class ReadData {
         return new ReadPacket(data);
     }
 
-    // TODO: not sure if I want to use generics or just separate methods, hmmm make it private in casec
+    // TODO: not sure if I want to use generics or just separate methods, hmmm make it private in case
     private <T> T ParsePage(byte[] data, int recordType) {
         int HEADER_LEN = 28;
         int NUM_REC_OFFSET = 4;
@@ -154,6 +162,14 @@ public class ReadData {
         int rec_len;
 
         switch (Constants.RECORD_TYPES.values()[recordType]) {
+            case SENSOR_DATA:
+                rec_len = 20;
+                SensorRecord[] sensorRecords = new SensorRecord[numRec];
+                for (int i = 0; i < numRec; i++) {
+                    int startIdx = HEADER_LEN + rec_len * i;
+                    sensorRecords[i] = new SensorRecord(Arrays.copyOfRange(data, startIdx, startIdx + rec_len - 1));
+                }
+                return (T) sensorRecords;
             case EGV_DATA:
                 rec_len = 13;
                 EGVRecord[] egvRecords = new EGVRecord[numRec];
