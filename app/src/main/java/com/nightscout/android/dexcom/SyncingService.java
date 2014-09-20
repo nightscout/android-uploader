@@ -97,7 +97,7 @@ public class SyncingService extends IntentService {
                 // Try powering off, will only work if rooted
                 USBPower.PowerOff();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Unable to close and powerOff usb", e);
             }
 
         } else {
@@ -118,7 +118,7 @@ public class SyncingService extends IntentService {
                 mSerialDevice.open();
                 return true;
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Unable to powerOn and open usb", e);
             }
         } else {
             Log.d(TAG, "Unable to acquire USB device from manager.");

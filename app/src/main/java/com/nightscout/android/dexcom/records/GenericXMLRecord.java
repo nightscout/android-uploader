@@ -1,5 +1,7 @@
 package com.nightscout.android.dexcom.records;
 
+import android.util.Log;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -13,6 +15,8 @@ import java.util.Arrays;
 public class GenericXMLRecord extends GenericTimestampRecord implements Serializable {
     int XML_START = 8;
     int XML_END = 241;
+
+    private final String TAG = GenericXMLRecord.class.getSimpleName();
 
     private Element xmlElement;
 
@@ -29,7 +33,7 @@ public class GenericXMLRecord extends GenericTimestampRecord implements Serializ
             document = builder.parse(new InputSource(new StringReader(xml)));
             xmlElement = document.getDocumentElement();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Unable to build xml element", e);
         }
     }
 
