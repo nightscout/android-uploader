@@ -64,7 +64,7 @@ public class Uploader {
     }
 
     private void doRESTUpload(SharedPreferences prefs, EGVRecord... records) {
-        String baseURLSettings = prefs.getString("cloud_storage_api_base_api", "");
+        String baseURLSettings = prefs.getString("cloud_storage_api_base", "");
         ArrayList<String> baseURIs = new ArrayList<String>();
 
         try {
