@@ -2,6 +2,7 @@ package com.nightscout.android.dexcom;
 
 import android.util.Log;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
+import com.nightscout.android.dexcom.records.CalRecord;
 import com.nightscout.android.dexcom.records.EGVRecord;
 import com.nightscout.android.dexcom.records.GenericXMLRecord;
 import com.nightscout.android.dexcom.records.MeterRecord;
@@ -63,6 +64,12 @@ public class ReadData {
 
     public SensorRecord[] getRecentSensorRecords() {
         int recordType = Constants.RECORD_TYPES.SENSOR_DATA.ordinal();
+        int endPage = readDataBasePageRange(recordType);
+        return readDataBasePage(recordType, endPage);
+    }
+
+    public CalRecord[] getRecentCalRecords() {
+        int recordType = Constants.RECORD_TYPES.CAL_SET.ordinal();
         int endPage = readDataBasePageRange(recordType);
         return readDataBasePage(recordType, endPage);
     }
@@ -162,6 +169,9 @@ public class ReadData {
         int rec_len;
 
         switch (Constants.RECORD_TYPES.values()[recordType]) {
+            case MANUFACTURING_DATA:
+                GenericXMLRecord xmlRecord = new GenericXMLRecord(Arrays.copyOfRange(data, HEADER_LEN, data.length - 1));
+                return (T) xmlRecord;
             case SENSOR_DATA:
                 rec_len = 20;
                 SensorRecord[] sensorRecords = new SensorRecord[numRec];
@@ -186,9 +196,14 @@ public class ReadData {
                     meterRecords[i] = new MeterRecord(Arrays.copyOfRange(data, startIdx, startIdx + rec_len - 1));
                 }
                 return (T) meterRecords;
-            case MANUFACTURING_DATA:
-                GenericXMLRecord xmlRecord = new GenericXMLRecord(Arrays.copyOfRange(data, HEADER_LEN, data.length - 1));
-                return (T) xmlRecord;
+            case CAL_SET:
+                rec_len = 148;
+                CalRecord[] calRecords = new CalRecord[numRec];
+                for (int i = 0; i < numRec; i++) {
+                    int startIdx = HEADER_LEN + rec_len * i;
+                    calRecords[i] = new CalRecord(Arrays.copyOfRange(data, startIdx, startIdx + rec_len - 1));
+                }
+                return (T) calRecords;
             default:
                 // Throw error "Database record not supported"
                 break;
