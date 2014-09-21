@@ -3,15 +3,15 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="com.nightscout.android.SettingsActivity$GeneralPreferenceFragment"
+        android:fragment="com.nightscout.android.settings.SettingsActivity$GeneralPreferenceFragment"
         android:title="@string/pref_header_general" />
 
     <header
-        android:fragment="com.nightscout.android.SettingsActivity$CloudStoragePreferenceFragment"
+        android:fragment="com.nightscout.android.settings.SettingsActivity$CloudStoragePreferenceFragment"
         android:title="@string/pref_header_cloud_storage" />
 
     <header
-        android:fragment="com.nightscout.android.SettingsActivity$AboutPreferenceFragment"
+        android:fragment="com.nightscout.android.settings.SettingsActivity$AboutPreferenceFragment"
         android:title="@string/pref_header_about" />
 
 </preference-headers>

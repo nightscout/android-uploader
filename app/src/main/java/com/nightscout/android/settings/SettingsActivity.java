@@ -1,4 +1,4 @@
-package com.nightscout.android;
+package com.nightscout.android.settings;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -19,6 +19,8 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 
+
+import com.nightscout.android.R;
 
 import java.util.List;
 

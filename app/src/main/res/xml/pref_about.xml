@@ -12,4 +12,13 @@
         android:summary="@string/pref_summary_about_version_number">
     </PreferenceScreen>
 
+    <com.nightscout.android.settings.OpenSourceDialog
+        android:key="about_gpl"
+        android:title="Open Source License"
+        android:summary="License details for Nightscout"
+        android:dialogMessage="@string/pref_gpl_summary"
+        android:positiveButtonText="Ok"
+        android:negativeButtonText="@null">
+    </com.nightscout.android.settings.OpenSourceDialog>
+
 </PreferenceScreen>
