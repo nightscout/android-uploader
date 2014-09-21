@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nightscout.android.dexcom.SyncingService;
+import com.nightscout.android.settings.SettingsActivity;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
