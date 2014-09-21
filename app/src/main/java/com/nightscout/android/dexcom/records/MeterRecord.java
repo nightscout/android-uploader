@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
-public class MeterRecord extends GenericTimestampRecord implements Serializable {
+public class MeterRecord extends GenericTimestampRecord {
 
     private int meterBG;
     private int meterTime;

@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.util.Arrays;
 
-public class GenericXMLRecord extends GenericTimestampRecord implements Serializable {
+public class GenericXMLRecord extends GenericTimestampRecord {
     int XML_START = 8;
     int XML_END = 241;
 
