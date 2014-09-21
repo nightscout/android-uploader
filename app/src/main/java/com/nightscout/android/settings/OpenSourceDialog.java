@@ -1,7 +1,6 @@
 package com.nightscout.android.settings;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 
