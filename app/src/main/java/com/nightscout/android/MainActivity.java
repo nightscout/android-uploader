@@ -39,10 +39,8 @@ public class MainActivity extends Activity {
     private ImageView mImageViewUSB;
     private ImageView mImageViewUpload;
 
-    // TODO: this is port from the main and needs to be merge to mUsbReceiver
     // TODO: should try and avoid use static
     public static int batLevel = 0;
-    BatteryReceiver mArrow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +58,12 @@ public class MainActivity extends Activity {
 
         mContext = getApplicationContext();
 
-        // Register USB attached/detached intents
-        IntentFilter usbFilter = new IntentFilter();
-        usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
-        usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-        registerReceiver(mUsbReceiver, usbFilter);
+        // Register USB attached/detached and battery changes intents
+        IntentFilter deviceStatusFilter = new IntentFilter();
+        deviceStatusFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+        deviceStatusFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+        deviceStatusFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        registerReceiver(mDeviceStatusReceiver, deviceStatusFilter);
 
         // Register Broadcast Receiver for response messages from mSyncingServiceIntent service
         mCGMStatusReceiver = new CGMStatusReceiver();
@@ -94,14 +93,6 @@ public class MainActivity extends Activity {
                 SyncingService.startActionSingleSync(mContext, 20);
             }
         });
-
-        // TODO: this is port from the main and needs to be merge to mUsbReceiver
-        mArrow = new BatteryReceiver();
-        IntentFilter mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(Intent.ACTION_BATTERY_LOW);
-        mIntentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
-        mIntentFilter.addAction(Intent.ACTION_BATTERY_OKAY);
-        registerReceiver(mArrow,mIntentFilter);
     }
 
     @Override
@@ -109,9 +100,7 @@ public class MainActivity extends Activity {
         Log.d(TAG, "onDestroy called.");
         super.onDestroy();
         unregisterReceiver(mCGMStatusReceiver);
-        unregisterReceiver(mUsbReceiver);
-        // TODO: this should be deleted when merged with usb receiver
-        unregisterReceiver(mArrow);
+        unregisterReceiver(mDeviceStatusReceiver);
     }
 
     @Override
@@ -174,19 +163,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    // TODO: this is port from the main and needs to be merge to mUsbReceiver
-    private class  BatteryReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context arg0, Intent arg1) {
-            if (arg1.getAction().equalsIgnoreCase(Intent.ACTION_BATTERY_LOW)
-                    || arg1.getAction().equalsIgnoreCase(Intent.ACTION_BATTERY_CHANGED)
-                    || arg1.getAction().equalsIgnoreCase(Intent.ACTION_BATTERY_OKAY)) {
-                batLevel = arg1.getIntExtra("level", 0);
-            }
-        }
-    }
-
-    BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
+    BroadcastReceiver mDeviceStatusReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
@@ -203,6 +180,8 @@ public class MainActivity extends Activity {
                 SyncingService.startActionSingleSync(mContext, 1);
                 //TODO: consider getting permission programmatically instead of user prompted
                 //if decided to need to add android.permission.USB_PERMISSION in manifest
+            } else if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
+                batLevel = intent.getIntExtra("level", 0);
             }
         }
     };
