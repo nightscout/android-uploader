@@ -48,6 +48,7 @@ public class Constants {
     public final static int EGV_VALUE_MASK = 1023;
     public final static int EGV_DISPLAY_ONLY_MASK = 32768;
     public final static int EGV_TREND_ARROW_MASK = 15;
+    public final static int EGV_NOISE_MASK = 112;
 
     public enum BATTERY_STATES {
         NONE,
