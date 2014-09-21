@@ -17,6 +17,7 @@
         android:title="Open Source License"
         android:summary="License details for Nightscout"
         android:dialogMessage="@string/pref_gpl_summary"
+        android:dialogIcon="@drawable/ic_launcher"
         android:positiveButtonText="Ok"
         android:negativeButtonText="@null">
     </com.nightscout.android.settings.OpenSourceDialog>
