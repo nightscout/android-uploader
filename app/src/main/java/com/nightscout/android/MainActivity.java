@@ -5,15 +5,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.nightscout.android.dexcom.SyncingService;
@@ -40,8 +43,27 @@ public class MainActivity extends Activity {
     private ImageView mImageViewUSB;
     private ImageView mImageViewUpload;
 
+    private Button acceptButton;
+    private SharedPreferences prefs;
+    // TODO: this is port from the main and needs to be merge to mUsbReceiver
     // TODO: should try and avoid use static
     public static int batLevel = 0;
+
+    private int acceptanceTimerCount=0;
+    private int acceptanceDelaySeconds=10;
+    private Runnable delayAcceptance = new Runnable() {
+        @Override
+        public void run() {
+            if (acceptanceTimerCount>=acceptanceDelaySeconds){
+                acceptButton.setText(R.string.disclaimer_accept);
+                acceptButton.setEnabled(true);
+                return;
+            }
+            acceptButton.setText(getText(R.string.disclaimer_accept)+"("+acceptanceDelaySeconds+")");
+            acceptanceDelaySeconds-=1;
+            mHandler.postDelayed(delayAcceptance,1000);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +78,9 @@ public class MainActivity extends Activity {
         mImageViewUpload = (ImageView) findViewById(R.id.imageViewUploadStatus);
         mImageViewUpload.setImageResource(R.drawable.ic_upload_fail);
         mImageViewUpload.setTag(R.drawable.ic_upload_fail);
+        acceptButton= (Button) findViewById(R.id.understandButton);
+//        cancelButton= (Button) findViewById(R.id.noUnderstandButton);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         mContext = getApplicationContext();
 
@@ -65,6 +90,17 @@ public class MainActivity extends Activity {
         deviceStatusFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         deviceStatusFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver(mDeviceStatusReceiver, deviceStatusFilter);
+        if (userAcceptsRisk()){
+            hideDisclaimer();
+        } else {
+            mHandler.postDelayed(delayAcceptance, 1000);
+        }
+
+//        // Register USB attached/detached intents
+//        IntentFilter usbFilter = new IntentFilter();
+//        usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+//        usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+//        registerReceiver(mUsbReceiver, usbFilter);
 
         // Register Broadcast Receiver for response messages from mSyncingServiceIntent service
         mCGMStatusReceiver = new CGMStatusReceiver();
@@ -94,6 +130,28 @@ public class MainActivity extends Activity {
                 SyncingService.startActionSingleSync(mContext, 20);
             }
         });
+
+        acceptButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putBoolean("i_understand",true);
+                editor.apply();
+                hideDisclaimer();
+            }
+        });
+
+    }
+
+    public void hideDisclaimer(){
+        RelativeLayout disclaimerLayout=(RelativeLayout) findViewById(R.id.DisclaimerRelativeLayout);
+        RelativeLayout mainLayout=(RelativeLayout) findViewById(R.id.MainLayout);
+        mainLayout.setVisibility(View.VISIBLE);
+        disclaimerLayout.setVisibility(View.INVISIBLE);
+    }
+
+    public boolean userAcceptsRisk(){
+        return prefs.getBoolean("i_understand",false);
     }
 
     @Override

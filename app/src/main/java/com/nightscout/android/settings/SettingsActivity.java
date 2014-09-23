@@ -25,7 +25,7 @@ import com.nightscout.android.R;
 import java.util.List;
 
 /**
- * A {@link PreferenceActivity} that presents a set of application settings. On
+ * A {@link android.preference.PreferenceActivity} that presents a set of application settings. On
  * handset devices, settings are presented as a single list. On tablets,
  * settings are split by category, with category headers shown to the left of
  * the list of settings.
@@ -109,6 +109,13 @@ public class SettingsActivity extends PreferenceActivity {
         getPreferenceScreen().addPreference(fakeHeader);
         addPreferencesFromResource(R.xml.pref_cloud_storage);
 
+        // MQTT settings
+        fakeHeader = new PreferenceCategory(this);
+        fakeHeader.setTitle(R.string.pref_mqtt);
+        getPreferenceScreen().addPreference(fakeHeader);
+        addPreferencesFromResource(R.xml.pref_mqtt);
+
+
         // Add 'data and sync' preferences, and a corresponding header.
         fakeHeader = new PreferenceCategory(this);
         fakeHeader.setTitle(R.string.pref_header_about);
@@ -122,6 +129,8 @@ public class SettingsActivity extends PreferenceActivity {
         bindPreferenceSummaryToValue(findPreference("cloud_storage_mongodb_device_status_collection"));
         bindPreferenceSummaryToValue(findPreference("cloud_storage_mongodb_collection"));
         bindPreferenceSummaryToValue(findPreference("cloud_storage_api_base"));
+        bindPreferenceSummaryToValue(findPreference("mqtt_endpoint"));
+        bindPreferenceSummaryToValue(findPreference("mqtt_user"));
     }
 
     /** {@inheritDoc} */
@@ -142,7 +151,7 @@ public class SettingsActivity extends PreferenceActivity {
     /**
      * Determines whether the simplified settings UI should be shown. This is
      * true if this is forced via {@link #ALWAYS_SIMPLE_PREFS}, or the device
-     * doesn't have newer APIs like {@link PreferenceFragment}, or the device
+     * doesn't have newer APIs like {@link android.preference.PreferenceFragment}, or the device
      * doesn't have an extra-large screen. In these cases, a single-pane
      * "simplified" settings UI should be shown.
      */
@@ -291,4 +300,19 @@ public class SettingsActivity extends PreferenceActivity {
             // guidelines.
         }
     }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class MQTTPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_mqtt);
+
+            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+            // to their values. When their values change, their summaries are
+            // updated to reflect the new value, per the Android Design
+            // guidelines.
+        }
+    }
+
 }

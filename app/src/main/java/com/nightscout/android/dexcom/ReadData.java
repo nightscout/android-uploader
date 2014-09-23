@@ -110,6 +110,12 @@ public class ReadData {
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt(4);
     }
 
+    public int readBatteryLevel(){
+        writeCommand(Constants.READ_BATTERY_LEVEL);
+        byte[] readData = read(MIN_LEN).getData();
+        return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
+    }
+
     private <T> T readDataBasePage(int recordType, int page) {
         byte numOfPages = 1;
         ArrayList<Byte> payload = new ArrayList<Byte>();

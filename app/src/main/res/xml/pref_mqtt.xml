@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceScreen
+        android:dependency="i_understand"
+        android:key="mqtt"
+        android:title="@string/pref_title_mqtt"
+        android:summary="@string/pref_summary_mqtt">
+
+        <EditTextPreference
+            android:title="@string/pref_title_mqtt_endpoint"
+            android:key="mqtt_endpoint"
+            android:dialogTitle="@string/pref_dialog_mqtt_endpoint"
+            android:dialogMessage="@string/pref_message_mqtt_endpoint"
+            android:defaultValue="@string/pref_default_mqtt_endpoint">
+        </EditTextPreference>
+
+        <EditTextPreference
+            android:title="@string/pref_title_mqtt_user"
+            android:key="mqtt_user"
+            android:dialogTitle="@string/pref_dialog_mqtt_user"
+            android:dialogMessage="@string/pref_message_mqtt_user">
+        </EditTextPreference>
+
+        <EditTextPreference
+            android:title="@string/pref_title_mqtt_pass"
+            android:key="mqtt_pass"
+            android:dialogTitle="@string/pref_dialog_mqtt_pass"
+            android:dialogMessage="@string/pref_message_mqtt_pass"
+            android:password="true">
+        </EditTextPreference>
+    </PreferenceScreen>
+</PreferenceScreen>

@@ -232,7 +232,7 @@ public class Uploader {
                     testData.put("date", record.getDisplayTime().getTime());
                     testData.put("dateString", record.getDisplayTime().toString());
                     testData.put("sgv", record.getBGValue());
-                    testData.put("direction", record.getTrend());
+                    testData.put("direction", record.getTrend().friendlyTrendName());
                     dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
                 }
 

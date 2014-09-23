@@ -27,7 +27,7 @@ import java.nio.ByteBuffer;
 
 
 /**
- * Utility class which services a {@link UsbSerialDriver} in its {@link #run()}
+ * Utility class which services a {@link com.nightscout.android.dexcom.USB.UsbSerialDriver} in its {@link #run()}
  * method.
  *
  * @author mike wakerly (opensource@hoho.com)
@@ -66,7 +66,7 @@ public class SerialInputOutputManager implements Runnable {
         public void onNewData(byte[] data);
 
         /**
-         * Called when {@link SerialInputOutputManager#run()} aborts due to an
+         * Called when {@link com.nightscout.android.dexcom.USB.SerialInputOutputManager#run()} aborts due to an
          * error.
          */
         public void onRunError(Exception e);
