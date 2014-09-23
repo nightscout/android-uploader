@@ -153,6 +153,9 @@ public class MQTTMgr implements MqttCallback,MQTTMgrObservable {
             state=State.CONNECTED;
         } catch (MqttException e) {
             Log.e(TAG, "Error while connecting: ", e);
+        } catch (IllegalArgumentException e) {
+            // TODO: add more robust handling to let the user know there was a problem and what it was
+            Log.e(TAG, "Error while connecting: ", e);
         }
     }
 
