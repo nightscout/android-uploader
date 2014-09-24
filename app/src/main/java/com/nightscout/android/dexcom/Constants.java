@@ -1,6 +1,6 @@
 package com.nightscout.android.dexcom;
 
-import com.nightscout.android.SGV;
+import com.nightscout.android.protobuf.SGV;
 
 public class Constants {
 
@@ -78,28 +78,28 @@ public class Constants {
     }
 
     public enum TREND_ARROW_VALUES {
-        NONE(SGV.ProposeCookieMonsterSGVG4.Direction.NONE),
-        DOUBLE_UP("\u21C8", "DoubleUp",SGV.ProposeCookieMonsterSGVG4.Direction.DOUBLE_UP),
-        SINGLE_UP("\u2191", "SingleUp",SGV.ProposeCookieMonsterSGVG4.Direction.SINGLE_UP),
-        UP_45("\u2197", "FortyFiveUp",SGV.ProposeCookieMonsterSGVG4.Direction.FORTY_FIVE_UP),
-        FLAT("\u2192", "Flat",SGV.ProposeCookieMonsterSGVG4.Direction.FLAT),
-        DOWN_45("\u2198", "FortyFiveDown",SGV.ProposeCookieMonsterSGVG4.Direction.FORTY_FIVE_DOWN),
-        SINGLE_DOWN("\u2193", "SingleDown",SGV.ProposeCookieMonsterSGVG4.Direction.SINGLE_DOWN),
-        DOUBLE_DOWN("\u21CA", "DoubleDown",SGV.ProposeCookieMonsterSGVG4.Direction.DOUBLE_DOWN),
-        NOT_COMPUTABLE(SGV.ProposeCookieMonsterSGVG4.Direction.NOT_COMPUTABLE),
-        OUT_OF_RANGE(SGV.ProposeCookieMonsterSGVG4.Direction.RATE_OUT_OF_RANGE);
+        NONE(SGV.CookieMonsterSGVG4.Direction.NONE),
+        DOUBLE_UP("\u21C8", "DoubleUp",SGV.CookieMonsterSGVG4.Direction.DOUBLE_UP),
+        SINGLE_UP("\u2191", "SingleUp",SGV.CookieMonsterSGVG4.Direction.SINGLE_UP),
+        UP_45("\u2197", "FortyFiveUp",SGV.CookieMonsterSGVG4.Direction.FORTY_FIVE_UP),
+        FLAT("\u2192", "Flat",SGV.CookieMonsterSGVG4.Direction.FLAT),
+        DOWN_45("\u2198", "FortyFiveDown",SGV.CookieMonsterSGVG4.Direction.FORTY_FIVE_DOWN),
+        SINGLE_DOWN("\u2193", "SingleDown",SGV.CookieMonsterSGVG4.Direction.SINGLE_DOWN),
+        DOUBLE_DOWN("\u21CA", "DoubleDown",SGV.CookieMonsterSGVG4.Direction.DOUBLE_DOWN),
+        NOT_COMPUTABLE(SGV.CookieMonsterSGVG4.Direction.NOT_COMPUTABLE),
+        OUT_OF_RANGE(SGV.CookieMonsterSGVG4.Direction.RATE_OUT_OF_RANGE);
 
         private String arrowSymbol;
         private String trendName;
-        private SGV.ProposeCookieMonsterSGVG4.Direction protoBuffEnum;
+        private SGV.CookieMonsterSGVG4.Direction protoBuffEnum;
 
-        TREND_ARROW_VALUES(String a, String t, SGV.ProposeCookieMonsterSGVG4.Direction d) {
+        TREND_ARROW_VALUES(String a, String t, SGV.CookieMonsterSGVG4.Direction d) {
             arrowSymbol = a;
             trendName = t;
             protoBuffEnum = d;
         }
 
-        TREND_ARROW_VALUES(SGV.ProposeCookieMonsterSGVG4.Direction d) {
+        TREND_ARROW_VALUES(SGV.CookieMonsterSGVG4.Direction d) {
             this(null, null,d);
         }
 
@@ -119,7 +119,7 @@ public class Constants {
             }
         }
 
-        public SGV.ProposeCookieMonsterSGVG4.Direction getProtoBuffEnum(){
+        public SGV.CookieMonsterSGVG4.Direction getProtoBuffEnum(){
             return this.protoBuffEnum;
         }
 

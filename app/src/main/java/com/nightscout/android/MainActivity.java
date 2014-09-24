@@ -96,12 +96,6 @@ public class MainActivity extends Activity {
             mHandler.postDelayed(delayAcceptance, 1000);
         }
 
-//        // Register USB attached/detached intents
-//        IntentFilter usbFilter = new IntentFilter();
-//        usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
-//        usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-//        registerReceiver(mUsbReceiver, usbFilter);
-
         // Register Broadcast Receiver for response messages from mSyncingServiceIntent service
         mCGMStatusReceiver = new CGMStatusReceiver();
         IntentFilter filter = new IntentFilter(CGMStatusReceiver.PROCESS_RESPONSE);

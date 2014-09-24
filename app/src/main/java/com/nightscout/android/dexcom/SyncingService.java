@@ -3,16 +3,14 @@ package com.nightscout.android.dexcom;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.hardware.usb.UsbManager;
-import android.os.BatteryManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.nightscout.android.MQTT.MQTTMgr;
+import com.nightscout.android.upload.MQTT.MQTTMgr;
 import com.nightscout.android.MainActivity;
-import com.nightscout.android.SGV;
+import com.nightscout.android.protobuf.SGV;
 import com.nightscout.android.dexcom.USB.USBPower;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.USB.UsbSerialProber;
@@ -22,7 +20,6 @@ import com.nightscout.android.TimeConstants;
 import com.nightscout.android.upload.Uploader;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -128,19 +125,19 @@ public class SyncingService extends IntentService {
         MQTTMgr mqttMgr = new MQTTMgr(getApplicationContext(),usr,pw,"dexcom");
         mqttMgr.connect(url);
         ArrayList<SGV> sgvs = new ArrayList<SGV>();
-        SGV.ProposedCookieMonsterG4Download.Builder recordBuilder = SGV.ProposedCookieMonsterG4Download.newBuilder()
-                .setDownloadStatus(SGV.ProposedCookieMonsterG4Download.DownloadStatus.SUCCESS)
+        SGV.CookieMonsterG4Download.Builder recordBuilder = SGV.CookieMonsterG4Download.newBuilder()
+                .setDownloadStatus(SGV.CookieMonsterG4Download.DownloadStatus.SUCCESS)
                 .setDownloadTimestamp(new Date().getTime())
-                .setUploaderBattery((int) getBatteryLevel())
+                .setUploaderBattery(MainActivity.batLevel)
                 .setReceiverBattery(batteryLevel)
-                .setUnits(SGV.ProposedCookieMonsterG4Download.Unit.MGDL);
-        SGV.ProposeCookieMonsterSGVG4 sgv = SGV.ProposeCookieMonsterSGVG4.newBuilder()
+                .setUnits(SGV.CookieMonsterG4Download.Unit.MGDL);
+        SGV.CookieMonsterSGVG4 sgv = SGV.CookieMonsterSGVG4.newBuilder()
                 .setSgv(recentEGV.getBGValue())
                 .setTimestamp(recentEGV.getDisplayTime().getTime())
                 .setDirection(recentEGV.getTrend().getProtoBuffEnum())
                 .build();
         recordBuilder.addSgv(sgv);
-        SGV.ProposedCookieMonsterG4Download download=recordBuilder.build();
+        SGV.CookieMonsterG4Download download=recordBuilder.build();
 
         mqttMgr.publish(download.toByteArray(),PROTOBUF_DOWNLOAD_TOPIC);
         mqttMgr.disconnect();
@@ -186,17 +183,5 @@ public class SyncingService extends IntentService {
         broadcastIntent.putExtra(RESPONSE_TIMESTAMP, "---");
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, TimeConstants.FIVE_MINUTES_MS);
         sendBroadcast(broadcastIntent);
-    }
-
-    public float getBatteryLevel() {
-        Intent batteryIntent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-        int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-
-        if(level == -1 || scale == -1) {
-            return 50.0f;
-        }
-
-        return ((float)level / (float)scale) * 100.0f;
     }
 }

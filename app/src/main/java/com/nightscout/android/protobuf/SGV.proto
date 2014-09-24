@@ -1,8 +1,8 @@
-option java_package = "com.nightscout.android";
+option java_package = "com.nightscout.android.protobuf";
 option java_outer_classname = "SGV";
 
-message ProposedCookieMonsterG4Download {
-    repeated ProposeCookieMonsterSGVG4 sgv = 1; // Glucose records as reported by the G4
+message CookieMonsterG4Download {
+    repeated CookieMonsterSGVG4 sgv = 1; // Glucose records as reported by the G4
     enum Unit {
         MGDL = 0;
         MMOL = 1;
@@ -24,7 +24,7 @@ message ProposedCookieMonsterG4Download {
 }
 
 
-message ProposeCookieMonsterSGVG4 {
+message CookieMonsterSGVG4 {
     required uint32 sgv = 1; // Glucose value
     optional uint64 timestamp = 2; // timestamp of the record
     enum Direction {
