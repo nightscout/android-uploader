@@ -33,5 +33,6 @@
     <string name="feedback_dialog_comment_prompt">Please add your comments below:</string>
     <string name="feedback_dialog_ok_toast">Thank you!</string>
     <string name="feedback_toast_text"></string>
-
+    <string name="disclaimer_accept">I accept</string>
+    <string name="disclaimer_cancel">Cancel</string>
 </resources>

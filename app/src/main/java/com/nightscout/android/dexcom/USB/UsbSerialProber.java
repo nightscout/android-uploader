@@ -31,7 +31,7 @@ import java.util.Map;
 //import com.hoho.android.usbserial.driver.FtdiSerialDriver;
 
 /**
- * Helper class to assist in detecting and building {@link UsbSerialDriver}
+ * Helper class to assist in detecting and building {@link com.nightscout.android.dexcom.USB.UsbSerialDriver}
  * instances from available hardware.
  *
  * @author mike wakerly (opensource@hoho.com)
@@ -90,13 +90,13 @@ public enum UsbSerialProber {
     private static final String TAG = UsbSerialProber.class.getSimpleName();
 
     /**
-     * Builds a new {@link UsbSerialDriver} instance from the raw device, or
+     * Builds a new {@link com.nightscout.android.dexcom.USB.UsbSerialDriver} instance from the raw device, or
      * returns <code>null</code> if it could not be built (for example, if the
      * probe failed).
      *
      * @param manager the {@link android.hardware.usb.UsbManager} to use
      * @param usbDevice the raw {@link android.hardware.usb.UsbDevice} to use
-     * @return the first available {@link UsbSerialDriver}, or {@code null} if
+     * @return the first available {@link com.nightscout.android.dexcom.USB.UsbSerialDriver}, or {@code null} if
      *         no devices could be acquired
      */
     public abstract UsbSerialDriver getDevice(final UsbManager manager, final UsbDevice usbDevice);
@@ -107,7 +107,7 @@ public enum UsbSerialProber {
      * be acquired.
      *
      * @param usbManager the {@link android.hardware.usb.UsbManager} to use
-     * @return the first available {@link UsbSerialDriver}, or {@code null} if
+     * @return the first available {@link com.nightscout.android.dexcom.USB.UsbSerialDriver}, or {@code null} if
      *         no devices could be acquired
      */
     public static UsbSerialDriver acquire(final UsbManager usbManager) {
@@ -121,13 +121,13 @@ public enum UsbSerialProber {
     }
 
     /**
-     * Builds and returns a new {@link UsbSerialDriver} from the given
+     * Builds and returns a new {@link com.nightscout.android.dexcom.USB.UsbSerialDriver} from the given
      * {@link android.hardware.usb.UsbDevice}, or returns {@code null} if no drivers supported this
      * device.
      *
      * @param usbManager the {@link android.hardware.usb.UsbManager} to use
      * @param usbDevice the {@link android.hardware.usb.UsbDevice} to use
-     * @return a new {@link UsbSerialDriver}, or {@code null} if no devices
+     * @return a new {@link com.nightscout.android.dexcom.USB.UsbSerialDriver}, or {@code null} if no devices
      *         could be acquired
      */
     public static UsbSerialDriver acquire(final UsbManager usbManager, final UsbDevice usbDevice) {

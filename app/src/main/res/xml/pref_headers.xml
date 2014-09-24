@@ -11,6 +11,10 @@
         android:title="@string/pref_header_cloud_storage" />
 
     <header
+        android:fragment="com.nightscout.android.settings.SettingsActivity$MQTTPreferenceFragment"
+        android:title="@string/pref_mqtt" />
+
+    <header
         android:fragment="com.nightscout.android.settings.SettingsActivity$AboutPreferenceFragment"
         android:title="@string/pref_header_about" />
 

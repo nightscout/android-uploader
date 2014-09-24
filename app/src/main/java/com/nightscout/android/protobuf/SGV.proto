@@ -1,0 +1,43 @@
+option java_package = "com.nightscout.android.protobuf";
+option java_outer_classname = "SGV";
+
+message CookieMonsterG4Download {
+    repeated CookieMonsterSGVG4 sgv = 1; // Glucose records as reported by the G4
+    enum Unit {
+        MGDL = 0;
+        MMOL = 1;
+    }
+    optional Unit units = 2; // Units reported by the device
+    required uint64 download_timestamp = 3;  // Timestamp of the download - should be UTC
+    enum DownloadStatus {
+        SUCCESS = 0;
+        NO_DATA = 1;
+        DEVICE_NOT_FOUND = 2;
+        IO_ERROR = 3;
+        APPLICATION_ERROR = 4;
+        NONE = 6;
+        UNKNOWN = 7;
+    }
+    optional DownloadStatus download_status = 4 [default = NONE];  // Status of the download
+    optional uint32 receiver_battery = 5; // Battery level as reported by the receiver
+    optional uint32 uploader_battery = 6; // Battery level as reported by the uploader
+}
+
+
+message CookieMonsterSGVG4 {
+    required uint32 sgv = 1; // Glucose value
+    optional uint64 timestamp = 2; // timestamp of the record
+    enum Direction {
+        NONE = 0;
+        DOUBLE_UP = 1;
+        SINGLE_UP = 2;
+        FORTY_FIVE_UP = 3;
+        FLAT = 4;
+        FORTY_FIVE_DOWN = 5;
+        SINGLE_DOWN = 6;
+        DOUBLE_DOWN = 7;
+        NOT_COMPUTABLE = 8;
+        RATE_OUT_OF_RANGE = 9;
+    }
+    optional Direction direction = 3; // Trend arrow
+}
