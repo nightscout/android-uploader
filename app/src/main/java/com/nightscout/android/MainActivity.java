@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
 import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.settings.SettingsActivity;
 
@@ -94,6 +95,8 @@ public class MainActivity extends Activity {
                 SyncingService.startActionSingleSync(mContext, 20);
             }
         });
+
+        GoogleAnalytics.getInstance(getApplicationContext()).dispatchLocalHits();
     }
 
     @Override

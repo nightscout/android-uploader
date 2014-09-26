@@ -6,7 +6,10 @@ import android.content.Context;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.MainActivity;
+import com.nightscout.android.Nightscout;
 import com.nightscout.android.dexcom.USB.USBPower;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.USB.UsbSerialProber;
@@ -40,6 +43,7 @@ public class SyncingService extends IntentService {
     private UsbManager mUsbManager;
     private UsbSerialDriver mSerialDevice;
 
+
     /**
      * Starts this service to perform action Single Sync with the given parameters. If
      * the service is already performing a task this action will be queued.
@@ -47,6 +51,9 @@ public class SyncingService extends IntentService {
      * @see IntentService
      */
     public static void startActionSingleSync(Context context, int numOfPages) {
+        Tracker tracker=((Nightscout) context).getTracker();
+        tracker.send(new HitBuilders.EventBuilder("Nightscout","startActionSingleSync").build());
+
         Intent intent = new Intent(context, SyncingService.class);
         intent.setAction(ACTION_SYNC);
         intent.putExtra(SYNC_PERIOD, numOfPages);
@@ -99,7 +106,14 @@ public class SyncingService extends IntentService {
             try {
                 mSerialDevice.close();
             } catch (IOException e) {
-                Log.e(TAG, "Unable to close and powerOff usb", e);
+                Tracker tracker;
+                tracker = ((Nightscout) getApplicationContext()).getTracker();
+                tracker.send(new HitBuilders.ExceptionBuilder()
+                        .setDescription("Unable to close serial connection")
+                        .setFatal(false)
+                        .build()
+                );
+                Log.e(TAG, "Unable to close", e);
             }
             // Try powering off, will only work if rooted
             USBPower.PowerOff();
@@ -123,6 +137,13 @@ public class SyncingService extends IntentService {
                 return true;
             } catch (IOException e) {
                 Log.e(TAG, "Unable to powerOn and open usb", e);
+                Tracker tracker;
+                tracker = ((Nightscout) getApplicationContext()).getTracker();
+                tracker.send(new HitBuilders.ExceptionBuilder()
+                                .setDescription("Unable to open serial connection")
+                                .setFatal(false)
+                                .build()
+                );
             }
         } else {
             Log.d(TAG, "Unable to acquire USB device from manager.");

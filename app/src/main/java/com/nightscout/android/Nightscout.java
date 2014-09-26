@@ -2,6 +2,9 @@ package com.nightscout.android;
 
 import android.app.Application;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
+
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.*;
@@ -25,10 +28,19 @@ import org.acra.annotation.*;
 )
 
 public class Nightscout extends Application {
+    private Tracker tracker=null;
 
     @Override
     public void onCreate() {
         super.onCreate();
         ACRA.init(this);
+    }
+
+    synchronized public Tracker getTracker() {
+        if (tracker==null) {
+            GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
+            return analytics.newTracker(R.xml.app_tracker);
+        }
+        return tracker;
     }
 }
