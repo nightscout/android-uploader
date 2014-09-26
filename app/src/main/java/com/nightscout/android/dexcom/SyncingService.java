@@ -98,12 +98,11 @@ public class SyncingService extends IntentService {
             // Close serial
             try {
                 mSerialDevice.close();
-                // Try powering off, will only work if rooted
-                USBPower.PowerOff();
             } catch (IOException e) {
                 Log.e(TAG, "Unable to close and powerOff usb", e);
             }
-
+            // Try powering off, will only work if rooted
+            USBPower.PowerOff();
         } else {
             // Not connected to serial device
             broadcastSGVToUI();
