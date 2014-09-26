@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -42,6 +44,7 @@ public class MainActivity extends Activity {
     Tracker tracker;
 
     // UI components
+    private WebView mWebView;
     private TextView mTextSGV;
     private TextView mTextTimestamp;
     private Button mButton;
@@ -59,6 +62,19 @@ public class MainActivity extends Activity {
         mTextSGV = (TextView) findViewById(R.id.sgValue);
         mTextTimestamp = (TextView) findViewById(R.id.timeAgo);
         mButton = (Button)findViewById(R.id.stopSyncingButton);
+        mImageViewUSB = (ImageView) findViewById(R.id.imageViewUSB);
+        mImageViewUpload = (ImageView) findViewById(R.id.imageViewUploadStatus);
+        mImageViewUpload.setImageResource(R.drawable.ic_upload_fail);
+        mImageViewUpload.setTag(R.drawable.ic_upload_fail);
+        mWebView = (WebView)findViewById(R.id.webView);
+        WebSettings webSettings = mWebView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setDatabaseEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setAppCacheEnabled(true);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        mWebView.setBackgroundColor(0);
+        mWebView.loadUrl("file:///android_asset/index.html");
         topIcons = new TopIcons();
 
         mContext = getApplicationContext();

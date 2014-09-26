@@ -85,4 +85,13 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentLeft="true" />
 
+    <WebView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/webView"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/timeAgo"
+        android:layout_alignRight="@+id/timeAgo"
+        android:layout_above="@+id/stopSyncingButton" />
+
 </RelativeLayout>
