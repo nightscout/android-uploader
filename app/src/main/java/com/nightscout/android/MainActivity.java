@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,6 +25,9 @@ import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.acra.ACRAConfigurationException;
 import org.acra.ReportingInteractionMode;
+
+import java.util.HashMap;
+import java.util.Iterator;
 
 public class MainActivity extends Activity {
 
@@ -76,7 +80,27 @@ public class MainActivity extends Activity {
         // If app started due to android.hardware.usb.action.USB_DEVICE_ATTACHED intent, start syncing
         Intent startIntent = getIntent();
         String action = startIntent.getAction();
+        boolean g4Connected=false;
         if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
+            g4Connected=true;
+        } else {
+            // Iterate through devices and see if the dexcom is connected
+            // Allowing us to start to start syncing if the G4 is already connected
+            // vendor-id="8867" product-id="71" class="2" subclass="0" protocol="0"
+            UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
+            HashMap<String, UsbDevice> deviceList = manager.getDeviceList();
+            Iterator<UsbDevice> deviceIterator = deviceList.values().iterator();
+            while(deviceIterator.hasNext()){
+                UsbDevice device = deviceIterator.next();
+                if (device.getVendorId()==8867 && device.getProductId()==71
+                        && device.getDeviceClass()==2 && device.getDeviceSubclass()==0
+                        && device.getDeviceProtocol()== 0){
+                    g4Connected=true;
+                }
+            }
+        }
+
+        if (g4Connected) {
             mImageViewUSB.setImageResource(R.drawable.ic_usb_connected);
             mImageViewUSB.setTag(R.drawable.ic_usb_connected);
             Log.d(TAG, "Starting syncing in OnCreate...");
@@ -95,7 +119,6 @@ public class MainActivity extends Activity {
                 SyncingService.startActionSingleSync(mContext, 20);
             }
         });
-
         GoogleAnalytics.getInstance(getApplicationContext()).dispatchLocalHits();
     }
 
