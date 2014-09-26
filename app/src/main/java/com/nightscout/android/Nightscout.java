@@ -20,7 +20,8 @@ import org.acra.annotation.*;
         resDialogCommentPrompt = R.string.feedback_dialog_comment_prompt,
         resDialogOkToast = R.string.feedback_dialog_ok_toast,
         excludeMatchingSharedPreferencesKeys= {"cloud_storage_mongodb_uri", "cloud_storage_api_base"},
-        mode = ReportingInteractionMode.TOAST
+        mode = ReportingInteractionMode.TOAST,
+        logcatArguments = { "-t", "1000", "-v", "time" }
 )
 
 public class Nightscout extends Application {
