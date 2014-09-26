@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.settings.SettingsActivity;
 
@@ -26,8 +27,7 @@ import org.acra.ACRAConfiguration;
 import org.acra.ACRAConfigurationException;
 import org.acra.ReportingInteractionMode;
 
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Date;
 
 public class MainActivity extends Activity {
 
@@ -38,12 +38,14 @@ public class MainActivity extends Activity {
     private Handler mHandler = new Handler();
     private Context mContext;
 
+    // Analytics tracker
+    Tracker tracker;
+
     // UI components
     private TextView mTextSGV;
     private TextView mTextTimestamp;
     private Button mButton;
-    private ImageView mImageViewUSB;
-    private ImageView mImageViewUpload;
+    TopIcons topIcons;
 
     // TODO: should try and avoid use static
     public static int batLevel = 0;
@@ -51,16 +53,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        tracker = ((Nightscout) getApplicationContext()).getTracker();
         // Setup UI components
         setContentView(R.layout.activity_main);
         mTextSGV = (TextView) findViewById(R.id.sgValue);
         mTextTimestamp = (TextView) findViewById(R.id.timeAgo);
         mButton = (Button)findViewById(R.id.stopSyncingButton);
-        mImageViewUSB = (ImageView) findViewById(R.id.imageViewUSB);
-        mImageViewUpload = (ImageView) findViewById(R.id.imageViewUploadStatus);
-        mImageViewUpload.setImageResource(R.drawable.ic_upload_fail);
-        mImageViewUpload.setTag(R.drawable.ic_upload_fail);
+        topIcons = new TopIcons();
 
         mContext = getApplicationContext();
 
@@ -80,34 +79,13 @@ public class MainActivity extends Activity {
         // If app started due to android.hardware.usb.action.USB_DEVICE_ATTACHED intent, start syncing
         Intent startIntent = getIntent();
         String action = startIntent.getAction();
-        boolean g4Connected=false;
-        if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
-            g4Connected=true;
-        } else {
-            // Iterate through devices and see if the dexcom is connected
-            // Allowing us to start to start syncing if the G4 is already connected
-            // vendor-id="8867" product-id="71" class="2" subclass="0" protocol="0"
-            UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
-            HashMap<String, UsbDevice> deviceList = manager.getDeviceList();
-            Iterator<UsbDevice> deviceIterator = deviceList.values().iterator();
-            while(deviceIterator.hasNext()){
-                UsbDevice device = deviceIterator.next();
-                if (device.getVendorId()==8867 && device.getProductId()==71
-                        && device.getDeviceClass()==2 && device.getDeviceSubclass()==0
-                        && device.getDeviceProtocol()== 0){
-                    g4Connected=true;
-                }
-            }
-        }
-
-        if (g4Connected) {
-            mImageViewUSB.setImageResource(R.drawable.ic_usb_connected);
-            mImageViewUSB.setTag(R.drawable.ic_usb_connected);
+        if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) || SyncingService.isG4Connected(getApplicationContext())) {
+            topIcons.setUSB(true);
             Log.d(TAG, "Starting syncing in OnCreate...");
             // TODO: 2nd parameter should be static constant from intent service
             SyncingService.startActionSingleSync(mContext, 1);
         } else {
-            mImageViewUSB.setTag(R.drawable.ic_usb_disconnected);
+            topIcons.setUSB(false);
         }
 
         mButton.setOnClickListener(new View.OnClickListener() {
@@ -136,8 +114,10 @@ public class MainActivity extends Activity {
         outState.putString("saveTextSGV", mTextSGV.getText().toString());
         outState.putString("saveTextTimestamp", mTextTimestamp.getText().toString());
         outState.putString("saveTextButton", mButton.getText().toString());
-        outState.putInt("saveImageViewUSB", (Integer) mImageViewUSB.getTag());
-        outState.putInt("saveImageViewUpload", (Integer) mImageViewUpload.getTag());
+
+        outState.putBoolean("saveImageViewUSB", topIcons.getUSB());
+        outState.putBoolean("saveImageViewUpload", topIcons.getUpload());
+        outState.putBoolean("saveImageViewTimeIndicator", topIcons.getTimeIndicator());
     }
 
     @Override
@@ -146,10 +126,10 @@ public class MainActivity extends Activity {
         mTextSGV.setText(savedInstanceState.getString("saveTextSGV"));
         mTextTimestamp.setText(savedInstanceState.getString("saveTextTimestamp"));
         mButton.setText(savedInstanceState.getString("saveTextButton"));
-        mImageViewUSB.setImageResource(savedInstanceState.getInt("saveImageViewUSB"));
-        mImageViewUSB.setTag(savedInstanceState.getInt("saveImageViewUSB"));
-        mImageViewUpload.setImageResource(savedInstanceState.getInt("saveImageViewUpload"));
-        mImageViewUpload.setTag(savedInstanceState.getInt("saveImageViewUpload"));
+
+        topIcons.setUSB(savedInstanceState.getBoolean("saveImageViewUSB"));
+        topIcons.setUpload(savedInstanceState.getBoolean("saveImageViewUpload"));
+        topIcons.setTimeIndicator(savedInstanceState.getBoolean("saveImageViewTimeIndicator"));
     }
 
     public class CGMStatusReceiver extends BroadcastReceiver {
@@ -162,13 +142,13 @@ public class MainActivity extends Activity {
             String responseMessage = intent.getStringExtra(SyncingService.RESPONSE_TIMESTAMP);
             boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
             int responseNextUploadTime = intent.getIntExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
+            long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME,new Date().getTime());
+            int rssi = intent.getIntExtra(SyncingService.RESPONSE_RSSI,-1);
 
             if (responseUploadStatus) {
-                mImageViewUpload.setImageResource(R.drawable.ic_upload_success);
-                mImageViewUpload.setTag(R.drawable.ic_upload_success);
+                topIcons.setUpload(true);
             } else {
-                mImageViewUpload.setImageResource(R.drawable.ic_upload_fail);
-                mImageViewUpload.setTag(R.drawable.ic_upload_fail);
+                topIcons.setUpload(false);
             }
             // Update UI with latest record information
             mTextSGV.setText(responseString);
@@ -177,13 +157,25 @@ public class MainActivity extends Activity {
             int nextUploadTime = TimeConstants.FIVE_MINUTES_MS;
 
             if (responseNextUploadTime > TimeConstants.FIVE_MINUTES_MS) {
+                // TODO how should we handle this situation?
                 Log.d(TAG, "Receiver's time is less than current record time, possible time change.");
+                tracker.send(new HitBuilders.EventBuilder("Main","Time change").build());
             } else if (responseNextUploadTime > 0) {
                 Log.d(TAG, "Setting next upload time to: " + responseNextUploadTime);
                 nextUploadTime = responseNextUploadTime;
             } else {
                 Log.d(TAG, "OUT OF RANGE: Setting next upload time to: " + nextUploadTime + " ms.");
             }
+
+            if (Math.abs(new Date().getTime()-responseDisplayTime) >= TimeConstants.TWENTY_MINUTES_MS) {
+                Log.w(TAG,"Receiver timeoffset");
+                tracker.send(new HitBuilders.EventBuilder("Main","Time difference > 20 minutes").build());
+                topIcons.setTimeIndicator(false);
+            } else {
+                topIcons.setTimeIndicator(true);
+            }
+
+            Log.d(TAG,"RSSI is "+rssi);
 
             mHandler.removeCallbacks(syncCGM);
             mHandler.postDelayed(syncCGM, nextUploadTime);
@@ -194,14 +186,11 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
-                mImageViewUSB.setImageResource(R.drawable.ic_usb_disconnected);
-                mImageViewUSB.setTag(R.drawable.ic_usb_disconnected);
-                mImageViewUpload.setImageResource(R.drawable.ic_upload_fail);
-                mImageViewUpload.setTag(R.drawable.ic_upload_fail);
+                topIcons.setUSB(false);
+                topIcons.setUpload(false);
                 mHandler.removeCallbacks(syncCGM);
             } else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
-                mImageViewUSB.setImageResource(R.drawable.ic_usb_connected);
-                mImageViewUSB.setTag(R.drawable.ic_usb_connected);
+                topIcons.setUSB(true);
                 Log.d(TAG, "Starting syncing on USB attached...");
                 // TODO: 2nd parameter should be static constant from intent service
                 SyncingService.startActionSingleSync(mContext, 1);
@@ -257,5 +246,68 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public class TopIcons {
+        private ImageView mImageViewUSB;
+        private ImageView mImageViewUpload;
+        private ImageView mImageViewTimeIndicator;
+        private boolean usbActive;
+        private boolean uploadActive;
+        private boolean displayTimeSync;
+
+        TopIcons(){
+            mImageViewUSB = (ImageView) findViewById(R.id.imageViewUSB);
+            mImageViewUpload = (ImageView) findViewById(R.id.imageViewUploadStatus);
+            mImageViewTimeIndicator = (ImageView) findViewById(R.id.imageViewTimeIndicator);
+            setUSB(false);
+            setUpload(false);
+            setTimeIndicator(false);
+        }
+
+        public void setUSB(boolean active){
+            usbActive=active;
+            if (active) {
+                mImageViewUSB.setImageResource(R.drawable.ic_usb_connected);
+                mImageViewUSB.setTag(R.drawable.ic_usb_connected);
+            } else {
+                mImageViewUSB.setImageResource(R.drawable.ic_usb_disconnected);
+                mImageViewUSB.setTag(R.drawable.ic_usb_disconnected);
+            }
+        }
+
+        public void setUpload(boolean active){
+            uploadActive=active;
+            if (active) {
+                mImageViewUpload.setImageResource(R.drawable.ic_upload_success);
+                mImageViewUpload.setTag(R.drawable.ic_upload_success);
+            } else {
+                mImageViewUpload.setImageResource(R.drawable.ic_upload_fail);
+                mImageViewUpload.setTag(R.drawable.ic_upload_fail);
+            }
+        }
+
+        public void setTimeIndicator(boolean active){
+            displayTimeSync=active;
+            if (active) {
+                mImageViewTimeIndicator.setImageResource(R.drawable.ic_clock_good);
+                mImageViewTimeIndicator.setTag(R.drawable.ic_clock_good);
+            } else {
+                mImageViewTimeIndicator.setImageResource(R.drawable.ic_clock_bad);
+                mImageViewTimeIndicator.setTag(R.drawable.ic_clock_bad);
+            }
+        }
+
+        public boolean getUSB(){
+            return usbActive;
+        }
+
+        public boolean getUpload(){
+            return uploadActive;
+        }
+
+        public boolean getTimeIndicator(){
+            return uploadActive;
+        }
     }
 }
