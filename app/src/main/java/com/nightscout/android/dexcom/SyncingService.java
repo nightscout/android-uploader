@@ -21,6 +21,7 @@ import com.nightscout.android.dexcom.records.SensorRecord;
 import com.nightscout.android.upload.Uploader;
 
 import org.acra.ACRA;
+import org.json.JSONArray;
 
 import java.io.IOException;
 import java.util.Date;
@@ -46,6 +47,7 @@ public class SyncingService extends IntentService {
     public static final String RESPONSE_UPLOAD_STATUS = "myUploadStatus";
     public static final String RESPONSE_DISPLAY_TIME = "myDisplayTime";
     public static final String RESPONSE_RSSI = "myRSSI";
+    public static final String RESPONSE_JSON = "myJSON";
     public static final String RESPONSE_BAT = "myBatLvl";
 
     private final String TAG = SyncingService.class.getSimpleName();
@@ -102,6 +104,10 @@ public class SyncingService extends IntentService {
                 MeterRecord[] meterRecords = readData.getRecentMeterRecords();
                 SensorRecord[] sensorRecords = readData.getRecentSensorRecords();
 
+                // convert into json for d3 plot
+                JSONArray array = new JSONArray();
+                for (int i = 0; i < recentRecords.length; i++) array.put(recentRecords[i].toJSON());
+
                 // FIXME: should we do boundary checking here as well?
                 int timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
                 int nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
@@ -118,7 +124,7 @@ public class SyncingService extends IntentService {
                 // TODO: should this be a constant?
                 int offset = 3000;
                 EGVRecord recentEGV = recentRecords[recentRecords.length - 1];
-                broadcastSGVToUI(recentEGV, true, nextUploadTime + offset, displayTime, rssi,batLevel);
+                broadcastSGVToUI(recentEGV, true, nextUploadTime + offset, displayTime, rssi, array ,batLevel);
 
             } catch (IOException e) {
                 tracker.send(new HitBuilders.ExceptionBuilder()
@@ -187,7 +193,9 @@ public class SyncingService extends IntentService {
         return g4Connected;
     }
 
-    private void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus, int nextUploadTime,long displayTime, int rssi, int batLvl) {
+    private void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus,
+                                  int nextUploadTime, long displayTime, int rssi,
+                                  JSONArray json, int batLevel) {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -198,6 +206,7 @@ public class SyncingService extends IntentService {
         broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, uploadStatus);
         broadcastIntent.putExtra(RESPONSE_DISPLAY_TIME, displayTime);
         broadcastIntent.putExtra(RESPONSE_RSSI, rssi);
+        broadcastIntent.putExtra(RESPONSE_JSON, json.toString());
         broadcastIntent.putExtra(RESPONSE_BAT, batLvl);
         sendBroadcast(broadcastIntent);
     }

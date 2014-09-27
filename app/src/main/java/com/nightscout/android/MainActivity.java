@@ -38,6 +38,7 @@ public class MainActivity extends Activity {
     private CGMStatusReceiver mCGMStatusReceiver;
     private Handler mHandler = new Handler();
     private Context mContext;
+    private String mJSONData;
 
     // Analytics tracker
     Tracker tracker;
@@ -72,7 +73,11 @@ public class MainActivity extends Activity {
         mWebView.setVerticalScrollBarEnabled(false);
         mWebView.setHorizontalScrollBarEnabled(false);
         mWebView.setBackgroundColor(0);
-        mWebView.loadUrl("file:///android_asset/index.html");
+
+        if (savedInstanceState == null) {
+            mWebView.loadUrl("file:///android_asset/index.html");
+        }
+
         topIcons = new TopIcons();
 
         mContext = getApplicationContext();
@@ -105,10 +110,10 @@ public class MainActivity extends Activity {
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mHandler.removeCallbacks(syncCGM);
-                Log.d(TAG, "Starting 2 day syncing onClick...");
-                // TODO: 2nd parameter should be static constant from intent service
-                SyncingService.startActionSingleSync(mContext, 20);
+            mHandler.removeCallbacks(syncCGM);
+            Log.d(TAG, "Starting 2 day syncing onClick...");
+            // TODO: 2nd parameter should be static constant from intent service
+            SyncingService.startActionSingleSync(mContext, 20);
             }
         });
 //        GoogleAnalytics.getInstance(getApplicationContext()).dispatchLocalHits();
@@ -125,10 +130,11 @@ public class MainActivity extends Activity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        mWebView.saveState(outState);
+        outState.putString("saveJSONData", mJSONData);
         outState.putString("saveTextSGV", mTextSGV.getText().toString());
         outState.putString("saveTextTimestamp", mTextTimestamp.getText().toString());
         outState.putString("saveTextButton", mButton.getText().toString());
-
         outState.putBoolean("saveImageViewUSB", topIcons.getUSB());
         outState.putBoolean("saveImageViewUpload", topIcons.getUpload());
         outState.putBoolean("saveImageViewTimeIndicator", topIcons.getTimeIndicator());
@@ -139,10 +145,12 @@ public class MainActivity extends Activity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+        // Restore the state of the WebView
+        mWebView.restoreState(savedInstanceState);
+        mJSONData = savedInstanceState.getString("mJSONData");
         mTextSGV.setText(savedInstanceState.getString("saveTextSGV"));
         mTextTimestamp.setText(savedInstanceState.getString("saveTextTimestamp"));
         mButton.setText(savedInstanceState.getString("saveTextButton"));
-
         topIcons.setUSB(savedInstanceState.getBoolean("saveImageViewUSB"));
         topIcons.setUpload(savedInstanceState.getBoolean("saveImageViewUpload"));
         topIcons.setTimeIndicator(savedInstanceState.getBoolean("saveImageViewTimeIndicator"));
@@ -163,6 +171,13 @@ public class MainActivity extends Activity {
             long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME,new Date().getTime());
             int rssi = intent.getIntExtra(SyncingService.RESPONSE_RSSI,-1);
             int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT,-1);
+
+            String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
+
+            if (json != null) {
+                mJSONData = json;
+                mWebView.loadUrl("javascript:updateData(" + mJSONData + ")");
+            }
 
             if (responseUploadStatus) {
                 topIcons.setUpload(true);
@@ -214,7 +229,7 @@ public class MainActivity extends Activity {
                 topIcons.setUSB(true);
                 Log.d(TAG, "Starting syncing on USB attached...");
                 // TODO: 2nd parameter should be static constant from intent service
-                SyncingService.startActionSingleSync(mContext, 1);
+                SyncingService.startActionSingleSync(mContext, 5);
                 //TODO: consider getting permission programmatically instead of user prompted
                 //if decided to need to add android.permission.USB_PERMISSION in manifest
             } else if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
