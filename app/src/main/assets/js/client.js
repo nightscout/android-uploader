@@ -1,51 +1,39 @@
-(function () {
-    "use strict";
-
-    var latestSGV,
-        errorCode,
-        treatments,
-        padding = { top: 20, right: 10, bottom: 30, left: 10 },
-        opacity = {current: 1, DAY: 1, NIGHT: 0.5},
-        now = Date.now(),
-        data = [],
-        dateFn = function (d) { return new Date(d.date) },
-        xScale, xScale2, yScale, yScale2,
-        xAxis, yAxis, xAxis2, yAxis2,
-        prevChartWidth = 0,
-        prevChartHeight = 0,
-        focusHeight,
-        contextHeight,
-        UPDATE_TRANS_MS = 750, // milliseconds
-        brush,
-        BRUSH_TIMEOUT = 300000,  // 5 minutes in ms
-        brushTimer,
-        brushInProgress = false,
-        clip,
-        TWENTY_FIVE_MINS_IN_MS = 1500000,
-        THIRTY_MINS_IN_MS = 1800000,
-        FORTY_MINS_IN_MS = 2400000,
-        FORTY_TWO_MINS_IN_MS = 2520000,
-        SIXTY_MINS_IN_MS = 3600000,
-        FOCUS_DATA_RANGE_MS = 12600000, // 3.5 hours of actual data
-        FORMAT_TIME = '%p', //alternate format '%H:%M'
-        audio = document.getElementById('audio'),
-        alarmInProgress = false,
-        currentAlarmType = null,
-        alarmSound = 'alarm.mp3',
-        urgentAlarmSound = 'alarm2.mp3',
-        WIDTH_TIME_HIDDEN = 600,
-        MINUTES_SINCE_LAST_UPDATE_WARN = 10,
-        MINUTES_SINCE_LAST_UPDATE_URGENT = 20;
-
-    var data = [{x:new Date(Date.now()),date:new Date(Date.now()), y:150, sgv:150}];
-    latestSGV = data[data.length - 1];
-    var bg = 120;
-    var j = 0;
-    for (var i = 12*4; i >= 0; i--) {
-        data[j] = {type: "sgv",x:new Date(Date.now() - 1000 * 60 * 5 * i),date:new Date(Date.now() - 1000 * 60 * 5 * i), y:bg, sgv:bg}
-        bg = bg + Math.random() * 5 - Math.random() * 4;
-        j++;
-    }
+var latestSGV,
+    errorCode,
+    treatments,
+    padding = { top: 20, right: 0, bottom: 10, left: 0 },
+    opacity = {current: 1, DAY: 1, NIGHT: 0.5},
+    now = Date.now(),
+    data = [],
+    dateFn = function (d) { return new Date(d.date) },
+    xScale, xScale2, yScale, yScale2,
+    xAxis, yAxis, xAxis2, yAxis2,
+    prevChartWidth = 0,
+    prevChartHeight = 0,
+    focusHeight,
+    contextHeight,
+    UPDATE_TRANS_MS = 750, // milliseconds
+    brush,
+    BRUSH_TIMEOUT = 300000,  // 5 minutes in ms
+    brushTimer,
+    brushInProgress = false,
+    clip,
+    TWENTY_FIVE_MINS_IN_MS = 1500000,
+    THIRTY_MINS_IN_MS = 1800000,
+    FORTY_MINS_IN_MS = 2400000,
+    FORTY_TWO_MINS_IN_MS = 2520000,
+    SIXTY_MINS_IN_MS = 3600000,
+    FOCUS_DATA_RANGE_MS = 14400000,
+    FORMAT_TIME = '%p', //alternate format '%H:%M'
+    audio = document.getElementById('audio'),
+    alarmInProgress = false,
+    currentAlarmType = null,
+    alarmSound = 'alarm.mp3',
+    urgentAlarmSound = 'alarm2.mp3',
+    WIDTH_TIME_HIDDEN = 600,
+    MINUTES_SINCE_LAST_UPDATE_WARN = 10,
+    MINUTES_SINCE_LAST_UPDATE_URGENT = 20,
+    updateTimer;
 
     // Tick Values
     var tickValues = [40, 60, 80, 120, 180, 300, 400];
@@ -55,7 +43,7 @@
         .domain([TWENTY_FIVE_MINS_IN_MS, SIXTY_MINS_IN_MS])
         .range([0.8, 0.1]);
 
-    // create svg and g to contain the chart contents
+// create svg and g to contain the chart contents
     var charts = d3.select('#chartContainer').append('svg')
         .append('g')
         .attr('class', 'chartContainer')
@@ -63,22 +51,22 @@
 
     var focus = charts.append('g');
 
-    // create the x axis container
+// create the x axis container
     focus.append('g')
         .attr('class', 'x axis');
 
-    // create the y axis container
+// create the y axis container
     focus.append('g')
         .attr('class', 'y axis');
 
-    // Remove leading zeros from the time (eg. 08:40 = 8:40) & lowercase the am/pm
+// Remove leading zeros from the time (eg. 08:40 = 8:40) & lowercase the am/pm
     function formatTime(time) {
         time = d3.time.format(FORMAT_TIME)(time);
         time = time.replace(/^0/, '').toLowerCase();
         return time;
     }
 
-    // lixgbg: Convert mg/dL BG value to metric mmol
+// lixgbg: Convert mg/dL BG value to metric mmol
     function scaleBg(bg) {
         return bg;
 //        if (browserSettings.units == "mmol") {
@@ -88,18 +76,18 @@
 //        }
     }
 
-    // initial setup of chart when data is first made available
+// initial setup of chart when data is first made available
     function initializeCharts() {
 
         // define the parts of the axis that aren't dependent on width or height
         xScale = d3.time.scale()
-            .domain(d3.extent(data, function (d) { return d.date; }));
+            .domain([new Date(Date.now() - FOCUS_DATA_RANGE_MS),new Date(Date.now())]);
 
         yScale = d3.scale.log()
             .domain([scaleBg(30), scaleBg(510)]);
 
         xScale2 = d3.time.scale()
-            .domain(d3.extent(data, function (d) { return d.date; }));
+            .domain([new Date(Date.now() - FOCUS_DATA_RANGE_MS),new Date(Date.now())]);
 
         yScale2 = d3.scale.log()
             .domain([scaleBg(36), scaleBg(420)]);
@@ -130,7 +118,7 @@
         updateChart(true);
     }
 
-    // get the desired opacity for context chart based on the brush extent
+// get the desired opacity for context chart based on the brush extent
     function highlightBrushPoints(data) {
         if (data.date.getTime() >= brush.extent()[0].getTime() && data.date.getTime() <= brush.extent()[1].getTime()) {
             return futureOpacity(data.date - latestSGV.x);
@@ -140,8 +128,10 @@
     }
 
 
-    // called for initial update and updates for resize
+// called for initial update and updates for resize
     function updateChart(init) {
+
+        console.log("Updating chart...");
 
         // get current data range
         var dataRange = d3.extent(data, dateFn);
@@ -152,14 +142,6 @@
 
         var chartHeight = (document.getElementById('chartContainer')
             .getBoundingClientRect().height) - padding.top - padding.bottom;
-
-console.log("width: " + chartWidth);
-console.log("height: " + chartHeight);
-
-        //chartWidth =  window.outerWidth - padding.top - padding.bottom;
-        //console.log("width: " + chartWidth);
-        //chartHeight = ‌‌window.outerHeight - padding.top - padding.bottom;
-        //console.log("height: " + chartHeight);
 
         // get the height of each chart based on its container size ratio
         focusHeight = chartHeight;
@@ -202,9 +184,9 @@ console.log("height: " + chartHeight);
                 // add a y-axis line that shows the high bg threshold
                 focus.append('line')
                     .attr('class', 'high-line')
-                    .attr('x1', xScale(dataRange[0]))
+                    .attr('x1', xScale(new Date(Date.now() - FOCUS_DATA_RANGE_MS)))
                     .attr('y1', yScale(scaleBg(180)))
-                    .attr('x2', xScale(dataRange[1]))
+                    .attr('x2', xScale(new Date(Date.now())))
                     .attr('y2', yScale(scaleBg(180)))
                     .style('stroke-dasharray', ('3, 3'))
                     .attr('stroke', 'grey');
@@ -212,9 +194,9 @@ console.log("height: " + chartHeight);
                 // add a y-axis line that shows the low bg threshold
                 focus.append('line')
                     .attr('class', 'low-line')
-                    .attr('x1', xScale(dataRange[0]))
+                    .attr('x1', xScale(new Date(Date.now() - FOCUS_DATA_RANGE_MS)))
                     .attr('y1', yScale(scaleBg(80)))
-                    .attr('x2', xScale(dataRange[1]))
+                    .attr('x2', xScale(new Date(Date.now())))
                     .attr('y2', yScale(scaleBg(80)))
                     .style('stroke-dasharray', ('3, 3'))
                     .attr('stroke', 'grey');
@@ -236,46 +218,19 @@ console.log("height: " + chartHeight);
                 focus.select('.high-line')
                     .transition()
                     .duration(UPDATE_TRANS_MS)
-                    .attr('x1', xScale(currentBrushExtent[0]))
+                    .attr('x1', xScale(new Date(Date.now() - FOCUS_DATA_RANGE_MS)))
                     .attr('y1', yScale(scaleBg(180)))
-                    .attr('x2', xScale(currentBrushExtent[1]))
+                    .attr('x2', xScale(new Date(Date.now())))
                     .attr('y2', yScale(scaleBg(180)));
 
                 // transition low line to correct location
                 focus.select('.low-line')
                     .transition()
                     .duration(UPDATE_TRANS_MS)
-                    .attr('x1', xScale(currentBrushExtent[0]))
+                    .attr('x1', xScale(new Date(Date.now() - FOCUS_DATA_RANGE_MS)))
                     .attr('y1', yScale(scaleBg(80)))
-                    .attr('x2', xScale(currentBrushExtent[1]))
+                    .attr('x2', xScale(new Date(Date.now())))
                     .attr('y2', yScale(scaleBg(80)));
-
-                // transition open-top line to correct location
-                focus.select('.open-top')
-                    .transition()
-                    .duration(UPDATE_TRANS_MS)
-                    .attr('x1', xScale2(currentBrushExtent[0]))
-                    .attr('y1', yScale(scaleBg(30)))
-                    .attr('x2', xScale2(currentBrushExtent[1]))
-                    .attr('y2', yScale(scaleBg(30)));
-
-                // transition open-left line to correct location
-                focus.select('.open-left')
-                    .transition()
-                    .duration(UPDATE_TRANS_MS)
-                    .attr('x1', xScale2(currentBrushExtent[0]))
-                    .attr('y1', focusHeight)
-                    .attr('x2', xScale2(currentBrushExtent[0]))
-                    .attr('y2', chartHeight);
-
-                // transition open-right line to correct location
-                focus.select('.open-right')
-                    .transition()
-                    .duration(UPDATE_TRANS_MS)
-                    .attr('x1', xScale2(currentBrushExtent[1]))
-                    .attr('y1', focusHeight)
-                    .attr('x2', xScale2(currentBrushExtent[1]))
-                    .attr('y2', chartHeight);
             }
         }
 
@@ -299,7 +254,7 @@ console.log("height: " + chartHeight);
             .attr('cx', function (d) { return xScale(d.date); })
             .attr('cy', function (d) { return yScale(d.sgv); })
             .attr('fill', function (d) { return d.color; })
-            .attr('opacity', function (d) { return futureOpacity(d.date - latestSGV.x); })
+            //.attr('opacity', function (d) { return futureOpacity(d.date - latestSGV.x); })
             .attr('r', function(d) { if (d.type == 'mbg') return 6; else return 3;});
 
         focusCircles.exit()
@@ -324,9 +279,6 @@ console.log("height: " + chartHeight);
             updateChart(false);
         }, 100);
     };
-
-    var isInitialData = true;
-    initializeCharts();
 
     function timeAgo(offset) {
         var parts = {},
@@ -370,11 +322,11 @@ console.log("height: " + chartHeight);
 
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //draw a compact visualization of a treatment (carbs, insulin)
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//draw a compact visualization of a treatment (carbs, insulin)
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     function drawTreatment(treatment, scale, showValues) {
         var carbs = treatment.carbs;
         var insulin = treatment.insulin;
@@ -488,4 +440,25 @@ console.log("height: " + chartHeight);
         }
         return predicted;
     }
-})();
+
+    function updateChartWithTimer() {
+            updateChart(false);
+    }
+
+    function updateData(newData) {
+        clearTimeout(updateTimer);
+        console.log(newData);
+        if (newData != null) {
+            data = newData.map(function (obj) {
+                return { date: new Date(obj.date), sgv: obj.sgv, type: 'sgv'}
+            });
+        }
+        isInitialData = false;
+        updateChart(false);
+        updateTimer = setTimeout(updateChartWithTimer, 60000);
+    }
+
+    // Initialize Charts
+    var isInitialData = true;
+    initializeCharts();
+    updateTimer = setTimeout(updateChartWithTimer, 60000);

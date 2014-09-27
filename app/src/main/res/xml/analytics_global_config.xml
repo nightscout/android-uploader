@@ -2,5 +2,5 @@
 <resources>
     <string name="ga_logLevel">warning</string>
     <integer name="ga_dispatchPeriod">1000</integer>
-    <bool name="ga_dryRun">false</bool>
+    <bool name="ga_dryRun">true</bool>
 </resources>

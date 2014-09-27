@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="ga_sessionTimeout">300</integer>
-
+    <bool name="ga_dryRun">true</bool>
     <!-- Enable automatic Activity measurement -->
     <bool name="ga_autoActivityTracking">true</bool>
     <bool name="ga_reportUncaughtExceptions">false</bool>

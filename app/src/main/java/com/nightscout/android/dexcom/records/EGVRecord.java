@@ -2,6 +2,9 @@ package com.nightscout.android.dexcom.records;
 
 import com.nightscout.android.dexcom.Constants;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -33,5 +36,16 @@ public class EGVRecord extends GenericTimestampRecord {
 
     public String getTrendSymbol() {
         return trendSymbol;
+    }
+
+    public JSONObject toJSON() {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("sgv", getBGValue());
+            obj.put("date", getDisplayTimeSeconds());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return obj;
     }
 }
