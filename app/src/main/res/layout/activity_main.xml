@@ -38,6 +38,13 @@
                 android:layout_toRightOf="@+id/imageViewUSB"
                 android:src="@drawable/ic_upload_fail" />
 
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageViewTimeIndicator"
+                android:layout_toRightOf="@+id/imageViewUploadStatus"
+                android:background="@drawable/ic_clock_good" />
+
         </RelativeLayout>
 
     </LinearLayout>
