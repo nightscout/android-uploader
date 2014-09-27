@@ -39,10 +39,11 @@
 
     var data = [{x:new Date(Date.now()),date:new Date(Date.now()), y:150, sgv:150}];
     latestSGV = data[data.length - 1];
-
+    var bg = 120;
     var j = 0;
     for (var i = 12*4; i >= 0; i--) {
-        data[j] = {type: "sgv",x:new Date(Date.now() - 1000 * 60 * 5 * i),date:new Date(Date.now() - 1000 * 60 * 5 * i), y:150, sgv:150}
+        data[j] = {type: "sgv",x:new Date(Date.now() - 1000 * 60 * 5 * i),date:new Date(Date.now() - 1000 * 60 * 5 * i), y:bg, sgv:bg}
+        bg = bg + Math.random() * 5 - Math.random() * 4;
         j++;
     }
 
@@ -152,6 +153,14 @@
         var chartHeight = (document.getElementById('chartContainer')
             .getBoundingClientRect().height) - padding.top - padding.bottom;
 
+console.log("width: " + chartWidth);
+console.log("height: " + chartHeight);
+
+        //chartWidth =  window.outerWidth - padding.top - padding.bottom;
+        //console.log("width: " + chartWidth);
+        //chartHeight = ‌‌window.outerHeight - padding.top - padding.bottom;
+        //console.log("height: " + chartHeight);
+
         // get the height of each chart based on its container size ratio
         focusHeight = chartHeight;
 
@@ -189,16 +198,6 @@
                     .append('rect')
                     .attr('height', chartHeight)
                     .attr('width', chartWidth);
-
-                // add a line that marks the current time
-                focus.append('line')
-                    .attr('class', 'now-line')
-                    .attr('x1', xScale(new Date(now)))
-                    .attr('y1', yScale(scaleBg(36)))
-                    .attr('x2', xScale(new Date(now)))
-                    .attr('y2', yScale(scaleBg(420)))
-                    .style('stroke-dasharray', ('3, 3'))
-                    .attr('stroke', 'grey');
 
                 // add a y-axis line that shows the high bg threshold
                 focus.append('line')
@@ -328,14 +327,6 @@
 
     var isInitialData = true;
     initializeCharts();
-//    isInitialData = false;
-//    updateChart(true);
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//    var isInitialData = false;
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
     function timeAgo(offset) {
         var parts = {},

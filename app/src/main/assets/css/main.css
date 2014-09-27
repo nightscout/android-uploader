@@ -1,30 +1,13 @@
-html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-}
 body {
     font-family: 'Open Sans', Helvetica, Arial, sans-serif;
     fill: #fff;
     background: #000;
     color: #808080;
+    overflow: hidden;
 }
-
-
-/* BEGIN: Dolphin/Stock Android Browser Fix */
-@media (max-width: 700px) {
-    .bgStatus {
-        width: 100% !important;
-    }
-}
-#chartContainer {
-    top: 0px; /*(toolbar height + status height)*/
-}
-/* END: Dolphin/Stock Android Browser Fix */
-
 
 .container {
-    bottom: 0;
+overflow: hidden;
     display: block;
     height: 100%;
     left: 0;
@@ -33,20 +16,6 @@ body {
     top: 0px;
     width: 100%;
     z-index: 2;
-}
-
-#chartContainer {
-    background: #111;
-    bottom:0;
-    display: block;
-    height:auto;
-    left:0;
-    position:absolute;
-    right:0;
-}
-#chartContainer svg {
-    height: 100%;
-    width: 100%;
 }
 
 .axis path,
@@ -59,52 +28,4 @@ body {
 .grid path, .axis line {
   stroke: #808080;
   stroke-opacity: 1;
-}
-
-/* Large desktop */
-@media (min-width: 980px) {
-    .content {
-        padding-top: 20px;
-    }
-    .linediv-l {
-        border-right: 1px white solid;
-    }
-    .linedic-r {
-        border-left: 1px white solid;
-    }
-}
-
-@media (max-width: 768px) {
-    #chartContainer {
-        font-size: 150%;
-    }
-}
-
-@media (max-width: 700px) {
-    body {
-        font-size: 70%;
-    }
-
-    #currentTime {
-        display: inline;
-        font-size: 25%;
-        font-weight: bold;
-    }
-    .timeOther {
-        display: inline;
-        margin-left: auto;
-    }
-
-    #chartContainer {
-        top: calc(152px + 45px);
-    }
-    #chartContainer svg {
-        height: calc(100vh - (152px + 45px));
-    }
-}
-
-@media (max-width: 480px) {
-  #chartContainer {
-      font-size: 150%;
-  }
 }
