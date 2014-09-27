@@ -62,10 +62,6 @@ public class MainActivity extends Activity {
         mTextSGV = (TextView) findViewById(R.id.sgValue);
         mTextTimestamp = (TextView) findViewById(R.id.timeAgo);
         mButton = (Button)findViewById(R.id.stopSyncingButton);
-        mImageViewUSB = (ImageView) findViewById(R.id.imageViewUSB);
-        mImageViewUpload = (ImageView) findViewById(R.id.imageViewUploadStatus);
-        mImageViewUpload.setImageResource(R.drawable.ic_upload_fail);
-        mImageViewUpload.setTag(R.drawable.ic_upload_fail);
         mWebView = (WebView)findViewById(R.id.webView);
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
