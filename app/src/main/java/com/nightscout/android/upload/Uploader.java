@@ -50,7 +50,7 @@ public class Uploader {
         if (enableRESTUpload) {
             long start = System.currentTimeMillis();
             Log.i(TAG, String.format("Starting upload of %s record using a REST API", egvRecords.length));
-            doRESTUpload(prefs, egvRecords);
+            doRESTUpload(prefs, egvRecords, meterRecords);
             Log.i(TAG, String.format("Finished upload of %s record using a REST API in %s ms", egvRecords.length, System.currentTimeMillis() - start));
         }
 
@@ -63,7 +63,7 @@ public class Uploader {
         return true;
     }
 
-    private void doRESTUpload(SharedPreferences prefs, EGVRecord... records) {
+    private void doRESTUpload(SharedPreferences prefs, EGVRecord[] records, MeterRecord[] meterRecords) {
         String baseURLSettings = prefs.getString("cloud_storage_api_base", "");
         ArrayList<String> baseURIs = new ArrayList<String>();
 
@@ -80,14 +80,14 @@ public class Uploader {
 
         for (String baseURI : baseURIs) {
             try {
-                doRESTUploadTo(baseURI, records);
+                doRESTUploadTo(baseURI, records, meterRecords);
             } catch (Exception e) {
                 Log.e(TAG, "Unable to do REST API Upload to: " + baseURI, e);
             }
         }
     }
 
-    private void doRESTUploadTo(String baseURI, EGVRecord[] records) {
+    private void doRESTUploadTo(String baseURI, EGVRecord[] records, MeterRecord[] meterRecords) {
         try {
             int apiVersion = 0;
             if (baseURI.endsWith("/v1/")) apiVersion = 1;
@@ -165,6 +165,31 @@ public class Uploader {
                 }
             }
 
+            for (MeterRecord record : meterRecords) {
+                JSONObject json = new JSONObject();
+
+                try {
+                    populateV1APIEntry(json, record);
+                } catch (Exception e) {
+                    Log.w(TAG, "Unable to populate entry, apiVersion: " + apiVersion, e);
+                    continue;
+                }
+
+                String jsonString = json.toString();
+
+                try {
+                    StringEntity se = new StringEntity(jsonString);
+                    post.setEntity(se);
+                    post.setHeader("Accept", "application/json");
+                    post.setHeader("Content-type", "application/json");
+
+                    ResponseHandler responseHandler = new BasicResponseHandler();
+                    httpclient.execute(post, responseHandler);
+                } catch (Exception e) {
+                    Log.w(TAG, "Unable to post data to: '" + post.getURI().toString() + "'", e);
+                }
+            }
+
             // TODO: this is a quick port from the original code and needs to be checked before release
             postDeviceStatus(baseURL, httpclient);
 
@@ -185,6 +210,12 @@ public class Uploader {
         json.put("date", record.getDisplayTime().getTime());
         json.put("sgv", Integer.parseInt(String.valueOf(record.getBGValue())));
         json.put("direction", record.getTrend());
+    }
+
+    private void populateV1APIEntry(JSONObject json, MeterRecord record) throws Exception {
+        json.put("device", "dexcom");
+        json.put("date", record.getDisplayTime().getTime());
+        json.put("mbg", Integer.parseInt(String.valueOf(record.getMeterBG())));
     }
 
     // TODO: this is a quick port from original code and needs to be refactored before release
