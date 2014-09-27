@@ -195,7 +195,7 @@ public class SyncingService extends IntentService {
 
     private void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus,
                                   int nextUploadTime, long displayTime, int rssi,
-                                  JSONArray json, int batLevel) {
+                                  JSONArray json, int batLvl) {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
