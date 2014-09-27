@@ -3,8 +3,10 @@ package com.nightscout.android.dexcom;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.gms.analytics.HitBuilders;
@@ -63,6 +65,10 @@ public class SyncingService extends IntentService {
      * @see IntentService
      */
     public static void startActionSingleSync(Context context, int numOfPages) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        // Exit if the user hasn't selected "I understand"
+        if (! prefs.getBoolean("i_understand",false))
+            return;
         Tracker tracker=((Nightscout) context).getTracker();
         tracker.send(new HitBuilders.EventBuilder("DexcomG4", "Sync").setValue(numOfPages).build());
 
@@ -100,23 +106,41 @@ public class SyncingService extends IntentService {
         if (acquireSerialDevice()) {
             try {
                 ReadData readData = new ReadData(mSerialDevice);
-                EGVRecord[] recentRecords = readData.getRecentEGVsPages(numOfPages);
-                MeterRecord[] meterRecords = readData.getRecentMeterRecords();
-                SensorRecord[] sensorRecords = readData.getRecentSensorRecords();
+                EGVRecord[] recentRecords;
+                MeterRecord[] meterRecords;
+                SensorRecord[] sensorRecords;
+                int timeSinceLastRecord;
+                int nextUploadTime;
+                long displayTime;
+                int rssi;
+                int batLevel;
+
+                try {
+                    recentRecords = readData.getRecentEGVsPages(numOfPages);
+                    meterRecords = readData.getRecentMeterRecords();
+                    sensorRecords = readData.getRecentSensorRecords();
+
+                    // FIXME: should we do boundary checking here as well?
+                    timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
+                    nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
+                    displayTime = readData.readDisplayTime().getTime();
+                    rssi = sensorRecords[sensorRecords.length-1].getRSSI();
+                    batLevel = readData.readBatteryLevel();
+                    // Close serial
+                    mSerialDevice.close();
+                    // Try powering off, will only work if rooted
+                    USBPower.PowerOff();
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);
+                        tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Array Index out of bounds"+e.getMessage())
+                            .setFatal(false)
+                            .build());
+                    return;
+                }
 
                 // convert into json for d3 plot
                 JSONArray array = new JSONArray();
                 for (int i = 0; i < recentRecords.length; i++) array.put(recentRecords[i].toJSON());
-
-                // FIXME: should we do boundary checking here as well?
-                int timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
-                int nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
-                long displayTime = readData.readDisplayTime().getTime();
-                int rssi = sensorRecords[sensorRecords.length-1].getRSSI();
-                int batLevel = readData.readBatteryLevel();
-
-                // Close serial
-                mSerialDevice.close();
 
                 Uploader uploader = new Uploader(mContext);
                 uploader.upload(recentRecords, meterRecords);
@@ -125,7 +149,6 @@ public class SyncingService extends IntentService {
                 int offset = 3000;
                 EGVRecord recentEGV = recentRecords[recentRecords.length - 1];
                 broadcastSGVToUI(recentEGV, true, nextUploadTime + offset, displayTime, rssi, array ,batLevel);
-
             } catch (IOException e) {
                 tracker.send(new HitBuilders.ExceptionBuilder()
                                 .setDescription("Unable to close serial connection")
@@ -134,14 +157,12 @@ public class SyncingService extends IntentService {
                 );
                 Log.e(TAG, "Unable to close", e);
             } catch (Exception e) {
-                Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);
+                Log.wtf("Unhandled exception caught", e);
                 ACRA.getErrorReporter().handleException(e);
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Catch all exception in handleActionSync")
                         .setFatal(false)
                         .build());
             }
-            // Try powering off, will only work if rooted
-            USBPower.PowerOff();
         } else {
             // Not connected to serial device
             broadcastSGVToUI();

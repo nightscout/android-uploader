@@ -61,7 +61,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         mTextSGV = (TextView) findViewById(R.id.sgValue);
         mTextTimestamp = (TextView) findViewById(R.id.timeAgo);
-        mButton = (Button)findViewById(R.id.stopSyncingButton);
+        mButton = (Button)findViewById(R.id.twoDaySyncButton);
         mWebView = (WebView)findViewById(R.id.webView);
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -104,7 +104,8 @@ public class MainActivity extends Activity {
             // TODO: 2nd parameter should be static constant from intent service
             SyncingService.startActionSingleSync(mContext, 1);
         } else {
-            topIcons.setUSB(false);
+            // reset the top icons to their default state
+            topIcons.setDefaults();
         }
 
         mButton.setOnClickListener(new View.OnClickListener() {
@@ -307,9 +308,16 @@ public class MainActivity extends Activity {
             mImageRcvrBattery = (ImageView) findViewById(R.id.imageViewRcvrBattery);
             mImageRcvrBattery.setImageResource(R.drawable.battery);
 
+            setDefaults();
+
+        }
+
+        public void setDefaults(){
             setUSB(false);
             setUpload(false);
             setTimeIndicator(false);
+            setBatteryIndicator(-1);
+            setRSSIIndicator(-1);
         }
 
         public void setUSB(boolean active){
