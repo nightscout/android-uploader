@@ -79,6 +79,12 @@ public class ReadData {
         return read(MIN_LEN).getCommand() == Constants.ACK;
     }
 
+    public int readBatteryLevel(){
+        writeCommand(Constants.READ_BATTERY_LEVEL);
+        byte[] readData = read(MIN_LEN).getData();
+        return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
+    }
+
     public String readSerialNumber() {
         int PAGE_OFFSET = 0;
         byte[] readData = readDataBasePage(Constants.RECORD_TYPES.MANUFACTURING_DATA.ordinal(), PAGE_OFFSET);

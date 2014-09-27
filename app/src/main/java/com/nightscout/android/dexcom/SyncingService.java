@@ -23,6 +23,7 @@ import com.nightscout.android.upload.Uploader;
 import org.acra.ACRA;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -45,6 +46,7 @@ public class SyncingService extends IntentService {
     public static final String RESPONSE_UPLOAD_STATUS = "myUploadStatus";
     public static final String RESPONSE_DISPLAY_TIME = "myDisplayTime";
     public static final String RESPONSE_RSSI = "myRSSI";
+    public static final String RESPONSE_BAT = "myBatLvl";
 
     private final String TAG = SyncingService.class.getSimpleName();
     private Context mContext;
@@ -105,6 +107,7 @@ public class SyncingService extends IntentService {
                 int nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
                 long displayTime = readData.readDisplayTime().getTime();
                 int rssi = sensorRecords[sensorRecords.length-1].getRSSI();
+                int batLevel = readData.readBatteryLevel();
 
                 // Close serial
                 mSerialDevice.close();
@@ -115,7 +118,7 @@ public class SyncingService extends IntentService {
                 // TODO: should this be a constant?
                 int offset = 3000;
                 EGVRecord recentEGV = recentRecords[recentRecords.length - 1];
-                broadcastSGVToUI(recentEGV, true, nextUploadTime + offset, displayTime, rssi);
+                broadcastSGVToUI(recentEGV, true, nextUploadTime + offset, displayTime, rssi,batLevel);
 
             } catch (IOException e) {
                 tracker.send(new HitBuilders.ExceptionBuilder()
@@ -184,7 +187,7 @@ public class SyncingService extends IntentService {
         return g4Connected;
     }
 
-    private void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus, int nextUploadTime,long displayTime, int rssi) {
+    private void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus, int nextUploadTime,long displayTime, int rssi, int batLvl) {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -195,6 +198,7 @@ public class SyncingService extends IntentService {
         broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, uploadStatus);
         broadcastIntent.putExtra(RESPONSE_DISPLAY_TIME, displayTime);
         broadcastIntent.putExtra(RESPONSE_RSSI, rssi);
+        broadcastIntent.putExtra(RESPONSE_BAT, batLvl);
         sendBroadcast(broadcastIntent);
     }
 
@@ -205,6 +209,9 @@ public class SyncingService extends IntentService {
         broadcastIntent.putExtra(RESPONSE_SGV, "---");
         broadcastIntent.putExtra(RESPONSE_TIMESTAMP, "---");
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, TimeConstants.FIVE_MINUTES_MS);
+        broadcastIntent.putExtra(RESPONSE_DISPLAY_TIME, new Date().getTime());
+        broadcastIntent.putExtra(RESPONSE_RSSI, -1);
+        broadcastIntent.putExtra(RESPONSE_BAT, -1);
         sendBroadcast(broadcastIntent);
     }
 

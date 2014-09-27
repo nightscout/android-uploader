@@ -18,7 +18,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.dexcom.SyncingService;
@@ -109,7 +108,7 @@ public class MainActivity extends Activity {
                 SyncingService.startActionSingleSync(mContext, 20);
             }
         });
-        GoogleAnalytics.getInstance(getApplicationContext()).dispatchLocalHits();
+//        GoogleAnalytics.getInstance(getApplicationContext()).dispatchLocalHits();
     }
 
     @Override
@@ -130,6 +129,8 @@ public class MainActivity extends Activity {
         outState.putBoolean("saveImageViewUSB", topIcons.getUSB());
         outState.putBoolean("saveImageViewUpload", topIcons.getUpload());
         outState.putBoolean("saveImageViewTimeIndicator", topIcons.getTimeIndicator());
+        outState.putInt("saveImageViewBatteryIndicator", topIcons.getBatteryIndicator());
+        outState.putInt("saveImageViewRSSIIndicator", topIcons.getRSSIIndicator());
     }
 
     @Override
@@ -142,6 +143,8 @@ public class MainActivity extends Activity {
         topIcons.setUSB(savedInstanceState.getBoolean("saveImageViewUSB"));
         topIcons.setUpload(savedInstanceState.getBoolean("saveImageViewUpload"));
         topIcons.setTimeIndicator(savedInstanceState.getBoolean("saveImageViewTimeIndicator"));
+        topIcons.setBatteryIndicator(savedInstanceState.getInt("saveImageViewBatteryIndicator"));
+        topIcons.setRSSIIndicator(savedInstanceState.getInt("saveImageViewRSSIIndicator"));
     }
 
     public class CGMStatusReceiver extends BroadcastReceiver {
@@ -156,6 +159,7 @@ public class MainActivity extends Activity {
             int responseNextUploadTime = intent.getIntExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
             long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME,new Date().getTime());
             int rssi = intent.getIntExtra(SyncingService.RESPONSE_RSSI,-1);
+            int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT,-1);
 
             if (responseUploadStatus) {
                 topIcons.setUpload(true);
@@ -188,6 +192,8 @@ public class MainActivity extends Activity {
             }
 
             Log.d(TAG,"RSSI is "+rssi);
+            topIcons.setRSSIIndicator(rssi);
+            topIcons.setBatteryIndicator(rcvrBat);
 
             mHandler.removeCallbacks(syncCGM);
             mHandler.postDelayed(syncCGM, nextUploadTime);
@@ -264,14 +270,25 @@ public class MainActivity extends Activity {
         private ImageView mImageViewUSB;
         private ImageView mImageViewUpload;
         private ImageView mImageViewTimeIndicator;
+        private ImageView mImageViewRSSI;
+        private ImageView mImageRcvrBattery;
         private boolean usbActive;
         private boolean uploadActive;
         private boolean displayTimeSync;
+        private int batteryLevel;
+        private int rssi;
 
         TopIcons(){
             mImageViewUSB = (ImageView) findViewById(R.id.imageViewUSB);
             mImageViewUpload = (ImageView) findViewById(R.id.imageViewUploadStatus);
             mImageViewTimeIndicator = (ImageView) findViewById(R.id.imageViewTimeIndicator);
+
+            mImageViewRSSI = (ImageView) findViewById(R.id.imageViewRSSI);
+            mImageViewRSSI.setImageResource(R.drawable.rssi);
+
+            mImageRcvrBattery = (ImageView) findViewById(R.id.imageViewRcvrBattery);
+            mImageRcvrBattery.setImageResource(R.drawable.battery);
+
             setUSB(false);
             setUpload(false);
             setTimeIndicator(false);
@@ -310,6 +327,18 @@ public class MainActivity extends Activity {
             }
         }
 
+        public void setBatteryIndicator(int batLvl){
+            batteryLevel=batLvl;
+            mImageRcvrBattery.setImageLevel(batteryLevel);
+            mImageRcvrBattery.setTag(batteryLevel);
+        }
+
+        public void setRSSIIndicator(int r){
+            rssi=r;
+            mImageViewRSSI.setImageLevel(rssi);
+            mImageViewRSSI.setTag(rssi);
+        }
+
         public boolean getUSB(){
             return usbActive;
         }
@@ -319,7 +348,16 @@ public class MainActivity extends Activity {
         }
 
         public boolean getTimeIndicator(){
-            return uploadActive;
+            return displayTimeSync;
         }
+
+        public int getBatteryIndicator(){
+            return (Integer) mImageRcvrBattery.getTag();
+        }
+
+        public int getRSSIIndicator(){
+            return (Integer) mImageViewRSSI.getTag();
+        }
+
     }
 }

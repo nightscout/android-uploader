@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<level-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/rssi0" android:maxLevel="0" android:minLevel="0"/>
+    <item android:drawable="@drawable/rssi33" android:maxLevel="332" android:minLevel="1"/>
+    <item android:drawable="@drawable/rssi66" android:maxLevel="665" android:minLevel="333"/>
+    <item android:drawable="@drawable/rssifull" android:maxLevel="1000" android:minLevel="666"/>
+</level-list>

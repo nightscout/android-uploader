@@ -16,34 +16,56 @@
 
         <RelativeLayout
             android:id="@+id/layoutIcons"
-            android:layout_width="fill_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" >
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_gravity="center">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/imageViewUSB"
                 android:layout_alignParentLeft="true"
-                android:src="@drawable/ic_usb_disconnected" />
+                android:src="@drawable/ic_usb_disconnected"
+                android:layout_marginLeft="20sp" />
 
             <ImageView
                 android:id="@+id/imageViewUploadStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginTop="3dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp"
+                android:layout_marginLeft="20sp"
                 android:layout_toRightOf="@+id/imageViewUSB"
                 android:src="@drawable/ic_upload_fail" />
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/imageViewRcvrBattery"
+                android:layout_alignParentBottom="false"
+                android:background="@drawable/battery"
+                android:layout_marginLeft="20sp"
+                android:layout_toRightOf="@+id/imageViewUploadStatus" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:id="@+id/imageViewTimeIndicator"
-                android:layout_toRightOf="@+id/imageViewUploadStatus"
-                android:background="@drawable/ic_clock_good" />
+                android:background="@drawable/ic_clock_good"
+                android:layout_marginLeft="20sp"
+                android:layout_toRightOf="@+id/imageViewRcvrBattery" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageViewRSSI"
+                android:layout_alignParentBottom="false"
+                android:background="@drawable/rssi"
+                android:layout_alignParentRight="false"
+                android:layout_marginLeft="20sp"
+                android:layout_toRightOf="@+id/imageViewTimeIndicator" />
 
         </RelativeLayout>
 
