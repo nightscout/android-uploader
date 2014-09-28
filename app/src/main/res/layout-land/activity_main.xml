@@ -25,7 +25,7 @@
             android:id="@+id/imageViewUSB"
             android:layout_alignParentLeft="true"
             android:src="@drawable/ic_usb_disconnected"
-            android:layout_marginTop="15sp" />
+            android:layout_marginTop="25sp" />
 
         <ImageView
             android:id="@+id/imageViewUploadStatus"
@@ -34,7 +34,7 @@
             android:layout_centerVertical="true"
             android:src="@drawable/ic_upload_fail"
             android:layout_below="@+id/imageViewUSB"
-            android:layout_marginTop="15sp" />
+            android:layout_marginTop="25sp" />
 
         <ImageView
             android:layout_width="wrap_content"
@@ -43,7 +43,7 @@
             android:layout_alignParentBottom="false"
             android:background="@drawable/battery"
             android:layout_below="@+id/imageViewUploadStatus"
-            android:layout_marginTop="15sp" />
+            android:layout_marginTop="25sp" />
 
         <ImageView
             android:layout_width="wrap_content"
@@ -51,17 +51,17 @@
             android:id="@+id/imageViewTimeIndicator"
             android:background="@drawable/ic_clock_good"
             android:layout_below="@+id/imageViewRcvrBattery"
-            android:layout_marginTop="15sp" />
+            android:layout_marginTop="25sp" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/imageViewRSSI"
-            android:layout_alignParentBottom="false"
-            android:background="@drawable/rssi"
-            android:layout_alignParentRight="false"
-            android:layout_below="@+id/imageViewTimeIndicator"
-            android:layout_marginTop="15sp" />
+        <!--<ImageView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:id="@+id/imageViewRSSI"-->
+            <!--android:layout_alignParentBottom="false"-->
+            <!--android:background="@drawable/rssi"-->
+            <!--android:layout_alignParentRight="false"-->
+            <!--android:layout_below="@+id/imageViewTimeIndicator"-->
+            <!--android:layout_marginTop="15sp" />-->
 
     </RelativeLayout>
 

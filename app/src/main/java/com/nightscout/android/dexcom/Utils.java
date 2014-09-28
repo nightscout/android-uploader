@@ -1,5 +1,7 @@
 package com.nightscout.android.dexcom;
 
+import android.util.Log;
+
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -13,5 +15,35 @@ public class Utils {
         TimeZone tz = TimeZone.getDefault();
         if (tz.inDaylightTime(new Date())) timeAdd = timeAdd - 3600000L;
         return new Date(timeAdd);
+    }
+
+    public static String getTimeString(long timeDeltaMS) {
+        long minutes=(timeDeltaMS/1000)/60;
+        long hours=(minutes/60);
+        long days=(hours/24);
+        long weeks=(days/7);
+        minutes=minutes-(hours*60);
+        hours=hours-(days*24);
+        days=days-(weeks*7);
+        Log.d("XXX", "Delta MS: "+timeDeltaMS);
+        Log.d("XXX", "Minutes: "+ minutes);
+        Log.d("XXX", "Hours: "+ hours);
+        Log.d("XXX", "Days: "+ days);
+        Log.d("XXX", "Weeks: "+ weeks);
+
+        String timeAgoString="";
+        if (weeks>0){
+            timeAgoString+=weeks+" weeks ";
+        }
+        if (days>0){
+            timeAgoString+=days+" days ";
+        }
+        if (hours>0){
+            timeAgoString+=hours+" hours ";
+        }
+        if (minutes>=0){
+            timeAgoString+=minutes+" minutes ";
+        }
+        return (timeAgoString.equals("")?"--":timeAgoString+"ago");
     }
 }

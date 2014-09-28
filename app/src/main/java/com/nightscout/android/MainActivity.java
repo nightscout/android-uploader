@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.dexcom.SyncingService;
+import com.nightscout.android.dexcom.Utils;
 import com.nightscout.android.settings.SettingsActivity;
 
 import org.acra.ACRA;
@@ -40,6 +42,7 @@ public class MainActivity extends Activity {
     private Handler mHandler = new Handler();
     private Context mContext;
     private String mJSONData;
+    private long lastDisplayTime = 0;
 
     // Analytics tracker
     Tracker tracker;
@@ -58,28 +61,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tracker = ((Nightscout) getApplicationContext()).getTracker();
-        // Setup UI components
-        setContentView(R.layout.activity_main);
-        mTextSGV = (TextView) findViewById(R.id.sgValue);
-        mTextTimestamp = (TextView) findViewById(R.id.timeAgo);
-        mButton = (Button)findViewById(R.id.twoDaySyncButton);
-        mWebView = (WebView)findViewById(R.id.webView);
-        WebSettings webSettings = mWebView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setDatabaseEnabled(true);
-        webSettings.setDomStorageEnabled(true);
-        webSettings.setAppCacheEnabled(true);
-        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        webSettings.setUseWideViewPort(false);
-        mWebView.setVerticalScrollBarEnabled(false);
-        mWebView.setHorizontalScrollBarEnabled(false);
-        mWebView.setBackgroundColor(0);
 
-        if (savedInstanceState == null) {
-            mWebView.loadUrl("file:///android_asset/index.html");
-        }
-
-        topIcons = new TopIcons();
 
         mContext = getApplicationContext();
 
@@ -90,11 +72,14 @@ public class MainActivity extends Activity {
         deviceStatusFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver(mDeviceStatusReceiver, deviceStatusFilter);
 
+
         // Register Broadcast Receiver for response messages from mSyncingServiceIntent service
         mCGMStatusReceiver = new CGMStatusReceiver();
         IntentFilter filter = new IntentFilter(CGMStatusReceiver.PROCESS_RESPONSE);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(mCGMStatusReceiver, filter);
+
+        initUI(savedInstanceState);
 
         // If app started due to android.hardware.usb.action.USB_DEVICE_ATTACHED intent, start syncing
         Intent startIntent = getIntent();
@@ -125,7 +110,30 @@ public class MainActivity extends Activity {
                 return (event.getAction() == MotionEvent.ACTION_MOVE);
             }
         });
-//        GoogleAnalytics.getInstance(getApplicationContext()).dispatchLocalHits();
+    }
+
+    private void initUI(Bundle savedInstanceState){
+        // Setup UI components
+        setContentView(R.layout.activity_main);
+        mTextSGV = (TextView) findViewById(R.id.sgValue);
+        mTextTimestamp = (TextView) findViewById(R.id.timeAgo);
+        mButton = (Button)findViewById(R.id.twoDaySyncButton);
+        mWebView = (WebView) findViewById(R.id.webView);
+        WebSettings webSettings = mWebView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setDatabaseEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setAppCacheEnabled(true);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        webSettings.setUseWideViewPort(false);
+        mWebView.setVerticalScrollBarEnabled(false);
+        mWebView.setHorizontalScrollBarEnabled(false);
+        mWebView.setBackgroundColor(0);
+        if (savedInstanceState==null) {
+            mWebView.loadUrl("file:///android_asset/index.html");
+        }
+
+        topIcons = new TopIcons();
     }
 
     @Override
@@ -148,7 +156,8 @@ public class MainActivity extends Activity {
         outState.putBoolean("saveImageViewUpload", topIcons.getUpload());
         outState.putBoolean("saveImageViewTimeIndicator", topIcons.getTimeIndicator());
         outState.putInt("saveImageViewBatteryIndicator", topIcons.getBatteryIndicator());
-        outState.putInt("saveImageViewRSSIIndicator", topIcons.getRSSIIndicator());
+        //TODO latent code for RSSI
+//        outState.putInt("saveImageViewRSSIIndicator", topIcons.getRSSIIndicator());
     }
 
     @Override
@@ -164,8 +173,15 @@ public class MainActivity extends Activity {
         topIcons.setUpload(savedInstanceState.getBoolean("saveImageViewUpload"));
         topIcons.setTimeIndicator(savedInstanceState.getBoolean("saveImageViewTimeIndicator"));
         topIcons.setBatteryIndicator(savedInstanceState.getInt("saveImageViewBatteryIndicator"));
-        topIcons.setRSSIIndicator(savedInstanceState.getInt("saveImageViewRSSIIndicator"));
+        //TODO latent code for RSSI
+//        topIcons.setRSSIIndicator(savedInstanceState.getInt("saveImageViewRSSIIndicator"));
     }
+
+//    @Override
+//    public void onConfigurationChanged(Configuration newConfig){
+//        super.onConfigurationChanged(newConfig);
+//        setContentView(R.layout.activity_main);
+//    }
 
     public class CGMStatusReceiver extends BroadcastReceiver {
         public static final String PROCESS_RESPONSE = "com.mSyncingServiceIntent.action.PROCESS_RESPONSE";
@@ -173,11 +189,12 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get response messages from broadcast
-            String responseString = intent.getStringExtra(SyncingService.RESPONSE_SGV);
-            String responseMessage = intent.getStringExtra(SyncingService.RESPONSE_TIMESTAMP);
+            String responseSGV = intent.getStringExtra(SyncingService.RESPONSE_SGV);
+            long responseSGVTimestamp = intent.getLongExtra(SyncingService.RESPONSE_TIMESTAMP,-1);
             boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
             int responseNextUploadTime = intent.getIntExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
             long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME,new Date().getTime());
+            lastDisplayTime=responseDisplayTime;
             int rssi = intent.getIntExtra(SyncingService.RESPONSE_RSSI,-1);
             int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT,-1);
 
@@ -194,8 +211,9 @@ public class MainActivity extends Activity {
                 topIcons.setUpload(false);
             }
             // Update UI with latest record information
-            mTextSGV.setText(responseString);
-            mTextTimestamp.setText(responseMessage);
+            mTextSGV.setText(responseSGV);
+            mTextTimestamp.setText(Utils.getTimeString(new Date().getTime()-responseSGVTimestamp));
+            Log.i(TAG,"Time since record: "+Utils.getTimeString(responseSGVTimestamp));
 
             int nextUploadTime = TimeConstants.FIVE_MINUTES_MS;
 
@@ -219,11 +237,24 @@ public class MainActivity extends Activity {
             }
 
             Log.d(TAG,"RSSI is "+rssi);
-            topIcons.setRSSIIndicator(rssi);
+//            topIcons.setRSSIIndicator(rssi);
             topIcons.setBatteryIndicator(rcvrBat);
 
             mHandler.removeCallbacks(syncCGM);
             mHandler.postDelayed(syncCGM, nextUploadTime);
+        }
+    }
+
+    public class tickReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context mContext, Intent intent) {
+            long delta= new Date().getTime() - lastDisplayTime;
+            String timeAgoStr="";
+            if (delta<0)
+                timeAgoStr="Time change detected";
+            else
+                timeAgoStr=Utils.getTimeString(delta);
+            mTextTimestamp.setText(timeAgoStr);
         }
     }
 
@@ -310,8 +341,9 @@ public class MainActivity extends Activity {
             mImageViewUpload = (ImageView) findViewById(R.id.imageViewUploadStatus);
             mImageViewTimeIndicator = (ImageView) findViewById(R.id.imageViewTimeIndicator);
 
-            mImageViewRSSI = (ImageView) findViewById(R.id.imageViewRSSI);
-            mImageViewRSSI.setImageResource(R.drawable.rssi);
+            //TODO latent code for RSSI
+//            mImageViewRSSI = (ImageView) findViewById(R.id.imageViewRSSI);
+//            mImageViewRSSI.setImageResource(R.drawable.rssi);
 
             mImageRcvrBattery = (ImageView) findViewById(R.id.imageViewRcvrBattery);
             mImageRcvrBattery.setImageResource(R.drawable.battery);
@@ -325,7 +357,8 @@ public class MainActivity extends Activity {
             setUpload(false);
             setTimeIndicator(false);
             setBatteryIndicator(-1);
-            setRSSIIndicator(-1);
+            //TODO latent code for RSSI
+//            setRSSIIndicator(-1);
         }
 
         public void setUSB(boolean active){

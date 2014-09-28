@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -102,7 +103,9 @@ public class SyncingService extends IntentService {
         Tracker tracker = ((Nightscout) getApplicationContext()).getTracker();
         USBPower.PowerOn();
         try { Thread.sleep(3000); } catch (InterruptedException e) { }
-
+        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NSDownload");
+        wl.acquire();
         if (acquireSerialDevice()) {
             try {
                 ReadData readData = new ReadData(mSerialDevice);
@@ -132,7 +135,13 @@ public class SyncingService extends IntentService {
                     USBPower.PowerOff();
                 } catch (ArrayIndexOutOfBoundsException e) {
                     Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);
-                        tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Array Index out of bounds"+e.getMessage())
+                        tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Array Index out of bounds: "+e.getMessage())
+                            .setFatal(false)
+                            .build());
+                    return;
+                } catch (NegativeArraySizeException e) {
+                    Log.wtf("Negative array exception from receiver", e);
+                    tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Negative Array size: " + e.getMessage())
                             .setFatal(false)
                             .build());
                     return;
@@ -167,6 +176,7 @@ public class SyncingService extends IntentService {
             // Not connected to serial device
             broadcastSGVToUI();
         }
+        wl.release();
     }
 
     // TODO: this needs to be more robust as before, but will clean up it and implement here, this
@@ -222,7 +232,7 @@ public class SyncingService extends IntentService {
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
         broadcastIntent.putExtra(RESPONSE_SGV, String.valueOf(egvRecord.getBGValue()) + " "
                 + egvRecord.getTrendSymbol());
-        broadcastIntent.putExtra(RESPONSE_TIMESTAMP, egvRecord.getDisplayTime().toString());
+        broadcastIntent.putExtra(RESPONSE_TIMESTAMP, egvRecord.getDisplayTime().getTime());
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, nextUploadTime);
         broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, uploadStatus);
         broadcastIntent.putExtra(RESPONSE_DISPLAY_TIME, displayTime);
