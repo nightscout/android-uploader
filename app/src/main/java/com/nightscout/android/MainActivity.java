@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -115,6 +116,13 @@ public class MainActivity extends Activity {
             Log.d(TAG, "Starting 2 day syncing onClick...");
             // TODO: 2nd parameter should be static constant from intent service
             SyncingService.startActionSingleSync(mContext, 20);
+            }
+        });
+
+        mWebView.setOnTouchListener(new View.OnTouchListener() {
+
+            public boolean onTouch(View v, MotionEvent event) {
+                return (event.getAction() == MotionEvent.ACTION_MOVE);
             }
         });
 //        GoogleAnalytics.getInstance(getApplicationContext()).dispatchLocalHits();
