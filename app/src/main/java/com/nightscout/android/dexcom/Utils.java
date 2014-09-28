@@ -1,7 +1,5 @@
 package com.nightscout.android.dexcom;
 
-import android.util.Log;
-
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -25,11 +23,6 @@ public class Utils {
         minutes=minutes-(hours*60);
         hours=hours-(days*24);
         days=days-(weeks*7);
-        Log.d("XXX", "Delta MS: "+timeDeltaMS);
-        Log.d("XXX", "Minutes: "+ minutes);
-        Log.d("XXX", "Hours: "+ hours);
-        Log.d("XXX", "Days: "+ days);
-        Log.d("XXX", "Weeks: "+ weeks);
 
         String timeAgoString="";
         if (weeks>0){

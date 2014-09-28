@@ -9,6 +9,7 @@ import android.content.res.Configuration;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,7 +41,6 @@ public class MainActivity extends Activity {
     // Recievers
     private CGMStatusReceiver mCGMStatusReceiver;
 
-
     // Member components
     private Handler mHandler = new Handler();
     private Context mContext;
@@ -65,7 +65,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         tracker = ((Nightscout) getApplicationContext()).getTracker();
 
-
         mContext = getApplicationContext();
 
         // Register USB attached/detached and battery changes intents
@@ -80,6 +79,10 @@ public class MainActivity extends Activity {
         IntentFilter filter = new IntentFilter(CGMStatusReceiver.PROCESS_RESPONSE);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(mCGMStatusReceiver, filter);
+
+        IntentFilter screenFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
+        screenFilter.addAction(Intent.ACTION_SCREEN_OFF);
+        registerReceiver(screenStateReceiver,screenFilter);
 
         initUI(savedInstanceState);
 
@@ -146,6 +149,7 @@ public class MainActivity extends Activity {
         super.onDestroy();
         unregisterReceiver(mCGMStatusReceiver);
         unregisterReceiver(mDeviceStatusReceiver);
+        unregisterReceiver(screenStateReceiver);
     }
 
     @Override
@@ -199,7 +203,7 @@ public class MainActivity extends Activity {
             boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
             int responseNextUploadTime = intent.getIntExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
             long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME,new Date().getTime());
-            lastRecordTime =responseDisplayTime;
+            lastRecordTime=responseSGVTimestamp;
             int rssi = intent.getIntExtra(SyncingService.RESPONSE_RSSI,-1);
             int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT,-1);
 
@@ -218,8 +222,9 @@ public class MainActivity extends Activity {
             // Update UI with latest record information
             mTextSGV.setText(responseSGV);
             mTextSGV.setTag(responseSGV);
-            mTextTimestamp.setText(Utils.getTimeString(new Date().getTime()-responseSGVTimestamp));
-            mTextTimestamp.setTag(Utils.getTimeString(new Date().getTime()-responseSGVTimestamp));
+            String timeAgoStr = Utils.getTimeString(new Date().getTime()-responseSGVTimestamp);
+            mTextTimestamp.setText(timeAgoStr);
+            mTextTimestamp.setTag(timeAgoStr);
 
             int nextUploadTime = TimeConstants.FIVE_MINUTES_MS;
 
@@ -248,7 +253,9 @@ public class MainActivity extends Activity {
 
             mHandler.removeCallbacks(syncCGM);
             mHandler.postDelayed(syncCGM, nextUploadTime);
-            mHandler.postDelayed(updateTimeAgo,nextUploadTime/5);
+            PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+            if (pm.isScreenOn())
+                mHandler.postDelayed(updateTimeAgo,nextUploadTime/5);
         }
     }
 
@@ -268,6 +275,20 @@ public class MainActivity extends Activity {
                 //if decided to need to add android.permission.USB_PERMISSION in manifest
             } else if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
                 batLevel = intent.getIntExtra("level", 0);
+            }
+        }
+    };
+
+    BroadcastReceiver screenStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context mContext, Intent intent) {
+            Log.d(TAG,"Intent=>"+intent.getAction()+" received");
+            if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+                mHandler.post(updateTimeAgo);
+                Log.d(TAG,"Updating time ago");
+            } else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+                mHandler.removeCallbacks(updateTimeAgo);
+                Log.d(TAG,"Disable updating of time ago");
             }
         }
     };

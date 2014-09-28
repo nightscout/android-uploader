@@ -9,11 +9,13 @@ import android.hardware.usb.UsbManager;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.MainActivity;
 import com.nightscout.android.Nightscout;
+import com.nightscout.android.R;
 import com.nightscout.android.dexcom.USB.USBPower;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.USB.UsbSerialProber;
@@ -68,8 +70,10 @@ public class SyncingService extends IntentService {
     public static void startActionSingleSync(Context context, int numOfPages) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         // Exit if the user hasn't selected "I understand"
-        if (! prefs.getBoolean("i_understand",false))
+        if (! prefs.getBoolean("i_understand",false)) {
+            Toast.makeText(context, R.string.message_user_not_understand,Toast.LENGTH_LONG).show();
             return;
+        }
         Tracker tracker=((Nightscout) context).getTracker();
         tracker.send(new HitBuilders.EventBuilder("DexcomG4", "Sync").setValue(numOfPages).build());
 
@@ -168,7 +172,7 @@ public class SyncingService extends IntentService {
             } catch (Exception e) {
                 Log.wtf("Unhandled exception caught", e);
                 ACRA.getErrorReporter().handleException(e);
-                tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Catch all exception in handleActionSync")
+                tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Catch all exception in handleActionSync: "+e.getMessage())
                         .setFatal(false)
                         .build());
             }

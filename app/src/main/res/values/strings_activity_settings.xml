@@ -10,6 +10,7 @@
     <string name="pref_summary_i_understand">Nightscout should not be used to make medical decisions. There is no support or any warranty of any kind. The quality and performance of the project is with you. Anonymous data will be sent if a crash occurs to help make the app better.</string>
     <string name="pref_switch_on_i_understand">YES</string>
     <string name="pref_switch_off_i_understand">NO</string>
+    <string name="pref_acra_user_email">Email</string>
 
     <!-- Settings for Cloud Storage -->
     <string name="pref_header_cloud_storage">Cloud Storage</string>
@@ -76,5 +77,7 @@
 
     <!-- GPL -->
     <string name="pref_gpl_summary">Nightscout \u00A92014\n\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.\n\nThis program is distributed in the hope that it will be useful but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.</string>
+    <string name="pref_acra_dialog_title">Email</string>
+    <string name="pref_acra_dialog_message">Email address to be reported during crashes. This is optional and will only be used to help the developers improve the product</string>
 
 </resources>
