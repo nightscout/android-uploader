@@ -37,12 +37,15 @@ public class MainActivity extends Activity {
 
     private final String TAG = MainActivity.class.getSimpleName();
 
-    // Member components
+    // Recievers
     private CGMStatusReceiver mCGMStatusReceiver;
+
+
+    // Member components
     private Handler mHandler = new Handler();
     private Context mContext;
     private String mJSONData;
-    private long lastDisplayTime = 0;
+    private long lastRecordTime = 0;
 
     // Analytics tracker
     Tracker tracker;
@@ -71,7 +74,6 @@ public class MainActivity extends Activity {
         deviceStatusFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         deviceStatusFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver(mDeviceStatusReceiver, deviceStatusFilter);
-
 
         // Register Broadcast Receiver for response messages from mSyncingServiceIntent service
         mCGMStatusReceiver = new CGMStatusReceiver();
@@ -105,7 +107,6 @@ public class MainActivity extends Activity {
         });
 
         mWebView.setOnTouchListener(new View.OnTouchListener() {
-
             public boolean onTouch(View v, MotionEvent event) {
                 return (event.getAction() == MotionEvent.ACTION_MOVE);
             }
@@ -115,24 +116,27 @@ public class MainActivity extends Activity {
     private void initUI(Bundle savedInstanceState){
         // Setup UI components
         setContentView(R.layout.activity_main);
-        mTextSGV = (TextView) findViewById(R.id.sgValue);
-        mTextTimestamp = (TextView) findViewById(R.id.timeAgo);
-        mButton = (Button)findViewById(R.id.twoDaySyncButton);
-        mWebView = (WebView) findViewById(R.id.webView);
-        WebSettings webSettings = mWebView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setDatabaseEnabled(true);
-        webSettings.setDomStorageEnabled(true);
-        webSettings.setAppCacheEnabled(true);
-        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        webSettings.setUseWideViewPort(false);
-        mWebView.setVerticalScrollBarEnabled(false);
-        mWebView.setHorizontalScrollBarEnabled(false);
-        mWebView.setBackgroundColor(0);
-        if (savedInstanceState==null) {
+        if (mTextSGV==null)
+            mTextSGV = (TextView) findViewById(R.id.sgValue);
+        if (mTextTimestamp==null)
+            mTextTimestamp = (TextView) findViewById(R.id.timeAgo);
+        if (mButton==null)
+            mButton = (Button)findViewById(R.id.twoDaySyncButton);
+        if (mWebView==null) {
+            mWebView = (WebView) findViewById(R.id.webView);
+            mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            WebSettings webSettings = mWebView.getSettings();
+            webSettings.setJavaScriptEnabled(true);
+            webSettings.setDatabaseEnabled(true);
+            webSettings.setDomStorageEnabled(true);
+            webSettings.setAppCacheEnabled(true);
+            webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+            webSettings.setUseWideViewPort(false);
+            mWebView.setVerticalScrollBarEnabled(false);
+            mWebView.setHorizontalScrollBarEnabled(false);
+            mWebView.setBackgroundColor(0);
             mWebView.loadUrl("file:///android_asset/index.html");
         }
-
         topIcons = new TopIcons();
     }
 
@@ -181,6 +185,7 @@ public class MainActivity extends Activity {
 //    public void onConfigurationChanged(Configuration newConfig){
 //        super.onConfigurationChanged(newConfig);
 //        setContentView(R.layout.activity_main);
+//        initUI(null);
 //    }
 
     public class CGMStatusReceiver extends BroadcastReceiver {
@@ -194,7 +199,7 @@ public class MainActivity extends Activity {
             boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
             int responseNextUploadTime = intent.getIntExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
             long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME,new Date().getTime());
-            lastDisplayTime=responseDisplayTime;
+            lastRecordTime =responseDisplayTime;
             int rssi = intent.getIntExtra(SyncingService.RESPONSE_RSSI,-1);
             int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT,-1);
 
@@ -212,8 +217,9 @@ public class MainActivity extends Activity {
             }
             // Update UI with latest record information
             mTextSGV.setText(responseSGV);
+            mTextSGV.setTag(responseSGV);
             mTextTimestamp.setText(Utils.getTimeString(new Date().getTime()-responseSGVTimestamp));
-            Log.i(TAG,"Time since record: "+Utils.getTimeString(responseSGVTimestamp));
+            mTextTimestamp.setTag(Utils.getTimeString(new Date().getTime()-responseSGVTimestamp));
 
             int nextUploadTime = TimeConstants.FIVE_MINUTES_MS;
 
@@ -242,19 +248,7 @@ public class MainActivity extends Activity {
 
             mHandler.removeCallbacks(syncCGM);
             mHandler.postDelayed(syncCGM, nextUploadTime);
-        }
-    }
-
-    public class tickReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context mContext, Intent intent) {
-            long delta= new Date().getTime() - lastDisplayTime;
-            String timeAgoStr="";
-            if (delta<0)
-                timeAgoStr="Time change detected";
-            else
-                timeAgoStr=Utils.getTimeString(delta);
-            mTextTimestamp.setText(timeAgoStr);
+            mHandler.postDelayed(updateTimeAgo,nextUploadTime/5);
         }
     }
 
@@ -283,6 +277,24 @@ public class MainActivity extends Activity {
         public void run() {
             // TODO: 2nd parameter should be static constant from intent service
             SyncingService.startActionSingleSync(mContext, 1);
+        }
+    };
+
+    // TODO remove this runnable callback when the screen goes off and reinstate it when it comes
+    // back on to save battery.
+    public Runnable updateTimeAgo = new Runnable() {
+        @Override
+        public void run() {
+            long delta= new Date().getTime() - lastRecordTime;
+            Log.d("updateTimeAgo","Delta: "+delta);
+            Log.d("updateTimeAgo","lastRecordTime: "+lastRecordTime);
+            String timeAgoStr="";
+            if (delta<0)
+                timeAgoStr="Time change detected";
+            else
+                timeAgoStr=Utils.getTimeString(delta);
+            mTextTimestamp.setText(timeAgoStr);
+            mHandler.postDelayed(updateTimeAgo,60000);
         }
     };
 
