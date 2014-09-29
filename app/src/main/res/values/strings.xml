@@ -34,5 +34,6 @@
     <string name="feedback_dialog_ok_toast">Thank you!</string>
     <string name="feedback_toast_text"></string>
     <string name="message_user_not_understand">Reading from device is disabled until you review and accept \"I understand\" in preferences</string>
+    <string name="button_force_sync">Force sync</string>
 
 </resources>

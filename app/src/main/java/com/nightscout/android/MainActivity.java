@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Configuration;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -54,7 +53,7 @@ public class MainActivity extends Activity {
     private WebView mWebView;
     private TextView mTextSGV;
     private TextView mTextTimestamp;
-    private Button mButton;
+    private Button mTwoDaySyncButton;
     TopIcons topIcons;
 
     // TODO: should try and avoid use static
@@ -98,22 +97,6 @@ public class MainActivity extends Activity {
             // reset the top icons to their default state
             topIcons.setDefaults();
         }
-
-        mButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            mHandler.removeCallbacks(syncCGM);
-            Log.d(TAG, "Starting 2 day syncing onClick...");
-            // TODO: 2nd parameter should be static constant from intent service
-            SyncingService.startActionSingleSync(mContext, 20);
-            }
-        });
-
-        mWebView.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                return (event.getAction() == MotionEvent.ACTION_MOVE);
-            }
-        });
     }
 
     private void initUI(Bundle savedInstanceState){
@@ -123,8 +106,6 @@ public class MainActivity extends Activity {
             mTextSGV = (TextView) findViewById(R.id.sgValue);
         if (mTextTimestamp==null)
             mTextTimestamp = (TextView) findViewById(R.id.timeAgo);
-        if (mButton==null)
-            mButton = (Button)findViewById(R.id.twoDaySyncButton);
         if (mWebView==null) {
             mWebView = (WebView) findViewById(R.id.webView);
             mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -141,6 +122,24 @@ public class MainActivity extends Activity {
             mWebView.loadUrl("file:///android_asset/index.html");
         }
         topIcons = new TopIcons();
+
+        mTwoDaySyncButton = (Button)findViewById(R.id.twoDaySyncButton);
+
+        mTwoDaySyncButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mHandler.removeCallbacks(syncCGM);
+                Log.d(TAG, "Starting 2 day syncing onClick...");
+                // TODO: 2nd parameter should be static constant from intent service
+                SyncingService.startActionSingleSync(mContext, 20);
+            }
+        });
+
+        mWebView.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                return (event.getAction() == MotionEvent.ACTION_MOVE);
+            }
+        });
     }
 
     @Override
@@ -159,7 +158,7 @@ public class MainActivity extends Activity {
         outState.putString("saveJSONData", mJSONData);
         outState.putString("saveTextSGV", mTextSGV.getText().toString());
         outState.putString("saveTextTimestamp", mTextTimestamp.getText().toString());
-        outState.putString("saveTextButton", mButton.getText().toString());
+        outState.putString("saveTextButton", mTwoDaySyncButton.getText().toString());
         outState.putBoolean("saveImageViewUSB", topIcons.getUSB());
         outState.putBoolean("saveImageViewUpload", topIcons.getUpload());
         outState.putBoolean("saveImageViewTimeIndicator", topIcons.getTimeIndicator());
@@ -176,7 +175,7 @@ public class MainActivity extends Activity {
         mJSONData = savedInstanceState.getString("mJSONData");
         mTextSGV.setText(savedInstanceState.getString("saveTextSGV"));
         mTextTimestamp.setText(savedInstanceState.getString("saveTextTimestamp"));
-        mButton.setText(savedInstanceState.getString("saveTextButton"));
+        mTwoDaySyncButton.setText(savedInstanceState.getString("saveTextButton"));
         topIcons.setUSB(savedInstanceState.getBoolean("saveImageViewUSB"));
         topIcons.setUpload(savedInstanceState.getBoolean("saveImageViewUpload"));
         topIcons.setTimeIndicator(savedInstanceState.getBoolean("saveImageViewTimeIndicator"));
@@ -188,7 +187,7 @@ public class MainActivity extends Activity {
 //    @Override
 //    public void onConfigurationChanged(Configuration newConfig){
 //        super.onConfigurationChanged(newConfig);
-//        setContentView(R.layout.activity_main);
+//        Log.d(TAG,"onConfigurationChanged called");
 //        initUI(null);
 //    }
 
@@ -315,6 +314,7 @@ public class MainActivity extends Activity {
             else
                 timeAgoStr=Utils.getTimeString(delta);
             mTextTimestamp.setText(timeAgoStr);
+            mHandler.removeCallbacks(updateTimeAgo);
             mHandler.postDelayed(updateTimeAgo,60000);
         }
     };
@@ -349,6 +349,8 @@ public class MainActivity extends Activity {
             } catch (ACRAConfigurationException e) {
                 e.printStackTrace();
             }
+        } else if (id == R.id.force_sync) {
+            SyncingService.startActionSingleSync(getApplicationContext(),1);
         } else if (id == R.id.close_settings) {
             mHandler.removeCallbacks(syncCGM);
             finish();

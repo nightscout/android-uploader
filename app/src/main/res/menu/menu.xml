@@ -11,6 +11,11 @@
         android:title="Feedback">
     </item>
     <item
+        android:id="@+id/force_sync"
+        android:orderInCategory="100"
+        android:title="Force sync">
+    </item>
+    <item
         android:id="@+id/close_settings"
         android:orderInCategory="100"
         android:title="Close">

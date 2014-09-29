@@ -142,12 +142,14 @@ public class SyncingService extends IntentService {
                         tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Array Index out of bounds: "+e.getMessage())
                             .setFatal(false)
                             .build());
+                    broadcastSGVToUI();
                     return;
                 } catch (NegativeArraySizeException e) {
                     Log.wtf("Negative array exception from receiver", e);
                     tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Negative Array size: " + e.getMessage())
                             .setFatal(false)
                             .build());
+                    broadcastSGVToUI();
                     return;
                 }
 
