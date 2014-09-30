@@ -108,8 +108,9 @@ public class SyncingService extends IntentService {
      * parameters.
      */
     private void handleActionSync(int numOfPages) {
+        boolean rootEnabled=PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("root_support_enabled",false);
         Tracker tracker = ((Nightscout) getApplicationContext()).getTracker();
-        if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("root_support_enabled",false))
+        if (rootEnabled)
             USBPower.PowerOn();
         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NSDownload");
@@ -117,48 +118,23 @@ public class SyncingService extends IntentService {
         if (acquireSerialDevice()) {
             try {
                 ReadData readData = new ReadData(mSerialDevice);
-                EGVRecord[] recentRecords;
-                MeterRecord[] meterRecords;
-                SensorRecord[] sensorRecords;
-                GlucoseDataSet[] glucoseDataSets;
-                int timeSinceLastRecord;
-                int nextUploadTime;
-                long displayTime;
-                int rssi;
-                int batLevel;
+                EGVRecord[] recentRecords = readData.getRecentEGVsPages(numOfPages);;
+                MeterRecord[] meterRecords = readData.getRecentMeterRecords();;
+                SensorRecord[] sensorRecords = readData.getRecentSensorRecords(numOfPages);;
+                GlucoseDataSet[] glucoseDataSets = Utils.mergeGlucoseDataRecords(recentRecords, sensorRecords);;
 
-                try {
-                    recentRecords = readData.getRecentEGVsPages(numOfPages);
-                    meterRecords = readData.getRecentMeterRecords();
-                    sensorRecords = readData.getRecentSensorRecords(numOfPages);
-                    glucoseDataSets = Utils.mergeGlucoseDataRecords(recentRecords, sensorRecords);
+                // FIXME: should we do boundary checking here as well?
+                int timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
+                int nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
+                long displayTime = readData.readDisplayTime().getTime();
+                int rssi = sensorRecords[sensorRecords.length-1].getRSSI();
+                int batLevel = readData.readBatteryLevel();
+                // Close serial
+                mSerialDevice.close();
+                // Try powering off, will only work if rooted
+                if (rootEnabled)
+                    USBPower.PowerOff();
 
-                    // FIXME: should we do boundary checking here as well?
-                    timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
-                    nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
-                    displayTime = readData.readDisplayTime().getTime();
-                    rssi = sensorRecords[sensorRecords.length-1].getRSSI();
-                    batLevel = readData.readBatteryLevel();
-                    // Close serial
-                    mSerialDevice.close();
-                    // Try powering off, will only work if rooted
-                    if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("root_support_enabled",false))
-                        USBPower.PowerOff();
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);
-                        tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Array Index out of bounds: "+e.getMessage())
-                            .setFatal(false)
-                            .build());
-                    broadcastSGVToUI();
-                    return;
-                } catch (NegativeArraySizeException e) {
-                    Log.wtf("Negative array exception from receiver", e);
-                    tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Negative Array size: " + e.getMessage())
-                            .setFatal(false)
-                            .build());
-                    broadcastSGVToUI();
-                    return;
-                }
 
                 // convert into json for d3 plot
                 JSONArray array = new JSONArray();
@@ -185,6 +161,20 @@ public class SyncingService extends IntentService {
                                 .build()
                 );
                 Log.e(TAG, "Unable to close", e);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);
+                tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Array Index out of bounds: "+e.getMessage())
+                        .setFatal(false)
+                        .build());
+                broadcastSGVToUI();
+                return;
+            } catch (NegativeArraySizeException e) {
+                Log.wtf("Negative array exception from receiver", e);
+                tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Negative Array size: " + e.getMessage())
+                        .setFatal(false)
+                        .build());
+                broadcastSGVToUI();
+                return;
             } catch (Exception e) {
                 Log.wtf("Unhandled exception caught", e);
                 ACRA.getErrorReporter().handleException(e);
@@ -267,7 +257,7 @@ public class SyncingService extends IntentService {
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
         broadcastIntent.putExtra(RESPONSE_SGV, "---");
-        broadcastIntent.putExtra(RESPONSE_TIMESTAMP, "---");
+        broadcastIntent.putExtra(RESPONSE_TIMESTAMP, -1L);
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, TimeConstants.FIVE_MINUTES_MS);
         broadcastIntent.putExtra(RESPONSE_DISPLAY_TIME, new Date().getTime());
         broadcastIntent.putExtra(RESPONSE_RSSI, -1);

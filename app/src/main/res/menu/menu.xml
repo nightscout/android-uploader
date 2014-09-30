@@ -11,14 +11,9 @@
         android:title="Feedback">
     </item>
     <item
-        android:id="@+id/force_sync"
-        android:orderInCategory="100"
-        android:title="Force sync">
-    </item>
-    <item
         android:id="@+id/two_day_sync"
         android:orderInCategory="100"
-        android:title="Two day sync">
+        android:title="Gap sync">
     </item>
 
     <item

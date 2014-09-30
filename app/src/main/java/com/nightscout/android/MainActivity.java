@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
     private Handler mHandler = new Handler();
     private Context mContext;
     private String mJSONData;
-    private long lastRecordTime = 0;
+    private long lastRecordTime = -1;
 
     // Analytics tracker
     Tracker tracker;
@@ -203,7 +203,7 @@ public class MainActivity extends Activity {
             String timeAgoStr;
             Log.d(TAG,"Date: "+new Date().getTime());
             Log.d(TAG,"Response SGV Timestamp: "+responseSGVTimestamp);
-            if (responseSGVTimestamp!=-1) {
+            if (responseSGVTimestamp>0) {
                 timeAgoStr = Utils.getTimeString(new Date().getTime() - responseSGVTimestamp);
             }else{
                 timeAgoStr = "---";
@@ -298,8 +298,10 @@ public class MainActivity extends Activity {
             Log.d("updateTimeAgo","Delta: "+delta);
             Log.d("updateTimeAgo","lastRecordTime: "+lastRecordTime);
             String timeAgoStr="";
-            if (delta<0)
+            if (delta<=0 && lastRecordTime!=-1)
                 timeAgoStr="Time change detected";
+            else if (lastRecordTime==-1)
+                timeAgoStr="---";
             else
                 timeAgoStr=Utils.getTimeString(delta);
             mTextTimestamp.setText(timeAgoStr);
@@ -338,8 +340,6 @@ public class MainActivity extends Activity {
             } catch (ACRAConfigurationException e) {
                 e.printStackTrace();
             }
-        } else if (id == R.id.force_sync) {
-            SyncingService.startActionSingleSync(getApplicationContext(),1);
         } else if (id == R.id.two_day_sync) {
             SyncingService.startActionSingleSync(getApplicationContext(),20);
         } else if (id == R.id.close_settings) {

@@ -84,18 +84,16 @@
         android:layout_alignParentRight="true" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/unknown_values"
         android:id="@+id/timeAgo"
-        android:layout_below="@+id/sgValue"
-        android:layout_marginTop="110dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentLeft="false"
         android:gravity="center"
         android:singleLine="true"
-        android:layout_alignRight="@+id/sgValue" />
+        android:layout_below="@+id/sgValue" />
 
     <WebView
         android:layout_width="wrap_content"
