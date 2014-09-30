@@ -105,8 +105,7 @@ public class SyncingService extends IntentService {
      */
     private void handleActionSync(int numOfPages) {
         Tracker tracker = ((Nightscout) getApplicationContext()).getTracker();
-        USBPower.PowerOn();
-        try { Thread.sleep(3000); } catch (InterruptedException e) { }
+//        USBPower.PowerOn();
         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NSDownload");
         wl.acquire();
@@ -136,7 +135,7 @@ public class SyncingService extends IntentService {
                     // Close serial
                     mSerialDevice.close();
                     // Try powering off, will only work if rooted
-                    USBPower.PowerOff();
+//                    USBPower.PowerOff();
                 } catch (ArrayIndexOutOfBoundsException e) {
                     Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);
                         tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Array Index out of bounds: "+e.getMessage())
