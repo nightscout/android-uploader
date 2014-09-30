@@ -1,5 +1,7 @@
 package com.nightscout.android.dexcom;
 
+import com.nightscout.android.TimeConstants;
+
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -11,7 +13,7 @@ public class Utils {
         long milliseconds = epochMS - currentTZOffset;
         long timeAdd = milliseconds + (1000L * delta);
         TimeZone tz = TimeZone.getDefault();
-        if (tz.inDaylightTime(new Date())) timeAdd = timeAdd - 3600000L;
+        if (tz.inDaylightTime(new Date())) timeAdd = timeAdd - TimeConstants.ONE_HOUR_MS;
         return new Date(timeAdd);
     }
 
