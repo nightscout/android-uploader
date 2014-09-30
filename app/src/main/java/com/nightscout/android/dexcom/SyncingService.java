@@ -19,6 +19,7 @@ import com.nightscout.android.R;
 import com.nightscout.android.dexcom.USB.USBPower;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.USB.UsbSerialProber;
+import com.nightscout.android.dexcom.records.CalRecord;
 import com.nightscout.android.dexcom.records.EGVRecord;
 import com.nightscout.android.dexcom.records.GlucoseDataSet;
 import com.nightscout.android.dexcom.records.MeterRecord;
@@ -118,10 +119,11 @@ public class SyncingService extends IntentService {
         if (acquireSerialDevice()) {
             try {
                 ReadData readData = new ReadData(mSerialDevice);
-                EGVRecord[] recentRecords = readData.getRecentEGVsPages(numOfPages);;
-                MeterRecord[] meterRecords = readData.getRecentMeterRecords();;
-                SensorRecord[] sensorRecords = readData.getRecentSensorRecords(numOfPages);;
-                GlucoseDataSet[] glucoseDataSets = Utils.mergeGlucoseDataRecords(recentRecords, sensorRecords);;
+                EGVRecord[] recentRecords = readData.getRecentEGVsPages(numOfPages);
+                MeterRecord[] meterRecords = readData.getRecentMeterRecords();
+                SensorRecord[] sensorRecords = readData.getRecentSensorRecords(numOfPages);
+                GlucoseDataSet[] glucoseDataSets = Utils.mergeGlucoseDataRecords(recentRecords, sensorRecords);
+                CalRecord[] calRecords = readData.getRecentCalRecords();
 
                 // FIXME: should we do boundary checking here as well?
                 int timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
@@ -147,9 +149,10 @@ public class SyncingService extends IntentService {
                 // Only upload 1 record unless forcing a sync
                 if (numOfPages < 20) {
                     uploader.upload(glucoseDataSets[glucoseDataSets.length - 1],
-                                    meterRecords[meterRecords.length - 1]);
+                                    meterRecords[meterRecords.length - 1],
+                                    calRecords[calRecords.length - 1]);
                 } else {
-                    uploader.upload(glucoseDataSets, meterRecords);
+                    uploader.upload(glucoseDataSets, meterRecords, calRecords);
                 }
 
                 EGVRecord recentEGV = recentRecords[recentRecords.length - 1];

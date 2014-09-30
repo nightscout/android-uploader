@@ -13,7 +13,7 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.WriteConcern;
 
 import com.nightscout.android.MainActivity;
-import com.nightscout.android.dexcom.records.EGVRecord;
+import com.nightscout.android.dexcom.records.CalRecord;
 import com.nightscout.android.dexcom.records.GlucoseDataSet;
 import com.nightscout.android.dexcom.records.MeterRecord;
 
@@ -47,15 +47,17 @@ public class Uploader {
         enableMongoUpload = prefs.getBoolean("cloud_storage_mongodb_enable", false);
     }
 
-    public boolean upload(GlucoseDataSet glucoseDataSet, MeterRecord meterRecord) {
+    public boolean upload(GlucoseDataSet glucoseDataSet, MeterRecord meterRecord, CalRecord calRecord) {
         GlucoseDataSet[] glucoseDataSets = new GlucoseDataSet[1];
         glucoseDataSets[0] = glucoseDataSet;
         MeterRecord[] meterRecords = new MeterRecord[1];
         meterRecords[0] = meterRecord;
-        return upload(glucoseDataSets, meterRecords);
+        CalRecord[] calRecords = new CalRecord[1];
+        calRecords[0] = calRecord;
+        return upload(glucoseDataSets, meterRecords, calRecords);
     }
 
-    public boolean upload(GlucoseDataSet[] glucoseDataSets, MeterRecord[] meterRecords) {
+    public boolean upload(GlucoseDataSet[] glucoseDataSets, MeterRecord[] meterRecords, CalRecord[] calRecords) {
         if (enableRESTUpload) {
             long start = System.currentTimeMillis();
             Log.i(TAG, String.format("Starting upload of %s record using a REST API", glucoseDataSets.length));
@@ -66,7 +68,7 @@ public class Uploader {
         if (enableMongoUpload) {
             long start = System.currentTimeMillis();
             Log.i(TAG, String.format("Starting upload of %s record using a Mongo", glucoseDataSets.length));
-            doMongoUpload(prefs, glucoseDataSets, meterRecords);
+            doMongoUpload(prefs, glucoseDataSets, meterRecords, calRecords);
             Log.i(TAG, String.format("Finished upload of %s record using a Mongo in %s ms", glucoseDataSets.length + meterRecords.length, System.currentTimeMillis() - start));
         }
         return true;
@@ -247,7 +249,7 @@ public class Uploader {
     }
 
     private void doMongoUpload(SharedPreferences prefs, GlucoseDataSet[] glucoseDataSets,
-                               MeterRecord[] meterRecords) {
+                               MeterRecord[] meterRecords, CalRecord[] calRecords) {
 
         String dbURI = prefs.getString("cloud_storage_mongodb_uri", null);
         String collectionName = prefs.getString("cloud_storage_mongodb_collection", null);
@@ -274,7 +276,7 @@ public class Uploader {
                     testData.put("dateString", record.getDisplayTime().toString());
                     testData.put("sgv", record.getBGValue());
                     testData.put("direction", record.getTrend());
-                    if (prefs.getBoolean("cloud_sensor_data",false)) {
+                    if (prefs.getBoolean("cloud_sensor_data", false)) {
                         testData.put("filtered", record.getFiltered());
                         testData.put("unfilterd", record.getUnfiltered());
                         testData.put("rssi", record.getRssi());
@@ -293,9 +295,24 @@ public class Uploader {
                     dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
                 }
 
+                // TODO: might be best to merge with the the glucose data but will require time
+                // analysis to match record with cal set, for now this will do
+                if (prefs.getBoolean("cloud_cal_data", false)) {
+                    for (CalRecord calRecord : calRecords) {
+                        // make db object
+                        BasicDBObject testData = new BasicDBObject();
+                        testData.put("device", "dexcom");
+                        testData.put("date", calRecord.getDisplayTime().getTime());
+                        testData.put("dateString", calRecord.getDisplayTime().toString());
+                        testData.put("slope", calRecord.getSlope());
+                        testData.put("intercept", calRecord.getIntercept());
+                        testData.put("scale", calRecord.getScale());
+                        dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
+                    }
+                }
+
                 // TODO: quick port from original code, revisit before release
                 DBCollection dsCollection = db.getCollection(dsCollectionName);
-                // Uploading devicestatus
                 BasicDBObject devicestatus = new BasicDBObject();
                 devicestatus.put("uploaderBattery", MainActivity.batLevel);
                 devicestatus.put("created_at", new Date());
