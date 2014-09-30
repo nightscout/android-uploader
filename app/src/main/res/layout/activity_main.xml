@@ -78,10 +78,10 @@
         android:id="@+id/sgValue"
         android:layout_below="@+id/status_bar"
         android:layout_alignParentLeft="true"
-        android:layout_alignRight="@+id/twoDaySyncButton"
         android:textSize="@android:dimen/notification_large_icon_width"
         android:singleLine="true"
-        android:gravity="center" />
+        android:gravity="center"
+        android:layout_alignParentRight="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -104,16 +104,7 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/timeAgo"
         android:layout_alignRight="@+id/timeAgo"
-        android:layout_above="@+id/twoDaySyncButton" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_two_day_sync"
-        android:id="@+id/twoDaySyncButton"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentLeft="false" />
-
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>

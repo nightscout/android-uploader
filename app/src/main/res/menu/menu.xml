@@ -16,6 +16,12 @@
         android:title="Force sync">
     </item>
     <item
+        android:id="@+id/two_day_sync"
+        android:orderInCategory="100"
+        android:title="Two day sync">
+    </item>
+
+    <item
         android:id="@+id/close_settings"
         android:orderInCategory="100"
         android:title="Close">

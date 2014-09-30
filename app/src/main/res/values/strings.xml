@@ -24,8 +24,6 @@
     <string name="action_settings">Settings</string>
 
     <string name="unknown_values">---</string>
-    <string name="button_two_day_sync">Force 2 day sync</string>
-
 
     <string name="crash_toast_text">Oops! A crash has occurred and is being reported to nightscout so it can be fixed!</string>
     <string name="feedback_dialog_title">Nightscout feedback</string>

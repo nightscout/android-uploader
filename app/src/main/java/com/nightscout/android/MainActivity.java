@@ -53,7 +53,6 @@ public class MainActivity extends Activity {
     private WebView mWebView;
     private TextView mTextSGV;
     private TextView mTextTimestamp;
-    private Button mTwoDaySyncButton;
     TopIcons topIcons;
 
     // TODO: should try and avoid use static
@@ -122,24 +121,6 @@ public class MainActivity extends Activity {
             mWebView.loadUrl("file:///android_asset/index.html");
         }
         topIcons = new TopIcons();
-
-        mTwoDaySyncButton = (Button)findViewById(R.id.twoDaySyncButton);
-
-        mTwoDaySyncButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mHandler.removeCallbacks(syncCGM);
-                Log.d(TAG, "Starting 2 day syncing onClick...");
-                // TODO: 2nd parameter should be static constant from intent service
-                SyncingService.startActionSingleSync(mContext, 20);
-            }
-        });
-
-        mWebView.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                return (event.getAction() == MotionEvent.ACTION_MOVE);
-            }
-        });
     }
 
     @Override
@@ -158,7 +139,6 @@ public class MainActivity extends Activity {
         outState.putString("saveJSONData", mJSONData);
         outState.putString("saveTextSGV", mTextSGV.getText().toString());
         outState.putString("saveTextTimestamp", mTextTimestamp.getText().toString());
-        outState.putString("saveTextButton", mTwoDaySyncButton.getText().toString());
         outState.putBoolean("saveImageViewUSB", topIcons.getUSB());
         outState.putBoolean("saveImageViewUpload", topIcons.getUpload());
         outState.putBoolean("saveImageViewTimeIndicator", topIcons.getTimeIndicator());
@@ -175,7 +155,6 @@ public class MainActivity extends Activity {
         mJSONData = savedInstanceState.getString("mJSONData");
         mTextSGV.setText(savedInstanceState.getString("saveTextSGV"));
         mTextTimestamp.setText(savedInstanceState.getString("saveTextTimestamp"));
-        mTwoDaySyncButton.setText(savedInstanceState.getString("saveTextButton"));
         topIcons.setUSB(savedInstanceState.getBoolean("saveImageViewUSB"));
         topIcons.setUpload(savedInstanceState.getBoolean("saveImageViewUpload"));
         topIcons.setTimeIndicator(savedInstanceState.getBoolean("saveImageViewTimeIndicator"));
@@ -198,7 +177,7 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             // Get response messages from broadcast
             String responseSGV = intent.getStringExtra(SyncingService.RESPONSE_SGV);
-            long responseSGVTimestamp = intent.getLongExtra(SyncingService.RESPONSE_TIMESTAMP,-1);
+            long responseSGVTimestamp = intent.getLongExtra(SyncingService.RESPONSE_TIMESTAMP,-1L);
             boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
             int responseNextUploadTime = intent.getIntExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
             long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME,new Date().getTime());
@@ -221,7 +200,15 @@ public class MainActivity extends Activity {
             // Update UI with latest record information
             mTextSGV.setText(responseSGV);
             mTextSGV.setTag(responseSGV);
-            String timeAgoStr = Utils.getTimeString(new Date().getTime()-responseSGVTimestamp);
+            String timeAgoStr;
+            Log.d(TAG,"Date: "+new Date().getTime());
+            Log.d(TAG,"Response SGV Timestamp: "+responseSGVTimestamp);
+            if (responseSGVTimestamp!=-1) {
+                timeAgoStr = Utils.getTimeString(new Date().getTime() - responseSGVTimestamp);
+            }else{
+                timeAgoStr = "---";
+            }
+
             mTextTimestamp.setText(timeAgoStr);
             mTextTimestamp.setTag(timeAgoStr);
 
@@ -306,6 +293,8 @@ public class MainActivity extends Activity {
         @Override
         public void run() {
             long delta= new Date().getTime() - lastRecordTime;
+            if (lastRecordTime==0)
+                delta=0;
             Log.d("updateTimeAgo","Delta: "+delta);
             Log.d("updateTimeAgo","lastRecordTime: "+lastRecordTime);
             String timeAgoStr="";
@@ -351,6 +340,8 @@ public class MainActivity extends Activity {
             }
         } else if (id == R.id.force_sync) {
             SyncingService.startActionSingleSync(getApplicationContext(),1);
+        } else if (id == R.id.two_day_sync) {
+            SyncingService.startActionSingleSync(getApplicationContext(),20);
         } else if (id == R.id.close_settings) {
             mHandler.removeCallbacks(syncCGM);
             finish();
@@ -454,10 +445,14 @@ public class MainActivity extends Activity {
         }
 
         public int getBatteryIndicator(){
+            if (mImageRcvrBattery==null)
+                return 0;
             return (Integer) mImageRcvrBattery.getTag();
         }
 
         public int getRSSIIndicator(){
+            if (mImageViewRSSI==null)
+                return 0;
             return (Integer) mImageViewRSSI.getTag();
         }
 

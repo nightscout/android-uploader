@@ -14,4 +14,8 @@
         android:fragment="com.nightscout.android.settings.SettingsActivity$AboutPreferenceFragment"
         android:title="@string/pref_header_about" />
 
+    <header
+        android:fragment="com.nightscout.android.settings.SettingsActivity$LabsPreferenceFragment"
+        android:title="@string/pref_header_labs" />
+
 </preference-headers>
