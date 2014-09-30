@@ -14,6 +14,7 @@ import com.mongodb.WriteConcern;
 
 import com.nightscout.android.MainActivity;
 import com.nightscout.android.dexcom.records.EGVRecord;
+import com.nightscout.android.dexcom.records.GlucoseDataSet;
 import com.nightscout.android.dexcom.records.MeterRecord;
 
 import org.apache.http.client.ResponseHandler;
@@ -46,24 +47,24 @@ public class Uploader {
         enableMongoUpload = prefs.getBoolean("cloud_storage_mongodb_enable", false);
     }
 
-    public boolean upload(EGVRecord[] egvRecords, MeterRecord[] meterRecords) {
+    public boolean upload(GlucoseDataSet[] glucoseDataSets, MeterRecord[] meterRecords) {
         if (enableRESTUpload) {
             long start = System.currentTimeMillis();
-            Log.i(TAG, String.format("Starting upload of %s record using a REST API", egvRecords.length));
-            doRESTUpload(prefs, egvRecords, meterRecords);
-            Log.i(TAG, String.format("Finished upload of %s record using a REST API in %s ms", egvRecords.length, System.currentTimeMillis() - start));
+            Log.i(TAG, String.format("Starting upload of %s record using a REST API", glucoseDataSets.length));
+            doRESTUpload(prefs, glucoseDataSets, meterRecords);
+            Log.i(TAG, String.format("Finished upload of %s record using a REST API in %s ms", glucoseDataSets.length, System.currentTimeMillis() - start));
         }
 
         if (enableMongoUpload) {
             long start = System.currentTimeMillis();
-            Log.i(TAG, String.format("Starting upload of %s record using a Mongo", egvRecords.length));
-            doMongoUpload(prefs, egvRecords, meterRecords);
-            Log.i(TAG, String.format("Finished upload of %s record using a Mongo in %s ms", egvRecords.length + meterRecords.length, System.currentTimeMillis() - start));
+            Log.i(TAG, String.format("Starting upload of %s record using a Mongo", glucoseDataSets.length));
+            doMongoUpload(prefs, glucoseDataSets, meterRecords);
+            Log.i(TAG, String.format("Finished upload of %s record using a Mongo in %s ms", glucoseDataSets.length + meterRecords.length, System.currentTimeMillis() - start));
         }
         return true;
     }
 
-    private void doRESTUpload(SharedPreferences prefs, EGVRecord[] records, MeterRecord[] meterRecords) {
+    private void doRESTUpload(SharedPreferences prefs, GlucoseDataSet[] glucoseDataSets, MeterRecord[] meterRecords) {
         String baseURLSettings = prefs.getString("cloud_storage_api_base", "");
         ArrayList<String> baseURIs = new ArrayList<String>();
 
@@ -80,14 +81,14 @@ public class Uploader {
 
         for (String baseURI : baseURIs) {
             try {
-                doRESTUploadTo(baseURI, records, meterRecords);
+                doRESTUploadTo(baseURI, glucoseDataSets, meterRecords);
             } catch (Exception e) {
                 Log.e(TAG, "Unable to do REST API Upload to: " + baseURI, e);
             }
         }
     }
 
-    private void doRESTUploadTo(String baseURI, EGVRecord[] records, MeterRecord[] meterRecords) {
+    private void doRESTUploadTo(String baseURI, GlucoseDataSet[] glucoseDataSets, MeterRecord[] meterRecords) {
         try {
             int apiVersion = 0;
             if (baseURI.endsWith("/v1/")) apiVersion = 1;
@@ -135,7 +136,7 @@ public class Uploader {
                 }
             }
 
-            for (EGVRecord record : records) {
+            for (GlucoseDataSet record : glucoseDataSets) {
                 JSONObject json = new JSONObject();
 
                 try {
@@ -198,14 +199,14 @@ public class Uploader {
         }
     }
 
-    private void populateV1APIEntry(JSONObject json, EGVRecord record) throws Exception {
+    private void populateV1APIEntry(JSONObject json, GlucoseDataSet record) throws Exception {
         json.put("device", "dexcom");
         json.put("date", record.getDisplayTime().getTime());
         json.put("sgv", Integer.parseInt(String.valueOf(record.getBGValue())));
         json.put("direction", record.getTrend());
     }
 
-    private void populateLegacyAPIEntry(JSONObject json, EGVRecord record) throws Exception {
+    private void populateLegacyAPIEntry(JSONObject json, GlucoseDataSet record) throws Exception {
         json.put("device", "dexcom");
         json.put("date", record.getDisplayTime().getTime());
         json.put("sgv", Integer.parseInt(String.valueOf(record.getBGValue())));
@@ -237,7 +238,8 @@ public class Uploader {
         httpclient.execute(post, responseHandler);
     }
 
-    private void doMongoUpload(SharedPreferences prefs, EGVRecord[] egvRecords, MeterRecord[] meterRecords) {
+    private void doMongoUpload(SharedPreferences prefs, GlucoseDataSet[] glucoseDataSets,
+                               MeterRecord[] meterRecords) {
 
         String dbURI = prefs.getString("cloud_storage_mongodb_uri", null);
         String collectionName = prefs.getString("cloud_storage_mongodb_collection", null);
@@ -255,8 +257,8 @@ public class Uploader {
 
                 // get collection
                 DBCollection dexcomData = db.getCollection(collectionName.trim());
-                Log.i(TAG, "The number of EGV records being sent to MongoDB is " + egvRecords.length);
-                for (EGVRecord record : egvRecords) {
+                Log.i(TAG, "The number of EGV records being sent to MongoDB is " + glucoseDataSets.length);
+                for (GlucoseDataSet record : glucoseDataSets) {
                     // make db object
                     BasicDBObject testData = new BasicDBObject();
                     testData.put("device", "dexcom");
@@ -264,6 +266,11 @@ public class Uploader {
                     testData.put("dateString", record.getDisplayTime().toString());
                     testData.put("sgv", record.getBGValue());
                     testData.put("direction", record.getTrend());
+                    if (prefs.getBoolean("cloud_sensor_data",false)) {
+                        testData.put("filtered", record.getFiltered());
+                        testData.put("unfilterd", record.getUnfiltered());
+                        testData.put("rssi", record.getRssi());
+                    }
                     dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
                 }
 
@@ -280,7 +287,7 @@ public class Uploader {
 
                 // TODO: quick port from original code, revisit before release
                 DBCollection dsCollection = db.getCollection(dsCollectionName);
-                //Uploading devicestatus
+                // Uploading devicestatus
                 BasicDBObject devicestatus = new BasicDBObject();
                 devicestatus.put("uploaderBattery", MainActivity.batLevel);
                 devicestatus.put("created_at", new Date());

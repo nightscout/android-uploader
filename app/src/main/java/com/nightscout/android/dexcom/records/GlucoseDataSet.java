@@ -1,7 +1,11 @@
 package com.nightscout.android.dexcom.records;
 
+import java.util.Date;
+
 public class GlucoseDataSet {
 
+    private Date systemTime;
+    private Date displayTime;
     private int bGValue;
     private String trend;
     private String trendSymbol;
@@ -10,6 +14,9 @@ public class GlucoseDataSet {
     private int rssi;
 
     public GlucoseDataSet(EGVRecord egvRecord, SensorRecord sensorRecord) {
+        // TODO check times match between record
+        systemTime = egvRecord.getSystemTime();
+        displayTime = egvRecord.getDisplayTime();
         bGValue = egvRecord.getBGValue();
         trend = egvRecord.getTrend();
         trendSymbol = egvRecord.getTrendSymbol();
@@ -18,7 +25,15 @@ public class GlucoseDataSet {
         rssi = sensorRecord.getRSSI();
     }
 
-    public int getbGValue() {
+    public Date getSystemTime() {
+        return systemTime;
+    }
+
+    public Date getDisplayTime() {
+        return displayTime;
+    }
+
+    public int getBGValue() {
         return bGValue;
     }
 

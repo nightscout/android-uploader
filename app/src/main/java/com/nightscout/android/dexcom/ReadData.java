@@ -62,10 +62,22 @@ public class ReadData {
         return readDataBasePage(recordType, endPage);
     }
 
-    public SensorRecord[] getRecentSensorRecords() {
+    public SensorRecord[] getRecentSensorRecords(int numOfRecentPages) {
+        if (numOfRecentPages < 1) {
+            throw new IllegalArgumentException("Number of pages must be greater than 1.");
+        }
         int recordType = Constants.RECORD_TYPES.SENSOR_DATA.ordinal();
         int endPage = readDataBasePageRange(recordType);
-        return readDataBasePage(recordType, endPage);
+        numOfRecentPages = numOfRecentPages - 1;
+        SensorRecord[] allPages = new SensorRecord[0];
+        for (int i = numOfRecentPages; i >= 0; i--) {
+            int nextPage = endPage - i;
+            SensorRecord[] ithSensorRecordPage = readDataBasePage(recordType, nextPage);
+            SensorRecord[] result = Arrays.copyOf(allPages, allPages.length + ithSensorRecordPage.length);
+            System.arraycopy(ithSensorRecordPage, 0, result, allPages.length, ithSensorRecordPage.length);
+            allPages = result;
+        }
+        return allPages;
     }
 
     public CalRecord[] getRecentCalRecords() {

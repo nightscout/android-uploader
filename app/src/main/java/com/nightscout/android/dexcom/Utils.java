@@ -48,12 +48,12 @@ public class Utils {
 
     public static GlucoseDataSet[] mergeGlucoseDataRecords(EGVRecord[] egvRecords,
                                                            SensorRecord[] sensorRecords) {
-        int egvLength = egvRecords.length - 1;
-        int sensorLength = sensorRecords.length - 1;
+        int egvLength = egvRecords.length;
+        int sensorLength = sensorRecords.length;
         int smallerLength = egvLength < sensorLength ? egvLength : sensorLength;
         GlucoseDataSet[] glucoseDataSets = new GlucoseDataSet[smallerLength];
-        for (int i = 0; i < smallerLength; i++) {
-            glucoseDataSets[i] = new GlucoseDataSet(egvRecords[egvLength - i], sensorRecords[sensorLength - i]);
+        for (int i = 1; i <= smallerLength; i++) {
+            glucoseDataSets[smallerLength - i] = new GlucoseDataSet(egvRecords[egvLength - i], sensorRecords[sensorLength - i]);
         }
         return glucoseDataSets;
     }

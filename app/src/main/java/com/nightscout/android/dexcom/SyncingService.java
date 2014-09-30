@@ -129,7 +129,7 @@ public class SyncingService extends IntentService {
                 try {
                     recentRecords = readData.getRecentEGVsPages(numOfPages);
                     meterRecords = readData.getRecentMeterRecords();
-                    sensorRecords = readData.getRecentSensorRecords();
+                    sensorRecords = readData.getRecentSensorRecords(numOfPages);
                     glucoseDataSets = Utils.mergeGlucoseDataRecords(recentRecords, sensorRecords);
 
                     // FIXME: should we do boundary checking here as well?
@@ -163,7 +163,7 @@ public class SyncingService extends IntentService {
                 for (int i = 0; i < recentRecords.length; i++) array.put(recentRecords[i].toJSON());
 
                 Uploader uploader = new Uploader(mContext);
-                uploader.upload(recentRecords, meterRecords);
+                uploader.upload(glucoseDataSets, meterRecords);
 
                 EGVRecord recentEGV = recentRecords[recentRecords.length - 1];
                 broadcastSGVToUI(recentEGV, true, nextUploadTime + TIME_SYNC_OFFSET, displayTime, rssi, array ,batLevel);
