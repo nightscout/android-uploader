@@ -1,6 +1,9 @@
 package com.nightscout.android.dexcom;
 
 import com.nightscout.android.TimeConstants;
+import com.nightscout.android.dexcom.records.EGVRecord;
+import com.nightscout.android.dexcom.records.GlucoseDataSet;
+import com.nightscout.android.dexcom.records.SensorRecord;
 
 import java.util.Date;
 import java.util.TimeZone;
@@ -26,20 +29,32 @@ public class Utils {
         hours = hours - days * 24;
         days= days - weeks * 7;
 
-        String timeAgoString="";
+        String timeAgoString = "";
         if (weeks > 0) {
-            timeAgoString+=weeks+" weeks ";
+            timeAgoString += weeks + " weeks ";
         }
         if (days > 0) {
-            timeAgoString+=days+" days ";
+            timeAgoString += days + " days ";
         }
         if (hours > 0) {
-            timeAgoString+=hours+" hours ";
+            timeAgoString += hours + " hours ";
         }
         if (minutes >= 0) {
-            timeAgoString+=minutes+" min ";
+            timeAgoString += minutes + " min ";
         }
 
         return (timeAgoString.equals("") ? "--" : timeAgoString + "ago");
+    }
+
+    public static GlucoseDataSet[] mergeGlucoseDataRecords(EGVRecord[] egvRecords,
+                                                           SensorRecord[] sensorRecords) {
+        int egvLength = egvRecords.length - 1;
+        int sensorLength = sensorRecords.length - 1;
+        int smallerLength = egvLength < sensorLength ? egvLength : sensorLength;
+        GlucoseDataSet[] glucoseDataSets = new GlucoseDataSet[smallerLength];
+        for (int i = 0; i < smallerLength; i++) {
+            glucoseDataSets[i] = new GlucoseDataSet(egvRecords[egvLength - i], sensorRecords[sensorLength - i]);
+        }
+        return glucoseDataSets;
     }
 }

@@ -92,7 +92,7 @@ public class MainActivity extends Activity {
             topIcons.setUSB(true);
             Log.d(TAG, "Starting syncing in OnCreate...");
             // TODO: 2nd parameter should be static constant from intent service
-            SyncingService.startActionSingleSync(mContext, 1);
+            SyncingService.startActionSingleSync(mContext, 5);
         } else {
             // reset the top icons to their default state
             topIcons.setDefaults();
@@ -296,7 +296,7 @@ public class MainActivity extends Activity {
     public Runnable syncCGM = new Runnable() {
         public void run() {
             // TODO: 2nd parameter should be static constant from intent service
-            SyncingService.startActionSingleSync(mContext, 1);
+            SyncingService.startActionSingleSync(mContext, 5);
         }
     };
 

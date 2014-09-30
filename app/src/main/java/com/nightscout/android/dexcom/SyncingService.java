@@ -20,6 +20,7 @@ import com.nightscout.android.dexcom.USB.USBPower;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.USB.UsbSerialProber;
 import com.nightscout.android.dexcom.records.EGVRecord;
+import com.nightscout.android.dexcom.records.GlucoseDataSet;
 import com.nightscout.android.dexcom.records.MeterRecord;
 import com.nightscout.android.TimeConstants;
 import com.nightscout.android.dexcom.records.SensorRecord;
@@ -59,6 +60,9 @@ public class SyncingService extends IntentService {
     private Context mContext;
     private UsbManager mUsbManager;
     private UsbSerialDriver mSerialDevice;
+
+    // Constants
+    private final int TIME_SYNC_OFFSET = 3000;
 
 
     /**
@@ -115,6 +119,7 @@ public class SyncingService extends IntentService {
                 EGVRecord[] recentRecords;
                 MeterRecord[] meterRecords;
                 SensorRecord[] sensorRecords;
+                GlucoseDataSet[] glucoseDataSets;
                 int timeSinceLastRecord;
                 int nextUploadTime;
                 long displayTime;
@@ -125,6 +130,7 @@ public class SyncingService extends IntentService {
                     recentRecords = readData.getRecentEGVsPages(numOfPages);
                     meterRecords = readData.getRecentMeterRecords();
                     sensorRecords = readData.getRecentSensorRecords();
+                    glucoseDataSets = Utils.mergeGlucoseDataRecords(recentRecords, sensorRecords);
 
                     // FIXME: should we do boundary checking here as well?
                     timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
@@ -159,10 +165,8 @@ public class SyncingService extends IntentService {
                 Uploader uploader = new Uploader(mContext);
                 uploader.upload(recentRecords, meterRecords);
 
-                // TODO: should this be a constant?
-                int offset = 3000;
                 EGVRecord recentEGV = recentRecords[recentRecords.length - 1];
-                broadcastSGVToUI(recentEGV, true, nextUploadTime + offset, displayTime, rssi, array ,batLevel);
+                broadcastSGVToUI(recentEGV, true, nextUploadTime + TIME_SYNC_OFFSET, displayTime, rssi, array ,batLevel);
             } catch (IOException e) {
                 tracker.send(new HitBuilders.ExceptionBuilder()
                                 .setDescription("Unable to close serial connection")
@@ -220,9 +224,9 @@ public class SyncingService extends IntentService {
         boolean g4Connected=false;
         while(deviceIterator.hasNext()){
             UsbDevice device = deviceIterator.next();
-            if (device.getVendorId()==8867 && device.getProductId()==71
-                    && device.getDeviceClass()==2 && device.getDeviceSubclass()==0
-                    && device.getDeviceProtocol()== 0){
+            if (device.getVendorId() == 8867 && device.getProductId() == 71
+                    && device.getDeviceClass() == 2 && device.getDeviceSubclass() ==0
+                    && device.getDeviceProtocol() == 0){
                 g4Connected=true;
             }
         }
