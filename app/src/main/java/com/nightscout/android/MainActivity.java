@@ -37,7 +37,7 @@ public class MainActivity extends Activity {
 
     private final String TAG = MainActivity.class.getSimpleName();
 
-    // Recievers
+    // Receivers
     private CGMStatusReceiver mCGMStatusReceiver;
 
     // Member components
