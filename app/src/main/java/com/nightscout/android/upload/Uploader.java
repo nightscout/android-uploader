@@ -47,6 +47,14 @@ public class Uploader {
         enableMongoUpload = prefs.getBoolean("cloud_storage_mongodb_enable", false);
     }
 
+    public boolean upload(GlucoseDataSet glucoseDataSet, MeterRecord meterRecord) {
+        GlucoseDataSet[] glucoseDataSets = new GlucoseDataSet[1];
+        glucoseDataSets[0] = glucoseDataSet;
+        MeterRecord[] meterRecords = new MeterRecord[1];
+        meterRecords[0] = meterRecord;
+        return upload(glucoseDataSets, meterRecords);
+    }
+
     public boolean upload(GlucoseDataSet[] glucoseDataSets, MeterRecord[] meterRecords) {
         if (enableRESTUpload) {
             long start = System.currentTimeMillis();

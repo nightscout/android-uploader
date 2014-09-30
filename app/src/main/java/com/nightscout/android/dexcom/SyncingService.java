@@ -165,7 +165,16 @@ public class SyncingService extends IntentService {
                 for (int i = 0; i < recentRecords.length; i++) array.put(recentRecords[i].toJSON());
 
                 Uploader uploader = new Uploader(mContext);
-                uploader.upload(glucoseDataSets, meterRecords);
+                // TODO: This should be cleaned up, 5 should be a constant, maybe handle in uploader,
+                // and maybe might not have to read 5 pages (that was only done for single sync for UI
+                // plot updating and might be able to be done in javascript d3 code as a FIFO array
+                // Only upload 1 record unless forcing a sync
+                if (numOfPages < 20) {
+                    uploader.upload(glucoseDataSets[glucoseDataSets.length - 1],
+                                    meterRecords[meterRecords.length - 1]);
+                } else {
+                    uploader.upload(glucoseDataSets, meterRecords);
+                }
 
                 EGVRecord recentEGV = recentRecords[recentRecords.length - 1];
                 broadcastSGVToUI(recentEGV, true, nextUploadTime + TIME_SYNC_OFFSET, displayTime, rssi, array ,batLevel);
