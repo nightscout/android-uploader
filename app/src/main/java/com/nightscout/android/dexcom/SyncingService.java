@@ -111,10 +111,13 @@ public class SyncingService extends IntentService {
     private void handleActionSync(int numOfPages) {
         boolean rootEnabled=PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("root_support_enabled",false);
         Tracker tracker = ((Nightscout) getApplicationContext()).getTracker();
+
         if (rootEnabled) USBPower.PowerOn();
+
         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NSDownload");
         wl.acquire();
+
         if (acquireSerialDevice()) {
             try {
                 ReadData readData = new ReadData(mSerialDevice);
@@ -137,7 +140,6 @@ public class SyncingService extends IntentService {
                 // Try powering off, will only work if rooted
                 if (rootEnabled) USBPower.PowerOff();
 
-
                 // convert into json for d3 plot
                 JSONArray array = new JSONArray();
                 for (int i = 0; i < recentRecords.length; i++) array.put(recentRecords[i].toJSON());
@@ -147,16 +149,18 @@ public class SyncingService extends IntentService {
                 // and maybe might not have to read 5 pages (that was only done for single sync for UI
                 // plot updating and might be able to be done in javascript d3 code as a FIFO array
                 // Only upload 1 record unless forcing a sync
+                boolean uploadStatus;
                 if (numOfPages < 20) {
-                    uploader.upload(glucoseDataSets[glucoseDataSets.length - 1],
+                    uploadStatus = uploader.upload(glucoseDataSets[glucoseDataSets.length - 1],
                                     meterRecords[meterRecords.length - 1],
                                     calRecords[calRecords.length - 1]);
                 } else {
-                    uploader.upload(glucoseDataSets, meterRecords, calRecords);
+                    uploadStatus = uploader.upload(glucoseDataSets, meterRecords, calRecords);
                 }
 
                 EGVRecord recentEGV = recentRecords[recentRecords.length - 1];
-                broadcastSGVToUI(recentEGV, true, nextUploadTime + TIME_SYNC_OFFSET, displayTime, rssi, array ,batLevel);
+                broadcastSGVToUI(recentEGV, uploadStatus, nextUploadTime + TIME_SYNC_OFFSET,
+                                 displayTime, rssi, array ,batLevel);
             } catch (IOException e) {
                 tracker.send(new HitBuilders.ExceptionBuilder()
                                 .setDescription("Unable to close serial connection")
@@ -192,8 +196,6 @@ public class SyncingService extends IntentService {
         wl.release();
     }
 
-    // TODO: this needs to be more robust as before, but will clean up it and implement here, this
-    // is just simple testing code
     private boolean acquireSerialDevice() {
         // Try powering on, will only work if rooted
         mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
@@ -262,6 +264,7 @@ public class SyncingService extends IntentService {
         broadcastIntent.putExtra(RESPONSE_SGV, "---");
         broadcastIntent.putExtra(RESPONSE_TIMESTAMP, -1L);
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, TimeConstants.FIVE_MINUTES_MS);
+        broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, false);
         broadcastIntent.putExtra(RESPONSE_DISPLAY_TIME, new Date().getTime());
         broadcastIntent.putExtra(RESPONSE_RSSI, -1);
         broadcastIntent.putExtra(RESPONSE_BAT, -1);
