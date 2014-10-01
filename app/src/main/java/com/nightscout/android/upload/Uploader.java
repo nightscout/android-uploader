@@ -58,6 +58,10 @@ public class Uploader {
     }
 
     public boolean upload(GlucoseDataSet[] glucoseDataSets, MeterRecord[] meterRecords, CalRecord[] calRecords) {
+
+        boolean mongoStatus = false;
+        boolean apiStatus = false;
+
         if (enableRESTUpload) {
             long start = System.currentTimeMillis();
             Log.i(TAG, String.format("Starting upload of %s record using a REST API", glucoseDataSets.length));
@@ -68,13 +72,15 @@ public class Uploader {
         if (enableMongoUpload) {
             long start = System.currentTimeMillis();
             Log.i(TAG, String.format("Starting upload of %s record using a Mongo", glucoseDataSets.length));
-            doMongoUpload(prefs, glucoseDataSets, meterRecords, calRecords);
+            mongoStatus = doMongoUpload(prefs, glucoseDataSets, meterRecords, calRecords);
             Log.i(TAG, String.format("Finished upload of %s record using a Mongo in %s ms", glucoseDataSets.length + meterRecords.length, System.currentTimeMillis() - start));
         }
-        return true;
+
+        // TODO: not sure how to handle case when user is uploading to both and only one works
+        return apiStatus || mongoStatus;
     }
 
-    private void doRESTUpload(SharedPreferences prefs, GlucoseDataSet[] glucoseDataSets, MeterRecord[] meterRecords) {
+    private boolean doRESTUpload(SharedPreferences prefs, GlucoseDataSet[] glucoseDataSets, MeterRecord[] meterRecords) {
         String baseURLSettings = prefs.getString("cloud_storage_api_base", "");
         ArrayList<String> baseURIs = new ArrayList<String>();
 
@@ -86,7 +92,7 @@ public class Uploader {
             }
         } catch (Exception e) {
             Log.e(TAG, "Unable to process API Base URL setting: " + baseURLSettings, e);
-            return;
+            return false;
         }
 
         for (String baseURI : baseURIs) {
@@ -94,8 +100,10 @@ public class Uploader {
                 doRESTUploadTo(baseURI, glucoseDataSets, meterRecords);
             } catch (Exception e) {
                 Log.e(TAG, "Unable to do REST API Upload to: " + baseURI, e);
+                return false;
             }
         }
+        return true;
     }
 
     private void doRESTUploadTo(String baseURI, GlucoseDataSet[] glucoseDataSets, MeterRecord[] meterRecords) {
@@ -248,7 +256,7 @@ public class Uploader {
         httpclient.execute(post, responseHandler);
     }
 
-    private void doMongoUpload(SharedPreferences prefs, GlucoseDataSet[] glucoseDataSets,
+    private boolean doMongoUpload(SharedPreferences prefs, GlucoseDataSet[] glucoseDataSets,
                                MeterRecord[] meterRecords, CalRecord[] calRecords) {
 
         String dbURI = prefs.getString("cloud_storage_mongodb_uri", null);
@@ -320,10 +328,12 @@ public class Uploader {
 
                 client.close();
 
+                return true;
+
             } catch (Exception e) {
                 Log.e(TAG, "Unable to upload data to mongo", e);
             }
         }
-
+        return false;
     }
 }
