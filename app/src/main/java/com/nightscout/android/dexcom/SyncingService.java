@@ -111,8 +111,7 @@ public class SyncingService extends IntentService {
     private void handleActionSync(int numOfPages) {
         boolean rootEnabled=PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("root_support_enabled",false);
         Tracker tracker = ((Nightscout) getApplicationContext()).getTracker();
-        if (rootEnabled)
-            USBPower.PowerOn();
+        if (rootEnabled) USBPower.PowerOn();
         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NSDownload");
         wl.acquire();
@@ -131,11 +130,12 @@ public class SyncingService extends IntentService {
                 long displayTime = readData.readDisplayTime().getTime();
                 int rssi = sensorRecords[sensorRecords.length-1].getRSSI();
                 int batLevel = readData.readBatteryLevel();
+
                 // Close serial
                 mSerialDevice.close();
+
                 // Try powering off, will only work if rooted
-                if (rootEnabled)
-                    USBPower.PowerOff();
+                if (rootEnabled) USBPower.PowerOff();
 
 
                 // convert into json for d3 plot
