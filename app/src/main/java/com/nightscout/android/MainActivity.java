@@ -453,6 +453,5 @@ public class MainActivity extends Activity {
                 return 0;
             return (Integer) mImageViewRSSI.getTag();
         }
-
     }
 }

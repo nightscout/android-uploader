@@ -5,22 +5,58 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.nightscout.android.MainActivity">
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/unknown_values"
+        android:id="@+id/sgValue"
+        android:layout_alignParentLeft="false"
+        android:textSize="@android:dimen/notification_large_icon_width"
+        android:singleLine="true"
+        android:gravity="center|center_vertical|center_horizontal"
+        android:layout_alignParentRight="false" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/unknown_values"
+        android:id="@+id/timeAgo"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentLeft="false"
+        android:gravity="center|center_vertical|center_horizontal"
+        android:singleLine="true"
+        android:layout_alignTop="@+id/sgValue"
+        android:layout_marginTop="70sp" />
+
+    <WebView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/webView"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/timeAgo"
+        android:layout_alignRight="@+id/timeAgo"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="false"
+        android:layout_marginBottom="65dp" />
 
     <LinearLayout
         android:id="@+id/status_bar"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:background="#ff006578">
 
         <RelativeLayout
             android:id="@+id/layoutIcons"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:layout_gravity="center">
+            android:layout_gravity="center"
+            android:padding="5dp">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -28,16 +64,37 @@
                 android:id="@+id/imageViewUSB"
                 android:layout_alignParentLeft="true"
                 android:src="@drawable/ic_usb_disconnected"
-                android:layout_marginLeft="35sp" />
+                android:layout_marginLeft="45sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="USB"
+                android:id="@+id/textView"
+                android:layout_below="@+id/imageViewUSB"
+                android:layout_alignLeft="@+id/imageViewUSB"
+                android:textSize="8dp" />
 
             <ImageView
                 android:id="@+id/imageViewUploadStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="35sp"
+                android:layout_marginLeft="45sp"
                 android:layout_toRightOf="@+id/imageViewUSB"
                 android:src="@drawable/ic_upload_fail" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Upload"
+                android:id="@+id/textView2"
+                android:layout_below="@+id/imageViewUploadStatus"
+                android:layout_alignLeft="@+id/imageViewUploadStatus"
+                android:autoText="false"
+                android:minLines="1"
+                android:textSize="8dp" />
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -45,16 +102,36 @@
                 android:id="@+id/imageViewRcvrBattery"
                 android:layout_alignParentBottom="false"
                 android:background="@drawable/battery"
-                android:layout_marginLeft="35sp"
+                android:layout_marginLeft="45sp"
                 android:layout_toRightOf="@+id/imageViewUploadStatus" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Battery"
+                android:id="@+id/textView3"
+                android:layout_below="@+id/imageViewRcvrBattery"
+                android:layout_alignLeft="@+id/imageViewRcvrBattery"
+                android:textSize="8dp" />
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/imageViewTimeIndicator"
-                android:background="@drawable/ic_clock_good"
-                android:layout_marginLeft="35sp"
+                android:background="@drawable/ic_clock_bad"
+                android:layout_marginLeft="45sp"
                 android:layout_toRightOf="@+id/imageViewRcvrBattery" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Time"
+                android:id="@+id/textView4"
+                android:layout_alignLeft="@+id/imageViewTimeIndicator"
+                android:layout_below="@+id/imageViewTimeIndicator"
+                android:textSize="8dp" />
 
             <!--<ImageView-->
                 <!--android:layout_width="wrap_content"-->
@@ -69,40 +146,5 @@
         </RelativeLayout>
 
     </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/unknown_values"
-        android:id="@+id/sgValue"
-        android:layout_below="@+id/status_bar"
-        android:layout_alignParentLeft="true"
-        android:textSize="@android:dimen/notification_large_icon_width"
-        android:singleLine="true"
-        android:gravity="center"
-        android:layout_alignParentRight="true" />
-
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/unknown_values"
-        android:id="@+id/timeAgo"
-        android:layout_alignParentTop="false"
-        android:layout_alignParentLeft="false"
-        android:gravity="center"
-        android:singleLine="true"
-        android:layout_below="@+id/sgValue" />
-
-    <WebView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/webView"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/timeAgo"
-        android:layout_alignRight="@+id/timeAgo"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>
