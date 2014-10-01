@@ -61,7 +61,7 @@ public class Uploader {
         if (enableRESTUpload) {
             long start = System.currentTimeMillis();
             Log.i(TAG, String.format("Starting upload of %s record using a REST API", glucoseDataSets.length));
-            doRESTUpload(prefs, glucoseDataSets, meterRecords);
+            doRESTUpload(prefs, glucoseDataSets, meterRecords, calRecords);
             Log.i(TAG, String.format("Finished upload of %s record using a REST API in %s ms", glucoseDataSets.length, System.currentTimeMillis() - start));
         }
 
@@ -74,7 +74,7 @@ public class Uploader {
         return true;
     }
 
-    private void doRESTUpload(SharedPreferences prefs, GlucoseDataSet[] glucoseDataSets, MeterRecord[] meterRecords) {
+    private void doRESTUpload(SharedPreferences prefs, GlucoseDataSet[] glucoseDataSets, MeterRecord[] meterRecords, CalRecord[] calRecords) {
         String baseURLSettings = prefs.getString("cloud_storage_api_base", "");
         ArrayList<String> baseURIs = new ArrayList<String>();
 
@@ -91,14 +91,14 @@ public class Uploader {
 
         for (String baseURI : baseURIs) {
             try {
-                doRESTUploadTo(baseURI, glucoseDataSets, meterRecords);
+                doRESTUploadTo(baseURI, glucoseDataSets, meterRecords, calRecords);
             } catch (Exception e) {
                 Log.e(TAG, "Unable to do REST API Upload to: " + baseURI, e);
             }
         }
     }
 
-    private void doRESTUploadTo(String baseURI, GlucoseDataSet[] glucoseDataSets, MeterRecord[] meterRecords) {
+    private void doRESTUploadTo(String baseURI, GlucoseDataSet[] glucoseDataSets, MeterRecord[] meterRecords, CalRecord[] calRecords) {
         try {
             int apiVersion = 0;
             if (baseURI.endsWith("/v1/")) apiVersion = 1;
@@ -161,7 +161,7 @@ public class Uploader {
 
                 String jsonString = json.toString();
 
-                Log.i(TAG, "DEXCOM JSON: " + jsonString);
+                Log.i(TAG, "SGV JSON: " + jsonString);
 
                 try {
                     StringEntity se = new StringEntity(jsonString);
@@ -187,6 +187,7 @@ public class Uploader {
                 }
 
                 String jsonString = json.toString();
+                Log.i(TAG, "MBG JSON: " + jsonString);
 
                 try {
                     StringEntity se = new StringEntity(jsonString);
@@ -198,6 +199,35 @@ public class Uploader {
                     httpclient.execute(post, responseHandler);
                 } catch (Exception e) {
                     Log.w(TAG, "Unable to post data to: '" + post.getURI().toString() + "'", e);
+                }
+            }
+
+            if (prefs.getBoolean("cloud_cal_data", false)) {
+                for (CalRecord calRecord : calRecords) {
+
+                    JSONObject json = new JSONObject();
+
+                    try {
+                        populateV1APIEntry(json, calRecord);
+                    } catch (Exception e) {
+                        Log.w(TAG, "Unable to populate entry, apiVersion: " + apiVersion, e);
+                        continue;
+                    }
+
+                    String jsonString = json.toString();
+                    Log.i(TAG, "CAL JSON: " + jsonString);
+
+                    try {
+                        StringEntity se = new StringEntity(jsonString);
+                        post.setEntity(se);
+                        post.setHeader("Accept", "application/json");
+                        post.setHeader("Content-type", "application/json");
+
+                        ResponseHandler responseHandler = new BasicResponseHandler();
+                        httpclient.execute(post, responseHandler);
+                    } catch (Exception e) {
+                        Log.w(TAG, "Unable to post data to: '" + post.getURI().toString() + "'", e);
+                    }
                 }
             }
 
@@ -225,8 +255,18 @@ public class Uploader {
 
     private void populateV1APIEntry(JSONObject json, MeterRecord record) throws Exception {
         json.put("device", "dexcom");
+        json.put("type", "mbg");
         json.put("date", record.getDisplayTime().getTime());
         json.put("mbg", Integer.parseInt(String.valueOf(record.getMeterBG())));
+    }
+
+    private void populateV1APIEntry(JSONObject json, CalRecord record) throws Exception {
+        json.put("device", "dexcom");
+        json.put("type", "cal");
+        json.put("date", record.getDisplayTime().getTime());
+        json.put("slope", record.getSlope());
+        json.put("intercept", record.getIntercept());
+        json.put("scale", record.getScale());
     }
 
     // TODO: this is a quick port from original code and needs to be refactored before release
@@ -289,6 +329,7 @@ public class Uploader {
                     // make db object
                     BasicDBObject testData = new BasicDBObject();
                     testData.put("device", "dexcom");
+                    testData.put("type", "mbg");
                     testData.put("date", meterRecord.getDisplayTime().getTime());
                     testData.put("dateString", meterRecord.getDisplayTime().toString());
                     testData.put("mbg", meterRecord.getMeterBG());
