@@ -75,12 +75,15 @@
     <string name="pref_title_about_version_number">Version number</string>
     <string name="pref_summary_about_version_number">0.1.0</string>
 
-    <!-- Lab settings -->
-    <string name="pref_header_labs">Labs</string>
-
     <!-- GPL -->
     <string name="pref_gpl_summary">Nightscout \u00A92014\n\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.\n\nThis program is distributed in the hope that it will be useful but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.</string>
     <string name="pref_acra_dialog_title">Email</string>
     <string name="pref_acra_dialog_message">Email address to be reported during crashes. This is optional and will only be used to help the developers improve the product</string>
+
+    <!-- Lab settings -->
+    <string name="pref_header_labs">Labs</string>
+
+    <string name="pref_title_root">Root support</string>
+    <string name="pref_summary_root">Select if phone is rooted</string>
 
 </resources>

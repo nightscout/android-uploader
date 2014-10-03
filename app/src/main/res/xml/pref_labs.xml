@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
-
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <CheckBoxPreference
-        android:title="Root support"
+
+    <SwitchPreference
+        android:title="@string/pref_title_root"
         android:key="root_support_enabled"
-        />
+        android:summary="@string/pref_summary_root">
+    </SwitchPreference>
 
 </PreferenceScreen>
