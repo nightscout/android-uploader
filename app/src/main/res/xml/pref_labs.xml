@@ -3,6 +3,7 @@
     <SwitchPreference
         android:title="@string/pref_title_root"
         android:key="root_support_enabled"
+        android:disableDependentsState="false"
         android:summary="@string/pref_summary_root">
     </SwitchPreference>
 
