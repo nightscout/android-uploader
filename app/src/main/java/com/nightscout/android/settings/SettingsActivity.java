@@ -128,7 +128,6 @@ public class SettingsActivity extends PreferenceActivity {
         bindPreferenceSummaryToValue(findPreference("cloud_storage_mongodb_device_status_collection"));
         bindPreferenceSummaryToValue(findPreference("cloud_storage_mongodb_collection"));
         bindPreferenceSummaryToValue(findPreference("cloud_storage_api_base"));
-        bindPreferenceSummaryToValue(findPreference("acra.user.email"));
     }
 
     /** {@inheritDoc} */
