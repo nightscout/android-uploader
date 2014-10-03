@@ -9,9 +9,4 @@
         android:summary="@string/pref_summary_i_understand">
     </SwitchPreference>
 
-    <EditTextPreference android:key="acra.user.email"
-        android:title="@string/pref_acra_user_email"
-        android:dialogTitle="@string/pref_acra_dialog_title"
-        android:dialogMessage="@string/pref_acra_dialog_message"/>
-
 </PreferenceScreen>
