@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.nightscout.android.dexcom.Constants;
 import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.dexcom.Utils;
 import com.nightscout.android.settings.SettingsActivity;
@@ -181,7 +182,7 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get response messages from broadcast
-            String responseSGV = intent.getStringExtra(SyncingService.RESPONSE_SGV);
+            int responseSGV = intent.getIntExtra(SyncingService.RESPONSE_SGV, -1);
             long responseSGVTimestamp = intent.getLongExtra(SyncingService.RESPONSE_TIMESTAMP,-1L);
             boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
             int responseNextUploadTime = intent.getIntExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
@@ -190,6 +191,9 @@ public class MainActivity extends Activity {
             int rssi = intent.getIntExtra(SyncingService.RESPONSE_RSSI, -1);
             int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT, -1);
             String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
+
+            String responseSGVStr=(responseSGV!=-1)?String.valueOf(responseSGV):
+                    (Constants.SPECIALBGVALUES.isSpecialValue(responseSGV))?Constants.SPECIALBGVALUES.getEGVSpecialValue(responseSGV).toString():"---";
 
             // Reload d3 chart with new data
             if (json != null) {
@@ -201,8 +205,8 @@ public class MainActivity extends Activity {
             statusBarIcons.setUpload(responseUploadStatus);
 
             // Update UI with latest record information
-            mTextSGV.setText(responseSGV);
-            mTextSGV.setTag(responseSGV);
+            mTextSGV.setText(responseSGVStr);
+            mTextSGV.setTag(responseSGVStr);
             String timeAgoStr = "---";
             Log.d(TAG,"Date: " + new Date().getTime());
             Log.d(TAG,"Response SGV Timestamp: " + responseSGVTimestamp);
@@ -378,7 +382,7 @@ public class MainActivity extends Activity {
 //            mImageViewRSSI.setImageResource(R.drawable.rssi);
 
             mImageRcvrBattery = (ImageView) findViewById(R.id.imageViewRcvrBattery);
-            mImageRcvrBattery.setImageResource(R.drawable.battery);
+            mImageRcvrBattery.setImageLevel(0);
 
             setDefaults();
 

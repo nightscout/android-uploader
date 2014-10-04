@@ -33,5 +33,9 @@
     <string name="feedback_toast_text"></string>
     <string name="message_user_not_understand">Reading from device is disabled until you review and accept \"I understand\" in preferences</string>
     <string name="button_force_sync">Force sync</string>
+    <string name="acra_enabled_summary">Crash reporting is enabled</string>
+    <string name="acra_disabled_summary">Crash reporting is disabled</string>
+    <string name="acra_email_dialog_title">Email</string>
+    <string name="acra_user_email_dialog_message">This is the email address included in bug reports and automatic crash reports. This field is optional</string>
 
 </resources>

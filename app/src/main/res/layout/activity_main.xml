@@ -81,7 +81,7 @@
                 android:layout_toRightOf="@+id/imageViewUploadStatus"
                 android:layout_column="3"
                 android:layout_weight="1"
-                android:src="@drawable/battery" />
+                android:src="@drawable/batteryempty" />
 
             <ImageView
                 android:layout_width="wrap_content"

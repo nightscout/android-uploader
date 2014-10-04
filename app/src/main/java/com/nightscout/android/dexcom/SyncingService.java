@@ -245,7 +245,7 @@ public class SyncingService extends IntentService {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.putExtra(RESPONSE_SGV, String.valueOf(egvRecord.getBGValue()) + " "
+        broadcastIntent.putExtra(RESPONSE_SGV, egvRecord.getBGValue() + " "
                 + egvRecord.getTrendSymbol());
         broadcastIntent.putExtra(RESPONSE_TIMESTAMP, egvRecord.getDisplayTime().getTime());
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, nextUploadTime);
@@ -261,7 +261,7 @@ public class SyncingService extends IntentService {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.putExtra(RESPONSE_SGV, "---");
+        broadcastIntent.putExtra(RESPONSE_SGV, -1);
         broadcastIntent.putExtra(RESPONSE_TIMESTAMP, -1L);
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, TimeConstants.FIVE_MINUTES_MS);
         broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, false);

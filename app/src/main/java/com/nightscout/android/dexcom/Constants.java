@@ -117,4 +117,49 @@ public class Constants {
 
     }
 
+    public enum SPECIALBGVALUES {
+        NONE("None",0),
+        SENSORNOTACTIVE("Sensor not active",1),
+        MINIMALLYEGVAB("Minimally EGV Aberration",2),
+        NOANTENNA("No Antenna",3),
+        SENSOROUTOFCAL("Sensor needs Calibration",5),
+        COUNTSAB("Counts Aberration",6),
+        ABSOLUTEAB("Absolute Aberration",9),
+        POWERAB("Power Aberration",10),
+        RFBADSTATUS("RF bad status",12);
+
+
+        private String name;
+        private int val;
+        private SPECIALBGVALUES(String s, int i){
+            name=s;
+            val=i;
+        }
+
+        public int getValue(){
+            return val;
+        }
+
+        public String toString(){
+            return name;
+        }
+
+        public static SPECIALBGVALUES getEGVSpecialValue(int val){
+            for (SPECIALBGVALUES e: values()){
+                if (e.getValue()==val)
+                    return e;
+            }
+            return null;
+        }
+
+        public static boolean isSpecialValue(int val){
+            for (SPECIALBGVALUES e: values()){
+                if (e.getValue()==val)
+                    return true;
+            }
+            return false;
+        }
+
+    }
+
 }
