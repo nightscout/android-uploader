@@ -1,10 +1,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
     <SwitchPreference
         android:title="@string/pref_title_root"
         android:key="root_support_enabled"
-        android:disableDependentsState="false"
+        android:defaultValue="false"
         android:summary="@string/pref_summary_root">
     </SwitchPreference>
-
 </PreferenceScreen>

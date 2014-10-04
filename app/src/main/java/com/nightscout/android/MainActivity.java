@@ -5,10 +5,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,6 +32,8 @@ import org.acra.ACRAConfiguration;
 import org.acra.ACRAConfigurationException;
 import org.acra.ReportingInteractionMode;
 
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class MainActivity extends Activity {
@@ -111,6 +116,23 @@ public class MainActivity extends Activity {
             // reset the top icons to their default state
             statusBarIcons.setDefaults();
         }
+
+        // Report API vs mongo stats once per session
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        if (prefs.getBoolean("cloud_storage_api_enable", false)) {
+            String baseURLSettings = prefs.getString("cloud_storage_api_base", "");
+            ArrayList<String> baseURIs = new ArrayList<String>();
+            for (String baseURLSetting : baseURLSettings.split(" ")) {
+                String baseURL = baseURLSetting.trim();
+                if (baseURL.isEmpty()) continue;
+                baseURIs.add(baseURL + (baseURL.endsWith("/") ? "" : "/"));
+                String apiVersion;
+                apiVersion=(baseURL.endsWith("/v1/"))?"WebAPIv1":"Legacy WebAPI";
+                tracker.send(new HitBuilders.EventBuilder("Upload", apiVersion).build());
+            }
+        }
+        if (prefs.getBoolean("cloud_storage_mongodb_enable", false))
+            tracker.send(new HitBuilders.EventBuilder("Upload","Mongo").build());
     }
 
     @Override
