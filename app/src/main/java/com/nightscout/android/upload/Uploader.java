@@ -65,7 +65,7 @@ public class Uploader {
         if (enableRESTUpload) {
             long start = System.currentTimeMillis();
             Log.i(TAG, String.format("Starting upload of %s record using a REST API", glucoseDataSets.length));
-            doRESTUpload(prefs, glucoseDataSets, meterRecords, calRecords);
+            apiStatus = doRESTUpload(prefs, glucoseDataSets, meterRecords, calRecords);
             Log.i(TAG, String.format("Finished upload of %s record using a REST API in %s ms", glucoseDataSets.length, System.currentTimeMillis() - start));
         }
 
