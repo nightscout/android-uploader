@@ -323,7 +323,7 @@ public class Uploader {
                     testData.put("date", record.getDisplayTime().getTime());
                     testData.put("dateString", record.getDisplayTime().toString());
                     testData.put("sgv", record.getBGValue());
-                    testData.put("direction", record.getTrend());
+                    testData.put("direction", record.getTrend().friendlyTrendName());
                     if (prefs.getBoolean("cloud_sensor_data", false)) {
                         testData.put("filtered", record.getFiltered());
                         testData.put("unfilterd", record.getUnfiltered());

@@ -183,6 +183,7 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             // Get response messages from broadcast
             int responseSGV = intent.getIntExtra(SyncingService.RESPONSE_SGV, -1);
+            String trendSymbol = Constants.TREND_ARROW_VALUES.values()[intent.getIntExtra(SyncingService.RESPONSE_TREND,0)].Symbol();
             long responseSGVTimestamp = intent.getLongExtra(SyncingService.RESPONSE_TIMESTAMP,-1L);
             boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
             int responseNextUploadTime = intent.getIntExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
@@ -192,7 +193,7 @@ public class MainActivity extends Activity {
             int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT, -1);
             String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
 
-            String responseSGVStr=(responseSGV!=-1)?String.valueOf(responseSGV):
+            String responseSGVStr=(responseSGV!=-1)?String.valueOf(responseSGV)+" "+trendSymbol:
                     (Constants.SPECIALBGVALUES.isSpecialValue(responseSGV))?Constants.SPECIALBGVALUES.getEGVSpecialValue(responseSGV).toString():"---";
 
             // Reload d3 chart with new data
@@ -292,16 +293,11 @@ public class MainActivity extends Activity {
         }
     };
 
-    // TODO remove this runnable callback when the screen goes off and reinstate it when it comes
-    // back on to save battery.
     public Runnable updateTimeAgo = new Runnable() {
         @Override
         public void run() {
             long delta = new Date().getTime() - lastRecordTime;
             if (lastRecordTime == 0) delta = 0;
-
-            Log.d("updateTimeAgo", "Delta: "+delta);
-            Log.d("updateTimeAgo", "lastRecordTime: "+lastRecordTime);
 
             String timeAgoStr= "";
 
@@ -382,7 +378,6 @@ public class MainActivity extends Activity {
 //            mImageViewRSSI.setImageResource(R.drawable.rssi);
 
             mImageRcvrBattery = (ImageView) findViewById(R.id.imageViewRcvrBattery);
-            mImageRcvrBattery.setImageLevel(0);
 
             setDefaults();
 
@@ -392,7 +387,7 @@ public class MainActivity extends Activity {
             setUSB(false);
             setUpload(false);
             setTimeIndicator(false);
-            setBatteryIndicator(-1);
+            setBatteryIndicator(0);
             //TODO latent code for RSSI
 //            setRSSIIndicator(-1);
         }

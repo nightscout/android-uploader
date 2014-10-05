@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.TimeZone;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous CGM Receiver downloads and cloud uploads
@@ -49,6 +50,7 @@ public class SyncingService extends IntentService {
 
     // Response to broadcast to activity
     public static final String RESPONSE_SGV = "mySGV";
+    public static final String RESPONSE_TREND = "myTrend";
     public static final String RESPONSE_TIMESTAMP = "myTimestamp";
     public static final String RESPONSE_NEXT_UPLOAD_TIME = "myUploadTime";
     public static final String RESPONSE_UPLOAD_STATUS = "myUploadStatus";
@@ -245,8 +247,8 @@ public class SyncingService extends IntentService {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.putExtra(RESPONSE_SGV, egvRecord.getBGValue() + " "
-                + egvRecord.getTrendSymbol());
+        broadcastIntent.putExtra(RESPONSE_SGV, egvRecord.getBGValue());
+        broadcastIntent.putExtra(RESPONSE_TREND, egvRecord.getTrend().getID());
         broadcastIntent.putExtra(RESPONSE_TIMESTAMP, egvRecord.getDisplayTime().getTime());
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, nextUploadTime);
         broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, uploadStatus);
