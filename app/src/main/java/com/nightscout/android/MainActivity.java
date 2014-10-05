@@ -186,7 +186,7 @@ public class MainActivity extends Activity {
             String trendSymbol = Constants.TREND_ARROW_VALUES.values()[intent.getIntExtra(SyncingService.RESPONSE_TREND,0)].Symbol();
             long responseSGVTimestamp = intent.getLongExtra(SyncingService.RESPONSE_TIMESTAMP,-1L);
             boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
-            int responseNextUploadTime = intent.getIntExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
+            long responseNextUploadTime = intent.getLongExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
             long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME,new Date().getTime());
             lastRecordTime = responseSGVTimestamp;
             int rssi = intent.getIntExtra(SyncingService.RESPONSE_RSSI, -1);
@@ -218,7 +218,7 @@ public class MainActivity extends Activity {
             mTextTimestamp.setText(timeAgoStr);
             mTextTimestamp.setTag(timeAgoStr);
 
-            int nextUploadTime = TimeConstants.FIVE_MINUTES_MS;
+            long nextUploadTime = TimeConstants.FIVE_MINUTES_MS;
 
             if (responseNextUploadTime > TimeConstants.FIVE_MINUTES_MS) {
                 // TODO: how should we handle this situation?
@@ -378,6 +378,7 @@ public class MainActivity extends Activity {
 //            mImageViewRSSI.setImageResource(R.drawable.rssi);
 
             mImageRcvrBattery = (ImageView) findViewById(R.id.imageViewRcvrBattery);
+            mImageRcvrBattery.setImageResource(R.drawable.battery);
 
             setDefaults();
 

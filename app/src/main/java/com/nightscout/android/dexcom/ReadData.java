@@ -52,7 +52,7 @@ public class ReadData {
         return allPages;
     }
 
-    public int getTimeSinceEGVRecord(EGVRecord egvRecord) {
+    public long getTimeSinceEGVRecord(EGVRecord egvRecord) {
         return readSystemTime() - egvRecord.getSystemTimeSeconds();
     }
 
@@ -108,7 +108,7 @@ public class ReadData {
         return Utils.receiverTimeToDate(readSystemTime() + readDisplayTimeOffset());
     }
 
-    public int readSystemTime() {
+    public long readSystemTime() {
         writeCommand(Constants.READ_SYSTEM_TIME);
         byte[] readData = read(MIN_LEN).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt() & 0xffffffff;

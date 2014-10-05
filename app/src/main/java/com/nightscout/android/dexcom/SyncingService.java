@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.mongodb.util.Util;
 import com.nightscout.android.MainActivity;
 import com.nightscout.android.Nightscout;
 import com.nightscout.android.R;
@@ -130,8 +131,8 @@ public class SyncingService extends IntentService {
                 CalRecord[] calRecords = readData.getRecentCalRecords();
 
                 // FIXME: should we do boundary checking here as well?
-                int timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
-                int nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
+                long timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
+                long nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
                 long displayTime = readData.readDisplayTime().getTime();
                 int rssi = sensorRecords[sensorRecords.length-1].getRSSI();
                 int batLevel = readData.readBatteryLevel();
@@ -242,7 +243,7 @@ public class SyncingService extends IntentService {
     }
 
     private void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus,
-                                  int nextUploadTime, long displayTime, int rssi,
+                                  long nextUploadTime, long displayTime, int rssi,
                                   JSONArray json, int batLvl) {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
