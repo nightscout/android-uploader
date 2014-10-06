@@ -171,6 +171,7 @@ public class SyncingService extends IntentService {
                                 .build()
                 );
                 Log.e(TAG, "Unable to close", e);
+                broadcastSGVToUI();
             } catch (ArrayIndexOutOfBoundsException e) {
                 Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Array Index out of bounds: "+e.getMessage())
@@ -191,6 +192,7 @@ public class SyncingService extends IntentService {
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Catch all exception in handleActionSync: "+e.getMessage())
                         .setFatal(false)
                         .build());
+                broadcastSGVToUI();
             }
         } else {
             // Not connected to serial device
