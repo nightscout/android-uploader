@@ -312,7 +312,7 @@ public class MainActivity extends Activity {
             }
             mTextTimestamp.setText(timeAgoStr);
             mHandler.removeCallbacks(updateTimeAgo);
-            mHandler.postDelayed(updateTimeAgo, 60000);
+            mHandler.postDelayed(updateTimeAgo, TimeConstants.ONE_MINUTE_MS);
         }
     };
 
