@@ -123,7 +123,7 @@ public class Constants {
 
     }
 
-    public enum SPECIALBGVALUES {
+    public enum SPECIALBGVALUES_MGDL {
         NONE("None",0),
         SENSORNOTACTIVE("Sensor not active",1),
         MINIMALLYEGVAB("Minimally EGV Aberration",2),
@@ -137,7 +137,7 @@ public class Constants {
 
         private String name;
         private int val;
-        private SPECIALBGVALUES(String s, int i){
+        private SPECIALBGVALUES_MGDL(String s, int i){
             name=s;
             val=i;
         }
@@ -150,8 +150,8 @@ public class Constants {
             return name;
         }
 
-        public static SPECIALBGVALUES getEGVSpecialValue(int val){
-            for (SPECIALBGVALUES e: values()){
+        public static SPECIALBGVALUES_MGDL getEGVSpecialValue(int val){
+            for (SPECIALBGVALUES_MGDL e: values()){
                 if (e.getValue()==val)
                     return e;
             }
@@ -159,7 +159,7 @@ public class Constants {
         }
 
         public static boolean isSpecialValue(int val){
-            for (SPECIALBGVALUES e: values()){
+            for (SPECIALBGVALUES_MGDL e: values()){
                 if (e.getValue()==val)
                     return true;
             }
@@ -167,7 +167,52 @@ public class Constants {
         }
 
     }
-    
+
+    // TODO - consider breaking these special values out to a separate class to clean up this class
+    public enum SPECIALBGVALUES_MMOL {
+        // TODO Are there more? What happened to Sensor not active and min egv aberration?
+        NONE("None",0),
+        NOANTENNA("No Antenna",2),
+        SENSOROUTOFCAL("Sensor needs Calibration",3),
+        COUNTSAB("Counts Aberration",4),
+        ABSOLUTEAB("Absolute Aberration",5),
+        POWERAB("Power Aberration",6),
+        RFBADSTATUS("RF bad status",7);
+
+
+        private String name;
+        private int val;
+        private SPECIALBGVALUES_MMOL(String s, int i){
+            name=s;
+            val=i;
+        }
+
+        public int getValue(){
+            return val;
+        }
+
+        public String toString(){
+            return name;
+        }
+
+        public static SPECIALBGVALUES_MMOL getEGVSpecialValue(int val){
+            for (SPECIALBGVALUES_MMOL e: values()){
+                if (e.getValue()==val)
+                    return e;
+            }
+            return null;
+        }
+
+        public static boolean isSpecialValue(int val){
+            for (SPECIALBGVALUES_MMOL e: values()){
+                if (e.getValue()==val)
+                    return true;
+            }
+            return false;
+        }
+
+    }
+
     public enum InsertionState {
         NONE,
         REMOVED,

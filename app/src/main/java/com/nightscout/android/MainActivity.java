@@ -197,8 +197,10 @@ public class MainActivity extends Activity {
             int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT, -1);
             String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
 
+            // TODO - add special values for MMOL as well.
+            // Consider returning the message "High" and "Low" for the sensor limits
             String responseSGVStr=(responseSGV!=-1)?String.valueOf(responseSGV)+" "+trendSymbol:
-                    (Constants.SPECIALBGVALUES.isSpecialValue(responseSGV))?Constants.SPECIALBGVALUES.getEGVSpecialValue(responseSGV).toString():"---";
+                    (Constants.SPECIALBGVALUES_MGDL.isSpecialValue(responseSGV))? Constants.SPECIALBGVALUES_MGDL.getEGVSpecialValue(responseSGV).toString():"---";
 
             // Reload d3 chart with new data
             if (json != null) {
