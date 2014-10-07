@@ -6,10 +6,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
-/**
- * Created by klee24 on 10/5/14.
- */
-public class onUpgradeReceiver extends BroadcastReceiver {
+public class OnUpgradeReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context,final Intent intent)
     {
