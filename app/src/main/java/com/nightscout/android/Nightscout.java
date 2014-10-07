@@ -28,7 +28,7 @@ import org.acra.annotation.*;
 )
 
 public class Nightscout extends Application {
-    private Tracker tracker=null;
+    private Tracker tracker = null;
 
     @Override
     public void onCreate() {
@@ -37,7 +37,7 @@ public class Nightscout extends Application {
     }
 
     synchronized public Tracker getTracker() {
-        if (tracker==null) {
+        if (tracker == null) {
             GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
             return analytics.newTracker(R.xml.app_tracker);
         }

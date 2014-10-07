@@ -13,7 +13,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.mongodb.util.Util;
 import com.nightscout.android.MainActivity;
 import com.nightscout.android.Nightscout;
 import com.nightscout.android.R;
@@ -35,7 +34,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.TimeZone;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous CGM Receiver downloads and cloud uploads
@@ -76,13 +74,17 @@ public class SyncingService extends IntentService {
      * @see IntentService
      */
     public static void startActionSingleSync(Context context, int numOfPages) {
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
         // Exit if the user hasn't selected "I understand"
         if (! prefs.getBoolean("i_understand",false)) {
-            Toast.makeText(context, R.string.message_user_not_understand,Toast.LENGTH_LONG).show();
+            Toast.makeText(context, R.string.message_user_not_understand, Toast.LENGTH_LONG).show();
             return;
         }
-        Tracker tracker=((Nightscout) context).getTracker();
+
+        // TODO: do we always need to track this
+        Tracker tracker = ((Nightscout) context).getTracker();
         tracker.send(new HitBuilders.EventBuilder("DexcomG4", "Sync").setValue(numOfPages).build());
 
         Intent intent = new Intent(context, SyncingService.class);
@@ -130,7 +132,7 @@ public class SyncingService extends IntentService {
                 GlucoseDataSet[] glucoseDataSets = Utils.mergeGlucoseDataRecords(recentRecords, sensorRecords);
                 CalRecord[] calRecords = readData.getRecentCalRecords();
 
-                // FIXME: should we do boundary checking here as well?
+                // TODO: should we do boundary checking here as well?
                 long timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
                 long nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
                 long displayTime = readData.readDisplayTime().getTime();
@@ -192,7 +194,7 @@ public class SyncingService extends IntentService {
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Catch all exception in handleActionSync: "+e.getMessage())
                         .setFatal(false)
                         .build());
-                //FIXME this is cumbersome to always broadcast back to the UI to setup the next poll. There has to be another solution?
+                // TODO: this is cumbersome to always broadcast back to the UI to setup the next poll. There has to be another solution?
                 broadcastSGVToUI();
             }
         } else {
@@ -203,7 +205,6 @@ public class SyncingService extends IntentService {
     }
 
     private boolean acquireSerialDevice() {
-        // Try powering on, will only work if rooted
         mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         mSerialDevice = UsbSerialProber.acquire(mUsbManager);
         if (mSerialDevice != null) {
@@ -211,7 +212,7 @@ public class SyncingService extends IntentService {
                 mSerialDevice.open();
                 return true;
             } catch (IOException e) {
-                Log.e(TAG, "Unable to powerOn and open usb", e);
+                Log.e(TAG, "Unable to open USB. ", e);
                 Tracker tracker;
                 tracker = ((Nightscout) getApplicationContext()).getTracker();
                 tracker.send(new HitBuilders.ExceptionBuilder()

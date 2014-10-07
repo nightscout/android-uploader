@@ -10,7 +10,6 @@ import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
@@ -33,7 +32,6 @@ import org.acra.ACRAConfiguration;
 import org.acra.ACRAConfigurationException;
 import org.acra.ReportingInteractionMode;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -50,8 +48,8 @@ public class MainActivity extends Activity {
     private String mJSONData;
     private long lastRecordTime = -1;
 
-    // Analytics tracker
-    Tracker tracker;
+    // Analytics mTracker
+    Tracker mTracker;
 
     // UI components
     private WebView mWebView;
@@ -65,7 +63,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tracker = ((Nightscout) getApplicationContext()).getTracker();
+        mTracker = ((Nightscout) getApplicationContext()).getTracker();
 
         mContext = getApplicationContext();
 
@@ -129,11 +127,12 @@ public class MainActivity extends Activity {
                 baseURIs.add(baseURL + (baseURL.endsWith("/") ? "" : "/"));
                 String apiVersion;
                 apiVersion=(baseURL.endsWith("/v1/"))?"WebAPIv1":"Legacy WebAPI";
-                tracker.send(new HitBuilders.EventBuilder("Upload", apiVersion).build());
+                mTracker.send(new HitBuilders.EventBuilder("Upload", apiVersion).build());
             }
         }
-        if (prefs.getBoolean("cloud_storage_mongodb_enable", false))
-            tracker.send(new HitBuilders.EventBuilder("Upload","Mongo").build());
+        if (prefs.getBoolean("cloud_storage_mongodb_enable", false)) {
+            mTracker.send(new HitBuilders.EventBuilder("Upload", "Mongo").build());
+        }
     }
 
     @Override
@@ -223,7 +222,7 @@ public class MainActivity extends Activity {
             if (responseNextUploadTime > TimeConstants.FIVE_MINUTES_MS) {
                 // TODO: how should we handle this situation?
                 Log.d(TAG, "Receiver's time is less than current record time, possible time change.");
-                tracker.send(new HitBuilders.EventBuilder("Main","Time change").build());
+                mTracker.send(new HitBuilders.EventBuilder("Main", "Time change").build());
             } else if (responseNextUploadTime > 0) {
                 Log.d(TAG, "Setting next upload time to: " + responseNextUploadTime);
                 nextUploadTime = responseNextUploadTime;
@@ -232,8 +231,8 @@ public class MainActivity extends Activity {
             }
 
             if (Math.abs(new Date().getTime()-responseDisplayTime) >= TimeConstants.TWENTY_MINUTES_MS) {
-                Log.w(TAG,"Receiver timeoffset");
-                tracker.send(new HitBuilders.EventBuilder("Main","Time difference > 20 minutes").build());
+                Log.w(TAG, "Receiver time is off by 20 minutes or more.");
+                mTracker.send(new HitBuilders.EventBuilder("Main", "Time difference > 20 minutes").build());
                 statusBarIcons.setTimeIndicator(false);
             } else {
                 statusBarIcons.setTimeIndicator(true);
@@ -274,13 +273,13 @@ public class MainActivity extends Activity {
     BroadcastReceiver screenStateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context mContext, Intent intent) {
-            Log.d(TAG,"Intent=>"+intent.getAction()+" received");
+            Log.d(TAG,"Intent => " + intent.getAction() + " received.");
             if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
                 mHandler.post(updateTimeAgo);
-                Log.d(TAG,"Updating time ago");
+                Log.d(TAG, "Updating time ago");
             } else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
                 mHandler.removeCallbacks(updateTimeAgo);
-                Log.d(TAG,"Disable updating of time ago");
+                Log.d(TAG, "Disable updating of time ago");
             }
         }
     };
@@ -346,8 +345,8 @@ public class MainActivity extends Activity {
             } catch (ACRAConfigurationException e) {
                 e.printStackTrace();
             }
-        } else if (id == R.id.two_day_sync) {
-            SyncingService.startActionSingleSync(getApplicationContext(),20);
+        } else if (id == R.id.gap_sync) {
+            SyncingService.startActionSingleSync(getApplicationContext(), 20);
         } else if (id == R.id.close_settings) {
             mHandler.removeCallbacks(syncCGM);
             finish();
@@ -416,7 +415,7 @@ public class MainActivity extends Activity {
         }
 
         public void setTimeIndicator(boolean active){
-            displayTimeSync=active;
+            displayTimeSync = active;
             if (active) {
                 mImageViewTimeIndicator.setImageResource(R.drawable.ic_clock_good);
                 mImageViewTimeIndicator.setTag(R.drawable.ic_clock_good);
@@ -427,13 +426,13 @@ public class MainActivity extends Activity {
         }
 
         public void setBatteryIndicator(int batLvl){
-            batteryLevel=batLvl;
+            batteryLevel = batLvl;
             mImageRcvrBattery.setImageLevel(batteryLevel);
             mImageRcvrBattery.setTag(batteryLevel);
         }
 
         public void setRSSIIndicator(int r){
-            rssi=r;
+            rssi = r;
             mImageViewRSSI.setImageLevel(rssi);
             mImageViewRSSI.setTag(rssi);
         }
@@ -451,8 +450,9 @@ public class MainActivity extends Activity {
         }
 
         public int getBatteryIndicator(){
-            if (mImageRcvrBattery==null)
+            if (mImageRcvrBattery == null) {
                 return 0;
+            }
             return (Integer) mImageRcvrBattery.getTag();
         }
 
