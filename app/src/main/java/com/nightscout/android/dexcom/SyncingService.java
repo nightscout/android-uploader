@@ -273,7 +273,7 @@ public class SyncingService extends IntentService {
         broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, false);
         broadcastIntent.putExtra(RESPONSE_DISPLAY_TIME, new Date().getTime());
         broadcastIntent.putExtra(RESPONSE_RSSI, -1);
-        broadcastIntent.putExtra(RESPONSE_BAT, -1);
+        broadcastIntent.putExtra(RESPONSE_BAT, 0);
         sendBroadcast(broadcastIntent);
     }
 
