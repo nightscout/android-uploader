@@ -9,9 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Switch;
 
-/**
- * Created by klee24 on 10/4/14.
- */
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class CustomSwitchPreference extends SwitchPreference {
 
