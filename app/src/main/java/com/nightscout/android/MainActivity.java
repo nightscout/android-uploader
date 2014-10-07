@@ -34,6 +34,7 @@ import org.acra.ReportingInteractionMode;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.TimeZone;
 
 public class MainActivity extends Activity {
 
@@ -63,6 +64,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Add timezone ID to ACRA report
+        ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
+
         mTracker = ((Nightscout) getApplicationContext()).getTracker();
 
         mContext = getApplicationContext();
