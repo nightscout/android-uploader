@@ -14,8 +14,6 @@ public class onUpgradeReceiver extends BroadcastReceiver {
     public void onReceive(final Context context,final Intent intent)
     {
         final String msg="intent:"+intent+" action:"+intent.getAction();
-        Log.d("DEBUG", msg);
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
         Intent mainActivity= new Intent(context,MainActivity.class);
         mainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(mainActivity);

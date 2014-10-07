@@ -251,14 +251,14 @@ public class Uploader {
         json.put("device", "dexcom");
         json.put("date", record.getDisplayTime().getTime());
         json.put("sgv", Integer.parseInt(String.valueOf(record.getBGValue())));
-        json.put("direction", record.getTrend());
+        json.put("direction", record.getTrend().friendlyTrendName());
     }
 
     private void populateLegacyAPIEntry(JSONObject json, GlucoseDataSet record) throws Exception {
         json.put("device", "dexcom");
         json.put("date", record.getDisplayTime().getTime());
         json.put("sgv", Integer.parseInt(String.valueOf(record.getBGValue())));
-        json.put("direction", record.getTrend());
+        json.put("direction", record.getTrend().friendlyTrendName());
     }
 
     private void populateV1APIEntry(JSONObject json, MeterRecord record) throws Exception {

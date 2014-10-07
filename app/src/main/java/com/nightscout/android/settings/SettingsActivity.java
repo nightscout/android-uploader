@@ -2,6 +2,8 @@ package com.nightscout.android.settings;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -135,6 +137,15 @@ public class SettingsActivity extends PreferenceActivity {
         bindPreferenceSummaryToValue(findPreference("cloud_storage_mongodb_collection"));
         bindPreferenceSummaryToValue(findPreference("cloud_storage_api_base"));
         bindPreferenceSummaryToValue(findPreference("acra.user.email"));
+        try {
+            PackageInfo pInfo = null;
+            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            findPreference("about_version_number").setSummary(String.valueOf(pInfo.versionCode));
+            findPreference("about_version_name").setSummary(pInfo.versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /** {@inheritDoc} */

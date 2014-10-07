@@ -192,6 +192,7 @@ public class SyncingService extends IntentService {
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Catch all exception in handleActionSync: "+e.getMessage())
                         .setFatal(false)
                         .build());
+                //FIXME this is cumbersome to always broadcast back to the UI to setup the next poll. There has to be another solution?
                 broadcastSGVToUI();
             }
         } else {
