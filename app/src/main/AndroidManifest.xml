@@ -46,7 +46,7 @@
                 android:resource="@xml/device_filter" />
         </activity>
 
-        <receiver android:name=".onUpgradeReceiver">
+        <receiver android:name=".OnUpgradeReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
                 <data android:scheme="package" android:path="com.nightscout.android" />
