@@ -270,7 +270,7 @@ public class SyncingService extends IntentService {
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
         broadcastIntent.putExtra(RESPONSE_SGV, -1);
         broadcastIntent.putExtra(RESPONSE_TIMESTAMP, -1L);
-        broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, TimeConstants.FIVE_MINUTES_MS);
+        broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, (long) TimeConstants.FIVE_MINUTES_MS);
         broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, false);
         broadcastIntent.putExtra(RESPONSE_DISPLAY_TIME, new Date().getTime());
         broadcastIntent.putExtra(RESPONSE_RSSI, -1);
