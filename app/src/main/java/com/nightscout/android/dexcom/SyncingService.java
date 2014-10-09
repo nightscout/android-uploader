@@ -126,8 +126,10 @@ public class SyncingService extends IntentService {
         if (acquireSerialDevice()) {
             try {
                 ReadData readData = new ReadData(mSerialDevice);
+                // TODO: need to check if numOfPages if valid on ReadData side
                 EGVRecord[] recentRecords = readData.getRecentEGVsPages(numOfPages);
                 MeterRecord[] meterRecords = readData.getRecentMeterRecords();
+                // TODO: need to check if numOfPages if valid on ReadData side
                 SensorRecord[] sensorRecords = readData.getRecentSensorRecords(numOfPages);
                 GlucoseDataSet[] glucoseDataSets = Utils.mergeGlucoseDataRecords(recentRecords, sensorRecords);
                 CalRecord[] calRecords = readData.getRecentCalRecords();
