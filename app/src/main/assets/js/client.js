@@ -6,8 +6,8 @@ var latestSGV,
     now = Date.now(),
     data = [],
     dateFn = function (d) { return new Date(d.date) },
-    xScale, xScale2, yScale, yScale2,
-    xAxis, yAxis, xAxis2, yAxis2,
+    xScale, yScale,
+    xAxis, yAxis,
     prevChartWidth = 0,
     prevChartHeight = 0,
     focusHeight,
@@ -38,12 +38,11 @@ var latestSGV,
     // Tick Values
     var tickValues = [40, 60, 80, 120, 180, 300, 400];
 
-
     var futureOpacity = d3.scale.linear( )
         .domain([TWENTY_FIVE_MINS_IN_MS, SIXTY_MINS_IN_MS])
         .range([0.8, 0.1]);
 
-// create svg and g to contain the chart contents
+    // create svg and g to contain the chart contents
     var charts = d3.select('#chartContainer').append('svg')
         .append('g')
         .attr('class', 'chartContainer')
@@ -51,22 +50,22 @@ var latestSGV,
 
     var focus = charts.append('g');
 
-// create the x axis container
+    // create the x axis container
     focus.append('g')
         .attr('class', 'x axis');
 
-// create the y axis container
+    // create the y axis container
     focus.append('g')
         .attr('class', 'y axis');
 
-// Remove leading zeros from the time (eg. 08:40 = 8:40) & lowercase the am/pm
+    // Remove leading zeros from the time (eg. 08:40 = 8:40) & lowercase the am/pm
     function formatTime(time) {
         time = d3.time.format(FORMAT_TIME)(time);
         time = time.replace(/^0/, '').toLowerCase();
         return time;
     }
 
-// lixgbg: Convert mg/dL BG value to metric mmol
+    // lixgbg: Convert mg/dL BG value to metric mmol
     function scaleBg(bg) {
         return bg;
 //        if (browserSettings.units == "mmol") {
@@ -76,7 +75,7 @@ var latestSGV,
 //        }
     }
 
-// initial setup of chart when data is first made available
+    // initial setup of chart when data is first made available
     function initializeCharts() {
 
         // define the parts of the axis that aren't dependent on width or height
@@ -85,12 +84,6 @@ var latestSGV,
 
         yScale = d3.scale.log()
             .domain([scaleBg(30), scaleBg(510)]);
-
-        xScale2 = d3.time.scale()
-            .domain([new Date(Date.now() - FOCUS_DATA_RANGE_MS),new Date(Date.now())]);
-
-        yScale2 = d3.scale.log()
-            .domain([scaleBg(36), scaleBg(420)]);
 
         xAxis = d3.svg.axis()
             .scale(xScale)
@@ -104,21 +97,10 @@ var latestSGV,
             .tickValues(tickValues)
             .orient('left');
 
-        xAxis2 = d3.svg.axis()
-            .scale(xScale2)
-            .ticks(4)
-            .orient('bottom');
-
-        yAxis2 = d3.svg.axis()
-            .scale(yScale2)
-            .tickFormat(d3.format('d'))
-            .tickValues(tickValues)
-            .orient('right');
-
         updateChart(true);
     }
 
-// get the desired opacity for context chart based on the brush extent
+    // get the desired opacity for context chart based on the brush extent
     function highlightBrushPoints(data) {
         if (data.date.getTime() >= brush.extent()[0].getTime() && data.date.getTime() <= brush.extent()[1].getTime()) {
             return futureOpacity(data.date - latestSGV.x);
@@ -128,13 +110,13 @@ var latestSGV,
     }
 
 
-// called for initial update and updates for resize
+    // called for initial update and updates for resize
     function updateChart(init) {
 
         console.log("Updating chart...");
 
         // get current data range
-        var dataRange = d3.extent(data, dateFn);
+        var dataRange = [new Date(Date.now() - FOCUS_DATA_RANGE_MS), new Date()];
 
         // get the entire container height and width subtracting the padding
         var chartWidth = (document.getElementById('chartContainer')
@@ -158,9 +140,7 @@ var latestSGV,
 
             // ranges are based on the width and height available so reset
             xScale.range([0, chartWidth]);
-            xScale2.range([0, chartWidth]);
             yScale.range([focusHeight, 0]);
-            yScale2.range([chartHeight, chartHeight - contextHeight]);
 
             if (init) {
 
@@ -235,7 +215,7 @@ var latestSGV,
         }
 
         // update domain
-        xScale2.domain(dataRange);
+        xScale.domain(dataRange);
 
         // bind up the focus chart data to an array of circles
         // selects all our data into data and uses date function to get current max date
@@ -255,7 +235,7 @@ var latestSGV,
             .attr('cy', function (d) { return yScale(d.sgv); })
             .attr('fill', function (d) { return d.color; })
             //.attr('opacity', function (d) { return futureOpacity(d.date - latestSGV.x); })
-            .attr('r', function(d) { if (d.type == 'mbg') return 6; else return 3;});
+            .attr('r', function(d) { if (d.type == 'mbg') return 6; else return 2;});
 
         focusCircles.exit()
             .remove();
@@ -322,11 +302,11 @@ var latestSGV,
 
     }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//draw a compact visualization of a treatment (carbs, insulin)
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //draw a compact visualization of a treatment (carbs, insulin)
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     function drawTreatment(treatment, scale, showValues) {
         var carbs = treatment.carbs;
         var insulin = treatment.insulin;
@@ -442,12 +422,13 @@ var latestSGV,
     }
 
     function updateChartWithTimer() {
-            updateChart(false);
+        console.log("Timer expired...updating chart...");
+        updateChart(false);
+        updateTimer = setTimeout(updateChartWithTimer, 60000);
     }
 
     function updateData(newData) {
         clearTimeout(updateTimer);
-        console.log(newData);
         if (newData != null) {
             data = newData.map(function (obj) {
                 return { date: new Date(obj.date), sgv: obj.sgv, type: 'sgv'}
