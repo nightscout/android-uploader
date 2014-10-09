@@ -141,6 +141,22 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPaused called.");
+        mWebView.pauseTimers();
+        mWebView.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResumed called.");
+        mWebView.onResume();
+        mWebView.resumeTimers();
+    }
+
+    @Override
     protected void onDestroy() {
         Log.d(TAG, "onDestroy called.");
         super.onDestroy();
@@ -191,7 +207,7 @@ public class MainActivity extends Activity {
             long responseSGVTimestamp = intent.getLongExtra(SyncingService.RESPONSE_TIMESTAMP,-1L);
             boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
             long responseNextUploadTime = intent.getLongExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
-            long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME,new Date().getTime());
+            long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME, new Date().getTime());
             lastRecordTime = responseSGVTimestamp;
             int rssi = intent.getIntExtra(SyncingService.RESPONSE_RSSI, -1);
             int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT, -1);
