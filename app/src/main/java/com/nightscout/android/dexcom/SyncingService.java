@@ -77,29 +77,32 @@ public class SyncingService extends IntentService {
 
         if (acquireSerialDevice()) {
 
-            ReadData readData = new ReadData(mSerialDevice);
-            EGVRecord[] recentRecords = readData.getRecentEGVsPages(numOfPages);
-            MeterRecord[] meterRecords = readData.getRecentMeterRecords();
+            try {
+                ReadData readData = new ReadData(mSerialDevice);
+                EGVRecord[] recentRecords = readData.getRecentEGVsPages(numOfPages);
+                MeterRecord[] meterRecords = readData.getRecentMeterRecords();
 
-            int timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
-            int nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
-            int offset = 3000;
+                int timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
+                int nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
+                int offset = 3000;
 
-            Uploader uploader = new Uploader(mContext);
-            uploader.upload(recentRecords, meterRecords);
+                Uploader uploader = new Uploader(mContext);
+                uploader.upload(recentRecords, meterRecords);
 
-            EGVRecord recentEGV = recentRecords[recentRecords.length - 1];
-            broadcastSGVToUI(recentEGV, true, nextUploadTime + offset);
+                EGVRecord recentEGV = recentRecords[recentRecords.length - 1];
+                broadcastSGVToUI(recentEGV, true, nextUploadTime + offset);
+            } catch (Exception e) {
+                Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);
+            }
 
             // Close serial
             try {
                 mSerialDevice.close();
-                // Try powering off, will only work if rooted
-                USBPower.PowerOff();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Unable to close and powerOff usb", e);
             }
-
+            // Try powering off, will only work if rooted
+            USBPower.PowerOff();
         } else {
             // Not connected to serial device
             broadcastSGVToUI();
@@ -109,16 +112,17 @@ public class SyncingService extends IntentService {
     // TODO: this needs to be more robust as before, but will clean up it and implement here, this
     // is just simple testing code
     private boolean acquireSerialDevice() {
+        // Try powering on, will only work if rooted
+        USBPower.PowerOn();
+        try { Thread.sleep(3000); } catch (InterruptedException e) { }
         mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         mSerialDevice = UsbSerialProber.acquire(mUsbManager);
         if (mSerialDevice != null) {
             try {
-                // Try powering on, will only work if rooted
-                USBPower.PowerOn();
                 mSerialDevice.open();
                 return true;
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Unable to powerOn and open usb", e);
             }
         } else {
             Log.d(TAG, "Unable to acquire USB device from manager.");

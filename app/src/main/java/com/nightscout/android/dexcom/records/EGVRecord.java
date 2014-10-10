@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
-public class EGVRecord extends GenericTimestampRecord implements Serializable {
+public class EGVRecord extends GenericTimestampRecord {
 
     private int bGValue;
     private String trend;

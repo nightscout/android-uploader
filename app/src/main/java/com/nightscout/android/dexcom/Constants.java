@@ -48,6 +48,7 @@ public class Constants {
     public final static int EGV_VALUE_MASK = 1023;
     public final static int EGV_DISPLAY_ONLY_MASK = 32768;
     public final static int EGV_TREND_ARROW_MASK = 15;
+    public final static int EGV_NOISE_MASK = 112;
 
     public enum BATTERY_STATES {
         NONE,
@@ -78,7 +79,7 @@ public class Constants {
         NONE,
         DOUBLE_UP("\u21C8", "DoubleUp"),
         SINGLE_UP("\u2191", "SingleUp"),
-        UP_45("\u2197", "FortyFifeUp"),
+        UP_45("\u2197", "FortyFiveUp"),
         FLAT("\u2192", "Flat"),
         DOWN_45("\u2198", "FortyFiveDown"),
         SINGLE_DOWN("\u2193", "SingleDown"),

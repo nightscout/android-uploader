@@ -15,12 +15,13 @@ import org.acra.annotation.*;
         formUriBasicAuthPassword="8CgjF6r2u4i8EhPHoPJjnk8f",
         resToastText = R.string.crash_toast_text,
         resDialogText = R.string.feebback_dialog_text,
-        resDialogIcon = android.R.drawable.ic_dialog_alert,
+        resDialogIcon = R.drawable.ic_launcher,
         resDialogTitle = R.string.feedback_dialog_title,
         resDialogCommentPrompt = R.string.feedback_dialog_comment_prompt,
         resDialogOkToast = R.string.feedback_dialog_ok_toast,
         excludeMatchingSharedPreferencesKeys= {"cloud_storage_mongodb_uri", "cloud_storage_api_base"},
-        mode = ReportingInteractionMode.TOAST
+        mode = ReportingInteractionMode.TOAST,
+        logcatArguments = { "-t", "1000", "-v", "time" }
 )
 
 public class Nightscout extends Application {
