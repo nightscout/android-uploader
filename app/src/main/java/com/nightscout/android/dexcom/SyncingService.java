@@ -54,7 +54,6 @@ public class SyncingService extends IntentService {
     public static final String RESPONSE_NEXT_UPLOAD_TIME = "myUploadTime";
     public static final String RESPONSE_UPLOAD_STATUS = "myUploadStatus";
     public static final String RESPONSE_DISPLAY_TIME = "myDisplayTime";
-    public static final String RESPONSE_RSSI = "myRSSI";
     public static final String RESPONSE_JSON = "myJSON";
     public static final String RESPONSE_BAT = "myBatLvl";
 
@@ -65,6 +64,8 @@ public class SyncingService extends IntentService {
 
     // Constants
     private final int TIME_SYNC_OFFSET = 3000;
+    public static final int MIN_SYNC_PAGES = 5;
+    public static final int GAP_SYNC_PAGES = 20;
 
 
     /**
@@ -82,10 +83,6 @@ public class SyncingService extends IntentService {
             Toast.makeText(context, R.string.message_user_not_understand, Toast.LENGTH_LONG).show();
             return;
         }
-
-        // TODO: do we always need to track this
-        Tracker tracker = ((Nightscout) context).getTracker();
-        tracker.send(new HitBuilders.EventBuilder("DexcomG4", "Sync").setValue(numOfPages).build());
 
         Intent intent = new Intent(context, SyncingService.class);
         intent.setAction(ACTION_SYNC);
@@ -138,7 +135,6 @@ public class SyncingService extends IntentService {
                 long timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
                 long nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
                 long displayTime = readData.readDisplayTime().getTime();
-                int rssi = sensorRecords[sensorRecords.length-1].getRSSI();
                 int batLevel = readData.readBatteryLevel();
 
                 // Close serial
@@ -167,7 +163,7 @@ public class SyncingService extends IntentService {
 
                 EGVRecord recentEGV = recentRecords[recentRecords.length - 1];
                 broadcastSGVToUI(recentEGV, uploadStatus, nextUploadTime + TIME_SYNC_OFFSET,
-                                 displayTime, rssi, array ,batLevel);
+                                 displayTime, array ,batLevel);
             } catch (IOException e) {
                 tracker.send(new HitBuilders.ExceptionBuilder()
                                 .setDescription("Unable to close serial connection")
@@ -249,7 +245,7 @@ public class SyncingService extends IntentService {
     }
 
     private void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus,
-                                  long nextUploadTime, long displayTime, int rssi,
+                                  long nextUploadTime, long displayTime,
                                   JSONArray json, int batLvl) {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
@@ -260,7 +256,6 @@ public class SyncingService extends IntentService {
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, nextUploadTime);
         broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, uploadStatus);
         broadcastIntent.putExtra(RESPONSE_DISPLAY_TIME, displayTime);
-        broadcastIntent.putExtra(RESPONSE_RSSI, rssi);
         broadcastIntent.putExtra(RESPONSE_JSON, json.toString());
         broadcastIntent.putExtra(RESPONSE_BAT, batLvl);
         sendBroadcast(broadcastIntent);
@@ -275,7 +270,6 @@ public class SyncingService extends IntentService {
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, (long) TimeConstants.FIVE_MINUTES_MS);
         broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, false);
         broadcastIntent.putExtra(RESPONSE_DISPLAY_TIME, new Date().getTime());
-        broadcastIntent.putExtra(RESPONSE_RSSI, -1);
         broadcastIntent.putExtra(RESPONSE_BAT, 0);
         sendBroadcast(broadcastIntent);
     }

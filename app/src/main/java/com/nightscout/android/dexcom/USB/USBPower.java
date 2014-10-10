@@ -26,7 +26,7 @@ public class USBPower {
         try {
             runCommand(SET_POWER_ON_COMMAND);
             Log.i(TAG, "PowerOn USB complete");
-            Thread.sleep(3000);
+            Thread.sleep(5000);
         } catch (Exception e) {
             Log.e(TAG, "Unable to PowerOn USB");
         }

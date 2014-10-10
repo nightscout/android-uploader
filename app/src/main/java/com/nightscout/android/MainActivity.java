@@ -20,6 +20,7 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.dexcom.Constants;
@@ -85,10 +86,6 @@ public class MainActivity extends Activity {
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(mCGMStatusReceiver, filter);
 
-        IntentFilter screenFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-        screenFilter.addAction(Intent.ACTION_SCREEN_OFF);
-        registerReceiver(screenStateReceiver,screenFilter);
-
         // Setup UI components
         setContentView(R.layout.activity_main);
         mTextSGV = (TextView) findViewById(R.id.sgValue);
@@ -114,8 +111,7 @@ public class MainActivity extends Activity {
         if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) || SyncingService.isG4Connected(getApplicationContext())) {
             statusBarIcons.setUSB(true);
             Log.d(TAG, "Starting syncing in OnCreate...");
-            // TODO: 2nd parameter should be static constant from intent service
-            SyncingService.startActionSingleSync(mContext, 5);
+            SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
         } else {
             // reset the top icons to their default state
             statusBarIcons.setDefaults();
@@ -146,6 +142,7 @@ public class MainActivity extends Activity {
         Log.d(TAG, "onPaused called.");
         mWebView.pauseTimers();
         mWebView.onPause();
+        mHandler.removeCallbacks(updateTimeAgo);
     }
 
     @Override
@@ -154,6 +151,7 @@ public class MainActivity extends Activity {
         Log.d(TAG, "onResumed called.");
         mWebView.onResume();
         mWebView.resumeTimers();
+        mHandler.post(updateTimeAgo);
     }
 
     @Override
@@ -162,7 +160,18 @@ public class MainActivity extends Activity {
         super.onDestroy();
         unregisterReceiver(mCGMStatusReceiver);
         unregisterReceiver(mDeviceStatusReceiver);
-        unregisterReceiver(screenStateReceiver);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        GoogleAnalytics.getInstance(this).reportActivityStop(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        GoogleAnalytics.getInstance(this).reportActivityStart(this);
     }
 
     @Override
@@ -176,8 +185,6 @@ public class MainActivity extends Activity {
         outState.putBoolean("saveImageViewUpload", statusBarIcons.getUpload());
         outState.putBoolean("saveImageViewTimeIndicator", statusBarIcons.getTimeIndicator());
         outState.putInt("saveImageViewBatteryIndicator", statusBarIcons.getBatteryIndicator());
-        //TODO latent code for RSSI
-//        outState.putInt("saveImageViewRSSIIndicator", topIcons.getRSSIIndicator());
     }
 
     @Override
@@ -192,8 +199,6 @@ public class MainActivity extends Activity {
         statusBarIcons.setUpload(savedInstanceState.getBoolean("saveImageViewUpload"));
         statusBarIcons.setTimeIndicator(savedInstanceState.getBoolean("saveImageViewTimeIndicator"));
         statusBarIcons.setBatteryIndicator(savedInstanceState.getInt("saveImageViewBatteryIndicator"));
-        //TODO latent code for RSSI
-//        topIcons.setRSSIIndicator(savedInstanceState.getInt("saveImageViewRSSIIndicator"));
     }
 
     public class CGMStatusReceiver extends BroadcastReceiver {
@@ -209,11 +214,10 @@ public class MainActivity extends Activity {
             long responseNextUploadTime = intent.getLongExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
             long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME, new Date().getTime());
             lastRecordTime = responseSGVTimestamp;
-            int rssi = intent.getIntExtra(SyncingService.RESPONSE_RSSI, -1);
             int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT, -1);
             String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
 
-            // TODO - add special values for MMOL as well.
+            // TODO: add special values for MMOL as well.
             // Consider returning the message "High" and "Low" for the sensor limits
             String responseSGVStr=(responseSGV!=-1)?String.valueOf(responseSGV)+" "+trendSymbol:
                     (Constants.SPECIALBGVALUES_MGDL.isSpecialValue(responseSGV))? Constants.SPECIALBGVALUES_MGDL.getEGVSpecialValue(responseSGV).toString():"---";
@@ -243,7 +247,6 @@ public class MainActivity extends Activity {
             long nextUploadTime = TimeConstants.FIVE_MINUTES_MS;
 
             if (responseNextUploadTime > TimeConstants.FIVE_MINUTES_MS) {
-                // TODO: how should we handle this situation?
                 Log.d(TAG, "Receiver's time is less than current record time, possible time change.");
                 mTracker.send(new HitBuilders.EventBuilder("Main", "Time change").build());
             } else if (responseNextUploadTime > 0) {
@@ -261,12 +264,11 @@ public class MainActivity extends Activity {
                 statusBarIcons.setTimeIndicator(true);
             }
 
-            Log.d(TAG,"RSSI is "+rssi);
-//            topIcons.setRSSIIndicator(rssi);
             statusBarIcons.setBatteryIndicator(rcvrBat);
 
             mHandler.removeCallbacks(syncCGM);
             mHandler.postDelayed(syncCGM, nextUploadTime);
+            // Start updating the timeago only if the screen is on
             PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
             if (pm.isScreenOn())
                 mHandler.postDelayed(updateTimeAgo,nextUploadTime/5);
@@ -283,8 +285,7 @@ public class MainActivity extends Activity {
             } else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
                 statusBarIcons.setUSB(true);
                 Log.d(TAG, "Starting syncing on USB attached...");
-                // TODO: 2nd parameter should be static constant from intent service
-                SyncingService.startActionSingleSync(mContext, 5);
+                SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
                 //TODO: consider getting permission programmatically instead of user prompted
                 //if decided to need to add android.permission.USB_PERMISSION in manifest
             } else if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
@@ -293,25 +294,10 @@ public class MainActivity extends Activity {
         }
     };
 
-    BroadcastReceiver screenStateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context mContext, Intent intent) {
-            Log.d(TAG,"Intent => " + intent.getAction() + " received.");
-            if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
-                mHandler.post(updateTimeAgo);
-                Log.d(TAG, "Updating time ago");
-            } else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
-                mHandler.removeCallbacks(updateTimeAgo);
-                Log.d(TAG, "Disable updating of time ago");
-            }
-        }
-    };
-
     // Runnable to start service as needed to sync with mCGMStatusReceiver and cloud
     public Runnable syncCGM = new Runnable() {
         public void run() {
-            // TODO: 2nd parameter should be static constant from intent service
-            SyncingService.startActionSingleSync(mContext, 5);
+            SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
         }
     };
 
@@ -369,7 +355,7 @@ public class MainActivity extends Activity {
                 e.printStackTrace();
             }
         } else if (id == R.id.gap_sync) {
-            SyncingService.startActionSingleSync(getApplicationContext(), 20);
+            SyncingService.startActionSingleSync(getApplicationContext(), SyncingService.GAP_SYNC_PAGES);
         } else if (id == R.id.close_settings) {
             mHandler.removeCallbacks(syncCGM);
             finish();
@@ -382,22 +368,16 @@ public class MainActivity extends Activity {
         private ImageView mImageViewUSB;
         private ImageView mImageViewUpload;
         private ImageView mImageViewTimeIndicator;
-        private ImageView mImageViewRSSI;
         private ImageView mImageRcvrBattery;
         private boolean usbActive;
         private boolean uploadActive;
         private boolean displayTimeSync;
         private int batteryLevel;
-        private int rssi;
 
         StatusBarIcons(){
             mImageViewUSB = (ImageView) findViewById(R.id.imageViewUSB);
             mImageViewUpload = (ImageView) findViewById(R.id.imageViewUploadStatus);
             mImageViewTimeIndicator = (ImageView) findViewById(R.id.imageViewTimeIndicator);
-
-            //TODO latent code for RSSI
-//            mImageViewRSSI = (ImageView) findViewById(R.id.imageViewRSSI);
-//            mImageViewRSSI.setImageResource(R.drawable.rssi);
 
             mImageRcvrBattery = (ImageView) findViewById(R.id.imageViewRcvrBattery);
             mImageRcvrBattery.setImageResource(R.drawable.battery);
@@ -411,8 +391,6 @@ public class MainActivity extends Activity {
             setUpload(false);
             setTimeIndicator(false);
             setBatteryIndicator(0);
-            //TODO latent code for RSSI
-//            setRSSIIndicator(-1);
         }
 
         public void setUSB(boolean active){
@@ -454,12 +432,6 @@ public class MainActivity extends Activity {
             mImageRcvrBattery.setTag(batteryLevel);
         }
 
-        public void setRSSIIndicator(int r){
-            rssi = r;
-            mImageViewRSSI.setImageLevel(rssi);
-            mImageViewRSSI.setTag(rssi);
-        }
-
         public boolean getUSB(){
             return usbActive;
         }
@@ -477,12 +449,6 @@ public class MainActivity extends Activity {
                 return 0;
             }
             return (Integer) mImageRcvrBattery.getTag();
-        }
-
-        public int getRSSIIndicator(){
-            if (mImageViewRSSI==null)
-                return 0;
-            return (Integer) mImageViewRSSI.getTag();
         }
     }
 }
