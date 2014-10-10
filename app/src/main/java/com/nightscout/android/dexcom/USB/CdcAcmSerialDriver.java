@@ -102,7 +102,6 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
 
     @Override
     public int write(byte[] src, int timeoutMillis) throws IOException {
-        // TODO(mikey): Nearly identical to FtdiSerial write. Refactor.
         int offset = 0;
 
         while (offset < src.length) {
@@ -168,17 +167,17 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
 
     @Override
     public boolean getCD() throws IOException {
-        return false;  // TODO
+        return false;
     }
 
     @Override
     public boolean getCTS() throws IOException {
-        return false;  // TODO
+        return false;
     }
 
     @Override
     public boolean getDSR() throws IOException {
-        return false;  // TODO
+        return false;
     }
 
     @Override
@@ -194,7 +193,7 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
 
     @Override
     public boolean getRI() throws IOException {
-        return false;  // TODO
+        return false;
     }
 
     @Override
