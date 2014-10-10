@@ -66,6 +66,25 @@
     <string name="pref_title_cal_data">Calibration Data</string>
     <string name="pref_summary_cal_data">Calibration data used in converting sensor ISIG values to glucose values</string>
 
+    <!-- Settings for Display Options -->
+    <string name="pref_header_display_options">Display Options</string>
+
+    <!-- Chart Settings -->
+    <string name="pref_title_chart_options">Chart Options</string>
+    <string name="pref_summary_chart_options">Various configurations for chart</string>
+
+    <!-- Chart Units Settings -->
+    <string name="pref_title_chart_units_options">Unit Options</string>
+    <string name="pref_summary_chart_unit_options">Choose between mg/dL and mmol/L</string>
+    <string-array name="pref_options_units">
+        <item name="0">mg/dL</item>
+        <item name="1">mmol/L</item>
+    </string-array>
+    <string-array name="pref_options_units_values">
+        <item name="0">mg/dL</item>
+        <item name="1">mmol/L</item>
+    </string-array>
+
     <!-- About Settings -->
     <string name="pref_header_about">About</string>
 
