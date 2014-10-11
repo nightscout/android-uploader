@@ -256,22 +256,15 @@ public class SyncingService extends IntentService {
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, nextUploadTime);
         broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, uploadStatus);
         broadcastIntent.putExtra(RESPONSE_DISPLAY_TIME, displayTime);
-        broadcastIntent.putExtra(RESPONSE_JSON, json.toString());
+        if (json!=null)
+            broadcastIntent.putExtra(RESPONSE_JSON, json.toString());
         broadcastIntent.putExtra(RESPONSE_BAT, batLvl);
         sendBroadcast(broadcastIntent);
     }
 
     private void broadcastSGVToUI() {
-        Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
-        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.putExtra(RESPONSE_SGV, -1);
-        broadcastIntent.putExtra(RESPONSE_TIMESTAMP, -1L);
-        broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, (long) TimeConstants.FIVE_MINUTES_MS);
-        broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, false);
-        broadcastIntent.putExtra(RESPONSE_DISPLAY_TIME, new Date().getTime());
-        broadcastIntent.putExtra(RESPONSE_BAT, 0);
-        sendBroadcast(broadcastIntent);
+        EGVRecord record=new EGVRecord(-1, Constants.TREND_ARROW_VALUES.NONE,new Date(),new Date());
+        broadcastSGVToUI(record,false, (long) TimeConstants.FIVE_MINUTES_MS,new Date().getTime(),null,0);
     }
 
 }

@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
+import java.util.Date;
 
 public class EGVRecord extends GenericTimestampRecord {
 
@@ -22,6 +23,12 @@ public class EGVRecord extends GenericTimestampRecord {
         bGValue = eGValue & Constants.EGV_VALUE_MASK;
         int trendValue = ByteBuffer.wrap(packet).get(10) & Constants.EGV_TREND_ARROW_MASK;
         trend = Constants.TREND_ARROW_VALUES.values()[trendValue];
+    }
+
+    public EGVRecord(int bGValue,Constants.TREND_ARROW_VALUES trend,Date displayTime, Date systemTime){
+        super(displayTime, systemTime);
+        this.bGValue=bGValue;
+        this.trend=trend;
     }
 
     public int getBGValue() {

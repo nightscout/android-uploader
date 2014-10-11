@@ -125,15 +125,15 @@ public class Constants {
     }
 
     public enum SPECIALBGVALUES_MGDL {
-        NONE("None",0),
-        SENSORNOTACTIVE("Sensor not active",1),
-        MINIMALLYEGVAB("Minimally EGV Aberration",2),
-        NOANTENNA("No Antenna",3),
-        SENSOROUTOFCAL("Sensor needs Calibration",5),
-        COUNTSAB("Counts Aberration",6),
-        ABSOLUTEAB("Absolute Aberration",9),
-        POWERAB("Power Aberration",10),
-        RFBADSTATUS("RF bad status",12);
+        NONE("??0",0),
+        SENSORNOTACTIVE("?SN",1),
+        MINIMALLYEGVAB("??2",2),
+        NOANTENNA("?NA",3),
+        SENSOROUTOFCAL("?NC",5),
+        COUNTSAB("?CD",6),
+        ABSOLUTEAB("\u8987",9),
+        POWERAB("???",10),
+        RFBADSTATUS("?RF",12);
 
 
         private String name;

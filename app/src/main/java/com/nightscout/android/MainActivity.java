@@ -93,7 +93,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         mTextSGV = (TextView) findViewById(R.id.sgValue);
         mTextSGV.setTag(R.string.display_sgv,-1);
-        mTextSGV.setTag(R.string.display_trend,"");
+        mTextSGV.setTag(R.string.display_trend,0);
         mTextTimestamp = (TextView) findViewById(R.id.timeAgo);
         mWebView = (WebView) findViewById(R.id.webView);
         mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -163,19 +163,21 @@ public class MainActivity extends Activity {
         currentUnits = prefs.getString("display_options_units", "0").equals("0") ? 1 : Constants.MG_DL_TO_MMOL_L;
         int sgv = (Integer) mTextSGV.getTag(R.string.display_sgv);
 
-        String direction = (String) mTextSGV.getTag(R.string.display_trend);
+        int direction = (Integer) mTextSGV.getTag(R.string.display_trend);
         if (sgv!=-1)
-            mTextSGV.setText(getSGVStringByUnit(sgv) + " " + direction);
+            mTextSGV.setText(getSGVStringByUnit(sgv, Constants.TREND_ARROW_VALUES.values()[direction]));
         mHandler.post(updateTimeAgo);
     }
 
-    private String getSGVStringByUnit(int sgv){
+    private String getSGVStringByUnit(int sgv,Constants.TREND_ARROW_VALUES trend){
         String sgvStr;
         if (currentUnits!=1)
             sgvStr=String.format("%.1f",sgv*currentUnits);
         else
             sgvStr=String.valueOf(sgv);
-        return sgvStr;
+        String responseSGVStr = (sgv!=-1)?
+                (Constants.SPECIALBGVALUES_MGDL.isSpecialValue(sgv))?Constants.SPECIALBGVALUES_MGDL.getEGVSpecialValue(sgv).toString():sgvStr+" "+trend.Symbol():"---";
+        return responseSGVStr;
     }
 
     @Override
@@ -232,7 +234,7 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             // Get response messages from broadcast
             int responseSGV = intent.getIntExtra(SyncingService.RESPONSE_SGV, -1);
-            String trendSymbol = Constants.TREND_ARROW_VALUES.values()[intent.getIntExtra(SyncingService.RESPONSE_TREND,0)].Symbol();
+            Constants.TREND_ARROW_VALUES trend = Constants.TREND_ARROW_VALUES.values()[intent.getIntExtra(SyncingService.RESPONSE_TREND,0)];
             long responseSGVTimestamp = intent.getLongExtra(SyncingService.RESPONSE_TIMESTAMP,-1L);
             boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
             long responseNextUploadTime = intent.getLongExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
@@ -241,9 +243,7 @@ public class MainActivity extends Activity {
             int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT, -1);
             String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
 
-
-            String responseSGVStr = (responseSGV!=-1)?getSGVStringByUnit(responseSGV)+" "+trendSymbol:
-                    (Constants.SPECIALBGVALUES_MGDL.isSpecialValue(responseSGV))? Constants.SPECIALBGVALUES_MGDL.getEGVSpecialValue(responseSGV).toString():"---";
+            String responseSGVStr = getSGVStringByUnit(responseSGV,trend);
 
             // Reload d3 chart with new data
             if (json != null) {
@@ -257,7 +257,7 @@ public class MainActivity extends Activity {
             // Update UI with latest record information
             mTextSGV.setText(responseSGVStr);
             mTextSGV.setTag(R.string.display_sgv,responseSGV);
-            mTextSGV.setTag(R.string.display_trend,trendSymbol);
+            mTextSGV.setTag(R.string.display_trend,trend.getID());
             String timeAgoStr = "---";
             Log.d(TAG,"Date: " + new Date().getTime());
             Log.d(TAG,"Response SGV Timestamp: " + responseSGVTimestamp);
