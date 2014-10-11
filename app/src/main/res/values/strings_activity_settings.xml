@@ -77,12 +77,8 @@
     <string name="pref_title_chart_units_options">Unit Options</string>
     <string name="pref_summary_chart_unit_options">Choose between mg/dL and mmol/L</string>
     <string-array name="pref_options_units">
-        <item name="0">mg/dL</item>
-        <item name="1">mmol/L</item>
-    </string-array>
-    <string-array name="pref_options_units_values">
-        <item name="0">mg/dL</item>
-        <item name="1">mmol/L</item>
+        <item>mg/dL</item>
+        <item>mmol/L</item>
     </string-array>
 
     <!-- About Settings -->

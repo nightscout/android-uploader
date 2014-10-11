@@ -59,6 +59,9 @@ public class MainActivity extends Activity {
     private TextView mTextTimestamp;
     StatusBarIcons statusBarIcons;
 
+    // Display options
+    private double currentUnits = 1;
+
     // TODO: should try and avoid use static
     public static int batLevel = 0;
 
@@ -151,6 +154,8 @@ public class MainActivity extends Activity {
         Log.d(TAG, "onResumed called.");
         mWebView.onResume();
         mWebView.resumeTimers();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        currentUnits = prefs.getString("display_options_units", "mg/dL") == "mg/dL" ? 1 : Constants.MG_DL_TO_MMOL_L;
         mHandler.post(updateTimeAgo);
     }
 
@@ -219,7 +224,8 @@ public class MainActivity extends Activity {
 
             // TODO: add special values for MMOL as well.
             // Consider returning the message "High" and "Low" for the sensor limits
-            String responseSGVStr=(responseSGV!=-1)?String.valueOf(responseSGV)+" "+trendSymbol:
+            double a = responseSGV*currentUnits;
+            String responseSGVStr = (responseSGV!=-1)?String.valueOf(responseSGV*currentUnits)+" "+trendSymbol:
                     (Constants.SPECIALBGVALUES_MGDL.isSpecialValue(responseSGV))? Constants.SPECIALBGVALUES_MGDL.getEGVSpecialValue(responseSGV).toString():"---";
 
             // Reload d3 chart with new data

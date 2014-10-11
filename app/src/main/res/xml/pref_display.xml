@@ -5,7 +5,7 @@
         android:title="@string/pref_title_chart_units_options"
         android:key="display_options_units"
         android:entries="@array/pref_options_units"
-        android:entryValues="@array/pref_options_units_values"
+        android:entryValues="@array/pref_options_units"
         android:defaultValue="mg/dL"
         android:summary="@string/pref_summary_chart_unit_options"
         android:negativeButtonText="@null"
