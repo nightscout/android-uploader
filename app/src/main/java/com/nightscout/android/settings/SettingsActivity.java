@@ -18,6 +18,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 
@@ -143,6 +144,7 @@ public class SettingsActivity extends PreferenceActivity {
         bindPreferenceSummaryToValue(findPreference("cloud_storage_mongodb_collection"));
         bindPreferenceSummaryToValue(findPreference("cloud_storage_api_base"));
         bindPreferenceSummaryToValue(findPreference("acra.user.email"));
+        bindPreferenceSummaryToValue(findPreference("display_options_units"));
 
         try {
             PackageInfo pInfo = null;

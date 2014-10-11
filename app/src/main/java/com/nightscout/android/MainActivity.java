@@ -60,7 +60,7 @@ public class MainActivity extends Activity {
     StatusBarIcons statusBarIcons;
 
     // Display options
-    private double currentUnits = 1;
+    private float currentUnits = 1;
 
     // TODO: should try and avoid use static
     public static int batLevel = 0;
@@ -92,6 +92,8 @@ public class MainActivity extends Activity {
         // Setup UI components
         setContentView(R.layout.activity_main);
         mTextSGV = (TextView) findViewById(R.id.sgValue);
+        mTextSGV.setTag(R.string.display_sgv,-1);
+        mTextSGV.setTag(R.string.display_trend,"");
         mTextTimestamp = (TextView) findViewById(R.id.timeAgo);
         mWebView = (WebView) findViewById(R.id.webView);
         mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -154,9 +156,26 @@ public class MainActivity extends Activity {
         Log.d(TAG, "onResumed called.");
         mWebView.onResume();
         mWebView.resumeTimers();
+
+        // Set and deal with mmol/L<->mg/dL conversions
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        currentUnits = prefs.getString("display_options_units", "mg/dL") == "mg/dL" ? 1 : Constants.MG_DL_TO_MMOL_L;
+        Log.d(TAG,"display_options_units: "+prefs.getString("display_options_units", "0"));
+        currentUnits = prefs.getString("display_options_units", "0").equals("0") ? 1 : Constants.MG_DL_TO_MMOL_L;
+        int sgv = (Integer) mTextSGV.getTag(R.string.display_sgv);
+
+        String direction = (String) mTextSGV.getTag(R.string.display_trend);
+        if (sgv!=-1)
+            mTextSGV.setText(getSGVStringByUnit(sgv) + " " + direction);
         mHandler.post(updateTimeAgo);
+    }
+
+    private String getSGVStringByUnit(int sgv){
+        String sgvStr;
+        if (currentUnits!=1)
+            sgvStr=String.format("%.1f",sgv*currentUnits);
+        else
+            sgvStr=String.valueOf(sgv);
+        return sgvStr;
     }
 
     @Override
@@ -222,10 +241,8 @@ public class MainActivity extends Activity {
             int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT, -1);
             String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
 
-            // TODO: add special values for MMOL as well.
-            // Consider returning the message "High" and "Low" for the sensor limits
-            double a = responseSGV*currentUnits;
-            String responseSGVStr = (responseSGV!=-1)?String.valueOf(responseSGV*currentUnits)+" "+trendSymbol:
+
+            String responseSGVStr = (responseSGV!=-1)?getSGVStringByUnit(responseSGV)+" "+trendSymbol:
                     (Constants.SPECIALBGVALUES_MGDL.isSpecialValue(responseSGV))? Constants.SPECIALBGVALUES_MGDL.getEGVSpecialValue(responseSGV).toString():"---";
 
             // Reload d3 chart with new data
@@ -239,7 +256,8 @@ public class MainActivity extends Activity {
 
             // Update UI with latest record information
             mTextSGV.setText(responseSGVStr);
-            mTextSGV.setTag(responseSGVStr);
+            mTextSGV.setTag(R.string.display_sgv,responseSGV);
+            mTextSGV.setTag(R.string.display_trend,trendSymbol);
             String timeAgoStr = "---";
             Log.d(TAG,"Date: " + new Date().getTime());
             Log.d(TAG,"Response SGV Timestamp: " + responseSGVTimestamp);

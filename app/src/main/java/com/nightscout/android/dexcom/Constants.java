@@ -49,7 +49,7 @@ public class Constants {
     public final static int EGV_DISPLAY_ONLY_MASK = 32768;
     public final static int EGV_TREND_ARROW_MASK = 15;
     public final static int EGV_NOISE_MASK = 112;
-    public final static double MG_DL_TO_MMOL_L = 0.05556;
+    public final static float MG_DL_TO_MMOL_L = 0.05556f;
 
     public enum BATTERY_STATES {
         NONE,
@@ -161,51 +161,6 @@ public class Constants {
 
         public static boolean isSpecialValue(int val){
             for (SPECIALBGVALUES_MGDL e: values()){
-                if (e.getValue()==val)
-                    return true;
-            }
-            return false;
-        }
-
-    }
-
-    // TODO - consider breaking these special values out to a separate class to clean up this class
-    public enum SPECIALBGVALUES_MMOL {
-        // TODO Are there more? What happened to Sensor not active and min egv aberration?
-        NONE("None",0),
-        NOANTENNA("No Antenna",2),
-        SENSOROUTOFCAL("Sensor needs Calibration",3),
-        COUNTSAB("Counts Aberration",4),
-        ABSOLUTEAB("Absolute Aberration",5),
-        POWERAB("Power Aberration",6),
-        RFBADSTATUS("RF bad status",7);
-
-
-        private String name;
-        private int val;
-        private SPECIALBGVALUES_MMOL(String s, int i){
-            name=s;
-            val=i;
-        }
-
-        public int getValue(){
-            return val;
-        }
-
-        public String toString(){
-            return name;
-        }
-
-        public static SPECIALBGVALUES_MMOL getEGVSpecialValue(int val){
-            for (SPECIALBGVALUES_MMOL e: values()){
-                if (e.getValue()==val)
-                    return e;
-            }
-            return null;
-        }
-
-        public static boolean isSpecialValue(int val){
-            for (SPECIALBGVALUES_MMOL e: values()){
                 if (e.getValue()==val)
                     return true;
             }

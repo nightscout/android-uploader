@@ -75,10 +75,14 @@
 
     <!-- Chart Units Settings -->
     <string name="pref_title_chart_units_options">Unit Options</string>
-    <string name="pref_summary_chart_unit_options">Choose between mg/dL and mmol/L</string>
     <string-array name="pref_options_units">
         <item>mg/dL</item>
         <item>mmol/L</item>
+    </string-array>
+
+    <string-array name="pref_options_units_values">
+        <item>0</item>
+        <item>1</item>
     </string-array>
 
     <!-- About Settings -->

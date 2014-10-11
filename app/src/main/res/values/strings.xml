@@ -37,5 +37,6 @@
     <string name="acra_disabled_summary">Crash reporting is disabled</string>
     <string name="acra_email_dialog_title">Email</string>
     <string name="acra_user_email_dialog_message">This is the email address included in bug reports and automatic crash reports. This field is optional</string>
-
+    <string name="display_sgv"/>
+    <string name="display_trend"/>
 </resources>
