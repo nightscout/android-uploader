@@ -168,8 +168,6 @@ public class MainActivity extends Activity {
             mTextSGV.setText(getSGVStringByUnit(sgv, Constants.TREND_ARROW_VALUES.values()[direction]));
         }
 
-        String test = Boolean.toString(currentUnits > 1);
-
         mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) +  ")");
 
         mHandler.post(updateTimeAgo);
