@@ -164,8 +164,14 @@ public class MainActivity extends Activity {
         int sgv = (Integer) mTextSGV.getTag(R.string.display_sgv);
 
         int direction = (Integer) mTextSGV.getTag(R.string.display_trend);
-        if (sgv!=-1)
+        if (sgv != -1) {
             mTextSGV.setText(getSGVStringByUnit(sgv, Constants.TREND_ARROW_VALUES.values()[direction]));
+        }
+
+        String test = Boolean.toString(currentUnits > 1);
+
+        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) +  ")");
+
         mHandler.post(updateTimeAgo);
     }
 

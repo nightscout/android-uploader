@@ -8,6 +8,8 @@ var latestSGV,
     dateFn = function (d) { return new Date(d.date) },
     xScale, yScale,
     xAxis, yAxis,
+    chartWidth,
+    chartHeight,
     prevChartWidth = 0,
     prevChartHeight = 0,
     focusHeight,
@@ -33,7 +35,8 @@ var latestSGV,
     WIDTH_TIME_HIDDEN = 600,
     MINUTES_SINCE_LAST_UPDATE_WARN = 10,
     MINUTES_SINCE_LAST_UPDATE_URGENT = 20,
-    updateTimer;
+    updateTimer,
+    units = "mg/dL";
 
     // Tick Values
     var tickValues = [40, 60, 80, 120, 180, 300, 400];
@@ -67,12 +70,11 @@ var latestSGV,
 
     // lixgbg: Convert mg/dL BG value to metric mmol
     function scaleBg(bg) {
-        return bg;
-//        if (browserSettings.units == "mmol") {
-//            return (Math.round((bg / 18) * 10) / 10).toFixed(1);
-//        } else {
-//            return bg;
-//        }
+        if (units == "mmol") {
+            return (Math.round((bg / 18) * 10) / 10).toFixed(1);
+        } else {
+            return bg;
+        }
     }
 
     // initial setup of chart when data is first made available
@@ -119,10 +121,10 @@ var latestSGV,
         var dataRange = [new Date(Date.now() - FOCUS_DATA_RANGE_MS), new Date()];
 
         // get the entire container height and width subtracting the padding
-        var chartWidth = (document.getElementById('chartContainer')
+        chartWidth = (document.getElementById('chartContainer')
             .getBoundingClientRect().width) - padding.left - padding.right;
 
-        var chartHeight = (document.getElementById('chartContainer')
+        chartHeight = (document.getElementById('chartContainer')
             .getBoundingClientRect().height) - padding.top - padding.bottom;
 
         // get the height of each chart based on its container size ratio
@@ -431,12 +433,51 @@ var latestSGV,
         clearTimeout(updateTimer);
         if (newData != null) {
             data = newData.map(function (obj) {
-                return { date: new Date(obj.date), sgv: obj.sgv, type: 'sgv'}
+                return { date: new Date(obj.date), sgv: scaleBg(obj.sgv), type: 'sgv'}
             });
         }
         isInitialData = false;
         updateChart(false);
         updateTimer = setTimeout(updateChartWithTimer, 60000);
+    }
+
+    function updateUnits(isMmol) {
+        if (isMmol)  {
+            console.log("changing to mmol");
+            tickValues = [2.0, 3.0, 4.0, 6.0, 10.0, 15.0, 22.0];
+            units = "mmol";
+        } else {
+            console.log("changing to mg/dl");
+            tickValues = [40, 60, 80, 120, 180, 300, 400];
+            units = "mg/dL";
+        }
+
+        yScale = d3.scale.log()
+            .domain([scaleBg(30), scaleBg(510)]);
+
+        yAxis = d3.svg.axis()
+            .scale(yScale)
+            .tickFormat(d3.format('d'))
+            .tickValues(tickValues)
+            .orient('left');
+
+        focus.select('.y.axis').remove();
+
+        yScale.range([focusHeight, 0]);
+
+        focus.append('g')
+            .attr('class', 'y axis');
+
+        focus.select('.y')
+            .attr('transform', 'translate(' + chartWidth + ', 0)')
+            .call(yAxis);
+
+        data = data.map(function (obj) {
+            return { date: new Date(obj.date), sgv: scaleBg(obj.sgv), type: 'sgv'}
+        });
+        
+        isInitialData = false;
+        updateChart(false);
     }
 
     // Initialize Charts
