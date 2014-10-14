@@ -49,6 +49,7 @@ public class MainActivity extends Activity {
     private Context mContext;
     private String mJSONData;
     private long lastRecordTime = -1;
+    private long receiverOffsetFromUploader = 0;
 
     // Analytics mTracker
     Tracker mTracker;
@@ -244,6 +245,7 @@ public class MainActivity extends Activity {
             long responseNextUploadTime = intent.getLongExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
             long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME, new Date().getTime());
             lastRecordTime = responseSGVTimestamp;
+            receiverOffsetFromUploader = new Date().getTime()-responseDisplayTime;
             int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT, -1);
             String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
 
@@ -329,19 +331,20 @@ public class MainActivity extends Activity {
         }
     };
 
+    //FIXME: Strongly suggest refactoring this
     public Runnable updateTimeAgo = new Runnable() {
         @Override
         public void run() {
-            long delta = new Date().getTime() - lastRecordTime;
+            long delta = new Date().getTime() - lastRecordTime + receiverOffsetFromUploader;
             if (lastRecordTime == 0) delta = 0;
 
             String timeAgoStr= "";
 
-            if (delta <= 0 && lastRecordTime != -1) {
-                timeAgoStr = "Time change detected";
-            }
-            else if (lastRecordTime==-1) {
+            if (lastRecordTime==-1) {
                 timeAgoStr = "---";
+            }
+            else if (delta < 0) {
+                timeAgoStr = "Time change detected";
             }
             else {
                 timeAgoStr = Utils.getTimeString(delta);

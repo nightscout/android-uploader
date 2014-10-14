@@ -52,16 +52,16 @@ message CookieMonsterG4Meter {
 }
 
 message CookieMonsterG4Sensor {
-    required uint32 unfiltered = 1;
-    optional uint32 unfiltered = 2;
+    required uint64 filtered = 1;
+    optional uint64 unfiltered = 2;
     optional uint32 rssi = 3;
     optional uint64 timestamp = 4;
 }
 
 message CookieMonsterG4Cal {
-    required uint64 slope = 1;
-    optional uint64 intercept = 2;
-    optional uint64 scale = 3;
+    required double slope = 1;
+    optional double intercept = 2;
+    optional double scale = 3;
     optional uint64 timestamp = 4;
 }
 

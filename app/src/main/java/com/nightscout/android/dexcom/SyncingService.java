@@ -131,8 +131,10 @@ public class SyncingService extends IntentService {
                 GlucoseDataSet[] glucoseDataSets = Utils.mergeGlucoseDataRecords(recentRecords, sensorRecords);
                 CalRecord[] calRecords = readData.getRecentCalRecords();
 
-                // TODO: should we do boundary checking here as well?
                 long timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
+                // TODO: determine if the logic here is correct. I suspect it assumes the last record was less than 5
+                // minutes ago. If a reading is skipped and the device is plugged in then nextUploadTime will be
+                // set to a negative number. This situation will eventually correct itself.
                 long nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
                 long displayTime = readData.readDisplayTime().getTime();
                 int batLevel = readData.readBatteryLevel();
@@ -186,6 +188,12 @@ public class SyncingService extends IntentService {
                         .build());
                 broadcastSGVToUI();
                 return;
+            } catch (IndexOutOfBoundsException e) {
+                Log.wtf("IndexOutOfBounds exception from receiver", e);
+                tracker.send(new HitBuilders.ExceptionBuilder().setDescription("IndexOutOfBoundsException: " + e.getMessage())
+                        .setFatal(false)
+                        .build());
+                broadcastSGVToUI();
             } catch (Exception e) {
                 Log.wtf("Unhandled exception caught", e);
                 ACRA.getErrorReporter().handleException(e);
