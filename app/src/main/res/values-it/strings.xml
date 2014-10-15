@@ -5,7 +5,7 @@
     <string name="button_two_day_sync">Forza invio dati ultimi 2 giorni</string>
     <string name="crash_toast_text">Oops! É crashato il software. Sto mandando un rapporto a Nightscout così magari lo possono sistemare!</string>
     <string name="feebback_dialog_text">Per favore facci sapere cosa ne pensi</string>
-    <string name="feedback_dialog_comment_prompt">Per favore aggiungi i tuoi commenti qui sotto:</string>
+    <string name="feedback_dialog_comment_prompt">Aggiungi i tuoi commenti qui sotto:</string>
     <string name="feedback_dialog_ok_toast">Grazie!</string>
     <string name="feedback_dialog_title">Feedback a Nightscout</string>
     <string name="pref_default_api_url">latuapassword@http://{IL-TUO-SITO}.azurewebsites.net/api/v1</string>
@@ -31,7 +31,7 @@
     <string name="pref_summary_cal_data">Dati di calibrazione usati nella conversione dai dati ISI del sensore in valori di glicemia</string>
     <string name="pref_summary_data_to_upload">Dati vari mandati nel cloud. Attenzione, più dati invii più dati saranno usati sul tuo contratto se non sei connesso al WiFi</string>
     <string name="pref_summary_egv">Valori stimati di glicemia (VSG)</string>
-    <string name="pref_summary_i_understand">Nightscout non deve essere utilizzato per prendere decisioni mediche. Non vi è alcun supporto o garanzia di alcun tipo. La qualità e le prestazioni del progetto dipendono da voi. Dati anonimi saranno inviati se il sistema si bloccasse per contribuire a migliorare l\'applicazione.</string>
+    <string name="pref_summary_i_understand">Nightscout non va utilizzato per prendere decisioni mediche. Non vi è supporto o garanzia di alcun tipo. La qualità e le prestazioni del progetto dipendono da voi. Dati anonimi saranno inviati se il sistema si bloccasse per contribuire a migliorare l\'applicazione.</string>
     <string name="pref_summary_meter_bg">Valore di glicemia misurata con glucometro usato per la calibrazione</string>
     <string name="pref_summary_mongodb_enabled">Se stai usando MongoLab e Azure questo deve essere abilitato</string>
     <string name="pref_summary_sensor_data">Dati ISIG raw dal sensore</string>
@@ -59,4 +59,9 @@
     <string name="title_activity_settings">Impostazioni</string>
     <string name="unknown_values">---</string>
     <string name="hello">Hello World, DemoActivity!</string>
+    <string name="close_menu_text">Esci</string>
+    <string name="feedback_menu_text">Feedback</string>
+    <string name="preferences_menu_text">Preferenze</string>
+    <string name="pref_about_osl">Licenza Open Source</string>
+    <string name="pref_about_summary">Dettagli sulla licenza di Nightscout</string>
 </resources>

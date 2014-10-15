@@ -32,6 +32,14 @@
     <string name="feebback_dialog_text">Please let us know what you think.</string>
     <string name="feedback_dialog_comment_prompt">Please add your comments below:</string>
     <string name="feedback_dialog_ok_toast">Thank you!</string>
-    <string name="feedback_toast_text"></string>
+    <string name="feedback_toast_text"> </string>
 
+    <!-- Menu strings -->
+    <string name="preferences_menu_text">Preferences</string>
+    <string name="feedback_menu_text">Feedback</string>
+    <string name="close_menu_text">Close</string>
+
+    <!-- Pref about strings -->
+    <string name="pref_about_summary">License details for Nightscout</string>
+    <string name="pref_about_osl">Open Source License</string>
 </resources>
