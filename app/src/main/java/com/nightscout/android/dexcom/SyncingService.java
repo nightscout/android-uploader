@@ -63,7 +63,7 @@ public class SyncingService extends IntentService {
     private UsbSerialDriver mSerialDevice;
 
     // Constants
-    private final int TIME_SYNC_OFFSET = 3000;
+    private final int TIME_SYNC_OFFSET = 10000;
     public static final int MIN_SYNC_PAGES = 5;
     public static final int GAP_SYNC_PAGES = 20;
 
@@ -111,6 +111,7 @@ public class SyncingService extends IntentService {
      * parameters.
      */
     private void handleActionSync(int numOfPages) {
+        boolean broadcastSent = false;
         boolean rootEnabled=PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("root_support_enabled",false);
         Tracker tracker = ((Nightscout) getApplicationContext()).getTracker();
 
@@ -166,6 +167,7 @@ public class SyncingService extends IntentService {
                 EGVRecord recentEGV = recentRecords[recentRecords.length - 1];
                 broadcastSGVToUI(recentEGV, uploadStatus, nextUploadTime + TIME_SYNC_OFFSET,
                                  displayTime, array ,batLevel);
+                broadcastSent=true;
             } catch (IOException e) {
                 tracker.send(new HitBuilders.ExceptionBuilder()
                                 .setDescription("Unable to close serial connection")
@@ -173,40 +175,40 @@ public class SyncingService extends IntentService {
                                 .build()
                 );
                 Log.e(TAG, "Unable to close", e);
-                broadcastSGVToUI();
             } catch (ArrayIndexOutOfBoundsException e) {
                 Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);
-                tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Array Index out of bounds: "+e.getMessage())
+                tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Array Index out of bounds")
                         .setFatal(false)
                         .build());
-                broadcastSGVToUI();
-                return;
             } catch (NegativeArraySizeException e) {
                 Log.wtf("Negative array exception from receiver", e);
-                tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Negative Array size: " + e.getMessage())
+                tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Negative Array size")
                         .setFatal(false)
                         .build());
-                broadcastSGVToUI();
-                return;
             } catch (IndexOutOfBoundsException e) {
                 Log.wtf("IndexOutOfBounds exception from receiver", e);
-                tracker.send(new HitBuilders.ExceptionBuilder().setDescription("IndexOutOfBoundsException: " + e.getMessage())
+                tracker.send(new HitBuilders.ExceptionBuilder().setDescription("IndexOutOfBoundsException")
                         .setFatal(false)
                         .build());
-                broadcastSGVToUI();
+            } catch (CRCFailRuntimeException e){
+                // FIXME: may consider localizing this catch at a lower level (like ReadData) so that
+                // if the CRC check fails on one type of record we can capture the values if it
+                // doesn't fail on other types of records. This means we'd need to broadcast back
+                // partial results to the UI. Adding it to a lower level could make the ReadData class
+                // more difficult to maintain - needs discussion.
+                Log.wtf("CRC failed", e);
+                tracker.send(new HitBuilders.ExceptionBuilder().setDescription("CRC Failed")
+                        .setFatal(false)
+                        .build());
             } catch (Exception e) {
                 Log.wtf("Unhandled exception caught", e);
-                ACRA.getErrorReporter().handleException(e);
-                tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Catch all exception in handleActionSync: "+e.getMessage())
+                tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Catch all exception in handleActionSync")
                         .setFatal(false)
                         .build());
-                // TODO: this is cumbersome to always broadcast back to the UI to setup the next poll. There has to be another solution?
-                broadcastSGVToUI();
             }
-        } else {
-            // Not connected to serial device
-            broadcastSGVToUI();
         }
+        if (!broadcastSent)
+            broadcastSGVToUI();
         wl.release();
     }
 

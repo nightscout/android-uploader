@@ -169,7 +169,6 @@ public class ReadData {
     private ReadPacket read(int numOfBytes) {
         byte[] readData = new byte[numOfBytes];
         int len = 0;
-        // TODO: need to handle case when mSerialDevice == null
         try {
             len = mSerialDevice.read(readData, IO_TIMEOUT);
         } catch (IOException e) {
@@ -179,7 +178,6 @@ public class ReadData {
         return new ReadPacket(data);
     }
 
-    // TODO: not sure if I want to use generics or just separate methods, hmmm make it private in case
     private <T> T ParsePage(byte[] data, int recordType) {
         int HEADER_LEN = 28;
         int NUM_REC_OFFSET = 4;

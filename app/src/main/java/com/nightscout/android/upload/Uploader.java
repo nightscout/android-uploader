@@ -76,7 +76,6 @@ public class Uploader {
             Log.i(TAG, String.format("Finished upload of %s record using a Mongo in %s ms", glucoseDataSets.length + meterRecords.length, System.currentTimeMillis() - start));
         }
 
-        // TODO: not sure how to handle case when user is uploading to both and only one works
         return apiStatus || mongoStatus;
     }
 
