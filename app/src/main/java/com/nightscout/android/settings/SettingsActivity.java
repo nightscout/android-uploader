@@ -299,10 +299,8 @@ public class SettingsActivity extends PreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("cloud_storage_mongodb_uri"));
-            bindPreferenceSummaryToValue(findPreference("cloud_storage_mongodb_device_status_collection"));
-            bindPreferenceSummaryToValue(findPreference("cloud_storage_mongodb_collection"));
-            bindPreferenceSummaryToValue(findPreference("cloud_storage_api_base"));
+            // FIXME: Need to bind preferences here too for XLargeTablets but seems to crash
+            // when the option doesn't exist?
         }
     }
 
