@@ -16,6 +16,7 @@ bin/
 gen/
 out
 logs
+.DS_Store
 
 # Ignore gradle files
 .gradle/
