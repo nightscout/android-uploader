@@ -249,13 +249,21 @@ public class Uploader {
     private void populateV1APIEntry(JSONObject json, GlucoseDataSet record) throws Exception {
         json.put("device", "dexcom");
         json.put("date", record.getDisplayTime().getTime());
+        json.put("dateString", record.getDisplayTime().toString());
         json.put("sgv", Integer.parseInt(String.valueOf(record.getBGValue())));
         json.put("direction", record.getTrend().friendlyTrendName());
+        json.put("type", "sgv");
+        if (prefs.getBoolean("cloud_sensor_data", false)) {
+            json.put("filtered", record.getFiltered());
+            json.put("unfiltered", record.getUnfiltered());
+            json.put("rssi", record.getRssi());
+        }
     }
 
     private void populateLegacyAPIEntry(JSONObject json, GlucoseDataSet record) throws Exception {
         json.put("device", "dexcom");
         json.put("date", record.getDisplayTime().getTime());
+        json.put("dateString", record.getDisplayTime().toString());
         json.put("sgv", Integer.parseInt(String.valueOf(record.getBGValue())));
         json.put("direction", record.getTrend().friendlyTrendName());
     }
@@ -264,6 +272,7 @@ public class Uploader {
         json.put("device", "dexcom");
         json.put("type", "mbg");
         json.put("date", record.getDisplayTime().getTime());
+        json.put("dateString", record.getDisplayTime().toString());
         json.put("mbg", Integer.parseInt(String.valueOf(record.getMeterBG())));
     }
 
@@ -271,6 +280,7 @@ public class Uploader {
         json.put("device", "dexcom");
         json.put("type", "cal");
         json.put("date", record.getDisplayTime().getTime());
+        json.put("dateString", record.getDisplayTime().toString());
         json.put("slope", record.getSlope());
         json.put("intercept", record.getIntercept());
         json.put("scale", record.getScale());
@@ -323,9 +333,10 @@ public class Uploader {
                     testData.put("dateString", record.getDisplayTime().toString());
                     testData.put("sgv", record.getBGValue());
                     testData.put("direction", record.getTrend().friendlyTrendName());
+                    testData.put("type", "sgv");
                     if (prefs.getBoolean("cloud_sensor_data", false)) {
                         testData.put("filtered", record.getFiltered());
-                        testData.put("unfilterd", record.getUnfiltered());
+                        testData.put("unfiltered", record.getUnfiltered());
                         testData.put("rssi", record.getRssi());
                     }
                     dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
@@ -355,6 +366,7 @@ public class Uploader {
                         testData.put("slope", calRecord.getSlope());
                         testData.put("intercept", calRecord.getIntercept());
                         testData.put("scale", calRecord.getScale());
+                        testData.put("type", "cal");
                         dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
                     }
                 }
