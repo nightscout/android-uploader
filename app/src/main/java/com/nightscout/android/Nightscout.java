@@ -1,6 +1,7 @@
 package com.nightscout.android;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
@@ -37,9 +38,12 @@ public class Nightscout extends Application {
     }
 
     synchronized public Tracker getTracker() {
+        Log.d("Nightscout", "getTracker called");
         if (tracker == null) {
+            Log.d("Nightscout","tracker was null");
             GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
-            return analytics.newTracker(R.xml.app_tracker);
+            tracker = analytics.newTracker(R.xml.app_tracker);
+            return tracker;
         }
         return tracker;
     }
