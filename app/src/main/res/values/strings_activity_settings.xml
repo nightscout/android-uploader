@@ -103,7 +103,7 @@
     <string name="pref_header_labs">Labs</string>
 
     <string name="pref_title_root">Root support</string>
-    <string name="pref_summary_root">Select if phone is rooted</string>
+    <string name="pref_summary_root">Select if phone is rooted. This is a highly experimental feature - use at your own risk. Thar be dragons ahead</string>
 
     <!-- Privacy -->
     <string name="pref_header_privacy">Privacy</string>
