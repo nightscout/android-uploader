@@ -43,9 +43,7 @@ public class Nightscout extends Application {
             Log.d("Nightscout","tracker was null");
             GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
             tracker =  analytics.newTracker(R.xml.app_tracker);
-
             return tracker;
-
         }
         return tracker;
     }
