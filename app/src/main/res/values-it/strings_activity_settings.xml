@@ -88,7 +88,7 @@
     <!-- About Settings -->
     <string name="pref_header_about">A proposito</string>
 
-    <string name="pref_title_about_version_name">Nome della versione</string>
+    <string name="pref_title_about_release_name">Nome della versione</string>
     <string name="pref_summary_about_release_name">Cookie Monster</string>
 
     <string name="pref_title_about_version_number">Numero della versione</string>

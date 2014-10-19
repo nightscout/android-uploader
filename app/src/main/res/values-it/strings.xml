@@ -14,12 +14,12 @@
     <string name="feedback_dialog_comment_prompt">Aggiungi i tuoi commenti qui sotto:</string>
     <string name="feedback_dialog_ok_toast">Grazie!</string>
     <string name="feedback_toast_text"/>
-
-    <string name="button_two_day_sync">Forza invio dati ultimi 2 giorni</string>
-
-
-
-
+    <string name="message_user_not_understand">Reading from device is disabled until you review and accept \"I understand\" in preferences</string>
+    <string name="button_force_sync">Forza invio dati ultimi 2 giorni</string>
+    <string name="acra_enabled_summary">Crash reporting is enabled</string>
+    <string name="acra_disabled_summary">Crash reporting is disabled</string>
+    <string name="acra_email_dialog_title">Email</string>
+    <string name="acra_user_email_dialog_message">This is the email address included in bug reports and automatic crash reports. This field is optional</string>
     <string name="display_sgv"/>
     <string name="display_trend"/>
 
