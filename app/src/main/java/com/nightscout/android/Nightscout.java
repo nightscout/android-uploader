@@ -39,7 +39,10 @@ public class Nightscout extends Application {
     synchronized public Tracker getTracker() {
         if (tracker == null) {
             GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
-            return analytics.newTracker(R.xml.app_tracker);
+            tracker =  analytics.newTracker(R.xml.app_tracker);
+
+            return tracker;
+
         }
         return tracker;
     }
