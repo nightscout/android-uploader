@@ -1,5 +1,5 @@
 <resources>
-        <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_settings">Settings</string>
 
     <!-- Strings related to Settings -->
 
@@ -95,6 +95,9 @@
 
     <!-- GPL -->
     <string name="pref_gpl_summary">Nightscout \u00A92014\n\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.\n\nThis program is distributed in the hope that it will be useful but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.</string>
+    <string name="pref_about_osl">Open Source License</string>
+    <string name="pref_about_summary">License details for Nightscout</string>
+
 
     <!-- Lab settings -->
     <string name="pref_header_labs">Labs</string>
@@ -105,5 +108,4 @@
     <!-- Privacy -->
     <string name="pref_header_privacy">Privacy</string>
     <string name="pref_enable_acra">Enable crash reporting</string>
-
 </resources>

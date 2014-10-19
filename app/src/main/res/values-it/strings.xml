@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">G4 Connector</string>
+    <string name="self_destruct">Chiudi</string>
+    <string name="title_activity_main">Nightscout</string>
+
+    <string name="action_settings">Configurazione</string>
+
+    <string name="unknown_values">---</string>
+
+    <string name="crash_toast_text">Oops! É crashato il software. Sto mandando un rapporto a Nightscout così magari lo possono sistemare!</string>
+    <string name="feedback_dialog_title">Feedback a Nightscout</string>
+    <string name="feebback_dialog_text">Per favore facci sapere cosa ne pensi</string>
+    <string name="feedback_dialog_comment_prompt">Aggiungi i tuoi commenti qui sotto:</string>
+    <string name="feedback_dialog_ok_toast">Grazie!</string>
+    <string name="feedback_toast_text"/>
+
+    <string name="button_two_day_sync">Forza invio dati ultimi 2 giorni</string>
+
+
+
+
+    <string name="display_sgv"/>
+    <string name="display_trend"/>
+
+    <string name="close_menu_text">Esci</string>
+    <string name="feedback_menu_text">Feedback</string>
+    <string name="gap_sync_menu_text">Gap sync</string>
+    <string name="preferences_menu_text">Preferenze</string>
+    <string name="USBLabelText">USB</string>
+    <string name="UploadLabelText">Upload</string>
+    <string name="DexBatteryLabelText">Dex Battery</string>
+    <string name="TimeSyncLabelText">Time</string>
+</resources>
