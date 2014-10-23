@@ -14,10 +14,11 @@ public class ReadPacket {
     public ReadPacket(byte[] readPacket) {
         this.command = readPacket[OFFSET_CMD];
         this.data = Arrays.copyOfRange(readPacket, OFFSET_DATA, readPacket.length - CRC_LEN);
-        this.crc = Arrays.copyOfRange(readPacket,readPacket.length - CRC_LEN,readPacket.length);
-        this.crc_calc=CRC16.calculate(readPacket,0,readPacket.length-2);
-        if (!Arrays.equals(this.crc,this.crc_calc))
-            throw new CRCFailRuntimeException("CRC check failed: "+Utils.bytesToHex(this.crc) + " vs "+Utils.bytesToHex(this.crc_calc));
+        this.crc = Arrays.copyOfRange(readPacket, readPacket.length - CRC_LEN, readPacket.length);
+        this.crc_calc=CRC16.calculate(readPacket, 0, readPacket.length - 2);
+        if (!Arrays.equals(this.crc, this.crc_calc)) {
+            throw new CRCFailRuntimeException("CRC check failed: " + Utils.bytesToHex(this.crc) + " vs " + Utils.bytesToHex(this.crc_calc));
+        }
     }
 
     public int getCommand() {

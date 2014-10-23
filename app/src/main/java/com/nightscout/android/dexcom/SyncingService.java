@@ -207,8 +207,9 @@ public class SyncingService extends IntentService {
                         .build());
             }
         }
-        if (!broadcastSent)
-            broadcastSGVToUI();
+
+        if (!broadcastSent) broadcastSGVToUI();
+
         wl.release();
     }
 

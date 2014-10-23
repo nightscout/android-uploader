@@ -93,8 +93,8 @@ public class MainActivity extends Activity {
         // Setup UI components
         setContentView(R.layout.activity_main);
         mTextSGV = (TextView) findViewById(R.id.sgValue);
-        mTextSGV.setTag(R.string.display_sgv,-1);
-        mTextSGV.setTag(R.string.display_trend,0);
+        mTextSGV.setTag(R.string.display_sgv, -1);
+        mTextSGV.setTag(R.string.display_trend, 0);
         mTextTimestamp = (TextView) findViewById(R.id.timeAgo);
         mWebView = (WebView) findViewById(R.id.webView);
         mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -262,8 +262,8 @@ public class MainActivity extends Activity {
 
             // Update UI with latest record information
             mTextSGV.setText(responseSGVStr);
-            mTextSGV.setTag(R.string.display_sgv,responseSGV);
-            mTextSGV.setTag(R.string.display_trend,trend.getID());
+            mTextSGV.setTag(R.string.display_sgv, responseSGV);
+            mTextSGV.setTag(R.string.display_trend, trend.getID());
             String timeAgoStr = "---";
             Log.d(TAG,"Date: " + new Date().getTime());
             Log.d(TAG,"Response SGV Timestamp: " + responseSGVTimestamp);
@@ -286,7 +286,7 @@ public class MainActivity extends Activity {
                 Log.d(TAG, "OUT OF RANGE: Setting next upload time to: " + nextUploadTime + " ms.");
             }
 
-            if (Math.abs(new Date().getTime()-responseDisplayTime) >= TimeConstants.TWENTY_MINUTES_MS) {
+            if (Math.abs(new Date().getTime() - responseDisplayTime) >= TimeConstants.TWENTY_MINUTES_MS) {
                 Log.w(TAG, "Receiver time is off by 20 minutes or more.");
                 mTracker.send(new HitBuilders.EventBuilder("Main", "Time difference > 20 minutes").build());
                 statusBarIcons.setTimeIndicator(false);

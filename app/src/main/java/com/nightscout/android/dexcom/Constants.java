@@ -125,15 +125,15 @@ public class Constants {
     }
 
     public enum SPECIALBGVALUES_MGDL {
-        NONE("??0",0),
-        SENSORNOTACTIVE("?SN",1),
-        MINIMALLYEGVAB("??2",2),
-        NOANTENNA("?NA",3),
-        SENSOROUTOFCAL("?NC",5),
-        COUNTSAB("?CD",6),
-        ABSOLUTEAB("\u8987",9),
-        POWERAB("???",10),
-        RFBADSTATUS("?RF",12);
+        NONE("??0", 0),
+        SENSORNOTACTIVE("?SN", 1),
+        MINIMALLYEGVAB("??2", 2),
+        NOANTENNA("?NA", 3),
+        SENSOROUTOFCAL("?NC", 5),
+        COUNTSAB("?CD", 6),
+        ABSOLUTEAB("?AD", 9),
+        POWERAB("???", 10),
+        RFBADSTATUS("?RF", 12);
 
 
         private String name;
