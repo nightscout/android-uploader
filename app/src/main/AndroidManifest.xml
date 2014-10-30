@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nightscout.android"
     android:versionCode="10"
-    android:versionName="0.1.6b5">
+    android:versionName="0.1.6cwd">
 
     <uses-feature android:name="android.hardware.usb.host" />
 

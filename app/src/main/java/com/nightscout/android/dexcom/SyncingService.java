@@ -25,6 +25,7 @@ import com.nightscout.android.dexcom.records.GlucoseDataSet;
 import com.nightscout.android.dexcom.records.MeterRecord;
 import com.nightscout.android.TimeConstants;
 import com.nightscout.android.dexcom.records.SensorRecord;
+import com.nightscout.android.protobuf.SGV;
 import com.nightscout.android.upload.Uploader;
 
 import org.acra.ACRA;
@@ -34,6 +35,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous CGM Receiver downloads and cloud uploads
@@ -125,17 +127,19 @@ public class SyncingService extends IntentService {
             try {
                 ReadData readData = new ReadData(mSerialDevice);
                 // TODO: need to check if numOfPages if valid on ReadData side
-                EGVRecord[] recentRecords = readData.getRecentEGVsPages(numOfPages);
-                MeterRecord[] meterRecords = readData.getRecentMeterRecords();
+                List<EGVRecord> recentRecords = readData.getRecentEGVsPages(numOfPages);
+                List<MeterRecord> meterRecords = readData.getRecentMeterRecords();
                 // TODO: need to check if numOfPages if valid on ReadData side
-                SensorRecord[] sensorRecords = readData.getRecentSensorRecords(numOfPages);
-                GlucoseDataSet[] glucoseDataSets = Utils.mergeGlucoseDataRecords(recentRecords, sensorRecords);
-                CalRecord[] calRecords = readData.getRecentCalRecords();
+                List<SensorRecord> sensorRecords = readData.getRecentSensorRecords(numOfPages);
+                // FIXME: should probably merge these client side rather than create a merged version on the uploader
+                GlucoseDataSet[] glucoseDataSets = Utils.mergeGlucoseDataRecords(recentRecords.toArray(new EGVRecord[recentRecords.size()]), sensorRecords.toArray(new SensorRecord[sensorRecords.size()]));
+                List<CalRecord> calRecords = readData.getRecentCalRecords();
 
-                long timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
+                long timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords.get(recentRecords.size() - 1));
                 // TODO: determine if the logic here is correct. I suspect it assumes the last record was less than 5
                 // minutes ago. If a reading is skipped and the device is plugged in then nextUploadTime will be
                 // set to a negative number. This situation will eventually correct itself.
+                // Also assumes that at least one record exists.
                 long nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
                 long displayTime = readData.readDisplayTime().getTime();
                 int batLevel = readData.readBatteryLevel();
@@ -148,7 +152,18 @@ public class SyncingService extends IntentService {
 
                 // convert into json for d3 plot
                 JSONArray array = new JSONArray();
-                for (int i = 0; i < recentRecords.length; i++) array.put(recentRecords[i].toJSON());
+                for (EGVRecord record:recentRecords) array.put(record.toJSON());
+
+                G4Download.G4DownloadBuilder downloadBuilder= new G4Download.G4DownloadBuilder();
+                downloadBuilder.setDownloadTimestamp(new Date().getTime())
+                        .setEGVRecords(recentRecords)
+                        .setSensorRecords(sensorRecords)
+                        .setCalRecords(calRecords)
+                        .setMeterRecords(meterRecords)
+                        .setDownloadStatus(G4Download.DownloadStatus.SUCCESS)
+                        .setUnits(G4Download.Unit.MGDL)
+                        .setReceiverBattery(batLevel)
+                        .setUploaderBattery(MainActivity.batLevel);
 
                 Uploader uploader = new Uploader(mContext);
                 // TODO: This should be cleaned up, 5 should be a constant, maybe handle in uploader,
@@ -158,13 +173,13 @@ public class SyncingService extends IntentService {
                 boolean uploadStatus;
                 if (numOfPages < 20) {
                     uploadStatus = uploader.upload(glucoseDataSets[glucoseDataSets.length - 1],
-                                    meterRecords[meterRecords.length - 1],
-                                    calRecords[calRecords.length - 1]);
+                            meterRecords.get(meterRecords.size() - 1),
+                            calRecords.get(calRecords.size() - 1));
                 } else {
-                    uploadStatus = uploader.upload(glucoseDataSets, meterRecords, calRecords);
+                    uploadStatus = uploader.upload(glucoseDataSets, meterRecords.toArray(new MeterRecord[meterRecords.size()]), calRecords.toArray(new CalRecord[calRecords.size()]));
                 }
 
-                EGVRecord recentEGV = recentRecords[recentRecords.length - 1];
+                EGVRecord recentEGV = recentRecords.get(recentRecords.size() - 1);
                 broadcastSGVToUI(recentEGV, uploadStatus, nextUploadTime + TIME_SYNC_OFFSET,
                                  displayTime, array ,batLevel);
                 broadcastSent=true;

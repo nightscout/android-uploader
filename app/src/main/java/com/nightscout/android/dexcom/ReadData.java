@@ -16,6 +16,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class ReadData {
 
@@ -34,20 +35,18 @@ public class ReadData {
         return readDataBasePage(recordType, endPage);
     }
 
-    public EGVRecord[] getRecentEGVsPages(int numOfRecentPages) {
+    public List<EGVRecord> getRecentEGVsPages(int numOfRecentPages) {
         if (numOfRecentPages < 1) {
             throw new IllegalArgumentException("Number of pages must be greater than 1.");
         }
         int recordType = Constants.RECORD_TYPES.EGV_DATA.ordinal();
         int endPage = readDataBasePageRange(recordType);
         numOfRecentPages = numOfRecentPages - 1;
-        EGVRecord[] allPages = new EGVRecord[0];
+        List<EGVRecord> allPages = new ArrayList<EGVRecord>();
         for (int i = numOfRecentPages; i >= 0; i--) {
             int nextPage = endPage - i;
             EGVRecord[] ithEGVRecordPage = readDataBasePage(recordType, nextPage);
-            EGVRecord[] result = Arrays.copyOf(allPages, allPages.length + ithEGVRecordPage.length);
-            System.arraycopy(ithEGVRecordPage, 0, result, allPages.length, ithEGVRecordPage.length);
-            allPages = result;
+            allPages.addAll(Arrays.asList(ithEGVRecordPage));
         }
         return allPages;
     }
@@ -56,34 +55,34 @@ public class ReadData {
         return readSystemTime() - egvRecord.getSystemTimeSeconds();
     }
 
-    public MeterRecord[] getRecentMeterRecords() {
+    public List<MeterRecord> getRecentMeterRecords() {
         int recordType = Constants.RECORD_TYPES.METER_DATA.ordinal();
         int endPage = readDataBasePageRange(recordType);
-        return readDataBasePage(recordType, endPage);
+        //FIXME - too much casting going on here
+        return Arrays.asList((MeterRecord[]) readDataBasePage(recordType, endPage));
     }
 
-    public SensorRecord[] getRecentSensorRecords(int numOfRecentPages) {
+    public List<SensorRecord> getRecentSensorRecords(int numOfRecentPages) {
         if (numOfRecentPages < 1) {
             throw new IllegalArgumentException("Number of pages must be greater than 1.");
         }
         int recordType = Constants.RECORD_TYPES.SENSOR_DATA.ordinal();
         int endPage = readDataBasePageRange(recordType);
         numOfRecentPages = numOfRecentPages - 1;
-        SensorRecord[] allPages = new SensorRecord[0];
+        List<SensorRecord> allPages = new ArrayList<SensorRecord>();
         for (int i = numOfRecentPages; i >= 0; i--) {
             int nextPage = endPage - i;
             SensorRecord[] ithSensorRecordPage = readDataBasePage(recordType, nextPage);
-            SensorRecord[] result = Arrays.copyOf(allPages, allPages.length + ithSensorRecordPage.length);
-            System.arraycopy(ithSensorRecordPage, 0, result, allPages.length, ithSensorRecordPage.length);
-            allPages = result;
+            allPages.addAll(Arrays.asList(ithSensorRecordPage));
         }
         return allPages;
     }
 
-    public CalRecord[] getRecentCalRecords() {
+    public List<CalRecord> getRecentCalRecords() {
         int recordType = Constants.RECORD_TYPES.CAL_SET.ordinal();
         int endPage = readDataBasePageRange(recordType);
-        return readDataBasePage(recordType, endPage);
+        //FIXME - too much casting going on here
+        return Arrays.asList((CalRecord[]) readDataBasePage(recordType, endPage));
     }
 
     public boolean ping() {

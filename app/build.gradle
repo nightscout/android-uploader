@@ -28,4 +28,6 @@ dependencies {
     compile 'com.android.support:support-v4:20.0.0'
     compile 'org.mongodb:mongo-java-driver:2.10.1'
     compile 'com.google.android.gms:play-services:5.0.89'
+    compile files('libs/org.eclipse.paho.client.mqttv3-1.0.0.jar')
+    compile 'com.google.protobuf:protobuf-java:2.6.1'
 }
