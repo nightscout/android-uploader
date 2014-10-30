@@ -140,12 +140,6 @@ public class SyncingService extends IntentService {
                 long displayTime = readData.readDisplayTime().getTime();
                 int batLevel = readData.readBatteryLevel();
 
-                // Close serial
-                mSerialDevice.close();
-
-                // Try powering off, will only work if rooted
-                if (rootEnabled) USBPower.PowerOff();
-
                 // convert into json for d3 plot
                 JSONArray array = new JSONArray();
                 for (int i = 0; i < recentRecords.length; i++) array.put(recentRecords[i].toJSON());
@@ -168,13 +162,6 @@ public class SyncingService extends IntentService {
                 broadcastSGVToUI(recentEGV, uploadStatus, nextUploadTime + TIME_SYNC_OFFSET,
                                  displayTime, array ,batLevel);
                 broadcastSent=true;
-            } catch (IOException e) {
-                tracker.send(new HitBuilders.ExceptionBuilder()
-                                .setDescription("Unable to close serial connection")
-                                .setFatal(false)
-                                .build()
-                );
-                Log.e(TAG, "Unable to close", e);
             } catch (ArrayIndexOutOfBoundsException e) {
                 Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Array Index out of bounds")
@@ -205,6 +192,22 @@ public class SyncingService extends IntentService {
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Catch all exception in handleActionSync")
                         .setFatal(false)
                         .build());
+            } finally {
+                // FIXME: Nested try catches in the finally block? Yuck... =-(
+                // Close serial
+                try {
+                    mSerialDevice.close();
+                } catch (IOException e) {
+                    tracker.send(new HitBuilders.ExceptionBuilder()
+                                    .setDescription("Unable to close serial connection")
+                                    .setFatal(false)
+                                    .build()
+                    );
+                    Log.e(TAG, "Unable to close", e);
+                }
+
+                // Try powering off, will only work if rooted
+                if (rootEnabled) USBPower.PowerOff();
             }
         }
 
