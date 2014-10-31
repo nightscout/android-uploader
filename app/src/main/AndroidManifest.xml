@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nightscout.android"
-    android:versionCode="10"
-    android:versionName="0.1.6b5">
+    android:versionCode="12"
+    android:versionName="0.1.6b6">
 
     <uses-feature android:name="android.hardware.usb.host" />
 
