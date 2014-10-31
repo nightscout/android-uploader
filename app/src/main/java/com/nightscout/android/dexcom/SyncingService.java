@@ -27,7 +27,6 @@ import com.nightscout.android.TimeConstants;
 import com.nightscout.android.dexcom.records.SensorRecord;
 import com.nightscout.android.upload.Uploader;
 
-import org.acra.ACRA;
 import org.json.JSONArray;
 
 import java.io.IOException;
@@ -193,7 +192,6 @@ public class SyncingService extends IntentService {
                         .setFatal(false)
                         .build());
             } finally {
-                // FIXME: Nested try catches in the finally block? Yuck... =-(
                 // Close serial
                 try {
                     mSerialDevice.close();
