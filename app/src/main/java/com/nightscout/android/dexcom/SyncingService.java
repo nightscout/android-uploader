@@ -21,14 +21,12 @@ import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.USB.UsbSerialProber;
 import com.nightscout.android.dexcom.records.CalRecord;
 import com.nightscout.android.dexcom.records.EGVRecord;
-import com.nightscout.android.dexcom.records.GlucoseDataSet;
 import com.nightscout.android.dexcom.records.MeterRecord;
 import com.nightscout.android.TimeConstants;
 import com.nightscout.android.dexcom.records.SensorRecord;
-import com.nightscout.android.protobuf.SGV;
-import com.nightscout.android.upload.Uploader;
+import com.nightscout.android.processors.MongoProcessor;
+import com.nightscout.android.processors.ProcessorChain;
 
-import org.acra.ACRA;
 import org.json.JSONArray;
 
 import java.io.IOException;
@@ -42,6 +40,8 @@ import java.util.List;
  * requests in a service on a separate handler thread.
  */
 public class SyncingService extends IntentService {
+
+    ProcessorChain processorChain;
 
     // Action for intent
     private static final String ACTION_SYNC = "com.nightscout.android.dexcom.action.SYNC";
@@ -131,8 +131,6 @@ public class SyncingService extends IntentService {
                 List<MeterRecord> meterRecords = readData.getRecentMeterRecords();
                 // TODO: need to check if numOfPages if valid on ReadData side
                 List<SensorRecord> sensorRecords = readData.getRecentSensorRecords(numOfPages);
-                // FIXME: should probably merge these client side rather than create a merged version on the uploader
-                GlucoseDataSet[] glucoseDataSets = Utils.mergeGlucoseDataRecords(recentRecords.toArray(new EGVRecord[recentRecords.size()]), sensorRecords.toArray(new SensorRecord[sensorRecords.size()]));
                 List<CalRecord> calRecords = readData.getRecentCalRecords();
 
                 long timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords.get(recentRecords.size() - 1));
@@ -165,20 +163,16 @@ public class SyncingService extends IntentService {
                         .setReceiverBattery(batLevel)
                         .setUploaderBattery(MainActivity.batLevel);
 
-                Uploader uploader = new Uploader(mContext);
-                // TODO: This should be cleaned up, 5 should be a constant, maybe handle in uploader,
-                // and maybe might not have to read 5 pages (that was only done for single sync for UI
-                // plot updating and might be able to be done in javascript d3 code as a FIFO array
-                // Only upload 1 record unless forcing a sync
-                boolean uploadStatus;
-                if (numOfPages < 20) {
-                    uploadStatus = uploader.upload(glucoseDataSets[glucoseDataSets.length - 1],
-                            meterRecords.get(meterRecords.size() - 1),
-                            calRecords.get(calRecords.size() - 1));
-                } else {
-                    uploadStatus = uploader.upload(glucoseDataSets, meterRecords.toArray(new MeterRecord[meterRecords.size()]), calRecords.toArray(new CalRecord[calRecords.size()]));
+                if (processorChain==null) {
+                    processorChain = new ProcessorChain();
+                    // TODO: Add options to support this processor
+                    //MQTTUploadProcessor mqtt=new MQTTUploadProcessor(mContext);
+                    //processorChain.add(mqtt);
+                    MongoProcessor mongo = new MongoProcessor(mContext);
+                    processorChain.add(mongo);
                 }
-
+                // FIXME: does not currently handle gap sync functionality
+                boolean uploadStatus=processorChain.process(downloadBuilder.build());
                 EGVRecord recentEGV = recentRecords.get(recentRecords.size() - 1);
                 broadcastSGVToUI(recentEGV, uploadStatus, nextUploadTime + TIME_SYNC_OFFSET,
                                  displayTime, array ,batLevel);
