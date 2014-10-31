@@ -183,33 +183,35 @@ public class Uploader {
                 }
             }
 
-            for (MeterRecord record : meterRecords) {
-                JSONObject json = new JSONObject();
+            if (apiVersion >= 1) {
+                for (MeterRecord record : meterRecords) {
+                    JSONObject json = new JSONObject();
 
-                try {
-                    populateV1APIEntry(json, record);
-                } catch (Exception e) {
-                    Log.w(TAG, "Unable to populate entry, apiVersion: " + apiVersion, e);
-                    continue;
-                }
+                    try {
+                        populateV1APIEntry(json, record);
+                    } catch (Exception e) {
+                        Log.w(TAG, "Unable to populate entry, apiVersion: " + apiVersion, e);
+                        continue;
+                    }
 
-                String jsonString = json.toString();
-                Log.i(TAG, "MBG JSON: " + jsonString);
+                    String jsonString = json.toString();
+                    Log.i(TAG, "MBG JSON: " + jsonString);
 
-                try {
-                    StringEntity se = new StringEntity(jsonString);
-                    post.setEntity(se);
-                    post.setHeader("Accept", "application/json");
-                    post.setHeader("Content-type", "application/json");
+                    try {
+                        StringEntity se = new StringEntity(jsonString);
+                        post.setEntity(se);
+                        post.setHeader("Accept", "application/json");
+                        post.setHeader("Content-type", "application/json");
 
-                    ResponseHandler responseHandler = new BasicResponseHandler();
-                    httpclient.execute(post, responseHandler);
-                } catch (Exception e) {
-                    Log.w(TAG, "Unable to post data to: '" + post.getURI().toString() + "'", e);
+                        ResponseHandler responseHandler = new BasicResponseHandler();
+                        httpclient.execute(post, responseHandler);
+                    } catch (Exception e) {
+                        Log.w(TAG, "Unable to post data to: '" + post.getURI().toString() + "'", e);
+                    }
                 }
             }
 
-            if (prefs.getBoolean("cloud_cal_data", false)) {
+            if (apiVersion >= 1 && prefs.getBoolean("cloud_cal_data", false)) {
                 for (CalRecord calRecord : calRecords) {
 
                     JSONObject json = new JSONObject();
