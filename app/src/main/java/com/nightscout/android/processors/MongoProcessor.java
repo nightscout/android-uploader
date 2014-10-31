@@ -1,8 +1,6 @@
 package com.nightscout.android.processors;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.mongodb.BasicDBObject;
@@ -19,8 +17,8 @@ import com.nightscout.android.dexcom.records.EGVRecord;
 import com.nightscout.android.dexcom.records.GlucoseDataSet;
 import com.nightscout.android.dexcom.records.MeterRecord;
 import com.nightscout.android.dexcom.records.SensorRecord;
-import com.nightscout.android.processors.AbstractProcessor;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class MongoProcessor extends AbstractProcessor {
@@ -31,7 +29,7 @@ public class MongoProcessor extends AbstractProcessor {
     private boolean uploadSensorData;
     private boolean uploadCalData;
 
-    MongoProcessor(Context context){
+    public MongoProcessor(Context context){
         super(context,"mongo");
         dbURI = sharedPref.getString("cloud_storage_mongodb_uri", null);
         collectionName = sharedPref.getString("cloud_storage_mongodb_collection", null);
@@ -53,7 +51,11 @@ public class MongoProcessor extends AbstractProcessor {
 
                 // get collection
                 DBCollection dexcomData = db.getCollection(collectionName.trim());
-                GlucoseDataSet[] glucoseDataSets = Utils.mergeGlucoseDataRecords(download.getEGVRecords().toArray(new EGVRecord[download.getEGVRecords().size()]),download.getSensorRecords().toArray(new SensorRecord[download.getSensorRecords().size()]));
+                ArrayList<EGVRecord> egvRecords=filterRecords(download.getEGVRecords(),AbstractProcessor.LAST_EGV_REC_SHAREDPREF);
+                ArrayList<SensorRecord> sensorRecords=filterRecords(download.getSensorRecords(),AbstractProcessor.LAST_SENSOR_REC_SHAREDPREF);
+                ArrayList<MeterRecord> meterRecords=filterRecords(download.getMeterRecords(),AbstractProcessor.LAST_METER_REC_SHAREDPREF);
+                ArrayList<CalRecord> calRecords=filterRecords(download.getCalRecords(),AbstractProcessor.LAST_CAL_REC_SHAREDPREF);
+                GlucoseDataSet[] glucoseDataSets = Utils.mergeGlucoseDataRecords(egvRecords.toArray(new EGVRecord[egvRecords.size()]),sensorRecords.toArray(new SensorRecord[sensorRecords.size()]));
                 Log.i(TAG, "The number of EGV records being sent to MongoDB is " + glucoseDataSets.length);
                 for (GlucoseDataSet record : glucoseDataSets) {
                     // make db object
@@ -71,8 +73,8 @@ public class MongoProcessor extends AbstractProcessor {
                     dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
                 }
 
-                Log.i(TAG, "The number of MBG records being sent to MongoDB is " + download.getMeterRecords().size());
-                for (MeterRecord meterRecord : download.getMeterRecords()) {
+                Log.i(TAG, "The number of MBG records being sent to MongoDB is " + meterRecords.size());
+                for (MeterRecord meterRecord : meterRecords) {
                     // make db object
                     BasicDBObject testData = new BasicDBObject();
                     testData.put("device", "dexcom");
@@ -86,7 +88,7 @@ public class MongoProcessor extends AbstractProcessor {
                 // TODO: might be best to merge with the the glucose data but will require time
                 // analysis to match record with cal set, for now this will do
                 if (uploadCalData) {
-                    for (CalRecord calRecord : download.getCalRecords()) {
+                    for (CalRecord calRecord : calRecords) {
                         // make db object
                         BasicDBObject testData = new BasicDBObject();
                         testData.put("device", "dexcom");
@@ -112,15 +114,5 @@ public class MongoProcessor extends AbstractProcessor {
             }
         }
         return true;
-    }
-
-    @Override
-    public void stop() {
-
-    }
-
-    @Override
-    public void start() {
-
     }
 }

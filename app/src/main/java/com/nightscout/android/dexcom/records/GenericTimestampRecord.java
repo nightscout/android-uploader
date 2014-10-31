@@ -37,6 +37,7 @@ public class GenericTimestampRecord {
     public Date getDisplayTime() {
         return displayTime;
     }
+
     public long getDisplayTimeSeconds() {
         return displayTime.getTime();
     }
