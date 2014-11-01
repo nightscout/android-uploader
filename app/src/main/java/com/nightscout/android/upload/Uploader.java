@@ -38,6 +38,7 @@ public class Uploader {
     private Context mContext;
     private Boolean enableRESTUpload;
     private Boolean enableMongoUpload;
+    private Boolean enableMQTTUpload;
     private SharedPreferences prefs;
 
     public Uploader(Context context) {
@@ -45,6 +46,7 @@ public class Uploader {
         prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         enableRESTUpload = prefs.getBoolean("cloud_storage_api_enable", false);
         enableMongoUpload = prefs.getBoolean("cloud_storage_mongodb_enable", false);
+        enableMQTTUpload = prefs.getBoolean("cloud_storage_mqtt_enable", false);
     }
 
     public boolean upload(GlucoseDataSet glucoseDataSet, MeterRecord meterRecord, CalRecord calRecord) {

@@ -45,6 +45,49 @@
 
     <PreferenceScreen
         android:dependency="i_understand"
+        android:key="cloud_storage_mqtt"
+        android:title="@string/pref_title_mqtt"
+        android:summary="@string/pref_summary_mqtt_enabled">
+
+        <SwitchPreference
+            android:dependency="i_understand"
+            android:title="@string/pref_title_mqtt_enabled"
+            android:key="cloud_storage_mqtt_enable"
+            android:disableDependentsState="false"
+            android:summary="@string/pref_summary_mqtt_enabled">
+        </SwitchPreference>
+
+        <EditTextPreference
+            android:dependency="cloud_storage_mqtt_enable"
+            android:title="@string/pref_title_mqtt_endpoint"
+            android:key="cloud_storage_mqtt_endpoint"
+            android:dialogTitle="@string/pref_dialog_mqtt_endpoint"
+            android:dialogMessage="@string/pref_message_mqtt_endpoint"
+            android:defaultValue="@string/pref_default_mqtt_endpoint">
+        </EditTextPreference>
+
+        <EditTextPreference
+            android:dependency="cloud_storage_mqtt_enable"
+            android:title="@string/pref_title_mqtt_user"
+            android:key="cloud_storage_mqtt_user"
+            android:dialogTitle="@string/pref_dialog_mqtt_user"
+            android:dialogMessage="@string/pref_message_mqtt_user"
+            android:defaultValue="@string/pref_default_mqtt_user">
+        </EditTextPreference>
+
+        <EditTextPreference
+            android:dependency="cloud_storage_mqtt_enable"
+            android:title="@string/pref_title_mqtt_pass"
+            android:key="cloud_storage_mqtt_pass"
+            android:dialogTitle="@string/pref_dialog_mqtt_pass"
+            android:dialogMessage="@string/pref_message_mqtt_pass"
+            android:defaultValue="@string/pref_default_mqtt_pass">
+        </EditTextPreference>
+
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:dependency="i_understand"
         android:key="cloud_storage_api"
         android:title="@string/pref_title_api"
         android:summary="@string/pref_summary_api_enabled">

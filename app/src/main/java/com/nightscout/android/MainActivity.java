@@ -140,6 +140,9 @@ public class MainActivity extends Activity {
         if (prefs.getBoolean("cloud_storage_mongodb_enable", false)) {
             mTracker.send(new HitBuilders.EventBuilder("Upload", "Mongo").build());
         }
+        if (prefs.getBoolean("cloud_storage_mqtt_enable", false)) {
+            mTracker.send(new HitBuilders.EventBuilder("Upload", "mqtt").build());
+        }
     }
 
     @Override

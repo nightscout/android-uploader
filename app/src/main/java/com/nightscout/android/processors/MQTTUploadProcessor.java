@@ -16,9 +16,9 @@ public class MQTTUploadProcessor extends AbstractProcessor implements MQTTMgrObs
 
     public MQTTUploadProcessor(Context context) {
         super(context,"mqtt_uploader");
-        String url=sharedPref.getString("mqtt_endpoint","");
-        String usr=sharedPref.getString("mqtt_user","");
-        String pw=sharedPref.getString("mqtt_pass","");
+        String url=sharedPref.getString("cloud_storage_mqtt_endpoint","");
+        String usr=sharedPref.getString("cloud_storage_mqtt_user","");
+        String pw=sharedPref.getString("cloud_storage_mqtt_pass","");
         mqttMgr=new MQTTMgr(this.context,usr,pw);
         mqttMgr.initConnect(url);
         mqttMgr.registerObserver(this);

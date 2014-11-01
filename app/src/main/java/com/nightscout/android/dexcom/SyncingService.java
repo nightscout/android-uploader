@@ -25,8 +25,8 @@ import com.nightscout.android.dexcom.records.MeterRecord;
 import com.nightscout.android.TimeConstants;
 import com.nightscout.android.dexcom.records.SensorRecord;
 import com.nightscout.android.processors.MongoProcessor;
+import com.nightscout.android.processors.MQTTUploadProcessor;
 import com.nightscout.android.processors.ProcessorChain;
-
 import org.json.JSONArray;
 
 import java.io.IOException;
@@ -160,8 +160,8 @@ public class SyncingService extends IntentService {
                 if (processorChain==null) {
                     processorChain = new ProcessorChain();
                     // TODO: Add options to support this processor
-                    //MQTTUploadProcessor mqtt=new MQTTUploadProcessor(mContext);
-                    //processorChain.add(mqtt);
+                    MQTTUploadProcessor mqtt=new MQTTUploadProcessor(mContext);
+                    processorChain.add(mqtt);
                     MongoProcessor mongo = new MongoProcessor(mContext);
                     processorChain.add(mongo);
                 }
