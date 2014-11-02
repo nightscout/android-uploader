@@ -30,6 +30,18 @@ public class G4Download {
         this.meterRecords=builder.meterRecords;
     }
 
+    public G4Download(G4Download g4Download){
+        this.EGVRecords=g4Download.getEGVRecords();
+        this.CalRecords=g4Download.getCalRecords();
+        this.SensorRecords=g4Download.getSensorRecords();
+        this.units=g4Download.getUnits();
+        this.downloadTimestamp=g4Download.getDownloadTimestamp();
+        this.downloadStatus=g4Download.getDownloadStatus();
+        this.receiverBattery=g4Download.getReceiverBattery();
+        this.uploaderBattery=g4Download.getUploaderBattery();
+        this.meterRecords=g4Download.getMeterRecords();
+    }
+
     public List<EGVRecord> getEGVRecords() {
         return EGVRecords;
     }

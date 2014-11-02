@@ -30,6 +30,7 @@ import com.nightscout.android.processors.ProcessorChain;
 import org.json.JSONArray;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;

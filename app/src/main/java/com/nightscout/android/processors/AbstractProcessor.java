@@ -3,7 +3,13 @@ package com.nightscout.android.processors;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+
+import com.nightscout.android.dexcom.G4Download;
+import com.nightscout.android.dexcom.records.CalRecord;
+import com.nightscout.android.dexcom.records.EGVRecord;
 import com.nightscout.android.dexcom.records.GenericTimestampRecord;
+import com.nightscout.android.dexcom.records.MeterRecord;
+import com.nightscout.android.dexcom.records.SensorRecord;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -39,6 +45,21 @@ abstract public class AbstractProcessor implements ProcessorInterface {
         editor.putLong(name+sharedKey,list.get(list.size()-1).getSystemTimeSeconds());
         editor.apply();
         return (T) result;
+    }
+
+    protected G4Download filterDownload(G4Download download){
+        G4Download.G4DownloadBuilder dlCopyBuilder=new G4Download.G4DownloadBuilder();
+        G4Download dlCopy=dlCopyBuilder.setDownloadStatus(download.getDownloadStatus())
+                .setEGVRecords((ArrayList<EGVRecord>) filterRecords(download.getEGVRecords(), LAST_EGV_REC_SHAREDPREF))
+                .setSensorRecords((ArrayList<SensorRecord>) filterRecords(download.getSensorRecords(), LAST_SENSOR_REC_SHAREDPREF))
+                .setMeterRecords((ArrayList<MeterRecord>) filterRecords(download.getMeterRecords(), LAST_METER_REC_SHAREDPREF))
+                .setCalRecords((ArrayList<CalRecord>) filterRecords(download.getCalRecords(), LAST_CAL_REC_SHAREDPREF))
+                .setDownloadTimestamp(download.getDownloadTimestamp())
+                .setUnits(download.getUnits())
+                .setReceiverBattery(download.getReceiverBattery())
+                .setUploaderBattery(download.getUploaderBattery())
+                .build();
+        return dlCopy;
     }
 
     @Override
