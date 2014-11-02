@@ -21,6 +21,11 @@ public class GenericTimestampRecord {
         displayTime = Utils.receiverTimeToDate(dt);
     }
 
+    public GenericTimestampRecord(Date displayTime, Date systemTime){
+        this.displayTime=displayTime;
+        this.systemTime=systemTime;
+    }
+
     public Date getSystemTime() {
         return systemTime;
     }
@@ -31,6 +36,9 @@ public class GenericTimestampRecord {
 
     public Date getDisplayTime() {
         return displayTime;
+    }
+    public long getDisplayTimeSeconds() {
+        return displayTime.getTime();
     }
 
 }

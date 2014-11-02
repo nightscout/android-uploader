@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <string name="ga_logLevel">warning</string>
+    <integer name="ga_dispatchPeriod">7200</integer>
+    <bool name="ga_dryRun">false</bool>
+</resources>

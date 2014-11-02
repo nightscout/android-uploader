@@ -117,7 +117,6 @@ public class SerialInputOutputManager implements Runnable {
      * called, or until a driver exception is raised.
      *
      * NOTE(mikey): Uses inefficient read/write-with-timeout.
-     * TODO(mikey): Read asynchronously with {@link android.hardware.usb.UsbRequest#queue(java.nio.ByteBuffer, int)}
      */
     @Override
     public void run() {

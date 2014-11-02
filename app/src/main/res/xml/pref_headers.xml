@@ -11,7 +11,19 @@
         android:title="@string/pref_header_cloud_storage" />
 
     <header
+        android:fragment="com.nightscout.android.settings.SettingsActivity$DisplayPreferenceFragment"
+        android:title="@string/pref_header_display_options" />
+
+    <header
         android:fragment="com.nightscout.android.settings.SettingsActivity$AboutPreferenceFragment"
         android:title="@string/pref_header_about" />
+
+    <header
+        android:fragment="com.nightscout.android.settings.SettingsActivity$PrivacyPreferenceFragment"
+        android:title="@string/pref_header_privacy" />
+
+    <header
+        android:fragment="com.nightscout.android.settings.SettingsActivity$LabsPreferenceFragment"
+        android:title="@string/pref_header_labs" />
 
 </preference-headers>

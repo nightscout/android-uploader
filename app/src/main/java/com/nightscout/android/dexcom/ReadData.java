@@ -52,7 +52,7 @@ public class ReadData {
         return allPages;
     }
 
-    public int getTimeSinceEGVRecord(EGVRecord egvRecord) {
+    public long getTimeSinceEGVRecord(EGVRecord egvRecord) {
         return readSystemTime() - egvRecord.getSystemTimeSeconds();
     }
 
@@ -62,10 +62,22 @@ public class ReadData {
         return readDataBasePage(recordType, endPage);
     }
 
-    public SensorRecord[] getRecentSensorRecords() {
+    public SensorRecord[] getRecentSensorRecords(int numOfRecentPages) {
+        if (numOfRecentPages < 1) {
+            throw new IllegalArgumentException("Number of pages must be greater than 1.");
+        }
         int recordType = Constants.RECORD_TYPES.SENSOR_DATA.ordinal();
         int endPage = readDataBasePageRange(recordType);
-        return readDataBasePage(recordType, endPage);
+        numOfRecentPages = numOfRecentPages - 1;
+        SensorRecord[] allPages = new SensorRecord[0];
+        for (int i = numOfRecentPages; i >= 0; i--) {
+            int nextPage = endPage - i;
+            SensorRecord[] ithSensorRecordPage = readDataBasePage(recordType, nextPage);
+            SensorRecord[] result = Arrays.copyOf(allPages, allPages.length + ithSensorRecordPage.length);
+            System.arraycopy(ithSensorRecordPage, 0, result, allPages.length, ithSensorRecordPage.length);
+            allPages = result;
+        }
+        return allPages;
     }
 
     public CalRecord[] getRecentCalRecords() {
@@ -79,6 +91,12 @@ public class ReadData {
         return read(MIN_LEN).getCommand() == Constants.ACK;
     }
 
+    public int readBatteryLevel(){
+        writeCommand(Constants.READ_BATTERY_LEVEL);
+        byte[] readData = read(MIN_LEN).getData();
+        return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
+    }
+
     public String readSerialNumber() {
         int PAGE_OFFSET = 0;
         byte[] readData = readDataBasePage(Constants.RECORD_TYPES.MANUFACTURING_DATA.ordinal(), PAGE_OFFSET);
@@ -90,7 +108,7 @@ public class ReadData {
         return Utils.receiverTimeToDate(readSystemTime() + readDisplayTimeOffset());
     }
 
-    public int readSystemTime() {
+    public long readSystemTime() {
         writeCommand(Constants.READ_SYSTEM_TIME);
         byte[] readData = read(MIN_LEN).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt() & 0xffffffff;
@@ -151,7 +169,6 @@ public class ReadData {
     private ReadPacket read(int numOfBytes) {
         byte[] readData = new byte[numOfBytes];
         int len = 0;
-        // TODO: need to handle case when mSerialDevice == null
         try {
             len = mSerialDevice.read(readData, IO_TIMEOUT);
         } catch (IOException e) {
@@ -161,7 +178,6 @@ public class ReadData {
         return new ReadPacket(data);
     }
 
-    // TODO: not sure if I want to use generics or just separate methods, hmmm make it private in case
     private <T> T ParsePage(byte[] data, int recordType) {
         int HEADER_LEN = 28;
         int NUM_REC_OFFSET = 4;
