@@ -36,6 +36,28 @@
     <string name="pref_message_mongodb_device_status_collection">This is the name of the collection where the battery and other device data will be stored</string>
     <string name="pref_default_mongodb_device_status_collection">devicestatus</string>
 
+    <!-- MQTT Settings -->
+    <string name="pref_title_mqtt">MQTT</string>
+
+    <string name="pref_title_mqtt_enabled">Enabled</string>
+    <string name="pref_summary_mqtt_enabled">If you\'re using eg CloudMQTT this should be enabled</string>
+
+    <string name="pref_title_mqtt_endpoint">URI</string>
+    <string name="pref_dialog_mqtt_endpoint">Enter MQTT URI"</string>
+    <string name="pref_message_mqtt_endpoint">Replace example values in {}\'s with your correct values</string>
+    <string name="pref_default_mqtt_endpoint">tcp://{host}.cloudmqtt.com:{11111}</string>
+
+    <string name="pref_title_mqtt_user">MQTT user name</string>
+    <string name="pref_dialog_mqtt_user">Enter mqtt user name</string>
+    <string name="pref_message_mqtt_user">This the mqtt user name.</string>
+    <string name="pref_default_mqtt_user"></string>
+
+    <string name="pref_title_mqtt_pass">MQTT password</string>
+    <string name="pref_dialog_mqtt_pass">Enter mqtt password</string>
+    <string name="pref_message_mqtt_pass">This the mqtt password.</string>
+    <string name="pref_default_mqtt_pass"></string>
+
+
     <!-- API Settings -->
     <string name="pref_title_api">API Upload (REST)</string>
 
