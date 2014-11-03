@@ -20,7 +20,7 @@ import java.util.Date;
 public class ReadData {
 
     private static final String TAG = ReadData.class.getSimpleName();
-    private static final int IO_TIMEOUT = 200;
+    private static final int IO_TIMEOUT = 1000;
     private static final int MIN_LEN = 256;
     private UsbSerialDriver mSerialDevice;
 
