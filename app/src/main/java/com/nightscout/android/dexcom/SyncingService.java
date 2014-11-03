@@ -276,7 +276,7 @@ public class SyncingService extends IntentService {
 
     private void broadcastSGVToUI() {
         EGVRecord record=new EGVRecord(-1, Constants.TREND_ARROW_VALUES.NONE,new Date(),new Date());
-        broadcastSGVToUI(record,false, (long) TimeConstants.FIVE_MINUTES_MS,new Date().getTime(),null,0);
+        broadcastSGVToUI(record,false, (long) TimeConstants.FIVE_MINUTES_MS+TIME_SYNC_OFFSET,new Date().getTime(),null,0);
     }
 
 }
