@@ -63,7 +63,7 @@ public class SyncingService extends IntentService {
 
     // Constants
     private final int TIME_SYNC_OFFSET = 10000;
-    public static final int MIN_SYNC_PAGES = 5;
+    public static final int MIN_SYNC_PAGES = 2;
     public static final int GAP_SYNC_PAGES = 20;
 
 
