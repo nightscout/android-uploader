@@ -259,6 +259,7 @@ public class SyncingService extends IntentService {
     private void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus,
                                   long nextUploadTime, long displayTime,
                                   JSONArray json, int batLvl) {
+        Log.d(TAG, "Current EGV: " + egvRecord.getBGValue());
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -276,7 +277,7 @@ public class SyncingService extends IntentService {
 
     private void broadcastSGVToUI() {
         EGVRecord record=new EGVRecord(-1, Constants.TREND_ARROW_VALUES.NONE,new Date(),new Date());
-        broadcastSGVToUI(record,false, (long) TimeConstants.FIVE_MINUTES_MS+TIME_SYNC_OFFSET,new Date().getTime(),null,0);
+        broadcastSGVToUI(record,false, (long) TimeConstants.FIVE_MINUTES_MS + TIME_SYNC_OFFSET, new Date().getTime(), null, 0);
     }
 
 }
