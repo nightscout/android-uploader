@@ -186,6 +186,15 @@ public class ReadData {
         try {
             len = mSerialDevice.read(readData, IO_TIMEOUT);
             Log.d(TAG, "Read " + len + " byte(s) complete.");
+
+            // TODO: this debug code to print at most 30 bytes of the read, should be removed after
+            // finding the source of the reading issue
+            String bytes = "";
+            int readAmount = len > 30 ? 30 : len;
+            for (int i = 0; i < readAmount; i++) bytes += String.format("%02x", readData[i]) + " ";
+            Log.d(TAG, "Read data: " + bytes);
+            ////////////////////////////////////////////////////////////////////////////////////////
+
         } catch (IOException e) {
             Log.e(TAG, "Unable to read from serial device.", e);
         }
