@@ -1,6 +1,4 @@
-var latestSGV,
-    padding = { top: 20, right: 0, bottom: 10, left: 0 },
-    opacity = {current: 1, DAY: 1, NIGHT: 0.5},
+var padding = { top: 20, right: 0, bottom: 10, left: 0 },
     data = [],
     dateFn = function (d) { return new Date(d.date) },
     xScale, yScale,
@@ -10,26 +8,15 @@ var latestSGV,
     prevChartWidth = 0,
     prevChartHeight = 0,
     focusHeight,
-    contextHeight,
-    UPDATE_TRANS_MS = 750, // milliseconds
+    UPDATE_TRANS_MS = 750,
     brush,
     clip,
-    TWENTY_FIVE_MINS_IN_MS = 1500000,
-    THIRTY_MINS_IN_MS = 1800000,
-    FORTY_MINS_IN_MS = 2400000,
-    FORTY_TWO_MINS_IN_MS = 2520000,
-    SIXTY_MINS_IN_MS = 3600000,
     FOCUS_DATA_RANGE_MS = 14400000,
-    FORMAT_TIME = '%p', //alternate format '%H:%M'
     updateTimer,
     units = "mg/dL";
 
     // Tick Values
     var tickValues = [40, 60, 80, 120, 180, 300, 400];
-
-    var futureOpacity = d3.scale.linear( )
-        .domain([TWENTY_FIVE_MINS_IN_MS, SIXTY_MINS_IN_MS])
-        .range([0.8, 0.1]);
 
     // create svg and g to contain the chart contents
     var charts = d3.select('#chartContainer').append('svg')
@@ -47,14 +34,7 @@ var latestSGV,
     focus.append('g')
         .attr('class', 'y axis');
 
-    // Remove leading zeros from the time (eg. 08:40 = 8:40) & lowercase the am/pm
-    function formatTime(time) {
-        time = d3.time.format(FORMAT_TIME)(time);
-        time = time.replace(/^0/, '').toLowerCase();
-        return time;
-    }
-
-    // lixgbg: Convert mg/dL BG value to metric mmol
+    // Convert mg/dL BG value to metric mmol
     function scaleBg(bg) {
         if (units == "mmol") {
             return (Math.round((bg / 18) * 10) / 10).toFixed(1);
@@ -87,16 +67,6 @@ var latestSGV,
 
         updateChart(true);
     }
-
-    // get the desired opacity for context chart based on the brush extent
-    function highlightBrushPoints(data) {
-        if (data.date.getTime() >= brush.extent()[0].getTime() && data.date.getTime() <= brush.extent()[1].getTime()) {
-            return futureOpacity(data.date - latestSGV.x);
-        } else {
-            return 0.5;
-        }
-    }
-
 
     // called for initial update and updates for resize
     function updateChart(init) {
@@ -222,7 +192,6 @@ var latestSGV,
             .attr('cx', function (d) { return xScale(d.date); })
             .attr('cy', function (d) { return yScale(d.sgv); })
             .attr('fill', function (d) { return d.color; })
-            //.attr('opacity', function (d) { return futureOpacity(d.date - latestSGV.x); })
             .attr('r', function(d) { if (d.type == 'mbg') return 6; else return 2;});
 
         focusCircles.exit()
@@ -275,9 +244,6 @@ var latestSGV,
         var AR = [-0.723, 1.716];
         var dt = actual[1].date.getTime();
         var predictedColor = 'blue';
-//        if (browserSettings.theme == "colors") {
-//            predictedColor = 'cyan';
-//        }
         for (var i = 0; i < CONE.length; i++) {
             y = [y[1], AR[0] * y[0] + AR[1] * y[1]];
             dt = dt + FIVE_MINUTES;
@@ -321,6 +287,7 @@ var latestSGV,
     }
 
     function updateUnits(isMmol) {
+        // only update if units have changed
         if (isMmol && units != "mmol")  {
             console.log("changing to mmol");
             tickValues = [2.0, 3.0, 4.0, 6.0, 10.0, 15.0, 22.0];
@@ -328,7 +295,7 @@ var latestSGV,
             data = data.map(function (obj) {
                 return { date: new Date(obj.date), sgv: (Math.round((obj.sgv / 18) * 10) / 10).toFixed(1), type: 'sgv'}
             });
-        } else if (units != "mg/dL") {
+        } else if (!isMmol && units != "mg/dL") {
             console.log("changing to mg/dl");
             tickValues = [40, 60, 80, 120, 180, 300, 400];
             units = "mg/dL";
@@ -336,6 +303,7 @@ var latestSGV,
                 return { date: new Date(obj.date), sgv: obj.sgv * 18, type: 'sgv'}
             });
         }
+
 
         // remove the data that was staled when timers were paused
         focus.selectAll('circle').data([], dateFn).exit().remove();
@@ -359,8 +327,6 @@ var latestSGV,
         focus.select('.y')
             .attr('transform', 'translate(' + chartWidth + ', 0)')
             .call(yAxis);
-
-        data.push({});
 
         isInitialData = false;
         updateChart(false);
