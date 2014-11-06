@@ -337,6 +337,9 @@ var latestSGV,
             });
         }
 
+        // remove the data that was staled when timers were paused
+        focus.selectAll('circle').data([], dateFn).exit().remove();
+
         yScale = d3.scale.log()
             .domain([scaleBg(30), scaleBg(510)]);
 
