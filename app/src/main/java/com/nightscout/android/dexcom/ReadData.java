@@ -187,6 +187,9 @@ public class ReadData {
             len = mSerialDevice.read(readData, IO_TIMEOUT);
             Log.d(TAG, "Read " + len + " byte(s) complete.");
 
+            // Add a 100ms delay for when multiple write/reads are occurring in series
+            Thread.sleep(100);
+
             // TODO: this debug code to print at most 30 bytes of the read, should be removed after
             // finding the source of the reading issue
             String bytes = "";
@@ -197,6 +200,8 @@ public class ReadData {
 
         } catch (IOException e) {
             Log.e(TAG, "Unable to read from serial device.", e);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         byte[] data = Arrays.copyOfRange(readData, 0, len);
         return new ReadPacket(data);
