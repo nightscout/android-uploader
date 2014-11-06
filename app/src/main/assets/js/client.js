@@ -1,9 +1,6 @@
 var latestSGV,
-    errorCode,
-    treatments,
     padding = { top: 20, right: 0, bottom: 10, left: 0 },
     opacity = {current: 1, DAY: 1, NIGHT: 0.5},
-    now = Date.now(),
     data = [],
     dateFn = function (d) { return new Date(d.date) },
     xScale, yScale,
@@ -16,9 +13,6 @@ var latestSGV,
     contextHeight,
     UPDATE_TRANS_MS = 750, // milliseconds
     brush,
-    BRUSH_TIMEOUT = 300000,  // 5 minutes in ms
-    brushTimer,
-    brushInProgress = false,
     clip,
     TWENTY_FIVE_MINS_IN_MS = 1500000,
     THIRTY_MINS_IN_MS = 1800000,
@@ -27,14 +21,6 @@ var latestSGV,
     SIXTY_MINS_IN_MS = 3600000,
     FOCUS_DATA_RANGE_MS = 14400000,
     FORMAT_TIME = '%p', //alternate format '%H:%M'
-    audio = document.getElementById('audio'),
-    alarmInProgress = false,
-    currentAlarmType = null,
-    alarmSound = 'alarm.mp3',
-    urgentAlarmSound = 'alarm2.mp3',
-    WIDTH_TIME_HIDDEN = 600,
-    MINUTES_SINCE_LAST_UPDATE_WARN = 10,
-    MINUTES_SINCE_LAST_UPDATE_URGENT = 20,
     updateTimer,
     units = "mg/dL";
 
@@ -262,114 +248,7 @@ var latestSGV,
         }, 100);
     };
 
-    function timeAgo(offset) {
-        var parts = {},
-            MINUTE = 60,
-            HOUR = 3600,
-            DAY = 86400,
-            WEEK = 604800;
-
-        //offset = (MINUTE * MINUTES_SINCE_LAST_UPDATE_WARN) + 60
-        //offset = (MINUTE * MINUTES_SINCE_LAST_UPDATE_URGENT) + 60
-
-        if (offset <= MINUTE)              parts = { label: 'now' };
-        if (offset <= MINUTE * 2)          parts = { label: '1 min ago' };
-        else if (offset < (MINUTE * 60))   parts = { value: Math.round(Math.abs(offset / MINUTE)), label: 'mins' };
-        else if (offset < (HOUR * 2))      parts = { label: '1 hr ago' };
-        else if (offset < (HOUR * 24))     parts = { value: Math.round(Math.abs(offset / HOUR)), label: 'hrs' };
-        else if (offset < DAY)             parts = { label: '1 day ago' };
-        else if (offset < (DAY * 7))       parts = { value: Math.round(Math.abs(offset / DAY)), label: 'day' };
-        else if (offset < (WEEK * 52))     parts = { value: Math.round(Math.abs(offset / WEEK)), label: 'week' };
-        else                               parts = { label: 'a long time ago' };
-
-        if (offset > (MINUTE * MINUTES_SINCE_LAST_UPDATE_URGENT)) {
-            var lastEntry = $("#lastEntry");
-            lastEntry.removeClass("warn");
-            lastEntry.addClass("urgent");
-
-            $(".bgStatus").removeClass("current");
-        } else if (offset > (MINUTE * MINUTES_SINCE_LAST_UPDATE_WARN)) {
-            var lastEntry = $("#lastEntry");
-            lastEntry.removeClass("urgent");
-            lastEntry.addClass("warn");
-        } else {
-            $(".bgStatus").addClass("current");
-            $("#lastEntry").removeClass("warn urgent");
-        }
-
-        if (parts.value)
-            return parts.value + ' ' + parts.label + ' ago';
-        else
-            return parts.label;
-
-    }
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //draw a compact visualization of a treatment (carbs, insulin)
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    function drawTreatment(treatment, scale, showValues) {
-        var carbs = treatment.carbs;
-        var insulin = treatment.insulin;
-        var CR = treatment.CR;
-
-        var R1 = Math.sqrt(Math.min(carbs, insulin * CR)) / scale,
-            R2 = Math.sqrt(Math.max(carbs, insulin * CR)) / scale,
-            R3 = R2 + 8 / scale;
-
-        var arc_data = [
-            { 'element': '', 'color': '#9c4333', 'start': -1.5708, 'end': 1.5708, 'inner': 0, 'outer': R1 },
-            { 'element': '', 'color': '#d4897b', 'start': -1.5708, 'end': 1.5708, 'inner': R1, 'outer': R2 },
-            { 'element': '', 'color': 'transparent', 'start': -1.5708, 'end': 1.5708, 'inner': R2, 'outer': R3 },
-            { 'element': '', 'color': '#3d53b7', 'start': 1.5708, 'end': 4.7124, 'inner': 0, 'outer': R1 },
-            { 'element': '', 'color': '#5d72c9', 'start': 1.5708, 'end': 4.7124, 'inner': R1, 'outer': R2 },
-            { 'element': '', 'color': 'transparent', 'start': 1.5708, 'end': 4.7124, 'inner': R2, 'outer': R3 }
-        ];
-
-        if (carbs < insulin * CR) arc_data[1].color = 'transparent';
-        if (carbs > insulin * CR) arc_data[4].color = 'transparent';
-        if (carbs > 0) arc_data[2].element = Math.round(carbs) + ' g';
-        if (insulin > 0) arc_data[5].element = Math.round(insulin * 10) / 10 + ' U';
-
-        var arc = d3.svg.arc()
-            .innerRadius(function (d) { return 5 * d.inner; })
-            .outerRadius(function (d) { return 5 * d.outer; })
-            .endAngle(function (d) { return d.start; })
-            .startAngle(function (d) { return d.end; });
-
-        var treatmentDots = focus.selectAll('treatment-dot')
-            .data(arc_data)
-            .enter()
-            .append('g')
-            .attr('transform', 'translate(' + xScale(treatment.x) + ', ' + yScale(scaleBg(treatment.y)) + ')');
-
-        var arcs = treatmentDots.append('path')
-            .attr('class', 'path')
-            .attr('fill', function (d, i) { return d.color; })
-            .attr('id', function (d, i) { return 's' + i; })
-            .attr('d', arc);
-
-
-        // labels for carbs and insulin
-        if (showValues) {
-            var label = treatmentDots.append('g')
-                .attr('class', 'path')
-                .attr('id', 'label')
-                .style('fill', 'white');
-            label.append('text')
-                .style('font-size', 30 / scale)
-                .style('font-family', 'Arial')
-                .attr('text-anchor', 'middle')
-                .attr('dy', '.35em')
-                .attr('transform', function (d) {
-                    d.outerRadius = d.outerRadius * 2.1;
-                    d.innerRadius = d.outerRadius * 2.1;
-                    return 'translate(' + arc.centroid(d) + ')';
-                })
-                .text(function (d) { return d.element; })
-        }
-    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // function to predict
@@ -442,14 +321,20 @@ var latestSGV,
     }
 
     function updateUnits(isMmol) {
-        if (isMmol)  {
+        if (isMmol && units != "mmol")  {
             console.log("changing to mmol");
             tickValues = [2.0, 3.0, 4.0, 6.0, 10.0, 15.0, 22.0];
             units = "mmol";
-        } else {
+            data = data.map(function (obj) {
+                return { date: new Date(obj.date), sgv: (Math.round((obj.sgv / 18) * 10) / 10).toFixed(1), type: 'sgv'}
+            });
+        } else if (units != "mg/dL") {
             console.log("changing to mg/dl");
             tickValues = [40, 60, 80, 120, 180, 300, 400];
             units = "mg/dL";
+            data = data.map(function (obj) {
+                return { date: new Date(obj.date), sgv: obj.sgv * 18, type: 'sgv'}
+            });
         }
 
         yScale = d3.scale.log()
@@ -472,10 +357,8 @@ var latestSGV,
             .attr('transform', 'translate(' + chartWidth + ', 0)')
             .call(yAxis);
 
-        data = data.map(function (obj) {
-            return { date: new Date(obj.date), sgv: scaleBg(obj.sgv), type: 'sgv'}
-        });
-        
+        data.push({});
+
         isInitialData = false;
         updateChart(false);
     }
