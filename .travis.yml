@@ -17,7 +17,7 @@ android:
   licenses:
   - android-sdk-license-5be876d5
   - ".*intel.+"
-script: TERM=dumb ./gradlew assembleDebug
+script: TERM=dumb ./gradlew test connectedAndroidTest
 deploy:
   provider: releases
   file: "./app/build/outputs/apk/app-debug.apk"

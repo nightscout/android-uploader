@@ -1,8 +1,8 @@
 package com.nightscout.android.dexcom;
 
 import android.app.IntentService;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
@@ -13,19 +13,22 @@ import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.google.common.collect.Lists;
 import com.nightscout.android.MainActivity;
 import com.nightscout.android.Nightscout;
 import com.nightscout.android.R;
 import com.nightscout.android.dexcom.USB.USBPower;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.USB.UsbSerialProber;
-import com.nightscout.android.dexcom.records.CalRecord;
-import com.nightscout.android.dexcom.records.EGVRecord;
-import com.nightscout.android.dexcom.records.GlucoseDataSet;
-import com.nightscout.android.dexcom.records.MeterRecord;
-import com.nightscout.android.TimeConstants;
-import com.nightscout.android.dexcom.records.SensorRecord;
+import com.nightscout.core.dexcom.records.CalRecord;
+import com.nightscout.core.dexcom.records.EGVRecord;
+import com.nightscout.core.dexcom.records.GlucoseDataSet;
+import com.nightscout.core.dexcom.records.MeterRecord;
+import com.nightscout.core.dexcom.records.SensorRecord;
 import com.nightscout.android.upload.Uploader;
+import com.nightscout.core.dexcom.CRCFailRuntimeException;
+import com.nightscout.core.dexcom.Utils;
+import com.nightscout.core.dexcom.Constants;
 
 import org.json.JSONArray;
 
@@ -33,6 +36,11 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import java.util.List;
+
+import static org.joda.time.Duration.standardMinutes;
+import static org.joda.time.Duration.standardSeconds;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous CGM Receiver downloads and cloud uploads
@@ -78,7 +86,7 @@ public class SyncingService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         // Exit if the user hasn't selected "I understand"
-        if (! prefs.getBoolean("i_understand",false)) {
+        if (!prefs.getBoolean("i_understand",false)) {
             Toast.makeText(context, R.string.message_user_not_understand, Toast.LENGTH_LONG).show();
             return;
         }
@@ -125,17 +133,18 @@ public class SyncingService extends IntentService {
                 ReadData readData = new ReadData(mSerialDevice);
                 // TODO: need to check if numOfPages if valid on ReadData side
                 EGVRecord[] recentRecords = readData.getRecentEGVsPages(numOfPages);
-                MeterRecord[] meterRecords = readData.getRecentMeterRecords();
+                List<MeterRecord> meterRecords = Lists.newArrayList(readData.getRecentMeterRecords());
                 // TODO: need to check if numOfPages if valid on ReadData side
                 SensorRecord[] sensorRecords = readData.getRecentSensorRecords(numOfPages);
-                GlucoseDataSet[] glucoseDataSets = Utils.mergeGlucoseDataRecords(recentRecords, sensorRecords);
-                CalRecord[] calRecords = readData.getRecentCalRecords();
+                List<GlucoseDataSet> glucoseDataSets = Lists.newArrayList(
+                        Utils.mergeGlucoseDataRecords(recentRecords, sensorRecords));
+                List<CalRecord> calRecords = Lists.newArrayList(readData.getRecentCalRecords());
 
                 long timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
                 // TODO: determine if the logic here is correct. I suspect it assumes the last record was less than 5
                 // minutes ago. If a reading is skipped and the device is plugged in then nextUploadTime will be
                 // set to a negative number. This situation will eventually correct itself.
-                long nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
+                long nextUploadTime = standardMinutes(5).minus(standardSeconds(timeSinceLastRecord)).getMillis();
                 long displayTime = readData.readDisplayTime().getTime();
                 // FIXME: Device seems to flake out on battery level reads. Removing for now.
 //                int batLevel = readData.readBatteryLevel();
@@ -152,9 +161,9 @@ public class SyncingService extends IntentService {
                 // Only upload 1 record unless forcing a sync
                 boolean uploadStatus;
                 if (numOfPages < 20) {
-                    uploadStatus = uploader.upload(glucoseDataSets[glucoseDataSets.length - 1],
-                                    meterRecords[meterRecords.length - 1],
-                                    calRecords[calRecords.length - 1]);
+                    uploadStatus = uploader.upload(glucoseDataSets.get(glucoseDataSets.size() - 1),
+                                    meterRecords.get(meterRecords.size() - 1),
+                                    calRecords.get(calRecords.size() - 1));
                 } else {
                     uploadStatus = uploader.upload(glucoseDataSets, meterRecords, calRecords);
                 }
@@ -279,7 +288,7 @@ public class SyncingService extends IntentService {
 
     private void broadcastSGVToUI() {
         EGVRecord record=new EGVRecord(-1, Constants.TREND_ARROW_VALUES.NONE,new Date(),new Date());
-        broadcastSGVToUI(record,false, (long) TimeConstants.FIVE_MINUTES_MS + TIME_SYNC_OFFSET, new Date().getTime(), null, 0);
+        broadcastSGVToUI(record, false, standardMinutes(5).getMillis() + TIME_SYNC_OFFSET, new Date().getTime(), null, 0);
     }
 
 }

@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,23 +24,26 @@ import android.widget.TextView;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.nightscout.android.dexcom.Constants;
+import com.nightscout.core.dexcom.Constants;
 import com.nightscout.android.dexcom.SyncingService;
-import com.nightscout.android.dexcom.Utils;
+import com.nightscout.core.dexcom.Utils;
 import com.nightscout.android.settings.SettingsActivity;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.acra.ACRAConfigurationException;
 import org.acra.ReportingInteractionMode;
+import org.joda.time.DateTime;
+import org.joda.time.Minutes;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
 
-public class MainActivity extends Activity {
+import static org.joda.time.Duration.standardMinutes;
 
-    private final String TAG = MainActivity.class.getSimpleName();
+public class MainActivity extends Activity {
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     // Receivers
     private CGMStatusReceiver mCGMStatusReceiver;
@@ -52,7 +56,7 @@ public class MainActivity extends Activity {
     private long receiverOffsetFromUploader = 0;
 
     // Analytics mTracker
-    Tracker mTracker;
+    private Tracker mTracker;
 
     // UI components
     private WebView mWebView;
@@ -181,9 +185,8 @@ public class MainActivity extends Activity {
             sgvStr=String.format("%.1f",sgv*currentUnits);
         else
             sgvStr=String.valueOf(sgv);
-        String responseSGVStr = (sgv!=-1)?
+        return (sgv!=-1)?
                 (Constants.SPECIALBGVALUES_MGDL.isSpecialValue(sgv))?Constants.SPECIALBGVALUES_MGDL.getEGVSpecialValue(sgv).toString():sgvStr+" "+trend.Symbol():"---";
-        return responseSGVStr;
     }
 
     @Override
@@ -207,7 +210,7 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         mWebView.saveState(outState);
         outState.putString("saveJSONData", mJSONData);
@@ -220,7 +223,7 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         // Restore the state of the WebView
         mWebView.restoreState(savedInstanceState);
@@ -275,9 +278,9 @@ public class MainActivity extends Activity {
             mTextTimestamp.setText(timeAgoStr);
             mTextTimestamp.setTag(timeAgoStr);
 
-            long nextUploadTime = TimeConstants.FIVE_MINUTES_MS;
+            long nextUploadTime = standardMinutes(5).getMillis();
 
-            if (responseNextUploadTime > TimeConstants.FIVE_MINUTES_MS) {
+            if (responseNextUploadTime > nextUploadTime) {
                 Log.d(TAG, "Receiver's time is less than current record time, possible time change.");
                 mTracker.send(new HitBuilders.EventBuilder("Main", "Time change").build());
             } else if (responseNextUploadTime > 0) {
@@ -287,7 +290,8 @@ public class MainActivity extends Activity {
                 Log.d(TAG, "OUT OF RANGE: Setting next upload time to: " + nextUploadTime + " ms.");
             }
 
-            if (Math.abs(new Date().getTime() - responseDisplayTime) >= TimeConstants.TWENTY_MINUTES_MS) {
+            if (Minutes.minutesBetween(new DateTime(), new DateTime(responseDisplayTime))
+                    .isGreaterThan(Minutes.minutes(20))) {
                 Log.w(TAG, "Receiver time is off by 20 minutes or more.");
                 mTracker.send(new HitBuilders.EventBuilder("Main", "Time difference > 20 minutes").build());
                 statusBarIcons.setTimeIndicator(false);
@@ -352,7 +356,7 @@ public class MainActivity extends Activity {
             }
             mTextTimestamp.setText(timeAgoStr);
             mHandler.removeCallbacks(updateTimeAgo);
-            mHandler.postDelayed(updateTimeAgo, TimeConstants.ONE_MINUTE_MS);
+            mHandler.postDelayed(updateTimeAgo, standardMinutes(1).getMillis());
         }
     };
 
@@ -415,18 +419,17 @@ public class MainActivity extends Activity {
             mImageRcvrBattery.setImageResource(R.drawable.battery);
 
             setDefaults();
-
         }
 
-        public void setDefaults(){
+        public void setDefaults() {
             setUSB(false);
             setUpload(false);
             setTimeIndicator(false);
             setBatteryIndicator(0);
         }
 
-        public void setUSB(boolean active){
-            usbActive=active;
+        public void setUSB(boolean active) {
+            usbActive = active;
             if (active) {
                 mImageViewUSB.setImageResource(R.drawable.ic_usb_connected);
                 mImageViewUSB.setTag(R.drawable.ic_usb_connected);
@@ -436,8 +439,8 @@ public class MainActivity extends Activity {
             }
         }
 
-        public void setUpload(boolean active){
-            uploadActive=active;
+        public void setUpload(boolean active) {
+            uploadActive = active;
             if (active) {
                 mImageViewUpload.setImageResource(R.drawable.ic_upload_success);
                 mImageViewUpload.setTag(R.drawable.ic_upload_success);
@@ -447,7 +450,7 @@ public class MainActivity extends Activity {
             }
         }
 
-        public void setTimeIndicator(boolean active){
+        public void setTimeIndicator(boolean active) {
             displayTimeSync = active;
             if (active) {
                 mImageViewTimeIndicator.setImageResource(R.drawable.ic_clock_good);
@@ -458,25 +461,25 @@ public class MainActivity extends Activity {
             }
         }
 
-        public void setBatteryIndicator(int batLvl){
+        public void setBatteryIndicator(int batLvl) {
             batteryLevel = batLvl;
             mImageRcvrBattery.setImageLevel(batteryLevel);
             mImageRcvrBattery.setTag(batteryLevel);
         }
 
-        public boolean getUSB(){
+        public boolean getUSB() {
             return usbActive;
         }
 
-        public boolean getUpload(){
+        public boolean getUpload() {
             return uploadActive;
         }
 
-        public boolean getTimeIndicator(){
+        public boolean getTimeIndicator() {
             return displayTimeSync;
         }
 
-        public int getBatteryIndicator(){
+        public int getBatteryIndicator() {
             if (mImageRcvrBattery == null) {
                 return 0;
             }

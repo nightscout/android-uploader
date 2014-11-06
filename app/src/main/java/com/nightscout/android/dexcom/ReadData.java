@@ -2,11 +2,14 @@ package com.nightscout.android.dexcom;
 
 import android.util.Log;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
-import com.nightscout.android.dexcom.records.CalRecord;
-import com.nightscout.android.dexcom.records.EGVRecord;
-import com.nightscout.android.dexcom.records.GenericXMLRecord;
-import com.nightscout.android.dexcom.records.MeterRecord;
-import com.nightscout.android.dexcom.records.SensorRecord;
+import com.nightscout.core.dexcom.PacketBuilder;
+import com.nightscout.core.dexcom.records.CalRecord;
+import com.nightscout.core.dexcom.records.EGVRecord;
+import com.nightscout.core.dexcom.records.GenericXMLRecord;
+import com.nightscout.core.dexcom.records.MeterRecord;
+import com.nightscout.core.dexcom.records.SensorRecord;
+import com.nightscout.core.dexcom.Utils;
+import com.nightscout.core.dexcom.Constants;
 
 import org.w3c.dom.Element;
 
@@ -162,7 +165,7 @@ public class ReadData {
     }
 
     private void writeCommand(int command, ArrayList<Byte> payload) {
-        byte[] packet = new PacketBuilder(command, payload).compose();
+        byte[] packet = new PacketBuilder(command, payload).build();
         if (mSerialDevice != null) {
             try {
                 mSerialDevice.write(packet, IO_TIMEOUT);
@@ -173,7 +176,7 @@ public class ReadData {
     }
 
     private void writeCommand(int command) {
-        byte[] packet = new PacketBuilder(command).compose();
+        byte[] packet = new PacketBuilder(command).build();
         if (mSerialDevice != null) {
             try {
                 mSerialDevice.write(packet, IO_TIMEOUT);

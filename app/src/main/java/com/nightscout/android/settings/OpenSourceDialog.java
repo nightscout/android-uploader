@@ -9,5 +9,4 @@ public class OpenSourceDialog extends DialogPreference {
     public OpenSourceDialog(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
-
 }
