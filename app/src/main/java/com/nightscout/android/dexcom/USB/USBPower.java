@@ -1,18 +1,17 @@
 package com.nightscout.android.dexcom.USB;
 
 import android.util.Log;
-import com.nightscout.android.dexcom.DexcomG4Activity;
 
 import java.io.DataOutputStream;
-import java.io.IOException;
 
 public class USBPower {
 
-    private static final String TAG = "DexcomUSBPower";
+    private static final String TAG = USBPower.class.getSimpleName();
 
-    private static final String SET_POWER_ON_COMMAND = "echo 'on' > \"/sys/bus/usb/devices/1-1/power/level\"";
-    private static final String SET_POWER_SUSPEND_COMMAND_A = "echo \"0\" > \"/sys/bus/usb/devices/1-1/power/autosuspend\"";
-    private static final String SET_POWER_SUSPEND_COMMAND_B = "echo \"auto\" > \"/sys/bus/usb/devices/1-1/power/level\"";
+    private static final String SET_POWER_ON_COMMAND = "echo 'on' > \"/sys/bus/usb/devices/1-1/power/control\"";
+    private static final String SET_POWER_SUSPEND_COMMAND_A = "echo \"0\" > \"/sys/bus/usb/devices/1-1/power/autosuspend_delay_ms\"";
+    private static final String SET_POWER_SUSPEND_COMMAND_B = "echo \"auto\" > \"/sys/bus/usb/devices/1-1/power/control\"";
+    public static final int POWER_ON_DELAY = 5000;
 
     public static void PowerOff() {
         try {
@@ -28,6 +27,7 @@ public class USBPower {
         try {
             runCommand(SET_POWER_ON_COMMAND);
             Log.i(TAG, "PowerOn USB complete");
+            Thread.sleep(POWER_ON_DELAY);
         } catch (Exception e) {
             Log.e(TAG, "Unable to PowerOn USB");
         }

@@ -3,6 +3,22 @@
     <item
             android:id="@+id/menu_settings"
             android:orderInCategory="100"
-            android:title="Preferences">
+            android:title="@string/preferences_menu_text">
+    </item>
+    <item
+        android:id="@+id/feedback_settings"
+        android:orderInCategory="100"
+        android:title="@string/feedback_menu_text">
+    </item>
+    <item
+        android:id="@+id/gap_sync"
+        android:orderInCategory="100"
+        android:title="@string/gap_sync_menu_text">
+    </item>
+
+    <item
+        android:id="@+id/close_settings"
+        android:orderInCategory="100"
+        android:title="@string/close_menu_text">
     </item>
 </menu>
