@@ -137,7 +137,9 @@ public class SyncingService extends IntentService {
                 // set to a negative number. This situation will eventually correct itself.
                 long nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
                 long displayTime = readData.readDisplayTime().getTime();
-                int batLevel = readData.readBatteryLevel();
+                // FIXME: Device seems to flake out on battery level reads. Removing for now.
+//                int batLevel = readData.readBatteryLevel();
+                int batLevel = 100;
 
                 // convert into json for d3 plot
                 JSONArray array = new JSONArray();
