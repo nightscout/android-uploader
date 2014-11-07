@@ -63,7 +63,7 @@ public class SyncingService extends IntentService {
 
     // Constants
     private final int TIME_SYNC_OFFSET = 10000;
-    public static final int MIN_SYNC_PAGES = 5;
+    public static final int MIN_SYNC_PAGES = 2;
     public static final int GAP_SYNC_PAGES = 20;
 
 
@@ -137,7 +137,9 @@ public class SyncingService extends IntentService {
                 // set to a negative number. This situation will eventually correct itself.
                 long nextUploadTime = TimeConstants.FIVE_MINUTES_MS - (timeSinceLastRecord * TimeConstants.SEC_TO_MS);
                 long displayTime = readData.readDisplayTime().getTime();
-                int batLevel = readData.readBatteryLevel();
+                // FIXME: Device seems to flake out on battery level reads. Removing for now.
+//                int batLevel = readData.readBatteryLevel();
+                int batLevel = 100;
 
                 // convert into json for d3 plot
                 JSONArray array = new JSONArray();
@@ -259,6 +261,7 @@ public class SyncingService extends IntentService {
     private void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus,
                                   long nextUploadTime, long displayTime,
                                   JSONArray json, int batLvl) {
+        Log.d(TAG, "Current EGV: " + egvRecord.getBGValue());
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -276,7 +279,7 @@ public class SyncingService extends IntentService {
 
     private void broadcastSGVToUI() {
         EGVRecord record=new EGVRecord(-1, Constants.TREND_ARROW_VALUES.NONE,new Date(),new Date());
-        broadcastSGVToUI(record,false, (long) TimeConstants.FIVE_MINUTES_MS,new Date().getTime(),null,0);
+        broadcastSGVToUI(record,false, (long) TimeConstants.FIVE_MINUTES_MS + TIME_SYNC_OFFSET, new Date().getTime(), null, 0);
     }
 
 }
