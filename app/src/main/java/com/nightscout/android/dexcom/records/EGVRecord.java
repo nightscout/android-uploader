@@ -1,20 +1,19 @@
 package com.nightscout.android.dexcom.records;
 
 import com.nightscout.android.dexcom.Constants;
+import com.nightscout.android.dexcom.Trend;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 import java.util.Date;
 
 public class EGVRecord extends GenericTimestampRecord {
 
     private int bGValue;
-    private Constants.TREND_ARROW_VALUES trend;
+    private Trend trend;
 
     public EGVRecord(byte[] packet) {
         // system_time (UInt), display_time (UInt), glucose (UShort), trend_arrow (Byte), crc (UShort))
@@ -22,11 +21,17 @@ public class EGVRecord extends GenericTimestampRecord {
         int eGValue = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8);
         bGValue = eGValue & Constants.EGV_VALUE_MASK;
         int trendValue = ByteBuffer.wrap(packet).get(10) & Constants.EGV_TREND_ARROW_MASK;
-        trend = Constants.TREND_ARROW_VALUES.values()[trendValue];
+        trend = Trend.values()[trendValue];
     }
 
-    public EGVRecord(int bGValue,Constants.TREND_ARROW_VALUES trend,Date displayTime, Date systemTime){
+    public EGVRecord(int bGValue,Trend trend,Date displayTime, Date systemTime){
         super(displayTime, systemTime);
+        this.bGValue=bGValue;
+        this.trend=trend;
+    }
+
+    public EGVRecord(int bGValue,Trend trend,long displayTime, long systemTime){
+        super(displayTime,systemTime);
         this.bGValue=bGValue;
         this.trend=trend;
     }
@@ -35,7 +40,7 @@ public class EGVRecord extends GenericTimestampRecord {
         return bGValue;
     }
 
-    public Constants.TREND_ARROW_VALUES getTrend() {
+    public Trend getTrend() {
         return trend;
     }
 

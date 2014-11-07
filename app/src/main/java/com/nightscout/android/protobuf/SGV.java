@@ -2751,6 +2751,23 @@ public final class SGV {
     long getTimestamp();
 
     /**
+     * <code>optional uint64 sys_timestamp = 4;</code>
+     *
+     * <pre>
+     * system time stamp
+     * </pre>
+     */
+    boolean hasSysTimestamp();
+    /**
+     * <code>optional uint64 sys_timestamp = 4;</code>
+     *
+     * <pre>
+     * system time stamp
+     * </pre>
+     */
+    long getSysTimestamp();
+
+    /**
      * <code>optional .CookieMonsterG4EGV.Direction direction = 3;</code>
      *
      * <pre>
@@ -2835,9 +2852,14 @@ public final class SGV {
               if (value == null) {
                 unknownFields.mergeVarintField(3, rawValue);
               } else {
-                bitField0_ |= 0x00000004;
+                bitField0_ |= 0x00000008;
                 direction_ = value;
               }
+              break;
+            }
+            case 32: {
+              bitField0_ |= 0x00000004;
+              sysTimestamp_ = input.readUInt64();
               break;
             }
           }
@@ -3080,6 +3102,29 @@ public final class SGV {
       return timestamp_;
     }
 
+    public static final int SYS_TIMESTAMP_FIELD_NUMBER = 4;
+    private long sysTimestamp_;
+    /**
+     * <code>optional uint64 sys_timestamp = 4;</code>
+     *
+     * <pre>
+     * system time stamp
+     * </pre>
+     */
+    public boolean hasSysTimestamp() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional uint64 sys_timestamp = 4;</code>
+     *
+     * <pre>
+     * system time stamp
+     * </pre>
+     */
+    public long getSysTimestamp() {
+      return sysTimestamp_;
+    }
+
     public static final int DIRECTION_FIELD_NUMBER = 3;
     private com.nightscout.android.protobuf.SGV.CookieMonsterG4EGV.Direction direction_;
     /**
@@ -3090,7 +3135,7 @@ public final class SGV {
      * </pre>
      */
     public boolean hasDirection() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
      * <code>optional .CookieMonsterG4EGV.Direction direction = 3;</code>
@@ -3106,6 +3151,7 @@ public final class SGV {
     private void initFields() {
       sgv_ = 0;
       timestamp_ = 0L;
+      sysTimestamp_ = 0L;
       direction_ = com.nightscout.android.protobuf.SGV.CookieMonsterG4EGV.Direction.NONE;
     }
     private byte memoizedIsInitialized = -1;
@@ -3131,8 +3177,11 @@ public final class SGV {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeUInt64(2, timestamp_);
       }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeEnum(3, direction_.getNumber());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeUInt64(4, sysTimestamp_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -3151,9 +3200,13 @@ public final class SGV {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt64Size(2, timestamp_);
       }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(3, direction_.getNumber());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt64Size(4, sysTimestamp_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3276,8 +3329,10 @@ public final class SGV {
         bitField0_ = (bitField0_ & ~0x00000001);
         timestamp_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000002);
-        direction_ = com.nightscout.android.protobuf.SGV.CookieMonsterG4EGV.Direction.NONE;
+        sysTimestamp_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000004);
+        direction_ = com.nightscout.android.protobuf.SGV.CookieMonsterG4EGV.Direction.NONE;
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
@@ -3317,6 +3372,10 @@ public final class SGV {
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
+        result.sysTimestamp_ = sysTimestamp_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
         result.direction_ = direction_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -3339,6 +3398,9 @@ public final class SGV {
         }
         if (other.hasTimestamp()) {
           setTimestamp(other.getTimestamp());
+        }
+        if (other.hasSysTimestamp()) {
+          setSysTimestamp(other.getSysTimestamp());
         }
         if (other.hasDirection()) {
           setDirection(other.getDirection());
@@ -3470,6 +3532,54 @@ public final class SGV {
         return this;
       }
 
+      private long sysTimestamp_ ;
+      /**
+       * <code>optional uint64 sys_timestamp = 4;</code>
+       *
+       * <pre>
+       * system time stamp
+       * </pre>
+       */
+      public boolean hasSysTimestamp() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional uint64 sys_timestamp = 4;</code>
+       *
+       * <pre>
+       * system time stamp
+       * </pre>
+       */
+      public long getSysTimestamp() {
+        return sysTimestamp_;
+      }
+      /**
+       * <code>optional uint64 sys_timestamp = 4;</code>
+       *
+       * <pre>
+       * system time stamp
+       * </pre>
+       */
+      public Builder setSysTimestamp(long value) {
+        bitField0_ |= 0x00000004;
+        sysTimestamp_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional uint64 sys_timestamp = 4;</code>
+       *
+       * <pre>
+       * system time stamp
+       * </pre>
+       */
+      public Builder clearSysTimestamp() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        sysTimestamp_ = 0L;
+        onChanged();
+        return this;
+      }
+
       private com.nightscout.android.protobuf.SGV.CookieMonsterG4EGV.Direction direction_ = com.nightscout.android.protobuf.SGV.CookieMonsterG4EGV.Direction.NONE;
       /**
        * <code>optional .CookieMonsterG4EGV.Direction direction = 3;</code>
@@ -3479,7 +3589,7 @@ public final class SGV {
        * </pre>
        */
       public boolean hasDirection() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
        * <code>optional .CookieMonsterG4EGV.Direction direction = 3;</code>
@@ -3502,7 +3612,7 @@ public final class SGV {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         direction_ = value;
         onChanged();
         return this;
@@ -3515,7 +3625,7 @@ public final class SGV {
        * </pre>
        */
       public Builder clearDirection() {
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000008);
         direction_ = com.nightscout.android.protobuf.SGV.CookieMonsterG4EGV.Direction.NONE;
         onChanged();
         return this;
@@ -3562,6 +3672,23 @@ public final class SGV {
      * <code>optional uint64 timestamp = 3;</code>
      */
     long getTimestamp();
+
+    /**
+     * <code>optional uint64 sys_timestamp = 4;</code>
+     *
+     * <pre>
+     * system time stamp
+     * </pre>
+     */
+    boolean hasSysTimestamp();
+    /**
+     * <code>optional uint64 sys_timestamp = 4;</code>
+     *
+     * <pre>
+     * system time stamp
+     * </pre>
+     */
+    long getSysTimestamp();
   }
   /**
    * Protobuf type {@code CookieMonsterG4Meter}
@@ -3628,6 +3755,11 @@ public final class SGV {
             case 24: {
               bitField0_ |= 0x00000004;
               timestamp_ = input.readUInt64();
+              break;
+            }
+            case 32: {
+              bitField0_ |= 0x00000008;
+              sysTimestamp_ = input.readUInt64();
               break;
             }
           }
@@ -3715,10 +3847,34 @@ public final class SGV {
       return timestamp_;
     }
 
+    public static final int SYS_TIMESTAMP_FIELD_NUMBER = 4;
+    private long sysTimestamp_;
+    /**
+     * <code>optional uint64 sys_timestamp = 4;</code>
+     *
+     * <pre>
+     * system time stamp
+     * </pre>
+     */
+    public boolean hasSysTimestamp() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional uint64 sys_timestamp = 4;</code>
+     *
+     * <pre>
+     * system time stamp
+     * </pre>
+     */
+    public long getSysTimestamp() {
+      return sysTimestamp_;
+    }
+
     private void initFields() {
       meterBg_ = 0;
       meterTime_ = 0;
       timestamp_ = 0L;
+      sysTimestamp_ = 0L;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -3746,6 +3902,9 @@ public final class SGV {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeUInt64(3, timestamp_);
       }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeUInt64(4, sysTimestamp_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -3766,6 +3925,10 @@ public final class SGV {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt64Size(3, timestamp_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt64Size(4, sysTimestamp_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3890,6 +4053,8 @@ public final class SGV {
         bitField0_ = (bitField0_ & ~0x00000002);
         timestamp_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000004);
+        sysTimestamp_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
@@ -3930,6 +4095,10 @@ public final class SGV {
           to_bitField0_ |= 0x00000004;
         }
         result.timestamp_ = timestamp_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.sysTimestamp_ = sysTimestamp_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -3954,6 +4123,9 @@ public final class SGV {
         }
         if (other.hasTimestamp()) {
           setTimestamp(other.getTimestamp());
+        }
+        if (other.hasSysTimestamp()) {
+          setSysTimestamp(other.getSysTimestamp());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -4082,6 +4254,54 @@ public final class SGV {
         return this;
       }
 
+      private long sysTimestamp_ ;
+      /**
+       * <code>optional uint64 sys_timestamp = 4;</code>
+       *
+       * <pre>
+       * system time stamp
+       * </pre>
+       */
+      public boolean hasSysTimestamp() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional uint64 sys_timestamp = 4;</code>
+       *
+       * <pre>
+       * system time stamp
+       * </pre>
+       */
+      public long getSysTimestamp() {
+        return sysTimestamp_;
+      }
+      /**
+       * <code>optional uint64 sys_timestamp = 4;</code>
+       *
+       * <pre>
+       * system time stamp
+       * </pre>
+       */
+      public Builder setSysTimestamp(long value) {
+        bitField0_ |= 0x00000008;
+        sysTimestamp_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional uint64 sys_timestamp = 4;</code>
+       *
+       * <pre>
+       * system time stamp
+       * </pre>
+       */
+      public Builder clearSysTimestamp() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        sysTimestamp_ = 0L;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:CookieMonsterG4Meter)
     }
 
@@ -4132,6 +4352,23 @@ public final class SGV {
      * <code>optional uint64 timestamp = 4;</code>
      */
     long getTimestamp();
+
+    /**
+     * <code>optional uint64 sys_timestamp = 5;</code>
+     *
+     * <pre>
+     * system time stamp
+     * </pre>
+     */
+    boolean hasSysTimestamp();
+    /**
+     * <code>optional uint64 sys_timestamp = 5;</code>
+     *
+     * <pre>
+     * system time stamp
+     * </pre>
+     */
+    long getSysTimestamp();
   }
   /**
    * Protobuf type {@code CookieMonsterG4Sensor}
@@ -4203,6 +4440,11 @@ public final class SGV {
             case 32: {
               bitField0_ |= 0x00000008;
               timestamp_ = input.readUInt64();
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000010;
+              sysTimestamp_ = input.readUInt64();
               break;
             }
           }
@@ -4305,11 +4547,35 @@ public final class SGV {
       return timestamp_;
     }
 
+    public static final int SYS_TIMESTAMP_FIELD_NUMBER = 5;
+    private long sysTimestamp_;
+    /**
+     * <code>optional uint64 sys_timestamp = 5;</code>
+     *
+     * <pre>
+     * system time stamp
+     * </pre>
+     */
+    public boolean hasSysTimestamp() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional uint64 sys_timestamp = 5;</code>
+     *
+     * <pre>
+     * system time stamp
+     * </pre>
+     */
+    public long getSysTimestamp() {
+      return sysTimestamp_;
+    }
+
     private void initFields() {
       filtered_ = 0L;
       unfiltered_ = 0L;
       rssi_ = 0;
       timestamp_ = 0L;
+      sysTimestamp_ = 0L;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -4340,6 +4606,9 @@ public final class SGV {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeUInt64(4, timestamp_);
       }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeUInt64(5, sysTimestamp_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -4364,6 +4633,10 @@ public final class SGV {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt64Size(4, timestamp_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt64Size(5, sysTimestamp_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -4490,6 +4763,8 @@ public final class SGV {
         bitField0_ = (bitField0_ & ~0x00000004);
         timestamp_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000008);
+        sysTimestamp_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
 
@@ -4534,6 +4809,10 @@ public final class SGV {
           to_bitField0_ |= 0x00000008;
         }
         result.timestamp_ = timestamp_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.sysTimestamp_ = sysTimestamp_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -4561,6 +4840,9 @@ public final class SGV {
         }
         if (other.hasTimestamp()) {
           setTimestamp(other.getTimestamp());
+        }
+        if (other.hasSysTimestamp()) {
+          setSysTimestamp(other.getSysTimestamp());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -4721,6 +5003,54 @@ public final class SGV {
         return this;
       }
 
+      private long sysTimestamp_ ;
+      /**
+       * <code>optional uint64 sys_timestamp = 5;</code>
+       *
+       * <pre>
+       * system time stamp
+       * </pre>
+       */
+      public boolean hasSysTimestamp() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional uint64 sys_timestamp = 5;</code>
+       *
+       * <pre>
+       * system time stamp
+       * </pre>
+       */
+      public long getSysTimestamp() {
+        return sysTimestamp_;
+      }
+      /**
+       * <code>optional uint64 sys_timestamp = 5;</code>
+       *
+       * <pre>
+       * system time stamp
+       * </pre>
+       */
+      public Builder setSysTimestamp(long value) {
+        bitField0_ |= 0x00000010;
+        sysTimestamp_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional uint64 sys_timestamp = 5;</code>
+       *
+       * <pre>
+       * system time stamp
+       * </pre>
+       */
+      public Builder clearSysTimestamp() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        sysTimestamp_ = 0L;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:CookieMonsterG4Sensor)
     }
 
@@ -4771,6 +5101,23 @@ public final class SGV {
      * <code>optional uint64 timestamp = 4;</code>
      */
     long getTimestamp();
+
+    /**
+     * <code>optional uint64 sys_timestamp = 5;</code>
+     *
+     * <pre>
+     * system time stamp
+     * </pre>
+     */
+    boolean hasSysTimestamp();
+    /**
+     * <code>optional uint64 sys_timestamp = 5;</code>
+     *
+     * <pre>
+     * system time stamp
+     * </pre>
+     */
+    long getSysTimestamp();
   }
   /**
    * Protobuf type {@code CookieMonsterG4Cal}
@@ -4842,6 +5189,11 @@ public final class SGV {
             case 32: {
               bitField0_ |= 0x00000008;
               timestamp_ = input.readUInt64();
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000010;
+              sysTimestamp_ = input.readUInt64();
               break;
             }
           }
@@ -4944,11 +5296,35 @@ public final class SGV {
       return timestamp_;
     }
 
+    public static final int SYS_TIMESTAMP_FIELD_NUMBER = 5;
+    private long sysTimestamp_;
+    /**
+     * <code>optional uint64 sys_timestamp = 5;</code>
+     *
+     * <pre>
+     * system time stamp
+     * </pre>
+     */
+    public boolean hasSysTimestamp() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional uint64 sys_timestamp = 5;</code>
+     *
+     * <pre>
+     * system time stamp
+     * </pre>
+     */
+    public long getSysTimestamp() {
+      return sysTimestamp_;
+    }
+
     private void initFields() {
       slope_ = 0D;
       intercept_ = 0D;
       scale_ = 0D;
       timestamp_ = 0L;
+      sysTimestamp_ = 0L;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -4979,6 +5355,9 @@ public final class SGV {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeUInt64(4, timestamp_);
       }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeUInt64(5, sysTimestamp_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -5003,6 +5382,10 @@ public final class SGV {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt64Size(4, timestamp_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt64Size(5, sysTimestamp_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -5129,6 +5512,8 @@ public final class SGV {
         bitField0_ = (bitField0_ & ~0x00000004);
         timestamp_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000008);
+        sysTimestamp_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
 
@@ -5173,6 +5558,10 @@ public final class SGV {
           to_bitField0_ |= 0x00000008;
         }
         result.timestamp_ = timestamp_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.sysTimestamp_ = sysTimestamp_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -5200,6 +5589,9 @@ public final class SGV {
         }
         if (other.hasTimestamp()) {
           setTimestamp(other.getTimestamp());
+        }
+        if (other.hasSysTimestamp()) {
+          setSysTimestamp(other.getSysTimestamp());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -5360,6 +5752,54 @@ public final class SGV {
         return this;
       }
 
+      private long sysTimestamp_ ;
+      /**
+       * <code>optional uint64 sys_timestamp = 5;</code>
+       *
+       * <pre>
+       * system time stamp
+       * </pre>
+       */
+      public boolean hasSysTimestamp() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional uint64 sys_timestamp = 5;</code>
+       *
+       * <pre>
+       * system time stamp
+       * </pre>
+       */
+      public long getSysTimestamp() {
+        return sysTimestamp_;
+      }
+      /**
+       * <code>optional uint64 sys_timestamp = 5;</code>
+       *
+       * <pre>
+       * system time stamp
+       * </pre>
+       */
+      public Builder setSysTimestamp(long value) {
+        bitField0_ |= 0x00000010;
+        sysTimestamp_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional uint64 sys_timestamp = 5;</code>
+       *
+       * <pre>
+       * system time stamp
+       * </pre>
+       */
+      public Builder clearSysTimestamp() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        sysTimestamp_ = 0L;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:CookieMonsterG4Cal)
     }
 
@@ -5377,10 +5817,18 @@ public final class SGV {
 
     /**
      * <code>required uint64 timestamp = 1;</code>
+     *
+     * <pre>
+     * preferably UTC Unix epoch
+     * </pre>
      */
     boolean hasTimestamp();
     /**
      * <code>required uint64 timestamp = 1;</code>
+     *
+     * <pre>
+     * preferably UTC Unix epoch
+     * </pre>
      */
     long getTimestamp();
 
@@ -5616,12 +6064,20 @@ public final class SGV {
     private long timestamp_;
     /**
      * <code>required uint64 timestamp = 1;</code>
+     *
+     * <pre>
+     * preferably UTC Unix epoch
+     * </pre>
      */
     public boolean hasTimestamp() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
      * <code>required uint64 timestamp = 1;</code>
+     *
+     * <pre>
+     * preferably UTC Unix epoch
+     * </pre>
      */
     public long getTimestamp() {
       return timestamp_;
@@ -5918,18 +6374,30 @@ public final class SGV {
       private long timestamp_ ;
       /**
        * <code>required uint64 timestamp = 1;</code>
+       *
+       * <pre>
+       * preferably UTC Unix epoch
+       * </pre>
        */
       public boolean hasTimestamp() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
        * <code>required uint64 timestamp = 1;</code>
+       *
+       * <pre>
+       * preferably UTC Unix epoch
+       * </pre>
        */
       public long getTimestamp() {
         return timestamp_;
       }
       /**
        * <code>required uint64 timestamp = 1;</code>
+       *
+       * <pre>
+       * preferably UTC Unix epoch
+       * </pre>
        */
       public Builder setTimestamp(long value) {
         bitField0_ |= 0x00000001;
@@ -5939,6 +6407,10 @@ public final class SGV {
       }
       /**
        * <code>required uint64 timestamp = 1;</code>
+       *
+       * <pre>
+       * preferably UTC Unix epoch
+       * </pre>
        */
       public Builder clearTimestamp() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -6082,26 +6554,28 @@ public final class SGV {
       "\000\022\010\n\004MMOL\020\001\"|\n\016DownloadStatus\022\013\n\007SUCCESS" +
       "\020\000\022\013\n\007NO_DATA\020\001\022\024\n\020DEVICE_NOT_FOUND\020\002\022\014\n" +
       "\010IO_ERROR\020\003\022\025\n\021APPLICATION_ERROR\020\004\022\010\n\004NO" +
-      "NE\020\006\022\013\n\007UNKNOWN\020\007\"\233\002\n\022CookieMonsterG4EGV" +
-      "\022\013\n\003sgv\030\001 \002(\r\022\021\n\ttimestamp\030\002 \001(\004\0220\n\tdire" +
-      "ction\030\003 \001(\0162\035.CookieMonsterG4EGV.Directi" +
-      "on\"\262\001\n\tDirection\022\010\n\004NONE\020\000\022\r\n\tDOUBLE_UP\020" +
-      "\001\022\r\n\tSINGLE_UP\020\002\022\021\n\rFORTY_FIVE_UP\020\003\022\010\n\004F" +
-      "LAT\020\004\022\023\n\017FORTY_FIVE_DOWN\020\005\022\017\n\013SINGLE_DOW" +
-      "N\020\006\022\017\n\013DOUBLE_DOWN\020\007\022\022\n\016NOT_COMPUTABLE\020\010",
-      "\022\025\n\021RATE_OUT_OF_RANGE\020\t\"O\n\024CookieMonster" +
-      "G4Meter\022\020\n\010meter_bg\030\001 \002(\r\022\022\n\nmeter_time\030" +
-      "\002 \001(\r\022\021\n\ttimestamp\030\003 \001(\004\"^\n\025CookieMonste" +
-      "rG4Sensor\022\020\n\010filtered\030\001 \002(\004\022\022\n\nunfiltere" +
-      "d\030\002 \001(\004\022\014\n\004rssi\030\003 \001(\r\022\021\n\ttimestamp\030\004 \001(\004" +
-      "\"X\n\022CookieMonsterG4Cal\022\r\n\005slope\030\001 \002(\001\022\021\n" +
-      "\tintercept\030\002 \001(\001\022\r\n\005scale\030\003 \001(\001\022\021\n\ttimes" +
-      "tamp\030\004 \001(\004\"\257\001\n\033CookieMonsterReceiverStat" +
-      "us\022\021\n\ttimestamp\030\001 \002(\004\022:\n\005event\030\002 \003(\0162+.C" +
-      "ookieMonsterReceiverStatus.ReceiverStatu",
-      "s\"A\n\016ReceiverStatus\022\025\n\021RECEIVERCONNECTED" +
-      "\020\000\022\030\n\024RECEIVERDISCONNECTED\020\001B&\n\037com.nigh" +
-      "tscout.android.protobufB\003SGV"
+      "NE\020\006\022\013\n\007UNKNOWN\020\007\"\262\002\n\022CookieMonsterG4EGV" +
+      "\022\013\n\003sgv\030\001 \002(\r\022\021\n\ttimestamp\030\002 \001(\004\022\025\n\rsys_" +
+      "timestamp\030\004 \001(\004\0220\n\tdirection\030\003 \001(\0162\035.Coo" +
+      "kieMonsterG4EGV.Direction\"\262\001\n\tDirection\022" +
+      "\010\n\004NONE\020\000\022\r\n\tDOUBLE_UP\020\001\022\r\n\tSINGLE_UP\020\002\022" +
+      "\021\n\rFORTY_FIVE_UP\020\003\022\010\n\004FLAT\020\004\022\023\n\017FORTY_FI" +
+      "VE_DOWN\020\005\022\017\n\013SINGLE_DOWN\020\006\022\017\n\013DOUBLE_DOW",
+      "N\020\007\022\022\n\016NOT_COMPUTABLE\020\010\022\025\n\021RATE_OUT_OF_R" +
+      "ANGE\020\t\"f\n\024CookieMonsterG4Meter\022\020\n\010meter_" +
+      "bg\030\001 \002(\r\022\022\n\nmeter_time\030\002 \001(\r\022\021\n\ttimestam" +
+      "p\030\003 \001(\004\022\025\n\rsys_timestamp\030\004 \001(\004\"u\n\025Cookie" +
+      "MonsterG4Sensor\022\020\n\010filtered\030\001 \002(\004\022\022\n\nunf" +
+      "iltered\030\002 \001(\004\022\014\n\004rssi\030\003 \001(\r\022\021\n\ttimestamp" +
+      "\030\004 \001(\004\022\025\n\rsys_timestamp\030\005 \001(\004\"o\n\022CookieM" +
+      "onsterG4Cal\022\r\n\005slope\030\001 \002(\001\022\021\n\tintercept\030" +
+      "\002 \001(\001\022\r\n\005scale\030\003 \001(\001\022\021\n\ttimestamp\030\004 \001(\004\022" +
+      "\025\n\rsys_timestamp\030\005 \001(\004\"\257\001\n\033CookieMonster",
+      "ReceiverStatus\022\021\n\ttimestamp\030\001 \002(\004\022:\n\005eve" +
+      "nt\030\002 \003(\0162+.CookieMonsterReceiverStatus.R" +
+      "eceiverStatus\"A\n\016ReceiverStatus\022\025\n\021RECEI" +
+      "VERCONNECTED\020\000\022\030\n\024RECEIVERDISCONNECTED\020\001" +
+      "B&\n\037com.nightscout.android.protobufB\003SGV"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -6126,25 +6600,25 @@ public final class SGV {
     internal_static_CookieMonsterG4EGV_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_CookieMonsterG4EGV_descriptor,
-        new java.lang.String[] { "Sgv", "Timestamp", "Direction", });
+        new java.lang.String[] { "Sgv", "Timestamp", "SysTimestamp", "Direction", });
     internal_static_CookieMonsterG4Meter_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_CookieMonsterG4Meter_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_CookieMonsterG4Meter_descriptor,
-        new java.lang.String[] { "MeterBg", "MeterTime", "Timestamp", });
+        new java.lang.String[] { "MeterBg", "MeterTime", "Timestamp", "SysTimestamp", });
     internal_static_CookieMonsterG4Sensor_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_CookieMonsterG4Sensor_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_CookieMonsterG4Sensor_descriptor,
-        new java.lang.String[] { "Filtered", "Unfiltered", "Rssi", "Timestamp", });
+        new java.lang.String[] { "Filtered", "Unfiltered", "Rssi", "Timestamp", "SysTimestamp", });
     internal_static_CookieMonsterG4Cal_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_CookieMonsterG4Cal_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_CookieMonsterG4Cal_descriptor,
-        new java.lang.String[] { "Slope", "Intercept", "Scale", "Timestamp", });
+        new java.lang.String[] { "Slope", "Intercept", "Scale", "Timestamp", "SysTimestamp", });
     internal_static_CookieMonsterReceiverStatus_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_CookieMonsterReceiverStatus_fieldAccessorTable = new

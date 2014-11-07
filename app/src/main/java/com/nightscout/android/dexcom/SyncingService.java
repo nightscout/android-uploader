@@ -30,7 +30,6 @@ import com.nightscout.android.processors.ProcessorChain;
 import org.json.JSONArray;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -153,8 +152,8 @@ public class SyncingService extends IntentService {
                         .setSensorRecords(sensorRecords)
                         .setCalRecords(calRecords)
                         .setMeterRecords(meterRecords)
-                        .setDownloadStatus(G4Download.DownloadStatus.SUCCESS)
-                        .setUnits(G4Download.Unit.MGDL)
+                        .setDownloadStatus(DownloadStatus.SUCCESS)
+                        .setUnits(GlucoseUnit.MGDL)
                         .setReceiverBattery(batLevel)
                         .setUploaderBattery(MainActivity.batLevel);
 
@@ -286,7 +285,7 @@ public class SyncingService extends IntentService {
     }
 
     private void broadcastSGVToUI() {
-        EGVRecord record=new EGVRecord(-1, Constants.TREND_ARROW_VALUES.NONE,new Date(),new Date());
+        EGVRecord record=new EGVRecord(-1, Trend.NONE,new Date(),new Date());
         broadcastSGVToUI(record,false, (long) TimeConstants.FIVE_MINUTES_MS,new Date().getTime(),null,0);
     }
 

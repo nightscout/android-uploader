@@ -26,6 +26,12 @@ public class GenericTimestampRecord {
         this.systemTime=systemTime;
     }
 
+    public GenericTimestampRecord(long displayTime, long systemTime){
+        this.displayTime=new Date(displayTime);
+        this.systemTime=new Date(systemTime);
+    }
+
+
     public Date getSystemTime() {
         return systemTime;
     }

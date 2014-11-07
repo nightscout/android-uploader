@@ -5,14 +5,16 @@ import com.nightscout.android.dexcom.records.EGVRecord;
 import com.nightscout.android.dexcom.records.MeterRecord;
 import com.nightscout.android.dexcom.records.SensorRecord;
 import com.nightscout.android.protobuf.SGV;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class G4Download {
     protected List<EGVRecord> EGVRecords;
     protected List<CalRecord> CalRecords;
     protected List<SensorRecord> SensorRecords;
-    protected List<MeterRecord> meterRecords;
-    protected Unit units;
+    protected List<MeterRecord> MeterRecords;
+    protected GlucoseUnit unit;
     protected long downloadTimestamp;
     protected DownloadStatus downloadStatus;
     protected int receiverBattery;
@@ -22,24 +24,24 @@ public class G4Download {
         this.EGVRecords=builder.EGVRecords;
         this.CalRecords=builder.CalRecords;
         this.SensorRecords=builder.SensorRecords;
-        this.units=builder.units;
+        this.unit=builder.units;
         this.downloadTimestamp=builder.downloadTimestamp;
         this.downloadStatus=builder.downloadStatus;
         this.receiverBattery=builder.receiverBattery;
         this.uploaderBattery=builder.uploaderBattery;
-        this.meterRecords=builder.meterRecords;
+        this.MeterRecords =builder.MeterRecords;
     }
 
     public G4Download(G4Download g4Download){
         this.EGVRecords=g4Download.getEGVRecords();
         this.CalRecords=g4Download.getCalRecords();
         this.SensorRecords=g4Download.getSensorRecords();
-        this.units=g4Download.getUnits();
+        this.unit=g4Download.getUnit();
         this.downloadTimestamp=g4Download.getDownloadTimestamp();
         this.downloadStatus=g4Download.getDownloadStatus();
         this.receiverBattery=g4Download.getReceiverBattery();
         this.uploaderBattery=g4Download.getUploaderBattery();
-        this.meterRecords=g4Download.getMeterRecords();
+        this.MeterRecords =g4Download.getMeterRecords();
     }
 
     public List<EGVRecord> getEGVRecords() {
@@ -63,7 +65,7 @@ public class G4Download {
     }
 
     public List<MeterRecord> getMeterRecords() {
-        return meterRecords;
+        return MeterRecords;
     }
 
     public int getUploaderBattery() {
@@ -74,57 +76,16 @@ public class G4Download {
         return downloadTimestamp;
     }
 
-    public Unit getUnits() {
-        return units;
-    }
-
-    public enum DownloadStatus {
-        SUCCESS(0),
-        NO_DATA(1),
-        DEVICE_NOT_FOUND(2),
-        IO_ERROR(3),
-        APPLICATION_ERROR(4),
-        NONE(6),
-        UNKNOWN(7);
-
-        private int id;
-
-        DownloadStatus(int id) {
-            this.id = id;
-        }
-
-        public int getId() {
-            return id;
-        }
-    }
-
-    public enum Unit {
-        MGDL(0, "mg/dL"),
-        MMOL(1, "mmol/L");
-
-        private int id;
-        private String friendlyName;
-
-        Unit(int ID, String friendlyName) {
-            this.id = ID;
-            this.friendlyName = friendlyName;
-        }
-
-        public String getFriendlyName() {
-            return friendlyName;
-        }
-
-        public int getId() {
-            return id;
-        }
+    public GlucoseUnit getUnit() {
+        return unit;
     }
 
     public static class G4DownloadBuilder {
         protected List<EGVRecord> EGVRecords;
         protected List<CalRecord> CalRecords;
         protected List<SensorRecord> SensorRecords;
-        protected List<MeterRecord> meterRecords;
-        protected Unit units;
+        protected List<MeterRecord> MeterRecords;
+        protected GlucoseUnit units;
         protected long downloadTimestamp;
         protected DownloadStatus downloadStatus;
         protected int receiverBattery;
@@ -145,7 +106,7 @@ public class G4Download {
             return this;
         }
 
-        public G4DownloadBuilder setUnits(Unit units) {
+        public G4DownloadBuilder setUnits(GlucoseUnit units) {
             this.units = units;
             return this;
         }
@@ -171,7 +132,7 @@ public class G4Download {
         }
 
         public G4DownloadBuilder setMeterRecords(List<MeterRecord> meterRecords) {
-            this.meterRecords = meterRecords;
+            this.MeterRecords = meterRecords;
             return this;
         }
 
@@ -179,10 +140,41 @@ public class G4Download {
             return new G4Download(this);
         }
     }
+
+    public G4Download(SGV.CookieMonsterG4Download download){
+        ArrayList<EGVRecord> egvRecords=new ArrayList<EGVRecord>();
+        ArrayList<SensorRecord> sensorRecords=new ArrayList<SensorRecord>();
+        ArrayList<CalRecord> calRecords=new ArrayList<CalRecord>();
+        ArrayList<MeterRecord> meterRecords=new ArrayList<MeterRecord>();
+
+        for (SGV.CookieMonsterG4EGV record:download.getSgvList()){
+            egvRecords.add(new EGVRecord(record.getSgv(), Trend.values()[record.getDirection().getNumber()],record.getTimestamp(),record.getSysTimestamp()));
+        }
+        for (SGV.CookieMonsterG4Sensor record:download.getSensorList()){
+            sensorRecords.add(new SensorRecord(record.getUnfiltered(),record.getFiltered(),record.getRssi(),record.getTimestamp(),record.getSysTimestamp()));
+        }
+        for (SGV.CookieMonsterG4Cal record:download.getCalList()){
+            calRecords.add(new CalRecord(record.getSlope(),record.getIntercept(),record.getScale(),record.getTimestamp(),record.getSysTimestamp()));
+        }
+        for (SGV.CookieMonsterG4Meter record:download.getMeterList()){
+            meterRecords.add(new MeterRecord(record.getMeterBg(),record.getMeterTime(),record.getTimestamp(),record.getSysTimestamp()));
+        }
+        this.downloadStatus=DownloadStatus.values()[download.getDownloadStatus().getNumber()];
+        this.unit=GlucoseUnit.values()[download.getUnits().getNumber()];
+        this.receiverBattery=download.getReceiverBattery();
+        this.uploaderBattery=download.getUploaderBattery();
+        this.downloadTimestamp=download.getDownloadTimestamp();
+        // FIXME: these variable names break conventions but need to be renamed to avoid conflicts
+        this.EGVRecords=egvRecords;
+        this.MeterRecords=meterRecords;
+        this.SensorRecords=sensorRecords;
+        this.CalRecords=calRecords;
+    }
+
     public SGV.CookieMonsterG4Download toCookieProtobuf(){
         SGV.CookieMonsterG4Download.Builder downloadBuilder = SGV.CookieMonsterG4Download.newBuilder();
         SGV.CookieMonsterG4Download.DownloadStatus pbDownloadStatus=SGV.CookieMonsterG4Download.DownloadStatus.values()[downloadStatus.getId()];
-        SGV.CookieMonsterG4Download.Unit pbUnit=SGV.CookieMonsterG4Download.Unit.values()[units.getId()];
+        SGV.CookieMonsterG4Download.Unit pbUnit=SGV.CookieMonsterG4Download.Unit.values()[unit.getId()];
 
         SGV.CookieMonsterG4EGV.Builder pbSgvBuilder = SGV.CookieMonsterG4EGV.newBuilder();
         SGV.CookieMonsterG4EGV pbSgv;
@@ -227,7 +219,7 @@ public class G4Download {
 
         SGV.CookieMonsterG4Meter.Builder pbMeterBuilder = SGV.CookieMonsterG4Meter.newBuilder();
         SGV.CookieMonsterG4Meter pbMeter;
-        for (MeterRecord record:meterRecords){
+        for (MeterRecord record: MeterRecords){
             pbMeter=pbMeterBuilder.setTimestamp(record.getDisplayTime().getTime())
                     .setMeterBg(record.getMeterBG())
                     .setMeterTime(record.getMeterTime())

@@ -16,6 +16,12 @@ public class MeterRecord extends GenericTimestampRecord {
         meterTime = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(10);
     }
 
+    public MeterRecord(int meterBG, int meterTime,long displayTime, long systemTime) {
+        super(displayTime,systemTime);
+        this.meterBG=meterBG;
+        this.meterTime=meterTime;
+    }
+
     public int getMeterBG() {
         return meterBG;
     }

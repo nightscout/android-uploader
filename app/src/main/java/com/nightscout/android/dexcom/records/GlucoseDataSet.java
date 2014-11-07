@@ -1,6 +1,6 @@
 package com.nightscout.android.dexcom.records;
 
-import com.nightscout.android.dexcom.Constants;
+import com.nightscout.android.dexcom.Trend;
 
 import java.util.Date;
 
@@ -9,7 +9,7 @@ public class GlucoseDataSet {
     private Date systemTime;
     private Date displayTime;
     private int bGValue;
-    private Constants.TREND_ARROW_VALUES trend;
+    private Trend trend;
     private long unfiltered;
     private long filtered;
     private int rssi;
@@ -37,7 +37,7 @@ public class GlucoseDataSet {
         return bGValue;
     }
 
-    public Constants.TREND_ARROW_VALUES getTrend() {
+    public Trend getTrend() {
         return trend;
     }
 

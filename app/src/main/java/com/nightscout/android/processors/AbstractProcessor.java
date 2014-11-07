@@ -55,7 +55,7 @@ abstract public class AbstractProcessor implements ProcessorInterface {
                 .setMeterRecords((ArrayList<MeterRecord>) filterRecords(download.getMeterRecords(), LAST_METER_REC_SHAREDPREF))
                 .setCalRecords((ArrayList<CalRecord>) filterRecords(download.getCalRecords(), LAST_CAL_REC_SHAREDPREF))
                 .setDownloadTimestamp(download.getDownloadTimestamp())
-                .setUnits(download.getUnits())
+                .setUnits(download.getUnit())
                 .setReceiverBattery(download.getReceiverBattery())
                 .setUploaderBattery(download.getUploaderBattery())
                 .build();

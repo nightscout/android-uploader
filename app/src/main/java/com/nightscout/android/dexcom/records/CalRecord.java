@@ -4,6 +4,7 @@ import com.nightscout.android.TimeConstants;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Date;
 
 public class CalRecord extends GenericTimestampRecord {
 
@@ -34,6 +35,16 @@ public class CalRecord extends GenericTimestampRecord {
             calSubrecords[i] = new CalSubrecord(temp, displayTimeOffset);
             start += SUB_LEN;
         }
+    }
+
+    // TODO: do we need the other values? Not adding for now since they don't seem to be used
+    // anywhere else
+    public CalRecord(double slope, double intercept, double scale, long displayTime,
+                     long systemTime){
+        super(displayTime,systemTime);
+        this.slope=slope;
+        this.intercept=intercept;
+        this.scale=scale;
     }
 
     public double getSlope() {
