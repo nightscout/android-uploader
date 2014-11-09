@@ -158,7 +158,7 @@ public class SyncingService extends IntentService {
                 // Only upload 1 record unless forcing a sync
                 boolean uploadStatus;
                 if (numOfPages < 20) {
-                    uploadStatus =  uploader.upload(glucoseDataSets[glucoseDataSets.length - 1],
+                    uploadStatus = uploader.upload(glucoseDataSets[glucoseDataSets.length - 1],
                                     meterRecords[meterRecords.length - 1],
                                     calRecords[calRecords.length - 1]);
                 } else {
