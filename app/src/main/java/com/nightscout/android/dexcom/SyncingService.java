@@ -129,7 +129,14 @@ public class SyncingService extends IntentService {
                 // TODO: need to check if numOfPages if valid on ReadData side
                 SensorRecord[] sensorRecords = readData.getRecentSensorRecords(numOfPages);
                 GlucoseDataSet[] glucoseDataSets = Utils.mergeGlucoseDataRecords(recentRecords, sensorRecords);
-                CalRecord[] calRecords = readData.getRecentCalRecords();
+                //CalRecord[] calRecords = readData.getRecentCalRecords();
+
+                // FIXME: This is a workaround for the new Dexcom AP which seems to have a new format
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+                CalRecord[] calRecords = new CalRecord[1];
+                if (prefs.getBoolean("cloud_cal_data", false)) {
+                    calRecords = readData.getRecentCalRecords();
+                }
 
                 long timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
                 // TODO: determine if the logic here is correct. I suspect it assumes the last record was less than 5
@@ -152,7 +159,7 @@ public class SyncingService extends IntentService {
                 // Only upload 1 record unless forcing a sync
                 boolean uploadStatus;
                 if (numOfPages < 20) {
-                    uploadStatus = uploader.upload(glucoseDataSets[glucoseDataSets.length - 1],
+                    uploadStatus =  uploader.upload(glucoseDataSets[glucoseDataSets.length - 1],
                                     meterRecords[meterRecords.length - 1],
                                     calRecords[calRecords.length - 1]);
                 } else {
