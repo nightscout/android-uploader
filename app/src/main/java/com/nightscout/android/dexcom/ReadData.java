@@ -157,7 +157,6 @@ public class ReadData {
         payload.add(numOfPages);
         writeCommand(Constants.READ_DATABASE_PAGES, payload);
         byte[] readData = read(2122).getData();
-        ParsePage(readData, recordType);
         return ParsePage(readData, recordType);
     }
 
