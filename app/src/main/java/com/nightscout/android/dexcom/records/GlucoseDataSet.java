@@ -42,7 +42,7 @@ public class GlucoseDataSet {
     }
 
     public String getTrendSymbol() {
-        return trend.Symbol();
+        return trend.getTrendSymbol();
     }
 
     public long getUnfiltered() {

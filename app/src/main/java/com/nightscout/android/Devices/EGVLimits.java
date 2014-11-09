@@ -1,4 +1,4 @@
-package com.nightscout.android.analyzers;
+package com.nightscout.android.devices;
 
 public class EGVLimits {
     EGVThresholds criticalThreshold=new EGVThresholds(60,300);

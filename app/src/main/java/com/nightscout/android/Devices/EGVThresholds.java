@@ -1,4 +1,4 @@
-package com.nightscout.android.analyzers;
+package com.nightscout.android.devices;
 
 public class EGVThresholds {
     int highThreshold;
@@ -9,7 +9,7 @@ public class EGVThresholds {
         lowThreshold=low;
     }
 
-    EGVThresholds(){
+    public EGVThresholds(){
         highThreshold=180;
         lowThreshold=60;
     }

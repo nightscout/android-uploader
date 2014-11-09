@@ -7,7 +7,8 @@ public enum DownloadStatus {
     IO_ERROR(3),
     APPLICATION_ERROR(4),
     NONE(6),
-    UNKNOWN(7);
+    UNKNOWN(7),
+    REMOTE_DISCONNECTED(8);
 
     private int id;
 

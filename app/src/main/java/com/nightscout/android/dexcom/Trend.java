@@ -26,7 +26,7 @@ public enum Trend {
         this(id,null, null);
     }
 
-    public String Symbol() {
+    public String getTrendSymbol() {
         if (arrowSymbol == null) {
             return "\u2194";
         } else {

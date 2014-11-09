@@ -24,36 +24,22 @@ import android.util.Log;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.MainActivity;
+import com.nightscout.android.Nightscout;
+import com.nightscout.android.R;
+import com.nightscout.android.analyzers.AbstractDownloadAnalyzer;
 import com.nightscout.android.analyzers.AnalyzedDownload;
 import com.nightscout.android.analyzers.Condition;
+import com.nightscout.android.analyzers.G4DownloadAnalyzer;
+import com.nightscout.android.devices.Constants;
+import com.nightscout.android.dexcom.G4Constants;
 import com.nightscout.android.dexcom.G4Download;
+import com.nightscout.android.dexcom.Trend;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 
-/**
- Copyright (c) 2014, Kevin Lee (klee24@gmail.com)
- All rights reserved.
- Redistribution and use in source and binary forms, with or without modification,
- are permitted provided that the following conditions are met:
- 1. Redistributions of source code must retain the above copyright notice, this
- list of conditions and the following disclaimer.
- 2. Redistributions in binary form must reproduce the above copyright notice, this
- list of conditions and the following disclaimer in the documentation and/or
- other materials provided with the distribution.
- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 public class AndroidNotificationProcessor extends AbstractProcessor {
     private static final String TAG = AndroidNotificationProcessor.class.getSimpleName();
     protected NotificationCompat.Builder notifBuilder;
@@ -62,9 +48,6 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
     protected boolean isSilenced=false;
     protected Date timeSilenced;
     protected SnoozeReceiver snoozeReceiver;
-    protected tickReceiver tickReceiver;
-    protected screenStateReceiver screenStateReceiver;
-    protected G4Download lastDownload;
     protected ArrayList<G4Download> previousDownloads=new ArrayList<G4Download>();
     protected final int MAXPREVIOUS=3;
     private PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0);
@@ -73,39 +56,34 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
     private final int SNOOZEDURATION=1800000;
     private SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
     // Good is defined as one that has all data that we need to convey our message
-    private G4Download lastKnownGood;
     protected String phoneNum=null;
     protected AnalyzedDownload analyzedDownload;
-    protected int tickCounter=0;
-    protected boolean isTickCounterSyncd=false;
-    protected boolean isScreenOn=true;
     protected WearableExtender wearableExtender;
     protected boolean runInit =true;
-//    protected boolean firstReading = true;
-//    protected NotificationCompat.WearableExtender wearableExtender;
 
 
-    public void setNotifBuilder(NotificationCompat.Builder notifBuilder) {
-        this.notifBuilder = notifBuilder;
-    }
 
-    AndroidNotificationMonitor(String name,int devID,Context contxt){
-        super(name, devID, contxt, "android_notification");
+    public AndroidNotificationProcessor(int devID,Context context){
+        super(devID, context, "android_notification");
         wearableExtender =
                 new WearableExtender();
 
-        Uri uri=Uri.parse(sharedPref.getString(deviceIDStr+Constants.CONTACTDATAURISUFFIX,Uri.EMPTY.toString()));
+        Uri uri=Uri.parse(sharedPref.getString(device+ Constants.CONTACTDATAURISUFFIX,Uri.EMPTY.toString()));
 
         if (! uri.equals(Uri.EMPTY)) {
             InputStream inputStream = openDisplayPhoto(uri);
             bm = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(inputStream),200,200,true);
         }
         else {
-            bm = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon);
+            bm = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
         }
         wearableExtender.setBackground(bm)
                 .setHintHideIcon(true);
         init();
+    }
+
+    public void setNotifBuilder(NotificationCompat.Builder notifBuilder) {
+        this.notifBuilder = notifBuilder;
     }
 
     public void init(){
@@ -113,7 +91,7 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
 //        mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotifyMgr = NotificationManagerCompat.from(context);
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0);
-        Bitmap bm = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon);
+        Bitmap bm = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
         this.setNotifBuilder(new NotificationCompat.Builder(context)
                 .setContentTitle(name)
                 .setContentText("Monitor started. No data yet")
@@ -127,12 +105,7 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
         sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         this.setAllowVirtual(true);
         snoozeReceiver = new SnoozeReceiver();
-        screenStateReceiver= new screenStateReceiver();
-        tickReceiver = new tickReceiver();
         context.registerReceiver(snoozeReceiver, new IntentFilter(Constants.SNOOZE_INTENT));
-        context.registerReceiver(screenStateReceiver,new IntentFilter(Intent.ACTION_SCREEN_ON));
-        context.registerReceiver(screenStateReceiver,new IntentFilter(Intent.ACTION_SCREEN_OFF));
-        context.registerReceiver(tickReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
         runInit =false;
     }
 
@@ -149,7 +122,7 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
         if (previousDownloads!=null) {
             if (previousDownloads.size() > 0 && previousDownloads.get(previousDownloads.size() - 1).equals(dl)) {
                 Log.i(TAG, "Received a duplicate reading. Ignoring it");
-                return;
+                return true;
             } else {
                 Log.d(TAG,"Download determined to be a new reading");
             }
@@ -160,9 +133,6 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
         } else {
             Log.w(TAG, "No previous downloads?");
         }
-        if (dl.getEgvArrayListRecords().size()>0)
-            lastKnownGood = dl;
-        // FIXME think this violates the open/closed principle... have to change this class if any new devices are added. Look into DI
         if (dl.getDriver().equals(G4Constants.DRIVER)) {
             AbstractDownloadAnalyzer downloadAnalyzer = new G4DownloadAnalyzer(dl, context);
             analyzedDownload = downloadAnalyzer.analyze();
@@ -174,39 +144,17 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
             long duration=new Date().getTime()-timeSilenced.getTime();
             // Snooze for 30 minutes at a time
             if (duration>SNOOZEDURATION) {
-                Log.v(TAG,"Resetting snooze timer for "+deviceIDStr);
+                Log.v(TAG,"Resetting snooze timer for "+device);
                 isSilenced = false;
             }
-            Log.v(TAG,"Alarm "+getName()+"("+deviceIDStr+"/"+monitorType+") is snoozed");
+            Log.v(TAG,"Alarm "+getName()+"("+device+"/"+monitorType+") is snoozed");
         }
         for (Condition condition:analyzedDownload.getConditions()){
             Log.v(TAG,"Condition: "+condition);
         }
 
         mNotifyMgr.notify(deviceID, buildNotification(analyzedDownload));
-        if (! isTickCounterSyncd) {
-            syncTickCounter();
-            // Not sure this is what we want to do but I don't want to spend valuable CPU time/battery recalc'ing the sync when it will rarely if ever change.
-            isTickCounterSyncd=true;
-        }
-        try {
-            savelastSuccessDate(dl.getLastRecordReadingDate().getTime());
-        } catch (NoDataException e) {
-            Log.d(TAG,"No data in reading to get the last date");
-        }
-    }
-
-    private void syncTickCounter(){
-        try {
-            // tickCounter represents the number of minutes since the previous analyzed download
-            if (previousDownloads != null && previousDownloads.size() > 0) {
-                int timeSinceDownload = (int) (new Date().getTime() - previousDownloads.get(previousDownloads.size() - 1).getLastRecordReadingDate().getTime());
-                tickCounter = (timeSinceDownload / 1000) / 60;
-                Log.d(TAG, "Setting tickCounter to " + tickCounter);
-            }
-        } catch (NoDataException e) {
-//            e.printStackTrace();
-        }
+        return true;
     }
 
     private Notification buildNotification(AnalyzedDownload dl){
@@ -216,8 +164,6 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
         setActions(dl);
         setContent(dl);
         setIcon(dl);
-//        notifBuilder.extend(wearableExtender);
-
         return notifBuilder.build();
     }
     protected void setSound(AnalyzedDownload dl){
@@ -239,21 +185,21 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
         for (Condition condition:conditions) {
             switch (condition) {
                 case CRITICALHIGH:
-                    uri = Uri.parse(sharedPref.getString(deviceIDStr + "_critical_high_ringtone", "DEFAULT_SOUND"));
+                    uri = Uri.parse(sharedPref.getString(device + "_critical_high_ringtone", "DEFAULT_SOUND"));
                     breakloop=true;
                     break;
                 case WARNHIGH:
-                    uri = Uri.parse(sharedPref.getString(deviceIDStr + "_high_ringtone", "DEFAULT_SOUND"));
+                    uri = Uri.parse(sharedPref.getString(device + "_high_ringtone", "DEFAULT_SOUND"));
                     breakloop=true;
                     break;
                 case INRANGE:
                     break;
                 case WARNLOW:
-                    uri = Uri.parse(sharedPref.getString(deviceIDStr + "_low_ringtone", "DEFAULT_SOUND"));
+                    uri = Uri.parse(sharedPref.getString(device + "_low_ringtone", "DEFAULT_SOUND"));
                     breakloop=true;
                     break;
                 case CRITICALLOW:
-                    uri=Uri.parse(sharedPref.getString(deviceIDStr + "_critical_low_ringtone", "DEFAULT_SOUND"));
+                    uri=Uri.parse(sharedPref.getString(device + "_critical_low_ringtone", "DEFAULT_SOUND"));
                     breakloop=true;
                     break;
                 case DOWNLOADFAILED:
@@ -299,74 +245,68 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
         ArrayList<Condition> conditions=dl.getConditions();
         String message="";
         for (Condition condition:conditions) {
-            try {
-                if (condition == Condition.CRITICALHIGH || condition == Condition.WARNHIGH ||
-                        condition == Condition.INRANGE || condition == Condition.WARNLOW ||
-                        condition == Condition.CRITICALLOW) {
-                    if (!message.equals(""))
-                        message += "\n";
-                    message += dl.getLastReading() + " " + dl.getUnit() + " " + dl.getLastTrend().toString();
-                }
-                switch (condition) {
-                    case DOWNLOADFAILED:
-                        if (!message.equals(""))
-                            message += "\n";
-                        message += "Download failed";
-                        break;
-                    case DEVICEDISCONNECTED:
-                        if (!message.equals(""))
-                            message += "\n";
-                        message += "CGM appears to be disconnected";
-                        break;
-                    case NODATA:
-                        if (!message.equals(""))
-                            message += "\n";
-                        message += "No data available in download";
-                        break;
-                    case STALEDATA:
-                        if (!message.equals(""))
-                            message += "\n";
-                        message += "Data in download is over " + ((new Date().getTime() - dl.getLastRecordReadingDate().getTime()) / 1000) / 60;
-                        break;
-                    case UPLOADERCRITICALLOW:
-                        if (!message.equals(""))
-                            message += "\n";
-                        message += "Uploader is critically low: " + dl.getUploaderBattery();
-                        break;
-                    case UPLOADERLOW:
-                        if (!message.equals(""))
-                            message += "\n";
-                        message += "Uploader is low: " + dl.getUploaderBattery();
-                        break;
-                    case DEVICECRITICALLOW:
-                        if (!message.equals(""))
-                            message += "\n";
-                        message += "CGM is critically low: " + dl.getUploaderBattery();
-                        break;
-                    case DEVICELOW:
-                        if (!message.equals(""))
-                            message += "\n";
-                        message += "CGM is low: " + dl.getUploaderBattery();
-                        break;
-                    case DEVICEMSGS:
-                        break;
-                    case UNKNOWN:
-                        if (!message.equals(""))
-                            message += "\n";
-                        message += "Unidentified condition";
-                        break;
-                    case REMOTEDISCONNECTED:
-                        if (!message.equals(""))
-                            message+="\n";
-                        message+= Condition.REMOTEDISCONNECTED.toString();
-                        break;
-                    case NONE:
-                        break;
-                }
-            } catch (NoDataException e) {
+            if (condition == Condition.CRITICALHIGH || condition == Condition.WARNHIGH ||
+                    condition == Condition.INRANGE || condition == Condition.WARNLOW ||
+                    condition == Condition.CRITICALLOW) {
                 if (!message.equals(""))
                     message += "\n";
-                message += "No data available in download";
+                message += dl.getLastEGV() + " " + dl.getUnit() + " " + dl.getLastEGVTrend().getTrendSymbol();
+            }
+            switch (condition) {
+                case DOWNLOADFAILED:
+                    if (!message.equals(""))
+                        message += "\n";
+                    message += "Download failed";
+                    break;
+                case DEVICEDISCONNECTED:
+                    if (!message.equals(""))
+                        message += "\n";
+                    message += "CGM appears to be disconnected";
+                    break;
+                case NODATA:
+                    if (!message.equals(""))
+                        message += "\n";
+                    message += "No data available in download";
+                    break;
+                case STALEDATA:
+                    if (!message.equals(""))
+                        message += "\n";
+                    message += "Data in download is over " + ((new Date().getTime() - dl.getLastEGVTimestamp()) / 1000) / 60;
+                    break;
+                case UPLOADERCRITICALLOW:
+                    if (!message.equals(""))
+                        message += "\n";
+                    message += "Uploader is critically low: " + dl.getUploaderBattery();
+                    break;
+                case UPLOADERLOW:
+                    if (!message.equals(""))
+                        message += "\n";
+                    message += "Uploader is low: " + dl.getUploaderBattery();
+                    break;
+                case DEVICECRITICALLOW:
+                    if (!message.equals(""))
+                        message += "\n";
+                    message += "CGM is critically low: " + dl.getUploaderBattery();
+                    break;
+                case DEVICELOW:
+                    if (!message.equals(""))
+                        message += "\n";
+                    message += "CGM is low: " + dl.getUploaderBattery();
+                    break;
+                case DEVICEMSGS:
+                    break;
+                case UNKNOWN:
+                    if (!message.equals(""))
+                        message += "\n";
+                    message += "Unidentified condition";
+                    break;
+                case REMOTEDISCONNECTED:
+                    if (!message.equals(""))
+                        message+="\n";
+                    message+= Condition.REMOTEDISCONNECTED.toString();
+                    break;
+                case NONE:
+                    break;
             }
             notifBuilder.setTicker(message);
         }
@@ -374,7 +314,6 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
     }
 
     private void setDefaults(AnalyzedDownload dl){
-//        this.notifBuilder=new NotificationCompat.Builder(context)
         ArrayList<Condition> conditions=dl.getConditions();
         notifBuilder = new NotificationCompat.Builder(context);
         if ( conditions.contains(Condition.CRITICALHIGH)
@@ -383,7 +322,6 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
                 || conditions.contains(Condition.CRITICALLOW)) {
 
             notifBuilder.setPriority(Notification.PRIORITY_MAX);
-//            firstReading=false;
         } else {
             notifBuilder.setPriority(Notification.PRIORITY_DEFAULT);
         }
@@ -391,7 +329,6 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
                 .setContentTitle(name)
                 .setContentText("Default text")
                 .setContentIntent(contentIntent)
-//                .setOngoing(true)
                 .extend(wearableExtender)
                 .setSmallIcon(R.drawable.sandclock)
                 .setLargeIcon(bm);
@@ -406,9 +343,9 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
                         || condition == Condition.WARNLOW
                         || condition == Condition.CRITICALLOW) {
                     Intent snoozeIntent = new Intent(Constants.SNOOZE_INTENT);
-                    snoozeIntent.putExtra("device", deviceIDStr);
+                    snoozeIntent.putExtra("device", device);
                     PendingIntent snoozePendIntent = PendingIntent.getBroadcast(context, deviceID, snoozeIntent, 0);
-                    // TODO make the snooze time configurable
+                    // TODO make the snooze time configurable?
                     // TODO dont hardcode this value - use i18n
                     String snoozeActionText="Snooze";
                     notifBuilder.addAction(R.drawable.ic_snooze, snoozeActionText, snoozePendIntent);
@@ -460,12 +397,8 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
         if (conditions.contains(Condition.CRITICALLOW) || conditions.contains(Condition.WARNLOW)){
             range=2;
         }
-        try {
-            Trend trend = dl.getLastTrend();
-            iconLevel = trend.getVal() + (state * 10) + (range * 20);
-        } catch (NoDataException e) {
-            iconLevel=60;
-        }
+        Trend trend = dl.getLastEGVTrend();
+        iconLevel = trend.ordinal() + (state * 10) + (range * 20);
         int icon;
         switch (iconLevel){
             case (0):
@@ -657,13 +590,11 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
                 .setHintHideIcon(true);
         notifBuilder.extend(wearableExtender);
         notifBuilder.setSmallIcon(icon);
-//        notifBuilder.setSmallIcon(R.drawable.smicons, iconLevel);
     }
 
     @Override
     public void start() {
         super.start();
-//        init();
     }
 
     @Override
@@ -673,10 +604,6 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
         if (context !=null) {
             if (snoozeReceiver != null)
                 context.unregisterReceiver(snoozeReceiver);
-            if (screenStateReceiver !=null)
-                context.unregisterReceiver(screenStateReceiver);
-            if (tickReceiver != null)
-                context.unregisterReceiver(tickReceiver);
         }
 
     }
@@ -685,10 +612,10 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
         @Override
         public void onReceive(Context mContext, Intent intent) {
             if (intent.getAction().equals(Constants.SNOOZE_INTENT)) {
-                if (intent.getExtras().get("device").equals(deviceIDStr)) {
-                    Tracker tracker = ((BGScout) context.getApplicationContext()).getTracker();
+                if (intent.getExtras().get("device").equals(device)) {
+                    Tracker tracker = ((Nightscout) context.getApplicationContext()).getTracker();
                     tracker.send(new HitBuilders.EventBuilder("Snooze", "pressed").build());
-                    Log.d(TAG, deviceIDStr + ": Received a request to snooze alarm on " + intent.getExtras().get("device"));
+                    Log.d(TAG, device + ": Received a request to snooze alarm on " + intent.getExtras().get("device"));
                     // Only capture the first snooze operation.. ignore others until it is reset
                     if (!isSilenced) {
                         isSilenced = true;
@@ -697,7 +624,7 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
                     if (analyzedDownload != null)
                         mNotifyMgr.notify(deviceID, buildNotification(analyzedDownload));
                 } else {
-                    Log.d(TAG, deviceIDStr + ": Ignored a request to snooze alarm on " + intent.getExtras().get("device"));
+                    Log.d(TAG, device + ": Ignored a request to snooze alarm on " + intent.getExtras().get("device"));
                 }
             }
         }
@@ -715,57 +642,6 @@ public class AndroidNotificationProcessor extends AbstractProcessor {
             notifBuilder.setPriority(Notification.PRIORITY_LOW);
             Notification notification=notifBuilder.build();
             mNotifyMgr.notify(deviceID, notification);
-        }
-    }
-
-    public class screenStateReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context mContext, Intent intent) {
-            Log.d(TAG,"Intent=>"+intent.getAction()+" received");
-            if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
-                updateNotification();
-                isScreenOn=true;
-                Log.d(TAG, "Kicking off tick timer");
-            } else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
-                isScreenOn=false;
-            }
-        }
-    }
-
-    public class tickReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context mContext, Intent intent) {
-            if (intent.getAction().equals("android.intent.action.TIME_TICK")) {
-                if (analyzedDownload==null)
-                    return;
-                try {
-                    Log.d(TAG, "Comparing "+(new Date().getTime()-analyzedDownload.getLastRecordReadingDate().getTime()));
-                    if (new Date().getTime()-analyzedDownload.getLastRecordReadingDate().getTime()< 310000 && ! isScreenOn) {
-                        Log.d(TAG,"tickReceiver is returning because screen is off and the last reading is less than 5 minutes and 10 seconds old");
-                        return;
-                    }
-                    if (isScreenOn)
-                        updateNotification();
-                    // On every 5th tick lets only do an update to avoid double notifications when there is a timing mismatch
-                    if (tickCounter==5) {
-                        updateNotification();
-                        return;
-                    }
-                    if (tickCounter>6) {
-                        Log.d(TAG, "Reanalyzing the download");
-                        if (previousDownloads.size() > 0) {
-                            AbstractDownloadAnalyzer downloadAnalyzer = new G4DownloadAnalyzer(previousDownloads.get(previousDownloads.size() - 1), context);
-                            analyzedDownload = downloadAnalyzer.analyze();
-                            mNotifyMgr.notify(deviceID, buildNotification(analyzedDownload));
-                        }
-                        tickCounter=0;
-                    }
-                    tickCounter+=1;
-                } catch (NoDataException e) {
-//                    e.printStackTrace();
-                }
-
-            }
         }
     }
 

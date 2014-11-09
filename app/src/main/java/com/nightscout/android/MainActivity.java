@@ -23,7 +23,8 @@ import android.widget.TextView;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.nightscout.android.dexcom.Constants;
+import com.nightscout.android.devices.Constants;
+import com.nightscout.android.dexcom.G4Constants;
 import com.nightscout.android.dexcom.SpecialBGValue;
 import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.dexcom.Trend;
@@ -119,7 +120,7 @@ public class MainActivity extends Activity {
         if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) || SyncingService.isG4Connected(getApplicationContext())) {
             statusBarIcons.setUSB(true);
             Log.d(TAG, "Starting syncing in OnCreate...");
-            SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
+            SyncingService.startActionSingleSync(mContext, G4Constants.MIN_SYNC_PAGES);
         } else {
             // reset the top icons to their default state
             statusBarIcons.setDefaults();
@@ -186,7 +187,7 @@ public class MainActivity extends Activity {
         else
             sgvStr=String.valueOf(sgv);
         String responseSGVStr = (sgv!=-1)?
-                (SpecialBGValue.isSpecialValue(sgv))? SpecialBGValue.getEGVSpecialValue(sgv).toString():sgvStr+" "+trend.Symbol():"---";
+                (SpecialBGValue.isSpecialValue(sgv))? SpecialBGValue.getEGVSpecialValue(sgv).toString():sgvStr+" "+trend.getTrendSymbol():"---";
         return responseSGVStr;
     }
 
@@ -239,6 +240,7 @@ public class MainActivity extends Activity {
 
     public class CGMStatusReceiver extends BroadcastReceiver {
         public static final String PROCESS_RESPONSE = "com.mSyncingServiceIntent.action.PROCESS_RESPONSE";
+        public static final String REQUEST_DOWNLOAD = "com.mSyncingServiceIntent.action.REQUEST_DOWNLOAD";
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -320,7 +322,7 @@ public class MainActivity extends Activity {
             } else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
                 statusBarIcons.setUSB(true);
                 Log.d(TAG, "Starting syncing on USB attached...");
-                SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
+                SyncingService.startActionSingleSync(mContext, G4Constants.MIN_SYNC_PAGES);
                 //TODO: consider getting permission programmatically instead of user prompted
                 //if decided to need to add android.permission.USB_PERMISSION in manifest
             } else if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
@@ -332,7 +334,7 @@ public class MainActivity extends Activity {
     // Runnable to start service as needed to sync with mCGMStatusReceiver and cloud
     public Runnable syncCGM = new Runnable() {
         public void run() {
-            SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
+            SyncingService.startActionSingleSync(mContext, G4Constants.MIN_SYNC_PAGES);
         }
     };
 
@@ -391,7 +393,7 @@ public class MainActivity extends Activity {
                 e.printStackTrace();
             }
         } else if (id == R.id.gap_sync) {
-            SyncingService.startActionSingleSync(getApplicationContext(), SyncingService.GAP_SYNC_PAGES);
+            SyncingService.startActionSingleSync(getApplicationContext(), G4Constants.GAP_SYNC_PAGES);
         } else if (id == R.id.close_settings) {
             mHandler.removeCallbacks(syncCGM);
             finish();

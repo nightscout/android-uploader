@@ -1,6 +1,9 @@
 package com.nightscout.android.dexcom;
 
 import android.util.Log;
+
+import com.nightscout.android.devices.Constants;
+import com.nightscout.android.devices.DeviceTransportAbstract;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.records.CalRecord;
 import com.nightscout.android.dexcom.records.EGVRecord;
@@ -23,28 +26,31 @@ public class ReadData {
     private static final String TAG = ReadData.class.getSimpleName();
     private static final int IO_TIMEOUT = 200;
     private static final int MIN_LEN = 256;
-    private UsbSerialDriver mSerialDevice;
+    private DeviceTransportAbstract transport;
 
-    public ReadData(UsbSerialDriver device) {
-        mSerialDevice = device;
+    public ReadData(DeviceTransportAbstract transport) {
+        this.transport = transport;
     }
 
     public EGVRecord[] getRecentEGVs() {
-        int recordType = Constants.RECORD_TYPES.EGV_DATA.ordinal();
+        int recordType = RecordTypes.EGV_DATA.ordinal();
         int endPage = readDataBasePageRange(recordType);
         return readDataBasePage(recordType, endPage);
     }
 
+    // TODO: Add unit test once transport abstraction is in place. Test that < 20 pages work with
+    // gap sync
     public List<EGVRecord> getRecentEGVsPages(int numOfRecentPages) {
         if (numOfRecentPages < 1) {
             throw new IllegalArgumentException("Number of pages must be greater than 1.");
         }
-        int recordType = Constants.RECORD_TYPES.EGV_DATA.ordinal();
+        int recordType = RecordTypes.EGV_DATA.ordinal();
         int endPage = readDataBasePageRange(recordType);
         numOfRecentPages = numOfRecentPages - 1;
         List<EGVRecord> allPages = new ArrayList<EGVRecord>();
-        for (int i = numOfRecentPages; i >= 0; i--) {
+        for (int i = Math.min(numOfRecentPages,endPage); i >= 0; i--) {
             int nextPage = endPage - i;
+            Log.d(TAG, "Reading #" + i + " EGV pages (page number " + nextPage + ")");
             EGVRecord[] ithEGVRecordPage = readDataBasePage(recordType, nextPage);
             allPages.addAll(Arrays.asList(ithEGVRecordPage));
         }
@@ -56,22 +62,25 @@ public class ReadData {
     }
 
     public List<MeterRecord> getRecentMeterRecords() {
-        int recordType = Constants.RECORD_TYPES.METER_DATA.ordinal();
+        int recordType = RecordTypes.METER_DATA.ordinal();
         int endPage = readDataBasePageRange(recordType);
         //FIXME - too much casting going on here
         return Arrays.asList((MeterRecord[]) readDataBasePage(recordType, endPage));
     }
 
+    // TODO: Add unit test once transport abstraction is in place. Test that < 20 pages work with
+    // gap sync
     public List<SensorRecord> getRecentSensorRecords(int numOfRecentPages) {
         if (numOfRecentPages < 1) {
             throw new IllegalArgumentException("Number of pages must be greater than 1.");
         }
-        int recordType = Constants.RECORD_TYPES.SENSOR_DATA.ordinal();
+        int recordType = RecordTypes.SENSOR_DATA.ordinal();
         int endPage = readDataBasePageRange(recordType);
         numOfRecentPages = numOfRecentPages - 1;
         List<SensorRecord> allPages = new ArrayList<SensorRecord>();
-        for (int i = numOfRecentPages; i >= 0; i--) {
+        for (int i = Math.min(numOfRecentPages,endPage); i >= 0; i--) {
             int nextPage = endPage - i;
+            Log.d(TAG, "Reading #" + i + " Sensor pages (page number " + nextPage + ")");
             SensorRecord[] ithSensorRecordPage = readDataBasePage(recordType, nextPage);
             allPages.addAll(Arrays.asList(ithSensorRecordPage));
         }
@@ -79,7 +88,7 @@ public class ReadData {
     }
 
     public List<CalRecord> getRecentCalRecords() {
-        int recordType = Constants.RECORD_TYPES.CAL_SET.ordinal();
+        int recordType = RecordTypes.CAL_SET.ordinal();
         int endPage = readDataBasePageRange(recordType);
         //FIXME - too much casting going on here
         return Arrays.asList((CalRecord[]) readDataBasePage(recordType, endPage));
@@ -98,8 +107,8 @@ public class ReadData {
 
     public String readSerialNumber() {
         int PAGE_OFFSET = 0;
-        byte[] readData = readDataBasePage(Constants.RECORD_TYPES.MANUFACTURING_DATA.ordinal(), PAGE_OFFSET);
-        Element md = ParsePage(readData, Constants.RECORD_TYPES.MANUFACTURING_DATA.ordinal());
+        byte[] readData = readDataBasePage(RecordTypes.MANUFACTURING_DATA.ordinal(), PAGE_OFFSET);
+        Element md = ParsePage(readData, RecordTypes.MANUFACTURING_DATA.ordinal());
         return md.getAttribute("SerialNumber");
     }
 
@@ -129,6 +138,9 @@ public class ReadData {
 
     private <T> T readDataBasePage(int recordType, int page) {
         byte numOfPages = 1;
+        if (page < 0){
+            throw new IllegalArgumentException("Invalid page requested:" + page);
+        }
         ArrayList<Byte> payload = new ArrayList<Byte>();
         payload.add((byte) recordType);
         byte[] pageInt = ByteBuffer.allocate(4).putInt(page).array();
@@ -145,9 +157,9 @@ public class ReadData {
 
     private void writeCommand(int command, ArrayList<Byte> payload) {
         byte[] packet = new PacketBuilder(command, payload).compose();
-        if (mSerialDevice != null) {
+        if (transport != null) {
             try {
-                mSerialDevice.write(packet, IO_TIMEOUT);
+                transport.write(packet, IO_TIMEOUT);
             } catch (IOException e) {
                 Log.e(TAG, "Unable to write to serial device.", e);
             }
@@ -156,9 +168,9 @@ public class ReadData {
 
     private void writeCommand(int command) {
         byte[] packet = new PacketBuilder(command).compose();
-        if (mSerialDevice != null) {
+        if (transport != null) {
             try {
-                mSerialDevice.write(packet, IO_TIMEOUT);
+                transport.write(packet, IO_TIMEOUT);
             } catch (IOException e) {
                 Log.e(TAG, "Unable to write to serial device.", e);
             }
@@ -169,7 +181,7 @@ public class ReadData {
         byte[] readData = new byte[numOfBytes];
         int len = 0;
         try {
-            len = mSerialDevice.read(readData, IO_TIMEOUT);
+            len = transport.read(readData, IO_TIMEOUT);
         } catch (IOException e) {
             Log.e(TAG, "Unable to read from serial device.", e);
         }
@@ -183,7 +195,7 @@ public class ReadData {
         int numRec = data[NUM_REC_OFFSET];
         int rec_len;
 
-        switch (Constants.RECORD_TYPES.values()[recordType]) {
+        switch (RecordTypes.values()[recordType]) {
             case MANUFACTURING_DATA:
                 GenericXMLRecord xmlRecord = new GenericXMLRecord(Arrays.copyOfRange(data, HEADER_LEN, data.length - 1));
                 return (T) xmlRecord;

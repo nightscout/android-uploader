@@ -1,10 +1,13 @@
 package com.nightscout.android.processors;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.util.Log;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
+import com.nightscout.android.R;
+import com.nightscout.android.devices.Download;
 import com.nightscout.android.dexcom.G4Download;
 
 import java.util.ArrayList;
@@ -25,10 +28,16 @@ public class PebbleProcessor extends AbstractProcessor {
     private static final int BATT=6;
     private static final int NAME=7;
     private ArrayList<G4Download> downloadObjects=new ArrayList<G4Download>();
+    private int lowThreshold;
+    private int highThreshold;
 
-    public PebbleProcessor(String n, int devID, Context context) {
-        super(n, devID, context, "pebble_monitor");
+    public PebbleProcessor(String n, int deviceID, Context context) {
+        super(deviceID, context, "pebble_monitor");
         init();
+        Resources res=context.getResources();
+
+        lowThreshold=Integer.valueOf(sharedPref.getString("device_" + deviceID + "_warn_low_threshold", String.valueOf(res.getInteger(R.integer.pref_default_device_low))));
+        highThreshold=Integer.valueOf(sharedPref.getString("device_" + deviceID + "_warn_high_threshold", String.valueOf(res.getInteger(R.integer.pref_default_device_high))));
     }
 
     protected void init(){
@@ -63,53 +72,46 @@ public class PebbleProcessor extends AbstractProcessor {
             Log.d(TAG,"Trying to send message to pebble.. Here goes nothing");
             PebbleKit.sendDataToPebble(context,PEBBLEAPP_UUID,data);
         }
+        return true;
     }
 
     protected PebbleDictionary buildMsg(G4Download dl){
         String delta="";
         if (downloadObjects.size()>1) {
-            try {
-                int deltaInt=downloadObjects.get(1).getLastReading() - downloadObjects.get(0).getLastReading();
-                if (deltaInt>0)
-                    delta="+";
-                delta += String.valueOf(deltaInt);
-            } catch (NoDataException e) {
-                e.printStackTrace();
-            }
+            int deltaInt=downloadObjects.get(1).getLastEGV() - downloadObjects.get(0).getLastEGV();
+            if (deltaInt>0)
+                delta="+";
+            delta += String.valueOf(deltaInt);
         }
         PebbleDictionary data=new PebbleDictionary();
         Log.d(TAG,"Building the dictionary");
         byte alert=0x00;
-        try {
-            Log.d(TAG, "Trend arrow: " + dl.getLastTrend().getNsString());
-            data.addString(ICON_KEY, dl.getLastTrend().getNsString());
-            data.addString(BG_KEY, String.valueOf(dl.getLastReading()));
-            Calendar cal = Calendar.getInstance();
-            TimeZone tz = cal.getTimeZone();
-            int rawOffset=tz.getRawOffset()/1000;
-            if (tz.inDaylightTime(new Date()))
-                rawOffset+=3600; // 1 hour for daylight time if it is observed
-            long readTimeUTC=dl.getLastRecordReadingDate().getTime()/1000;
-            long readTimeLocal=readTimeUTC+rawOffset;
+        Log.d(TAG, "Trend arrow: " + dl.getLastEGVTrend().friendlyTrendName());
+        data.addString(ICON_KEY, dl.getLastEGVTrend().friendlyTrendName());
+        data.addString(BG_KEY, String.valueOf(dl.getLastEGV()));
+        Calendar cal = Calendar.getInstance();
+        TimeZone tz = cal.getTimeZone();
+        int rawOffset=tz.getRawOffset()/1000;
+        if (tz.inDaylightTime(new Date()))
+            rawOffset+=3600; // 1 hour for daylight time if it is observed
+        long readTimeUTC=dl.getLastEGVTimestamp()/1000;
+        long readTimeLocal=readTimeUTC+rawOffset;
 
-            data.addString(READTIME, String.valueOf(readTimeLocal));
-            if (dl.getLastReading() > 180)
-                alert = 0x02;
-            if (dl.getLastReading() < 70)
-                alert = 0x01;
-            data.addUint8(ALERT, alert);
-            long epochUTC=new Date().getTime()/1000;
-            long epochlocalSeconds=(epochUTC+rawOffset);
-            String tm = String.valueOf(epochlocalSeconds);
-            Log.d(TAG, "tm=" + tm);
-            data.addString(TIME, tm);
-            Log.d(TAG, "Delta=" + delta);
-            data.addString(DELTA, delta);
-            data.addString(BATT, String.valueOf((int) dl.getUploaderBattery()));
-            data.addString(NAME, dl.getDeviceName());
-        } catch (NoDataException e) {
-//            e.printStackTrace();
-        }
+        data.addString(READTIME, String.valueOf(readTimeLocal));
+        if (dl.getLastEGV() > highThreshold)
+            alert = 0x02;
+        if (dl.getLastEGV() < lowThreshold)
+            alert = 0x01;
+        data.addUint8(ALERT, alert);
+        long epochUTC=new Date().getTime()/1000;
+        long epochlocalSeconds=(epochUTC+rawOffset);
+        String tm = String.valueOf(epochlocalSeconds);
+        Log.d(TAG, "tm=" + tm);
+        data.addString(TIME, tm);
+        Log.d(TAG, "Delta=" + delta);
+        data.addString(DELTA, delta);
+        data.addString(BATT, String.valueOf(dl.getUploaderBattery()));
+        data.addString(NAME, getName());
         return data;
     }
 }

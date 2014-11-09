@@ -24,6 +24,8 @@ message CookieMonsterG4Download {
     repeated CookieMonsterG4Meter meter = 7;
     repeated CookieMonsterG4Sensor sensor = 8;
     repeated CookieMonsterG4Cal cal = 9;
+    optional string driver = 10;
+    optional uint32 device_id = 11;
 }
 
 

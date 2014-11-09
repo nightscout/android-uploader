@@ -212,6 +212,29 @@ public final class SGV {
      */
     com.nightscout.android.protobuf.SGV.CookieMonsterG4CalOrBuilder getCalOrBuilder(
         int index);
+
+    /**
+     * <code>optional string driver = 10;</code>
+     */
+    boolean hasDriver();
+    /**
+     * <code>optional string driver = 10;</code>
+     */
+    java.lang.String getDriver();
+    /**
+     * <code>optional string driver = 10;</code>
+     */
+    com.google.protobuf.ByteString
+        getDriverBytes();
+
+    /**
+     * <code>optional uint32 device_id = 11;</code>
+     */
+    boolean hasDeviceId();
+    /**
+     * <code>optional uint32 device_id = 11;</code>
+     */
+    int getDeviceId();
   }
   /**
    * Protobuf type {@code CookieMonsterG4Download}
@@ -332,6 +355,17 @@ public final class SGV {
                 mutable_bitField0_ |= 0x00000100;
               }
               cal_.add(input.readMessage(com.nightscout.android.protobuf.SGV.CookieMonsterG4Cal.PARSER, extensionRegistry));
+              break;
+            }
+            case 82: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000020;
+              driver_ = bs;
+              break;
+            }
+            case 88: {
+              bitField0_ |= 0x00000040;
+              deviceId_ = input.readUInt32();
               break;
             }
           }
@@ -870,6 +904,63 @@ public final class SGV {
       return cal_.get(index);
     }
 
+    public static final int DRIVER_FIELD_NUMBER = 10;
+    private java.lang.Object driver_;
+    /**
+     * <code>optional string driver = 10;</code>
+     */
+    public boolean hasDriver() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional string driver = 10;</code>
+     */
+    public java.lang.String getDriver() {
+      java.lang.Object ref = driver_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          driver_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string driver = 10;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDriverBytes() {
+      java.lang.Object ref = driver_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        driver_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int DEVICE_ID_FIELD_NUMBER = 11;
+    private int deviceId_;
+    /**
+     * <code>optional uint32 device_id = 11;</code>
+     */
+    public boolean hasDeviceId() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional uint32 device_id = 11;</code>
+     */
+    public int getDeviceId() {
+      return deviceId_;
+    }
+
     private void initFields() {
       sgv_ = java.util.Collections.emptyList();
       units_ = com.nightscout.android.protobuf.SGV.CookieMonsterG4Download.Unit.MGDL;
@@ -880,6 +971,8 @@ public final class SGV {
       meter_ = java.util.Collections.emptyList();
       sensor_ = java.util.Collections.emptyList();
       cal_ = java.util.Collections.emptyList();
+      driver_ = "";
+      deviceId_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -949,6 +1042,12 @@ public final class SGV {
       for (int i = 0; i < cal_.size(); i++) {
         output.writeMessage(9, cal_.get(i));
       }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeBytes(10, getDriverBytes());
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeUInt32(11, deviceId_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -993,6 +1092,14 @@ public final class SGV {
       for (int i = 0; i < cal_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(9, cal_.get(i));
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(10, getDriverBytes());
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(11, deviceId_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1149,6 +1256,10 @@ public final class SGV {
         } else {
           calBuilder_.clear();
         }
+        driver_ = "";
+        bitField0_ = (bitField0_ & ~0x00000200);
+        deviceId_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000400);
         return this;
       }
 
@@ -1233,6 +1344,14 @@ public final class SGV {
         } else {
           result.cal_ = calBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.driver_ = driver_;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.deviceId_ = deviceId_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1367,6 +1486,14 @@ public final class SGV {
               calBuilder_.addAllMessages(other.cal_);
             }
           }
+        }
+        if (other.hasDriver()) {
+          bitField0_ |= 0x00000200;
+          driver_ = other.driver_;
+          onChanged();
+        }
+        if (other.hasDeviceId()) {
+          setDeviceId(other.getDeviceId());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -2699,6 +2826,114 @@ public final class SGV {
           cal_ = null;
         }
         return calBuilder_;
+      }
+
+      private java.lang.Object driver_ = "";
+      /**
+       * <code>optional string driver = 10;</code>
+       */
+      public boolean hasDriver() {
+        return ((bitField0_ & 0x00000200) == 0x00000200);
+      }
+      /**
+       * <code>optional string driver = 10;</code>
+       */
+      public java.lang.String getDriver() {
+        java.lang.Object ref = driver_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            driver_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string driver = 10;</code>
+       */
+      public com.google.protobuf.ByteString
+          getDriverBytes() {
+        java.lang.Object ref = driver_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          driver_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string driver = 10;</code>
+       */
+      public Builder setDriver(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000200;
+        driver_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string driver = 10;</code>
+       */
+      public Builder clearDriver() {
+        bitField0_ = (bitField0_ & ~0x00000200);
+        driver_ = getDefaultInstance().getDriver();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string driver = 10;</code>
+       */
+      public Builder setDriverBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000200;
+        driver_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int deviceId_ ;
+      /**
+       * <code>optional uint32 device_id = 11;</code>
+       */
+      public boolean hasDeviceId() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      /**
+       * <code>optional uint32 device_id = 11;</code>
+       */
+      public int getDeviceId() {
+        return deviceId_;
+      }
+      /**
+       * <code>optional uint32 device_id = 11;</code>
+       */
+      public Builder setDeviceId(int value) {
+        bitField0_ |= 0x00000400;
+        deviceId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional uint32 device_id = 11;</code>
+       */
+      public Builder clearDeviceId() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        deviceId_ = 0;
+        onChanged();
+        return this;
       }
 
       // @@protoc_insertion_point(builder_scope:CookieMonsterG4Download)
@@ -6541,7 +6776,7 @@ public final class SGV {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\tSGV.proto\"\213\004\n\027CookieMonsterG4Download\022" +
+      "\n\tSGV.proto\"\256\004\n\027CookieMonsterG4Download\022" +
       " \n\003sgv\030\001 \003(\0132\023.CookieMonsterG4EGV\022,\n\005uni" +
       "ts\030\002 \001(\0162\035.CookieMonsterG4Download.Unit\022" +
       "\032\n\022download_timestamp\030\003 \002(\004\022F\n\017download_" +
@@ -6550,32 +6785,33 @@ public final class SGV {
       "\005 \001(\r\022\030\n\020uploader_battery\030\006 \001(\r\022$\n\005meter" +
       "\030\007 \003(\0132\025.CookieMonsterG4Meter\022&\n\006sensor\030" +
       "\010 \003(\0132\026.CookieMonsterG4Sensor\022 \n\003cal\030\t \003" +
-      "(\0132\023.CookieMonsterG4Cal\"\032\n\004Unit\022\010\n\004MGDL\020",
-      "\000\022\010\n\004MMOL\020\001\"|\n\016DownloadStatus\022\013\n\007SUCCESS" +
-      "\020\000\022\013\n\007NO_DATA\020\001\022\024\n\020DEVICE_NOT_FOUND\020\002\022\014\n" +
-      "\010IO_ERROR\020\003\022\025\n\021APPLICATION_ERROR\020\004\022\010\n\004NO" +
-      "NE\020\006\022\013\n\007UNKNOWN\020\007\"\262\002\n\022CookieMonsterG4EGV" +
-      "\022\013\n\003sgv\030\001 \002(\r\022\021\n\ttimestamp\030\002 \001(\004\022\025\n\rsys_" +
-      "timestamp\030\004 \001(\004\0220\n\tdirection\030\003 \001(\0162\035.Coo" +
-      "kieMonsterG4EGV.Direction\"\262\001\n\tDirection\022" +
-      "\010\n\004NONE\020\000\022\r\n\tDOUBLE_UP\020\001\022\r\n\tSINGLE_UP\020\002\022" +
-      "\021\n\rFORTY_FIVE_UP\020\003\022\010\n\004FLAT\020\004\022\023\n\017FORTY_FI" +
-      "VE_DOWN\020\005\022\017\n\013SINGLE_DOWN\020\006\022\017\n\013DOUBLE_DOW",
-      "N\020\007\022\022\n\016NOT_COMPUTABLE\020\010\022\025\n\021RATE_OUT_OF_R" +
-      "ANGE\020\t\"f\n\024CookieMonsterG4Meter\022\020\n\010meter_" +
-      "bg\030\001 \002(\r\022\022\n\nmeter_time\030\002 \001(\r\022\021\n\ttimestam" +
-      "p\030\003 \001(\004\022\025\n\rsys_timestamp\030\004 \001(\004\"u\n\025Cookie" +
-      "MonsterG4Sensor\022\020\n\010filtered\030\001 \002(\004\022\022\n\nunf" +
-      "iltered\030\002 \001(\004\022\014\n\004rssi\030\003 \001(\r\022\021\n\ttimestamp" +
-      "\030\004 \001(\004\022\025\n\rsys_timestamp\030\005 \001(\004\"o\n\022CookieM" +
-      "onsterG4Cal\022\r\n\005slope\030\001 \002(\001\022\021\n\tintercept\030" +
-      "\002 \001(\001\022\r\n\005scale\030\003 \001(\001\022\021\n\ttimestamp\030\004 \001(\004\022" +
-      "\025\n\rsys_timestamp\030\005 \001(\004\"\257\001\n\033CookieMonster",
-      "ReceiverStatus\022\021\n\ttimestamp\030\001 \002(\004\022:\n\005eve" +
-      "nt\030\002 \003(\0162+.CookieMonsterReceiverStatus.R" +
-      "eceiverStatus\"A\n\016ReceiverStatus\022\025\n\021RECEI" +
-      "VERCONNECTED\020\000\022\030\n\024RECEIVERDISCONNECTED\020\001" +
-      "B&\n\037com.nightscout.android.protobufB\003SGV"
+      "(\0132\023.CookieMonsterG4Cal\022\016\n\006driver\030\n \001(\t\022",
+      "\021\n\tdevice_id\030\013 \001(\r\"\032\n\004Unit\022\010\n\004MGDL\020\000\022\010\n\004" +
+      "MMOL\020\001\"|\n\016DownloadStatus\022\013\n\007SUCCESS\020\000\022\013\n" +
+      "\007NO_DATA\020\001\022\024\n\020DEVICE_NOT_FOUND\020\002\022\014\n\010IO_E" +
+      "RROR\020\003\022\025\n\021APPLICATION_ERROR\020\004\022\010\n\004NONE\020\006\022" +
+      "\013\n\007UNKNOWN\020\007\"\262\002\n\022CookieMonsterG4EGV\022\013\n\003s" +
+      "gv\030\001 \002(\r\022\021\n\ttimestamp\030\002 \001(\004\022\025\n\rsys_times" +
+      "tamp\030\004 \001(\004\0220\n\tdirection\030\003 \001(\0162\035.CookieMo" +
+      "nsterG4EGV.Direction\"\262\001\n\tDirection\022\010\n\004NO" +
+      "NE\020\000\022\r\n\tDOUBLE_UP\020\001\022\r\n\tSINGLE_UP\020\002\022\021\n\rFO" +
+      "RTY_FIVE_UP\020\003\022\010\n\004FLAT\020\004\022\023\n\017FORTY_FIVE_DO",
+      "WN\020\005\022\017\n\013SINGLE_DOWN\020\006\022\017\n\013DOUBLE_DOWN\020\007\022\022" +
+      "\n\016NOT_COMPUTABLE\020\010\022\025\n\021RATE_OUT_OF_RANGE\020" +
+      "\t\"f\n\024CookieMonsterG4Meter\022\020\n\010meter_bg\030\001 " +
+      "\002(\r\022\022\n\nmeter_time\030\002 \001(\r\022\021\n\ttimestamp\030\003 \001" +
+      "(\004\022\025\n\rsys_timestamp\030\004 \001(\004\"u\n\025CookieMonst" +
+      "erG4Sensor\022\020\n\010filtered\030\001 \002(\004\022\022\n\nunfilter" +
+      "ed\030\002 \001(\004\022\014\n\004rssi\030\003 \001(\r\022\021\n\ttimestamp\030\004 \001(" +
+      "\004\022\025\n\rsys_timestamp\030\005 \001(\004\"o\n\022CookieMonste" +
+      "rG4Cal\022\r\n\005slope\030\001 \002(\001\022\021\n\tintercept\030\002 \001(\001" +
+      "\022\r\n\005scale\030\003 \001(\001\022\021\n\ttimestamp\030\004 \001(\004\022\025\n\rsy",
+      "s_timestamp\030\005 \001(\004\"\257\001\n\033CookieMonsterRecei" +
+      "verStatus\022\021\n\ttimestamp\030\001 \002(\004\022:\n\005event\030\002 " +
+      "\003(\0162+.CookieMonsterReceiverStatus.Receiv" +
+      "erStatus\"A\n\016ReceiverStatus\022\025\n\021RECEIVERCO" +
+      "NNECTED\020\000\022\030\n\024RECEIVERDISCONNECTED\020\001B&\n\037c" +
+      "om.nightscout.android.protobufB\003SGV"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -6594,7 +6830,7 @@ public final class SGV {
     internal_static_CookieMonsterG4Download_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_CookieMonsterG4Download_descriptor,
-        new java.lang.String[] { "Sgv", "Units", "DownloadTimestamp", "DownloadStatus", "ReceiverBattery", "UploaderBattery", "Meter", "Sensor", "Cal", });
+        new java.lang.String[] { "Sgv", "Units", "DownloadTimestamp", "DownloadStatus", "ReceiverBattery", "UploaderBattery", "Meter", "Sensor", "Cal", "Driver", "DeviceId", });
     internal_static_CookieMonsterG4EGV_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_CookieMonsterG4EGV_fieldAccessorTable = new

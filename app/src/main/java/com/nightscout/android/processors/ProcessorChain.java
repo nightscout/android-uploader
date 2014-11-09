@@ -31,4 +31,16 @@ public class ProcessorChain {
         }
         return result;
     }
+
+    public void start(){
+        for (AbstractProcessor link: chain){
+            link.start();
+        }
+    }
+
+    public void stop(){
+        for (AbstractProcessor link: chain){
+            link.stop();
+        }
+    }
 }

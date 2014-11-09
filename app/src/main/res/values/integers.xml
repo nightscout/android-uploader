@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="pref_default_device_low">70</integer>
+    <integer name="pref_default_device_high">180</integer>
+    <integer name="pref_default_critical_device_low">55</integer>
+    <integer name="pref_default_critical_device_high">200</integer>
+</resources>

@@ -1,5 +1,9 @@
 package com.nightscout.android.dexcom;
 
+import com.nightscout.android.MainActivity;
+import com.nightscout.android.TimeConstants;
+import com.nightscout.android.devices.DexcomG4;
+import com.nightscout.android.devices.Download;
 import com.nightscout.android.dexcom.records.CalRecord;
 import com.nightscout.android.dexcom.records.EGVRecord;
 import com.nightscout.android.dexcom.records.MeterRecord;
@@ -7,18 +11,31 @@ import com.nightscout.android.dexcom.records.SensorRecord;
 import com.nightscout.android.protobuf.SGV;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-public class G4Download {
+public class G4Download extends Download {
     protected List<EGVRecord> EGVRecords;
     protected List<CalRecord> CalRecords;
     protected List<SensorRecord> SensorRecords;
     protected List<MeterRecord> MeterRecords;
-    protected GlucoseUnit unit;
-    protected long downloadTimestamp;
-    protected DownloadStatus downloadStatus;
     protected int receiverBattery;
     protected int uploaderBattery;
+
+    // Not included in protobuf definitions. Only used locally
+    protected long nextUploadTime;
+    protected long displayTime;
+
+    public G4Download(){
+        this.EGVRecords=new ArrayList<EGVRecord>();
+        this.CalRecords=new ArrayList<CalRecord>();
+        this.SensorRecords=new ArrayList<SensorRecord>();
+        this.MeterRecords=new ArrayList<MeterRecord>();
+        this.receiverBattery=0;
+        this.uploaderBattery=MainActivity.batLevel;
+        this.nextUploadTime=45000+G4Constants.TIME_SYNC_OFFSET;
+        this.displayTime=0;
+    }
 
     private G4Download(G4DownloadBuilder builder){
         this.EGVRecords=builder.EGVRecords;
@@ -30,6 +47,10 @@ public class G4Download {
         this.receiverBattery=builder.receiverBattery;
         this.uploaderBattery=builder.uploaderBattery;
         this.MeterRecords =builder.MeterRecords;
+        this.driver=builder.driver;
+        this.deviceID=builder.deviceID;
+        this.nextUploadTime=builder.nextUploadTime;
+        this.displayTime=builder.displayTime;
     }
 
     public G4Download(G4Download g4Download){
@@ -42,6 +63,10 @@ public class G4Download {
         this.receiverBattery=g4Download.getReceiverBattery();
         this.uploaderBattery=g4Download.getUploaderBattery();
         this.MeterRecords =g4Download.getMeterRecords();
+        this.driver=g4Download.getDriver();
+        this.deviceID=g4Download.getDeviceID();
+        this.nextUploadTime=g4Download.getNextUploadTime();
+        this.displayTime=g4Download.displayTime;
     }
 
     public List<EGVRecord> getEGVRecords() {
@@ -80,6 +105,46 @@ public class G4Download {
         return unit;
     }
 
+    public void setDownloadStatus(DownloadStatus downloadStatus) {
+        this.downloadStatus = downloadStatus;
+    }
+
+    public int getDeviceID() {
+        return deviceID;
+    }
+
+    public String getDriver() {
+        return driver;
+    }
+
+    public EGVRecord getLastEGVRecord(){
+        return EGVRecords.get(EGVRecords.size() - 1);
+    }
+
+    public long getLastEGVTimestamp(){
+        return getLastEGVRecord().getDisplayTimeSeconds();
+    }
+
+    public Date getLastEGVDisplayTime(){
+        return getLastEGVRecord().getDisplayTime();
+    }
+
+    public int getLastEGV(){
+        return getLastEGVRecord().getBGValue();
+    }
+
+    public Trend getLastEGVTrend(){
+        return getLastEGVRecord().getTrend();
+    }
+
+    public long getNextUploadTime() {
+        return nextUploadTime;
+    }
+
+    public long getDisplayTime() {
+        return displayTime;
+    }
+
     public static class G4DownloadBuilder {
         protected List<EGVRecord> EGVRecords;
         protected List<CalRecord> CalRecords;
@@ -90,6 +155,12 @@ public class G4Download {
         protected DownloadStatus downloadStatus;
         protected int receiverBattery;
         protected int uploaderBattery;
+        protected String driver;
+        protected int deviceID;
+
+        // Local only - not included in protobuf export
+        protected long nextUploadTime;
+        protected long displayTime;
 
         public G4DownloadBuilder setEGVRecords(List<EGVRecord> EGVRecords) {
             this.EGVRecords = EGVRecords;
@@ -136,6 +207,25 @@ public class G4Download {
             return this;
         }
 
+        public G4DownloadBuilder setNextUploadTime(long nextUploadTime) {
+            this.nextUploadTime = nextUploadTime;
+            return this;
+        }
+
+        public G4DownloadBuilder setDisplayTime(long displayTime) {
+            this.displayTime = displayTime;
+            return this;
+        }
+
+        public G4DownloadBuilder setDriver(String driver) {
+            this.driver = driver;
+            return this;
+        }
+
+        public void setDeviceID(int deviceID) {
+            this.deviceID = deviceID;
+        }
+
         public G4Download build(){
             return new G4Download(this);
         }
@@ -164,13 +254,18 @@ public class G4Download {
         this.receiverBattery=download.getReceiverBattery();
         this.uploaderBattery=download.getUploaderBattery();
         this.downloadTimestamp=download.getDownloadTimestamp();
+        this.driver=download.getDriver();
+        this.deviceID=download.getDeviceId();
+
         // FIXME: these variable names break conventions but need to be renamed to avoid conflicts
         this.EGVRecords=egvRecords;
         this.MeterRecords=meterRecords;
         this.SensorRecords=sensorRecords;
         this.CalRecords=calRecords;
+
     }
 
+    @Override
     public SGV.CookieMonsterG4Download toCookieProtobuf(){
         SGV.CookieMonsterG4Download.Builder downloadBuilder = SGV.CookieMonsterG4Download.newBuilder();
         SGV.CookieMonsterG4Download.DownloadStatus pbDownloadStatus=SGV.CookieMonsterG4Download.DownloadStatus.values()[downloadStatus.getId()];
@@ -183,6 +278,8 @@ public class G4Download {
                 .setUnits(pbUnit)
                 .setReceiverBattery(receiverBattery)
                 .setUploaderBattery(uploaderBattery)
+                .setDriver(driver)
+                .setDeviceId(deviceID)
                 .setDownloadTimestamp(downloadTimestamp);
 
         for (EGVRecord record:EGVRecords) {

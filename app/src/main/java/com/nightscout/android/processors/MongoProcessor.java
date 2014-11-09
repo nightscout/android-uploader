@@ -29,8 +29,8 @@ public class MongoProcessor extends AbstractProcessor {
     private boolean uploadSensorData;
     private boolean uploadCalData;
 
-    public MongoProcessor(Context context){
-        super(context,"mongo");
+    public MongoProcessor(Context context, int deviceID){
+        super(deviceID, context, "mongo");
         dbURI = sharedPref.getString("cloud_storage_mongodb_uri", null);
         collectionName = sharedPref.getString("cloud_storage_mongodb_collection", null);
         dsCollectionName = sharedPref.getString("cloud_storage_mongodb_device_status_collection", "devicestatus");

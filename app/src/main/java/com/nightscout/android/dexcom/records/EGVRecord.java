@@ -1,6 +1,6 @@
 package com.nightscout.android.dexcom.records;
 
-import com.nightscout.android.dexcom.Constants;
+import com.nightscout.android.devices.Constants;
 import com.nightscout.android.dexcom.Trend;
 
 import org.json.JSONException;

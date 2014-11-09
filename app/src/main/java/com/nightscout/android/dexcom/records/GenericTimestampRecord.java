@@ -14,6 +14,7 @@ public class GenericTimestampRecord {
     private int systemTimeSeconds;
     private Date displayTime;
 
+    // TODO: reassess if we should store as seconds only and convert to date only when necessary?
     public GenericTimestampRecord(byte[] packet) {
         systemTimeSeconds = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(OFFSET_SYS_TIME);
         systemTime = Utils.receiverTimeToDate(systemTimeSeconds);

@@ -1,4 +1,4 @@
-package com.nightscout.android.dexcom;
+package com.nightscout.android.devices;
 
 public class Constants {
 
@@ -49,9 +49,11 @@ public class Constants {
     public final static int EGV_DISPLAY_ONLY_MASK = 32768;
     public final static int EGV_TREND_ARROW_MASK = 15;
     public final static int EGV_NOISE_MASK = 112;
+    // Conversion
     public final static float MG_DL_TO_MMOL_L = 0.05556f;
-    public final static int MINEGV=39;
-    public final static int MAXEGV=401;
+
+    public final static String SNOOZE_INTENT="com.nightscout.android.SNOOZE_ALARM";
+    public final static String CONTACTDATAURISUFFIX="_contact_data_uri";
 
     public enum BATTERY_STATES {
         NONE,
@@ -59,23 +61,6 @@ public class Constants {
         NOT_CHARGING,
         NTC_FAULT,
         BAD_BATTERY
-    }
-
-    public enum RECORD_TYPES {
-        MANUFACTURING_DATA,
-        FIRMWARE_PARAMETER_DATA,
-        PC_SOFTWARE_PARAMETER,
-        SENSOR_DATA,
-        EGV_DATA,
-        CAL_SET,
-        DEVIATION,
-        INSERTION_TIME,
-        RECEIVER_LOG_DATA,
-        RECEIVER_ERROR_DATA,
-        METER_DATA,
-        USER_EVENT_DATA,
-        USER_SETTING_DATA,
-        MAX_VALUE
     }
 
     public enum InsertionState {
