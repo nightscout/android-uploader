@@ -129,7 +129,6 @@ public class SyncingService extends IntentService {
                 // TODO: need to check if numOfPages if valid on ReadData side
                 SensorRecord[] sensorRecords = readData.getRecentSensorRecords(numOfPages);
                 GlucoseDataSet[] glucoseDataSets = Utils.mergeGlucoseDataRecords(recentRecords, sensorRecords);
-                //CalRecord[] calRecords = readData.getRecentCalRecords();
 
                 // FIXME: This is a workaround for the new Dexcom AP which seems to have a new format
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
