@@ -44,9 +44,9 @@ public class ReadData {
         Log.d(TAG, "Reading " + numOfRecentPages + " EGV page(s)...");
         numOfRecentPages = numOfRecentPages - 1;
         EGVRecord[] allPages = new EGVRecord[0];
-        for (int i = numOfRecentPages; i >= 0; i--) {
+        for (int i = Math.min(numOfRecentPages,endPage); i >= 0; i--) {
             int nextPage = endPage - i;
-            Log.d(TAG, "Read number " + i + " of EGV pages (page number " + nextPage + ")");
+            Log.d(TAG, "Reading #" + i + " EGV pages (page number " + nextPage + ")");
             EGVRecord[] ithEGVRecordPage = readDataBasePage(recordType, nextPage);
             EGVRecord[] result = Arrays.copyOf(allPages, allPages.length + ithEGVRecordPage.length);
             System.arraycopy(ithEGVRecordPage, 0, result, allPages.length, ithEGVRecordPage.length);
@@ -77,9 +77,9 @@ public class ReadData {
         Log.d(TAG, "Reading " + numOfRecentPages + " Sensor page(s)...");
         numOfRecentPages = numOfRecentPages - 1;
         SensorRecord[] allPages = new SensorRecord[0];
-        for (int i = numOfRecentPages; i >= 0; i--) {
+        for (int i = Math.min(numOfRecentPages,endPage); i >= 0; i--) {
             int nextPage = endPage - i;
-            Log.d(TAG, "Read number " + i + " of Sensor pages (page number " + nextPage + ")");
+            Log.d(TAG, "Reading #" + i + " Sensor pages (page number " + nextPage + ")");
             SensorRecord[] ithSensorRecordPage = readDataBasePage(recordType, nextPage);
             SensorRecord[] result = Arrays.copyOf(allPages, allPages.length + ithSensorRecordPage.length);
             System.arraycopy(ithSensorRecordPage, 0, result, allPages.length, ithSensorRecordPage.length);
@@ -144,6 +144,9 @@ public class ReadData {
 
     private <T> T readDataBasePage(int recordType, int page) {
         byte numOfPages = 1;
+        if (page < 0){
+            throw new IllegalArgumentException("Invalid page requested:" + page);
+        }
         ArrayList<Byte> payload = new ArrayList<Byte>();
         payload.add((byte) recordType);
         byte[] pageInt = ByteBuffer.allocate(4).putInt(page).array();
