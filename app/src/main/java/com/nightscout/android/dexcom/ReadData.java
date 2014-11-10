@@ -6,6 +6,7 @@ import com.nightscout.android.dexcom.records.CalRecord;
 import com.nightscout.android.dexcom.records.EGVRecord;
 import com.nightscout.android.dexcom.records.GenericXMLRecord;
 import com.nightscout.android.dexcom.records.MeterRecord;
+import com.nightscout.android.dexcom.records.PageHeader;
 import com.nightscout.android.dexcom.records.SensorRecord;
 
 import org.w3c.dom.Element;
@@ -211,6 +212,9 @@ public class ReadData {
 
     private <T> T ParsePage(byte[] data, int recordType) {
         int HEADER_LEN = 28;
+        PageHeader pageHeader=new PageHeader(data);
+        Log.d(TAG,"Page header record type: "+pageHeader.getRecordType().name());
+        Log.d(TAG,"Page header record rev: "+pageHeader.getRevision());
         int NUM_REC_OFFSET = 4;
         int numRec = data[NUM_REC_OFFSET];
         int rec_len;
