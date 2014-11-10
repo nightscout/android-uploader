@@ -1,7 +1,5 @@
 package com.nightscout.android.dexcom.records;
 
-import android.util.Log;
-
 import com.nightscout.android.dexcom.CRC16;
 import com.nightscout.android.dexcom.CRCFailRuntimeException;
 import com.nightscout.android.dexcom.Constants;
