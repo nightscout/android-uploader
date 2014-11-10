@@ -157,7 +157,6 @@ public class ReadData {
         payload.add(numOfPages);
         writeCommand(Constants.READ_DATABASE_PAGES, payload);
         byte[] readData = read(2122).getData();
-        ParsePage(readData, recordType);
         return ParsePage(readData, recordType);
     }
 
@@ -193,10 +192,10 @@ public class ReadData {
             // Add a 100ms delay for when multiple write/reads are occurring in series
             Thread.sleep(100);
 
-            // TODO: this debug code to print at most 30 bytes of the read, should be removed after
+            // TODO: this debug code to print data of the read, should be removed after
             // finding the source of the reading issue
             String bytes = "";
-            int readAmount = len > 30 ? 30 : len;
+            int readAmount = len;
             for (int i = 0; i < readAmount; i++) bytes += String.format("%02x", readData[i]) + " ";
             Log.d(TAG, "Read data: " + bytes);
             ////////////////////////////////////////////////////////////////////////////////////////
