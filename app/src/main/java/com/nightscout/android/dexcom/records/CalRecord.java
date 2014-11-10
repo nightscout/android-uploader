@@ -28,11 +28,6 @@ public class CalRecord extends GenericTimestampRecord {
         unk[2] = packet[34];
         decay = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getDouble(35);
         numRecords = packet[43];
-        Log.d("CalDebug", "Slope: "+slope);
-        Log.d("CalDebug", "Intercept: "+intercept);
-        Log.d("CalDebug", "Scale: "+scale);
-        Log.d("CalDebug", "Decay: "+decay);
-        Log.d("CalDebug", "Number of records: "+numRecords);
         long displayTimeOffset = (getDisplayTime().getTime() - getSystemTime().getTime()) / TimeConstants.SEC_TO_MS;
         int start = 44;
         for (int i = 0; i < numRecords; i++) {

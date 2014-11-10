@@ -24,10 +24,6 @@ public class CalSubrecord {
         delta = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(12);
         dateApplied = Utils.receiverTimeToDate(delta + displayTimeOffset);
         unk = packet[16];
-        Log.d("CalDebug","Date entered: "+dateEntered);
-        Log.d("CalDebug","Cal BGL: "+calBGL);
-        Log.d("CalDebug","Cal Raw: "+calRaw);
-        Log.d("CalDebug","Date applied: "+dateApplied);
     }
 
     public Date getDateEntered() {

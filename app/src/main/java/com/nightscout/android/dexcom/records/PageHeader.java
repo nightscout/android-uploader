@@ -1,5 +1,7 @@
 package com.nightscout.android.dexcom.records;
 
+import android.util.Log;
+
 import com.nightscout.android.dexcom.CRC16;
 import com.nightscout.android.dexcom.CRCFailRuntimeException;
 import com.nightscout.android.dexcom.Constants;
@@ -10,6 +12,7 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 
 public class PageHeader {
+    protected final int HEADER_SIZE=28;
     protected final int FIRSTRECORDINDEX_OFFSET=0;
     protected final int NUMRECS_OFFSET=4;
     protected final int RECTYPE_OFFSET=8;
@@ -39,12 +42,11 @@ public class PageHeader {
         reserved2 = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(RESERVED2_OFFSET);
         reserved3 = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(RESERVED3_OFFSET);
         reserved4 = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(RESERVED4_OFFSET);
-//        Log.d("CalDebug", "")
-        System.arraycopy(packet,packet.length-Constants.CRC_LEN,crc,0,Constants.CRC_LEN);
-//        byte[] crc_calc = CRC16.calculate(packet,0,packet.length - Constants.CRC_LEN);
-//        if (!Arrays.equals(this.crc, crc_calc)) {
-//            throw new CRCFailRuntimeException("CRC check failed: " + Utils.bytesToHex(this.crc) + " vs " + Utils.bytesToHex(crc_calc));
-//        }
+        System.arraycopy(packet,HEADER_SIZE-Constants.CRC_LEN,crc,0,Constants.CRC_LEN);
+        byte[] crc_calc = CRC16.calculate(packet,0,HEADER_SIZE - Constants.CRC_LEN);
+        if (!Arrays.equals(this.crc, crc_calc)) {
+            throw new CRCFailRuntimeException("CRC check failed: " + Utils.bytesToHex(this.crc) + " vs " + Utils.bytesToHex(crc_calc));
+        }
 
     }
 
