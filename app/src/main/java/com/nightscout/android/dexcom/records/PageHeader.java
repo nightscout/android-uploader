@@ -1,13 +1,19 @@
 package com.nightscout.android.dexcom.records;
 
+import com.nightscout.android.dexcom.CRC16;
+import com.nightscout.android.dexcom.CRCFailRuntimeException;
 import com.nightscout.android.dexcom.Constants;
+import com.nightscout.android.dexcom.Utils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 
 public class PageHeader {
     protected final int FIRSTRECORDINDEX_OFFSET=0;
     protected final int NUMRECS_OFFSET=4;
+    protected final int RECTYPE_OFFSET=8;
+    protected final int REV_OFFSET=9;
     protected final int PAGENUMBER_OFFSET=10;
     protected final int RESERVED2_OFFSET=14;
     protected final int RESERVED3_OFFSET=18;
@@ -21,17 +27,25 @@ public class PageHeader {
     protected int reserved2;
     protected int reserved3;
     protected int reserved4;
+    protected byte[] crc=new byte[2];
 
 
     public PageHeader(byte[] packet) {
         firstRecordIndex = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(FIRSTRECORDINDEX_OFFSET);
         numOfRecords = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(NUMRECS_OFFSET);
+        recordType = Constants.RECORD_TYPES.values()[packet[RECTYPE_OFFSET]];
+        revision = packet[REV_OFFSET];
         pageNumber = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(PAGENUMBER_OFFSET);
-        recordType = Constants.RECORD_TYPES.values()[packet[8]];
-        revision = packet[9];
         reserved2 = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(RESERVED2_OFFSET);
         reserved3 = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(RESERVED3_OFFSET);
         reserved4 = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(RESERVED4_OFFSET);
+//        Log.d("CalDebug", "")
+        System.arraycopy(packet,packet.length-Constants.CRC_LEN,crc,0,Constants.CRC_LEN);
+//        byte[] crc_calc = CRC16.calculate(packet,0,packet.length - Constants.CRC_LEN);
+//        if (!Arrays.equals(this.crc, crc_calc)) {
+//            throw new CRCFailRuntimeException("CRC check failed: " + Utils.bytesToHex(this.crc) + " vs " + Utils.bytesToHex(crc_calc));
+//        }
+
     }
 
     public byte getRevision() {

@@ -213,8 +213,9 @@ public class ReadData {
     private <T> T ParsePage(byte[] data, int recordType) {
         int HEADER_LEN = 28;
         PageHeader pageHeader=new PageHeader(data);
-        Log.d(TAG,"Page header record type: "+pageHeader.getRecordType().name());
-        Log.d(TAG,"Page header record rev: "+pageHeader.getRevision());
+        Log.d("CalDebug", "Page header record type: " + pageHeader.getRecordType().name());
+        Log.d("CalDebug","Page header record rev: "+pageHeader.getRevision());
+        Log.d("CalDebug1", "Number of records: "+pageHeader.getNumOfRecords());
         int NUM_REC_OFFSET = 4;
         int numRec = data[NUM_REC_OFFSET];
         int rec_len;
@@ -248,7 +249,12 @@ public class ReadData {
                 }
                 return (T) meterRecords;
             case CAL_SET:
-                rec_len = 148;
+                rec_len = 250;
+                if (pageHeader.getRevision()<=2) {
+                    rec_len = 148;
+                }
+                Log.d("CalDebug","Record length: "+rec_len);
+                Log.d("CalDebug1","numRec=>"+numRec);
                 CalRecord[] calRecords = new CalRecord[numRec];
                 for (int i = 0; i < numRec; i++) {
                     int startIdx = HEADER_LEN + rec_len * i;
