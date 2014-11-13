@@ -85,6 +85,21 @@
         <item>1</item>
     </string-array>
 
+    <!-- Y axis setting (Linear/analog)-->
+    <string name="pref_title_chart_y_axis">verticale axis</string>
+    <string-array name="perf_verticle_axis">
+        <item>Logaritmic</item>
+        <item>Linear</item>
+    </string-array>
+
+    <string-array name="perf_verticle_axis_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    
+    
+    
+
     <!-- About Settings -->
     <string name="pref_header_about">About</string>
 
