@@ -11,4 +11,15 @@
         android:positiveButtonText="@null">
     </ListPreference>
 
+    <ListPreference
+        android:dependency="i_understand"
+        android:title="@string/pref_title_chart_y_axis"
+        android:key="display_verticle_axis"
+        android:entries="@array/perf_verticle_axis"
+        android:entryValues="@array/perf_verticle_axis_values"
+        android:defaultValue="0"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null">
+    </ListPreference>
+
 </PreferenceScreen>
