@@ -145,6 +145,7 @@ public class SettingsActivity extends PreferenceActivity {
         bindPreferenceSummaryToValue(findPreference("cloud_storage_api_base"));
         bindPreferenceSummaryToValue(findPreference("acra.user.email"));
         bindPreferenceSummaryToValue(findPreference("display_options_units"));
+        bindPreferenceSummaryToValue(findPreference("display_verticle_axis"));
 
         try {
             PackageInfo pInfo = null;

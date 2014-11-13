@@ -163,6 +163,7 @@ public class MainActivity extends Activity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         Log.d(TAG,"display_options_units: "+prefs.getString("display_options_units", "0"));
         currentUnits = prefs.getString("display_options_units", "0").equals("0") ? 1 : Constants.MG_DL_TO_MMOL_L;
+        boolean isLogritmic = prefs.getString("display_verticle_axis", "0").equals("0") ? true : false;
         int sgv = (Integer) mTextSGV.getTag(R.string.display_sgv);
 
         int direction = (Integer) mTextSGV.getTag(R.string.display_trend);
@@ -170,7 +171,8 @@ public class MainActivity extends Activity {
             mTextSGV.setText(getSGVStringByUnit(sgv, Constants.TREND_ARROW_VALUES.values()[direction]));
         }
 
-        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) +  ")");
+        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) +"," + 
+                                                     Boolean.toString(isLogritmic) +")");
 
         mHandler.post(updateTimeAgo);
     }
