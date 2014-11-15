@@ -35,6 +35,7 @@ public class G4Download extends Download {
         this.uploaderBattery=MainActivity.batLevel;
         this.nextUploadTime=45000+G4Constants.TIME_SYNC_OFFSET;
         this.displayTime=0;
+        this.driver=G4Constants.DRIVER;
     }
 
     private G4Download(G4DownloadBuilder builder){

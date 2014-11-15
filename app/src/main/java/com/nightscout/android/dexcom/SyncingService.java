@@ -57,6 +57,7 @@ public class SyncingService extends IntentService {
     public static final String RESPONSE_DISPLAY_TIME = "myDisplayTime";
     public static final String RESPONSE_JSON = "myJSON";
     public static final String RESPONSE_BAT = "myBatLvl";
+    private boolean deviceInitialized = false;
 
     private final String TAG = SyncingService.class.getSimpleName();
 
@@ -102,9 +103,17 @@ public class SyncingService extends IntentService {
      * parameters.
      */
     private void handleActionSync(int numOfPages) {
-        AbstractDevice device=new DexcomG4(1,getApplicationContext());
-        device.start();
-        ((DexcomG4) device).download();
+        AbstractDevice device = null;
+        if (! deviceInitialized) {
+            Log.i("XXX","Initializing device");
+            device = new DexcomG4(1, getApplicationContext());
+            device.start();
+            deviceInitialized=true;
+        }
+        if (device!=null) {
+            Log.i("XXX","Device initialized: "+device.getDriver());
+            ((DexcomG4) device).download();
+        }
     }
 
     static public boolean isG4Connected(Context c){

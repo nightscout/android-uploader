@@ -72,9 +72,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG,"OnCreate called.");
 
         // Add timezone ID to ACRA report
-        ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
+//        ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
 
         mTracker = ((Nightscout) getApplicationContext()).getTracker();
 

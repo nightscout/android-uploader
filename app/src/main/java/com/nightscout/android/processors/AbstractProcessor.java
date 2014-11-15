@@ -62,6 +62,7 @@ abstract public class AbstractProcessor implements ProcessorInterface {
                 .setCalRecords((ArrayList<CalRecord>) filterRecords(download.getCalRecords(), LAST_CAL_REC_SHAREDPREF))
                 .setDownloadTimestamp(download.getDownloadTimestamp())
                 .setUnits(download.getUnit())
+                .setDriver(download.getDriver())
                 .setReceiverBattery(download.getReceiverBattery())
                 .setUploaderBattery(download.getUploaderBattery())
                 .build();

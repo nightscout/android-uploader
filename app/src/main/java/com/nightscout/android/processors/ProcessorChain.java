@@ -1,11 +1,14 @@
 package com.nightscout.android.processors;
 
+import android.util.Log;
+
 import com.nightscout.android.dexcom.G4Download;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProcessorChain {
+    private static final String TAG = ProcessorChain.class.getSimpleName();
     private List<AbstractProcessor> chain;
 
     public ProcessorChain(){
@@ -25,6 +28,7 @@ public class ProcessorChain {
     // TODO: failures in the chain need to be propagated up cleanly. Just returning a false one one
     // link fails isn't clear enough.
     public boolean process(G4Download download){
+        Log.d(TAG, "XXX3: Driver: "+download.getDriver());
         boolean result = true;
         for (AbstractProcessor link:chain){
             result = result && link.process(download);

@@ -36,7 +36,7 @@ public class RemoteMQTTMonitor extends AbstractPushDevice implements MQTTMgrObse
         final String url=sharedPref.getString(deviceIDStr+"_mqtt_endpoint","");
         String usr=sharedPref.getString(deviceIDStr+"_mqtt_user","");
         String pw=sharedPref.getString(deviceIDStr+"_mqtt_pass","");
-        mqttMgr=new MQTTMgr(context,usr,pw);
+        mqttMgr=new MQTTMgr(context,usr,pw,deviceIDStr);
         mqttMgr.initConnect(url);
         Log.d(TAG, "Subscribe start");
         mqttMgr.subscribe("/entries/sgv", MQTTUploadProcessor.PROTOBUF_DOWNLOAD_TOPIC);

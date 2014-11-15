@@ -17,11 +17,13 @@ import com.nightscout.android.dexcom.records.CalRecord;
 import com.nightscout.android.dexcom.records.GlucoseDataSet;
 import com.nightscout.android.dexcom.records.MeterRecord;
 
+import org.apache.http.Header;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -138,6 +140,8 @@ public class Uploader {
 
             HttpPost post = new HttpPost(postURL);
 
+            Header apiSecretHeader = null;
+
             if (apiVersion > 0) {
                 if (secret == null || secret.isEmpty()) {
                     throw new Exception("Starting with API v1, a pass phase is required");
@@ -151,8 +155,12 @@ public class Uploader {
                         sb.append(String.format("%02x", b & 0xff));
                     }
                     String token = sb.toString();
-                    post.setHeader("api-secret", token);
+                    apiSecretHeader = new BasicHeader("api-secret", token);
                 }
+            }
+
+            if (apiSecretHeader != null) {
+                post.setHeader(apiSecretHeader);
             }
 
             for (GlucoseDataSet record : glucoseDataSets) {
@@ -185,33 +193,35 @@ public class Uploader {
                 }
             }
 
-            for (MeterRecord record : meterRecords) {
-                JSONObject json = new JSONObject();
+            if (apiVersion >= 1) {
+                for (MeterRecord record : meterRecords) {
+                    JSONObject json = new JSONObject();
 
-                try {
-                    populateV1APIEntry(json, record);
-                } catch (Exception e) {
-                    Log.w(TAG, "Unable to populate entry, apiVersion: " + apiVersion, e);
-                    continue;
-                }
+                    try {
+                        populateV1APIEntry(json, record);
+                    } catch (Exception e) {
+                        Log.w(TAG, "Unable to populate entry, apiVersion: " + apiVersion, e);
+                        continue;
+                    }
 
-                String jsonString = json.toString();
-                Log.i(TAG, "MBG JSON: " + jsonString);
+                    String jsonString = json.toString();
+                    Log.i(TAG, "MBG JSON: " + jsonString);
 
-                try {
-                    StringEntity se = new StringEntity(jsonString);
-                    post.setEntity(se);
-                    post.setHeader("Accept", "application/json");
-                    post.setHeader("Content-type", "application/json");
+                    try {
+                        StringEntity se = new StringEntity(jsonString);
+                        post.setEntity(se);
+                        post.setHeader("Accept", "application/json");
+                        post.setHeader("Content-type", "application/json");
 
-                    ResponseHandler responseHandler = new BasicResponseHandler();
-                    httpclient.execute(post, responseHandler);
-                } catch (Exception e) {
-                    Log.w(TAG, "Unable to post data to: '" + post.getURI().toString() + "'", e);
+                        ResponseHandler responseHandler = new BasicResponseHandler();
+                        httpclient.execute(post, responseHandler);
+                    } catch (Exception e) {
+                        Log.w(TAG, "Unable to post data to: '" + post.getURI().toString() + "'", e);
+                    }
                 }
             }
 
-            if (prefs.getBoolean("cloud_cal_data", false)) {
+            if (apiVersion >= 1 && prefs.getBoolean("cloud_cal_data", false)) {
                 for (CalRecord calRecord : calRecords) {
 
                     JSONObject json = new JSONObject();
@@ -241,7 +251,7 @@ public class Uploader {
             }
 
             // TODO: this is a quick port from the original code and needs to be checked before release
-            postDeviceStatus(baseURL, httpclient);
+            postDeviceStatus(baseURL, apiSecretHeader, httpclient);
 
         } catch (Exception e) {
             Log.e(TAG, "Unable to post data", e);
@@ -289,7 +299,7 @@ public class Uploader {
     }
 
     // TODO: this is a quick port from original code and needs to be refactored before release
-    private void postDeviceStatus(String baseURL, DefaultHttpClient httpclient) throws Exception {
+    private void postDeviceStatus(String baseURL, Header apiSecretHeader, DefaultHttpClient httpclient) throws Exception {
         String devicestatusURL = baseURL + "devicestatus";
         Log.i(TAG, "devicestatusURL: " + devicestatusURL);
 
@@ -298,6 +308,11 @@ public class Uploader {
         String jsonString = json.toString();
 
         HttpPost post = new HttpPost(devicestatusURL);
+
+        if (apiSecretHeader != null) {
+            post.setHeader(apiSecretHeader);
+        }
+
         StringEntity se = new StringEntity(jsonString);
         post.setEntity(se);
         post.setHeader("Accept", "application/json");

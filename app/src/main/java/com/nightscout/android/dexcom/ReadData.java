@@ -4,11 +4,11 @@ import android.util.Log;
 
 import com.nightscout.android.devices.Constants;
 import com.nightscout.android.devices.DeviceTransportAbstract;
-import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.records.CalRecord;
 import com.nightscout.android.dexcom.records.EGVRecord;
 import com.nightscout.android.dexcom.records.GenericXMLRecord;
 import com.nightscout.android.dexcom.records.MeterRecord;
+import com.nightscout.android.dexcom.records.PageHeader;
 import com.nightscout.android.dexcom.records.SensorRecord;
 
 import org.w3c.dom.Element;
@@ -24,7 +24,7 @@ import java.util.List;
 public class ReadData {
 
     private static final String TAG = ReadData.class.getSimpleName();
-    private static final int IO_TIMEOUT = 200;
+    private static final int IO_TIMEOUT = 1000;
     private static final int MIN_LEN = 256;
     private DeviceTransportAbstract transport;
 
@@ -44,8 +44,10 @@ public class ReadData {
         if (numOfRecentPages < 1) {
             throw new IllegalArgumentException("Number of pages must be greater than 1.");
         }
+        Log.d(TAG, "Reading EGV page range...");
         int recordType = RecordTypes.EGV_DATA.ordinal();
         int endPage = readDataBasePageRange(recordType);
+        Log.d(TAG, "Reading " + numOfRecentPages + " EGV page(s)...");
         numOfRecentPages = numOfRecentPages - 1;
         List<EGVRecord> allPages = new ArrayList<EGVRecord>();
         for (int i = Math.min(numOfRecentPages,endPage); i >= 0; i--) {
@@ -54,6 +56,7 @@ public class ReadData {
             EGVRecord[] ithEGVRecordPage = readDataBasePage(recordType, nextPage);
             allPages.addAll(Arrays.asList(ithEGVRecordPage));
         }
+        Log.d(TAG, "Read complete of EGV pages.");
         return allPages;
     }
 
@@ -63,6 +66,7 @@ public class ReadData {
 
     public List<MeterRecord> getRecentMeterRecords() {
         int recordType = RecordTypes.METER_DATA.ordinal();
+        Log.d(TAG, "Reading Meter page...");
         int endPage = readDataBasePageRange(recordType);
         //FIXME - too much casting going on here
         return Arrays.asList((MeterRecord[]) readDataBasePage(recordType, endPage));
@@ -74,8 +78,10 @@ public class ReadData {
         if (numOfRecentPages < 1) {
             throw new IllegalArgumentException("Number of pages must be greater than 1.");
         }
+        Log.d(TAG, "Reading Sensor page range...");
         int recordType = RecordTypes.SENSOR_DATA.ordinal();
         int endPage = readDataBasePageRange(recordType);
+        Log.d(TAG, "Reading " + numOfRecentPages + " Sensor page(s)...");
         numOfRecentPages = numOfRecentPages - 1;
         List<SensorRecord> allPages = new ArrayList<SensorRecord>();
         for (int i = Math.min(numOfRecentPages,endPage); i >= 0; i--) {
@@ -84,12 +90,15 @@ public class ReadData {
             SensorRecord[] ithSensorRecordPage = readDataBasePage(recordType, nextPage);
             allPages.addAll(Arrays.asList(ithSensorRecordPage));
         }
+        Log.d(TAG, "Read complete of Sensor pages.");
         return allPages;
     }
 
     public List<CalRecord> getRecentCalRecords() {
+        Log.d(TAG, "Reading Cal Records page range...");
         int recordType = RecordTypes.CAL_SET.ordinal();
         int endPage = readDataBasePageRange(recordType);
+        Log.d(TAG, "Reading Cal Records page...");
         //FIXME - too much casting going on here
         return Arrays.asList((CalRecord[]) readDataBasePage(recordType, endPage));
     }
@@ -99,7 +108,8 @@ public class ReadData {
         return read(MIN_LEN).getCommand() == Constants.ACK;
     }
 
-    public int readBatteryLevel(){
+    public int readBatteryLevel() {
+        Log.d(TAG, "Reading battery level...");
         writeCommand(Constants.READ_BATTERY_LEVEL);
         byte[] readData = read(MIN_LEN).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
@@ -117,12 +127,14 @@ public class ReadData {
     }
 
     public long readSystemTime() {
+        Log.d(TAG, "Reading system time...");
         writeCommand(Constants.READ_SYSTEM_TIME);
         byte[] readData = read(MIN_LEN).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt() & 0xffffffff;
     }
 
     public int readDisplayTimeOffset() {
+        Log.d(TAG, "Reading display time offset...");
         writeCommand(Constants.READ_DISPLAY_TIME_OFFSET);
         byte[] readData = read(MIN_LEN).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt() & 0xffffffff;
@@ -151,7 +163,6 @@ public class ReadData {
         payload.add(numOfPages);
         writeCommand(Constants.READ_DATABASE_PAGES, payload);
         byte[] readData = read(2122).getData();
-        ParsePage(readData, recordType);
         return ParsePage(readData, recordType);
     }
 
@@ -191,6 +202,7 @@ public class ReadData {
 
     private <T> T ParsePage(byte[] data, int recordType) {
         int HEADER_LEN = 28;
+        PageHeader pageHeader=new PageHeader(data);
         int NUM_REC_OFFSET = 4;
         int numRec = data[NUM_REC_OFFSET];
         int rec_len;
@@ -224,7 +236,10 @@ public class ReadData {
                 }
                 return (T) meterRecords;
             case CAL_SET:
-                rec_len = 148;
+                rec_len = 249;
+                if (pageHeader.getRevision()<=2) {
+                    rec_len = 148;
+                }
                 CalRecord[] calRecords = new CalRecord[numRec];
                 for (int i = 0; i < numRec; i++) {
                     int startIdx = HEADER_LEN + rec_len * i;

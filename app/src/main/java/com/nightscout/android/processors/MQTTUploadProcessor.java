@@ -21,18 +21,21 @@ public class MQTTUploadProcessor extends AbstractProcessor implements MQTTMgrObs
         String url=sharedPref.getString("cloud_storage_mqtt_endpoint","");
         String usr=sharedPref.getString("cloud_storage_mqtt_user","");
         String pw=sharedPref.getString("cloud_storage_mqtt_pass","");
-        mqttMgr=new MQTTMgr(this.context,usr,pw);
+        mqttMgr=new MQTTMgr(this.context,usr,pw,device);
         mqttMgr.initConnect(url);
         mqttMgr.registerObserver(this);
     }
 
     @Override
     public boolean process(G4Download d) {
+        Log.d(TAG,"XXX4 - Processing download for : "+d.getDriver());
         try {
             G4Download dl=filterDownload(new G4Download(d));
+            Log.d(TAG,"XXX5 - filtered download : "+dl.getDriver());
             mqttMgr.publish(dl.toCookieProtobuf().toByteArray(), PROTOBUF_DOWNLOAD_TOPIC);
             return true;
         } catch (Exception e){
+            Log.e("XXX","Exception: ",e);
             return false;
         }
     }

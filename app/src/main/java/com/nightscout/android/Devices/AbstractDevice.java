@@ -100,12 +100,12 @@ public abstract class AbstractDevice implements DeviceInterface {
                 mon = new MongoProcessor(getContext(),deviceID);
                 chain.add(mon);
             }
-            if (sharedPref.getBoolean(deviceIDStr + "cloud_storage_mqtt_enable", false)) {
+            if (sharedPref.getBoolean("cloud_storage_mqtt_enable", false)) {
                 Log.i(TAG, "Adding a push notification upload monitor");
                 mon = new MQTTUploadProcessor(getContext(),deviceID);
                 chain.add(mon);
             }
-            if (sharedPref.getBoolean(deviceIDStr + "cloud_storage_api_enable", false)) {
+            if (sharedPref.getBoolean("cloud_storage_api_enable", false)) {
                 Log.i(TAG, "Adding a Nightscout upload monitor");
                 mon = new NSAPIUpload(getContext(),deviceID);
                 chain.add(mon);
@@ -208,9 +208,11 @@ public abstract class AbstractDevice implements DeviceInterface {
 
     protected void onDownload(G4Download dl){
         // convert into json for d3 plot
+        // TODO: Pull this code after chart is replaced.
         JSONArray array = new JSONArray();
         for (EGVRecord record:dl.getEGVRecords()) array.put(record.toJSON());
         broadcastSGVToUI(dl.getLastEGVRecord(),true, dl.getNextUploadTime(),dl.getDisplayTime(),array,dl.getReceiverBattery());
+        Log.d(TAG,"XXX2: Driver"+dl.getDriver());
         chain.process(dl);
 //        GoogleAnalytics.getInstance(context.getApplicationContext()).dispatchLocalHits();
     }
@@ -296,4 +298,7 @@ public abstract class AbstractDevice implements DeviceInterface {
         broadcastSGVToUI(record,false, (long) TimeConstants.FIVE_MINUTES_MS+ G4Constants.TIME_SYNC_OFFSET,new Date().getTime(),null,0);
     }
 
+    public String getDriver() {
+        return driver;
+    }
 }

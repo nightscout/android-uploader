@@ -1,5 +1,7 @@
 package com.nightscout.android.dexcom.records;
 
+import android.util.Log;
+
 import com.nightscout.android.TimeConstants;
 
 import java.nio.ByteBuffer;
@@ -7,14 +9,14 @@ import java.nio.ByteOrder;
 import java.util.Date;
 
 public class CalRecord extends GenericTimestampRecord {
-
+    private static final String TAG = CalRecord.class.getSimpleName();
     private double slope;
     private double intercept;
     private double scale;
     private int[] unk = new int[3];
     private double decay;
     private int  numRecords;
-    private CalSubrecord[] calSubrecords = new CalSubrecord[6];
+    private CalSubrecord[] calSubrecords = new CalSubrecord[12];
     private int SUB_LEN = 17;
 
     public CalRecord(byte[] packet) {

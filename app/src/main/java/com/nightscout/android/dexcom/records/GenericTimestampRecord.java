@@ -8,11 +8,11 @@ import java.util.Date;
 
 public class GenericTimestampRecord {
 
-    private final int OFFSET_SYS_TIME = 0;
-    private final int OFFSET_DISPLAY_TIME = 4;
-    private Date systemTime;
-    private int systemTimeSeconds;
-    private Date displayTime;
+    protected final int OFFSET_SYS_TIME = 0;
+    protected final int OFFSET_DISPLAY_TIME = 4;
+    protected Date systemTime;
+    protected int systemTimeSeconds;
+    protected Date displayTime;
 
     // TODO: reassess if we should store as seconds only and convert to date only when necessary?
     public GenericTimestampRecord(byte[] packet) {

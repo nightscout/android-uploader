@@ -83,10 +83,10 @@ public class DexcomG4 extends AbstractPollDevice {
                         .setUnits(GlucoseUnit.MGDL)
                         .setReceiverBattery(batLevel)
                         .setNextUploadTime(nextUploadTime)
-                        .setDriver(G4Constants.DRIVER)
+                        .setDriver(driver)
                         .setUploaderBattery(MainActivity.batLevel);
                 download=downloadBuilder.build();
-
+                Log.d("XXX1","Driver: "+download.getDriver());
                 // FIXME: does not currently handle gap sync functionality
             } catch (ArrayIndexOutOfBoundsException e) {
                 Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);

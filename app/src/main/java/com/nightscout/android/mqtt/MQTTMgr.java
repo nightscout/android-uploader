@@ -54,8 +54,8 @@ public class MQTTMgr implements MqttCallback,MQTTMgrObservable {
     private String[] mqTopics=null;
     private String lastWill=null;
     private String deviceIDStr =null;
-    public static final String RECONNECT_INTENT_FILTER="com.ktind.cgm.MQTT_RECONNECT";
-    public static final String KEEPALIVE_INTENT_FILTER="com.ktind.cgm.MQTT_KEEPALIVE";
+    public static final String RECONNECT_INTENT_FILTER="com.nightscout.android.MQTT_RECONNECT";
+    public static final String KEEPALIVE_INTENT_FILTER="com.nightscout.android.MQTT_KEEPALIVE";
     private AlarmManager alarmMgr;
     private Intent reconnectIntent;
     private PendingIntent reconnectPendingIntent;
@@ -65,11 +65,12 @@ public class MQTTMgr implements MqttCallback,MQTTMgrObservable {
     protected boolean initialCallbackSetup=false;
     protected State state;
 
-    public MQTTMgr(Context context, String user, String pass) {
+    public MQTTMgr(Context context, String user, String pass,String deviceIDStr) {
         super();
         this.context = context;
         this.user=user;
         this.pass=pass;
+        this.deviceIDStr=deviceIDStr;
         mDeviceId = String.format(DEVICE_ID_FORMAT,deviceIDStr,
                 Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID));
         alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -106,8 +107,8 @@ public class MQTTMgr implements MqttCallback,MQTTMgrObservable {
             Log.d(TAG, "Connecting to URL: " + url);
             mClient = new MqttClient(url, mDeviceId, mDataStore);
             mClient.connect(mOpts);
-            setNextKeepAlive();
             state=State.CONNECTED;
+            setNextKeepAlive();
         } catch (MqttException e) {
             Log.e(TAG, "Error while connecting: ", e);
         } catch (IllegalArgumentException e) {
