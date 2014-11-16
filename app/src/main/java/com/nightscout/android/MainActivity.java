@@ -23,6 +23,8 @@ import android.widget.TextView;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.nightscout.android.devices.Constants;
 import com.nightscout.android.dexcom.G4Constants;
 import com.nightscout.android.dexcom.SpecialBGValue;
@@ -75,7 +77,7 @@ public class MainActivity extends Activity {
         Log.d(TAG,"OnCreate called.");
 
         // Add timezone ID to ACRA report
-//        ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
+        ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
 
         mTracker = ((Nightscout) getApplicationContext()).getTracker();
 
@@ -363,6 +365,15 @@ public class MainActivity extends Activity {
         }
     };
 
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+        if (scanResult != null) {
+            Log.d(TAG,"Contents: "+scanResult.getContents());
+            // handle scan result
+        }
+        // else continue with any other code you need in the method
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -393,6 +404,8 @@ public class MainActivity extends Activity {
             } catch (ACRAConfigurationException e) {
                 e.printStackTrace();
             }
+        } else if (id == R.id.scan_barcode) {
+            new IntentIntegrator(this).initiateScan();
         } else if (id == R.id.gap_sync) {
             SyncingService.startActionSingleSync(getApplicationContext(), G4Constants.GAP_SYNC_PAGES);
         } else if (id == R.id.close_settings) {

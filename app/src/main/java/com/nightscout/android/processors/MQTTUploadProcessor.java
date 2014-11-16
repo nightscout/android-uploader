@@ -28,14 +28,15 @@ public class MQTTUploadProcessor extends AbstractProcessor implements MQTTMgrObs
 
     @Override
     public boolean process(G4Download d) {
-        Log.d(TAG,"XXX4 - Processing download for : "+d.getDriver());
         try {
             G4Download dl=filterDownload(new G4Download(d));
-            Log.d(TAG,"XXX5 - filtered download : "+dl.getDriver());
+            Log.d(TAG,"Uploading "+dl.getEGVRecords().size()+" EGV records");
+            Log.d(TAG,"Uploading "+dl.getSensorRecords().size()+" Sensor records");
+            Log.d(TAG,"Uploading "+dl.getMeterRecords().size()+" Meter records");
+            Log.d(TAG,"Uploading "+dl.getCalRecords().size()+" Cal records");
             mqttMgr.publish(dl.toCookieProtobuf().toByteArray(), PROTOBUF_DOWNLOAD_TOPIC);
             return true;
         } catch (Exception e){
-            Log.e("XXX","Exception: ",e);
             return false;
         }
     }

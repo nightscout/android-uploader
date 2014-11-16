@@ -212,7 +212,6 @@ public abstract class AbstractDevice implements DeviceInterface {
         JSONArray array = new JSONArray();
         for (EGVRecord record:dl.getEGVRecords()) array.put(record.toJSON());
         broadcastSGVToUI(dl.getLastEGVRecord(),true, dl.getNextUploadTime(),dl.getDisplayTime(),array,dl.getReceiverBattery());
-        Log.d(TAG,"XXX2: Driver"+dl.getDriver());
         chain.process(dl);
 //        GoogleAnalytics.getInstance(context.getApplicationContext()).dispatchLocalHits();
     }

@@ -3,6 +3,8 @@ package com.nightscout.android.processors;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
+
 import com.nightscout.android.dexcom.G4Download;
 import com.nightscout.android.dexcom.records.CalRecord;
 import com.nightscout.android.dexcom.records.EGVRecord;
@@ -14,16 +16,17 @@ import java.util.Iterator;
 import java.util.List;
 
 abstract public class AbstractProcessor implements ProcessorInterface {
+    private static final String TAG = AbstractProcessor.class.getSimpleName();
     protected String name;
     protected int deviceID;
     protected String device;
     protected Context context;
     protected SharedPreferences sharedPref;
     protected boolean allowVirtual=false;
-    public static final String LAST_EGV_REC_SHAREDPREF="last_egv_systime";
-    public static final String LAST_SENSOR_REC_SHAREDPREF="last_sensor_systime";
-    public static final String LAST_METER_REC_SHAREDPREF="last_meter_systime";
-    public static final String LAST_CAL_REC_SHAREDPREF="last_cal_systime";
+    public static final String LAST_EGV_REC_SHAREDPREF="_last_egv_systime";
+    public static final String LAST_SENSOR_REC_SHAREDPREF="_last_sensor_systime";
+    public static final String LAST_METER_REC_SHAREDPREF="_last_meter_systime";
+    public static final String LAST_CAL_REC_SHAREDPREF="_last_cal_systime";
 
     public AbstractProcessor(int deviceID,Context context,String name){
         this.name=name;
@@ -43,6 +46,7 @@ abstract public class AbstractProcessor implements ProcessorInterface {
         Iterator<? extends GenericTimestampRecord> iter=result.iterator();
         while (iter.hasNext()){
             GenericTimestampRecord record=iter.next();
+            Log.d(TAG, "Comparing "+name+sharedKey+" "+record.getSystemTimeSeconds()+" to "+lastRecord);
             if (record.getSystemTimeSeconds() <= lastRecord) {
                 iter.remove();
             }

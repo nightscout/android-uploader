@@ -15,7 +15,11 @@
         android:orderInCategory="100"
         android:title="@string/gap_sync_menu_text">
     </item>
-
+    <item
+        android:id="@+id/scan_barcode"
+        android:orderInCategory="100"
+        android:title="Auto config">
+    </item>
     <item
         android:id="@+id/close_settings"
         android:orderInCategory="100"
