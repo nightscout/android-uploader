@@ -70,6 +70,10 @@ public class AbstractRestUploaderTest {
         captor = ArgumentCaptor.forClass(HttpUriRequest.class);
     }
 
+    public void setUpExecuteCaptor() throws IOException {
+        setUpExecuteCaptor(200);
+    }
+
     public void setUpExecuteCaptor(int status) throws IOException {
         HttpResponse response = new BasicHttpResponse(
                 new BasicStatusLine(new ProtocolVersion("mock", 1, 2), status, ""));
@@ -78,14 +82,14 @@ public class AbstractRestUploaderTest {
 
     @Test
     public void testUploads_isPost() throws Exception {
-        setUpExecuteCaptor(200);
+        setUpExecuteCaptor();
         restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
         assertThat(captor.getValue().getMethod(), is("POST"));
     }
 
     @Test
     public void testUploads_setsUrl() throws Exception {
-        setUpExecuteCaptor(200);
+        setUpExecuteCaptor();
         restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
         assertThat(captor.getValue().getURI(), is(not(nullValue())));
         assertThat(captor.getValue().getURI().toString(), is("http://test.com/endpoint"));
@@ -93,7 +97,7 @@ public class AbstractRestUploaderTest {
 
     @Test
     public void testUploads_setsContentType() throws Exception {
-        setUpExecuteCaptor(200);
+        setUpExecuteCaptor();
         restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
         assertThat(captor.getValue().getFirstHeader("Content-Type"), is(not(nullValue())));
         assertThat(captor.getValue().getFirstHeader("Content-Type").getValue(),
@@ -102,7 +106,7 @@ public class AbstractRestUploaderTest {
 
     @Test
     public void testUploads_setsAccept() throws Exception {
-        setUpExecuteCaptor(200);
+        setUpExecuteCaptor();
         restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
         assertThat(captor.getValue().getFirstHeader("Accept"), is(not(nullValue())));
         assertThat(captor.getValue().getFirstHeader("Accept").getValue(), is("application/json"));
@@ -110,14 +114,14 @@ public class AbstractRestUploaderTest {
 
     @Test
     public void testUploads_setsExtraHeaders() throws Exception {
-        setUpExecuteCaptor(200);
+        setUpExecuteCaptor();
         restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
         assertThat(captor.getValue().getFirstHeader("key").getValue(), is("value"));
     }
 
     @Test
     public void testUploads_setsEntity() throws IOException {
-        setUpExecuteCaptor(200);
+        setUpExecuteCaptor();
         restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
         HttpPost post = (HttpPost) captor.getValue();
         String entity = CharStreams.toString(new InputStreamReader(post.getEntity().getContent()));
@@ -126,8 +130,8 @@ public class AbstractRestUploaderTest {
     }
 
     @Test
-    public void testUploads_200StatusCodeReturnsTrue() throws IOException {
-        setUpExecuteCaptor(200);
+    public void testUploads_2XXStatusCodeReturnsTrue() throws IOException {
+        setUpExecuteCaptor(251);
         boolean result = restUploader.uploadGlucoseDataSets(
                 Lists.newArrayList(mockGlucoseDataSet()));
         assertThat(result, is(true));
