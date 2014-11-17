@@ -19,18 +19,21 @@ public abstract class BaseUploader {
 
     private final NightscoutPreferences preferences;
 
-    protected abstract void doUpload(GlucoseDataSet glucoseDataSet) throws IOException;
+    protected abstract boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException;
 
-    protected void doUpload(MeterRecord meterRecord) throws IOException {
+    protected boolean doUpload(MeterRecord meterRecord) throws IOException {
         log.info("Meter record upload not supported.");
+        return true;
     }
 
-    protected void doUpload(CalRecord calRecord) throws IOException {
+    protected boolean doUpload(CalRecord calRecord) throws IOException {
         log.info("Cal record upload not supported.");
+        return true;
     }
 
-    protected void doUpload(DeviceStatus deviceStatus) throws IOException {
+    protected boolean doUpload(DeviceStatus deviceStatus) throws IOException {
         log.info("Device status upload not supported.");
+        return true;
     }
 
     public BaseUploader(NightscoutPreferences preferences) {
@@ -39,55 +42,65 @@ public abstract class BaseUploader {
     }
 
     // TODO(trhodeos): implement some sort of retry logic in all of these public functions.
-    public final void uploadGlucoseDataSets(List<GlucoseDataSet> glucoseDataSets) {
+    public final boolean uploadGlucoseDataSets(List<GlucoseDataSet> glucoseDataSets) {
         if (glucoseDataSets == null) {
-            return;
+            return true;
         }
+        boolean output = true;
         for (GlucoseDataSet glucoseDataSet : glucoseDataSets) {
             try {
-                doUpload(glucoseDataSet);
+                output &= doUpload(glucoseDataSet);
             } catch (IOException e) {
                 log.error("Error uploading glucose data set.", e);
+                output = false;
             }
         }
+        return output;
     }
 
-    public final void uploadMeterRecords(List<MeterRecord> meterRecords) {
+    public final boolean uploadMeterRecords(List<MeterRecord> meterRecords) {
         if (meterRecords == null) {
-            return;
+            return true;
         }
+        boolean output = true;
         for (MeterRecord meterRecord : meterRecords) {
             try {
-                doUpload(meterRecord);
+                output &= doUpload(meterRecord);
             } catch (IOException e) {
                 log.error("Error uploading meter record.", e);
+                output = false;
             }
         }
+        return output;
     }
 
-    public final void uploadCalRecords(List<CalRecord> calRecords) {
+    public final boolean uploadCalRecords(List<CalRecord> calRecords) {
         if (calRecords == null) {
-            return;
+            return true;
         }
+        boolean output = true;
         if (getPreferences().isCalibrationUploadEnabled()) {
             for (CalRecord calRecord : calRecords) {
                 try {
-                    doUpload(calRecord);
+                    output &= doUpload(calRecord);
                 } catch (IOException e) {
                     log.error("Error uploading calibration record.", e);
+                    output = false;
                 }
             }
         }
+        return output;
     }
 
-    public final void uploadDeviceStatus(DeviceStatus deviceStatus) {
+    public final boolean uploadDeviceStatus(DeviceStatus deviceStatus) {
         if (deviceStatus == null) {
-            return;
+            return true;
         }
         try {
-            doUpload(deviceStatus);
+            return doUpload(deviceStatus);
         } catch (IOException e) {
             log.error("Error uploading device status", e);
+            return false;
         }
     }
 

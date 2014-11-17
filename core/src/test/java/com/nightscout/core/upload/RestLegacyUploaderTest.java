@@ -5,9 +5,13 @@ import com.google.common.io.CharStreams;
 import com.nightscout.core.preferences.TestPreferences;
 import com.nightscout.core.records.DeviceStatus;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolVersion;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.message.BasicHttpResponse;
+import org.apache.http.message.BasicStatusLine;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -48,8 +52,14 @@ public class RestLegacyUploaderTest {
     }
 
     public void setUpExecuteCaptor() throws IOException {
+        setUpExecuteCaptor(200);
+    }
+
+    public void setUpExecuteCaptor(int status) throws IOException {
         captor = ArgumentCaptor.forClass(HttpUriRequest.class);
-        when(mockHttpClient.execute(captor.capture())).thenReturn(null);
+        HttpResponse response = new BasicHttpResponse(
+                new BasicStatusLine(new ProtocolVersion("mock", 1, 2), status, ""));
+        when(mockHttpClient.execute(captor.capture())).thenReturn(response);
     }
 
     public static void verifyGlucoseDataSet(JSONObject jsonObject)

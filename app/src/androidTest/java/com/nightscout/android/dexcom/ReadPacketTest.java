@@ -4,8 +4,8 @@ import com.google.common.primitives.UnsignedBytes;
 
 import junit.framework.TestCase;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 
 public class ReadPacketTest extends TestCase {

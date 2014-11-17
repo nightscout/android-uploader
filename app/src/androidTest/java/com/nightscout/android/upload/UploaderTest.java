@@ -8,15 +8,14 @@ import com.nightscout.core.upload.MongoUploader;
 import com.nightscout.core.upload.RestLegacyUploader;
 import com.nightscout.core.upload.RestV1Uploader;
 
-import org.hamcrest.MatcherAssert;
 import org.mockito.ArgumentCaptor;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -57,7 +56,7 @@ public class UploaderTest extends BaseTest {
         assertThat(uploader.getUploaders(), hasSize(1));
     }
 
-    public void testInitialize_MongoValidCollection() {
+    public void testInitialize_MongoValidCollection() throws Exception {
         getPreferences().edit()
                 .putBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED, true)
                 .putString(PreferenceKeys.MONGO_URI, "mongodb://test.com/db")
@@ -69,7 +68,7 @@ public class UploaderTest extends BaseTest {
         ArgumentCaptor<String> collectionName = ArgumentCaptor.forClass(String.class);
         when(mongoUploader.getDB().getCollection(collectionName.capture())).thenReturn(null);
         mongoUploader.getCollection();
-        MatcherAssert.assertThat(collectionName.getValue(), is("collection"));
+        assertThat(collectionName.getValue(), is("collection"));
     }
 
     public void testInitialize_MongoValidDeviceStatusCollection() throws Exception {
@@ -84,7 +83,7 @@ public class UploaderTest extends BaseTest {
         ArgumentCaptor<String> collectionName = ArgumentCaptor.forClass(String.class);
         when(mongoUploader.getDB().getCollection(collectionName.capture())).thenReturn(null);
         mongoUploader.getDeviceStatusCollection();
-        MatcherAssert.assertThat(collectionName.getValue(), is("dscollection"));
+        assertThat(collectionName.getValue(), is("dscollection"));
     }
 
     public void testInitialize_Api() {

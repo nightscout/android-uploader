@@ -95,42 +95,46 @@ public class RestV1Uploader extends AbstractRestUploader {
     }
 
     @Override
-    protected void doUpload(GlucoseDataSet glucoseDataSet) throws IOException {
+    protected boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException {
         try {
-            doPost("entries", toJSONObject(glucoseDataSet));
+            return doPost("entries", toJSONObject(glucoseDataSet));
         } catch (JSONException e) {
             log.error("Could not create JSON object for rest v1 glucose data set.", e);
+            return false;
         }
     }
 
     @Override
-    protected void doUpload(MeterRecord meterRecord) throws IOException {
+    protected boolean doUpload(MeterRecord meterRecord) throws IOException {
         try {
             // TODO(trhodeos): in Uploader.java, this method still used 'entries' as the endpoint,
             // but this seems like a bug to me.
-            doPost("entries", toJSONObject(meterRecord));
+            return doPost("entries", toJSONObject(meterRecord));
         } catch (JSONException e) {
             log.error("Could not create JSON object for rest v1 meter record.", e);
+            return false;
         }
     }
 
     @Override
-    protected void doUpload(CalRecord calRecord) throws IOException {
+    protected boolean doUpload(CalRecord calRecord) throws IOException {
         try {
             // TODO(trhodeos): in Uploader.java, this method still used 'entries' as the endpoint,
             // but this seems like a bug to me.
-            doPost("entries", toJSONObject(calRecord));
+            return doPost("entries", toJSONObject(calRecord));
         } catch (JSONException e) {
             log.error("Could not create JSON object for rest v1 cal record.", e);
+            return false;
         }
     }
 
     @Override
-    protected void doUpload(DeviceStatus deviceStatus) throws IOException {
+    protected boolean doUpload(DeviceStatus deviceStatus) throws IOException {
         try {
-            doPost("devicestatus", toJSONObject(deviceStatus));
+            return doPost("devicestatus", toJSONObject(deviceStatus));
         } catch (JSONException e) {
             log.error("Could not create JSON object for rest v1 device status.", e);
+            return false;
         }
     }
 }

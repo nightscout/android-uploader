@@ -3,6 +3,7 @@ package com.nightscout.core.upload;
 import com.google.common.base.Joiner;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -43,12 +44,13 @@ public abstract class AbstractRestUploader extends BaseUploader {
         this.client = client;
     }
 
-    protected void doPost(String endpoint, JSONObject jsonObject) throws IOException {
+    protected boolean doPost(String endpoint, JSONObject jsonObject) throws IOException {
         HttpPost httpPost = new HttpPost(Joiner.on('/').join(uri.toString(), endpoint));
         httpPost.addHeader("Content-Type", "application/json");
         httpPost.addHeader("Accept", "application/json");
         setExtraHeaders(httpPost);
         httpPost.setEntity(new StringEntity(jsonObject.toString()));
-        getClient().execute(httpPost);
+        HttpResponse response = getClient().execute(httpPost);
+        return response.getStatusLine().getStatusCode() == 200;
     }
 }

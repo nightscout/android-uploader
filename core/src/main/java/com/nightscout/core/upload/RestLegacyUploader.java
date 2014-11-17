@@ -33,21 +33,23 @@ public class RestLegacyUploader extends AbstractRestUploader {
     }
 
     @Override
-    protected void doUpload(GlucoseDataSet glucoseDataSet) throws IOException {
+    protected boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException {
         try {
-            doPost("entries", toJSONObject(glucoseDataSet));
+            return doPost("entries", toJSONObject(glucoseDataSet));
         } catch (JSONException e) {
             log.error("Could not create JSON object for legacy rest glucose data set.", e);
+            return false;
         }
     }
 
     // TODO(trhodeos): is devicestatus supported in legacy apis?
     @Override
-    protected void doUpload(DeviceStatus deviceStatus) throws IOException {
+    protected boolean doUpload(DeviceStatus deviceStatus) throws IOException {
         try {
-            doPost("devicestatus", toJSONObject(deviceStatus));
+            return doPost("devicestatus", toJSONObject(deviceStatus));
         } catch (JSONException e) {
             log.error("Could not create JSON object for legacy rest device status.", e);
+            return false;
         }
     }
 }

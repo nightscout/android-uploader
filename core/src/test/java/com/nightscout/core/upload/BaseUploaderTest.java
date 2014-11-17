@@ -46,18 +46,21 @@ public class BaseUploaderTest {
         }
 
         @Override
-        protected void doUpload(GlucoseDataSet glucoseDataSet) throws IOException {
+        protected boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException {
             glucoseDataSets.add(glucoseDataSet);
+            return true;
         }
 
         @Override
-        protected void doUpload(MeterRecord meterRecord) throws IOException {
+        protected boolean doUpload(MeterRecord meterRecord) throws IOException {
             meterRecords.add(meterRecord);
+            return true;
         }
 
         @Override
-        protected void doUpload(CalRecord calRecord) throws IOException {
+        protected boolean doUpload(CalRecord calRecord) throws IOException {
             calRecords.add(calRecord);
+            return true;
         }
     }
 
@@ -67,22 +70,22 @@ public class BaseUploaderTest {
         }
 
         @Override
-        protected void doUpload(GlucoseDataSet glucoseDataSet) throws IOException {
+        protected boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException {
             throw new IOException("glucose");
         }
 
         @Override
-        protected void doUpload(MeterRecord meterRecord) throws IOException {
+        protected boolean doUpload(MeterRecord meterRecord) throws IOException {
             throw new IOException("meter");
         }
 
         @Override
-        protected void doUpload(CalRecord calRecord) throws IOException {
+        protected boolean doUpload(CalRecord calRecord) throws IOException {
             throw new IOException("cal");
         }
 
         @Override
-        protected void doUpload(DeviceStatus deviceStatus) throws IOException {
+        protected boolean doUpload(DeviceStatus deviceStatus) throws IOException {
             throw new IOException("device");
         }
     }

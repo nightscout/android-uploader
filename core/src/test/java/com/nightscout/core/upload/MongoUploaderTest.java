@@ -6,6 +6,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClientURI;
 import com.mongodb.WriteConcern;
+import com.mongodb.WriteResult;
 import com.nightscout.core.preferences.TestPreferences;
 import com.nightscout.core.records.DeviceStatus;
 
@@ -25,7 +26,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.validateMockitoUsage;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class MongoUploaderTest {
     MongoUploader mongoUploader;
@@ -44,10 +45,11 @@ public class MongoUploaderTest {
                 "dsCollection");
         mongoUploader.setCollection(mockCollection);
         mongoUploader.setDeviceStatusCollection(mockCollection);
+        setUpUpsertCapture();
     }
 
     public void verifyGlucoseDataSet(boolean enableCloudSensorData) {
-        BasicDBObject dbObject = setUpUpsertCapture();
+        BasicDBObject dbObject = captor.getValue();
         assertThat(dbObject.getString("device"), is("dexcom"));
         assertThat(dbObject.get("date"), is(not(nullValue())));
         assertThat(dbObject.get("dateString"), is(not(nullValue())));
@@ -66,7 +68,7 @@ public class MongoUploaderTest {
     }
 
     public void verifyMeterRecord() {
-        BasicDBObject dbObject = setUpUpsertCapture();
+        BasicDBObject dbObject = captor.getValue();
         assertThat(dbObject.getString("device"), is("dexcom"));
         assertThat(dbObject.getString("type"), is("mbg"));
         assertThat(dbObject.get("date"), is(not(nullValue())));
@@ -75,7 +77,7 @@ public class MongoUploaderTest {
     }
 
     public void verifyCalRecord() {
-        BasicDBObject dbObject = setUpUpsertCapture();
+        BasicDBObject dbObject = captor.getValue();
         assertThat(dbObject.getString("device"), is("dexcom"));
         assertThat(dbObject.getString("type"), is("cal"));
         assertThat(dbObject.get("date"), is(not(nullValue())));
@@ -86,21 +88,22 @@ public class MongoUploaderTest {
     }
 
     public void verifyDeviceStatus(DeviceStatus deviceStatus) {
-        BasicDBObject dbObject = setUpUpsertCapture();
+        BasicDBObject dbObject = captor.getValue();
         assertThat(dbObject.getInt("uploaderBattery"), is(deviceStatus.getBatteryLevel()));
         assertThat(dbObject.get("created_at"), is(not(nullValue())));
     }
 
-    public BasicDBObject setUpUpsertCapture() {
+    public void setUpUpsertCapture() {
         captor = ArgumentCaptor.forClass(BasicDBObject.class);
-        verify(mockCollection).update(
+        WriteResult result = mock(WriteResult.class);
+        when(result.getError()).thenReturn(null);
+        when(mockCollection.update(
                 any(DBObject.class),
                 captor.capture(),
                 eq(true),
                 eq(false),
-                eq(WriteConcern.UNACKNOWLEDGED));
+                eq(WriteConcern.UNACKNOWLEDGED))).thenReturn(result);
         validateMockitoUsage();
-        return captor.getValue();
     }
 
     @Test
@@ -134,5 +137,16 @@ public class MongoUploaderTest {
         DeviceStatus deviceStatus = mockDeviceStatus();
         mongoUploader.uploadDeviceStatus(deviceStatus);
         verifyDeviceStatus(deviceStatus);
+    }
+
+    @Test
+    public void testReturnFalseWithInvalidURI() {
+        mongoUploader = new MongoUploader(
+                preferences,
+                new MongoClientURI("mongodb://foobar/db"),
+                "collection",
+                "dsCollection");
+        DeviceStatus deviceStatus = mockDeviceStatus();
+        assertThat(mongoUploader.uploadDeviceStatus(deviceStatus), is(false));
     }
 }

@@ -99,13 +99,14 @@ public class Uploader {
         // TODO(trhodeos): make this not static
         deviceStatus.setBatteryLevel(MainActivity.batLevel);
 
+        boolean allSuccessful = true;
         for (BaseUploader uploader : uploaders) {
-            uploader.uploadGlucoseDataSets(glucoseDataSets);
-            uploader.uploadMeterRecords(meterRecords);
-            uploader.uploadCalRecords(calRecords);
-            uploader.uploadDeviceStatus(deviceStatus);
+            allSuccessful &= uploader.uploadGlucoseDataSets(glucoseDataSets);
+            allSuccessful &= uploader.uploadMeterRecords(meterRecords);
+            allSuccessful &= uploader.uploadCalRecords(calRecords);
+            allSuccessful &= uploader.uploadDeviceStatus(deviceStatus);
         }
-        return true;
+        return allSuccessful;
     }
 
     protected List<BaseUploader> getUploaders() {

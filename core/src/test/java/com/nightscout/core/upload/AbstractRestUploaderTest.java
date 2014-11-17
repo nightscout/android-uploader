@@ -6,10 +6,14 @@ import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.preferences.TestPreferences;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolVersion;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.message.AbstractHttpMessage;
+import org.apache.http.message.BasicHttpResponse;
+import org.apache.http.message.BasicStatusLine;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -28,7 +32,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class AbstractRestUploaderTest {
     private NoopRestUploader restUploader;
@@ -46,14 +50,14 @@ public class AbstractRestUploaderTest {
         }
 
         @Override
-        protected void doUpload(GlucoseDataSet glucoseDataSet) throws IOException {
+        protected boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException {
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject.put("jsonKey", "jsonValue");
             } catch (JSONException e) {
                 fail("This should never happen.");
             }
-            doPost("endpoint", jsonObject);
+            return doPost("endpoint", jsonObject);
         }
     }
 
@@ -66,56 +70,74 @@ public class AbstractRestUploaderTest {
         captor = ArgumentCaptor.forClass(HttpUriRequest.class);
     }
 
-    public void setUpExecuteCaptor() throws IOException {
-        verify(mockHttpClient).execute(captor.capture());
+    public void setUpExecuteCaptor(int status) throws IOException {
+        HttpResponse response = new BasicHttpResponse(
+                new BasicStatusLine(new ProtocolVersion("mock", 1, 2), status, ""));
+        when(mockHttpClient.execute(captor.capture())).thenReturn(response);
     }
 
     @Test
     public void testUploads_isPost() throws Exception {
+        setUpExecuteCaptor(200);
         restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
-        setUpExecuteCaptor();
         assertThat(captor.getValue().getMethod(), is("POST"));
     }
 
     @Test
     public void testUploads_setsUrl() throws Exception {
+        setUpExecuteCaptor(200);
         restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
-        setUpExecuteCaptor();
         assertThat(captor.getValue().getURI(), is(not(nullValue())));
         assertThat(captor.getValue().getURI().toString(), is("http://test.com/endpoint"));
     }
 
     @Test
     public void testUploads_setsContentType() throws Exception {
+        setUpExecuteCaptor(200);
         restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
-        setUpExecuteCaptor();
         assertThat(captor.getValue().getFirstHeader("Content-Type"), is(not(nullValue())));
         assertThat(captor.getValue().getFirstHeader("Content-Type").getValue(),
                 is("application/json"));
     }
 
     @Test
-    public void testUploads_setsAccept() throws Exception{
+    public void testUploads_setsAccept() throws Exception {
+        setUpExecuteCaptor(200);
         restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
-        setUpExecuteCaptor();
         assertThat(captor.getValue().getFirstHeader("Accept"), is(not(nullValue())));
         assertThat(captor.getValue().getFirstHeader("Accept").getValue(), is("application/json"));
     }
 
     @Test
     public void testUploads_setsExtraHeaders() throws Exception {
+        setUpExecuteCaptor(200);
         restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
-        setUpExecuteCaptor();
         assertThat(captor.getValue().getFirstHeader("key").getValue(), is("value"));
     }
 
     @Test
     public void testUploads_setsEntity() throws IOException {
+        setUpExecuteCaptor(200);
         restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
-        setUpExecuteCaptor();
         HttpPost post = (HttpPost) captor.getValue();
         String entity = CharStreams.toString(new InputStreamReader(post.getEntity().getContent()));
         assertThat(entity, containsString("jsonKey"));
         assertThat(entity, containsString("jsonValue"));
+    }
+
+    @Test
+    public void testUploads_200StatusCodeReturnsTrue() throws IOException {
+        setUpExecuteCaptor(200);
+        boolean result = restUploader.uploadGlucoseDataSets(
+                Lists.newArrayList(mockGlucoseDataSet()));
+        assertThat(result, is(true));
+    }
+
+    @Test
+    public void testUploads_Non200StatusCodeReturnsFalse() throws IOException {
+        setUpExecuteCaptor(400);
+        boolean result = restUploader.uploadGlucoseDataSets(
+                Lists.newArrayList(mockGlucoseDataSet()));
+        assertThat(result, is(false));
     }
 }

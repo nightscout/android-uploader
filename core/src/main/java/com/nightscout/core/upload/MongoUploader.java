@@ -7,6 +7,7 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.WriteConcern;
+import com.mongodb.WriteResult;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.records.DeviceStatus;
 import com.nightscout.core.dexcom.records.CalRecord;
@@ -40,19 +41,19 @@ public class MongoUploader extends BaseUploader {
         this.dsCollectionName = dsCollectionName.trim();
     }
 
-    public MongoClient getClient() {
+    public MongoClient getClient() throws IOException {
         if (client != null) {
             return client;
         }
         try {
             this.client = new MongoClient(dbUri);
         } catch (UnknownHostException e) {
-            log.error("Error connection to mongo uri {}.", dbUri.toString());
+            throw new IOException("Error connecting to mongo host " + dbUri.getURI(), e);
         }
         return this.client;
     }
 
-    public DB getDB() {
+    public DB getDB() throws IOException {
         if (db != null) {
             return db;
         }
@@ -60,7 +61,7 @@ public class MongoUploader extends BaseUploader {
         return db;
     }
 
-    public DBCollection getCollection() {
+    public DBCollection getCollection() throws IOException {
         if (collection != null) {
             return collection;
         }
@@ -68,7 +69,7 @@ public class MongoUploader extends BaseUploader {
         return collection;
     }
 
-    public DBCollection getDeviceStatusCollection() {
+    public DBCollection getDeviceStatusCollection() throws IOException {
         if (deviceStatusCollection != null) {
             return deviceStatusCollection;
         }
@@ -137,32 +138,34 @@ public class MongoUploader extends BaseUploader {
         return output;
     }
 
-    private void upsert(BasicDBObject dbObject) {
-        upsert(getCollection(), dbObject);
+    private boolean upsert(BasicDBObject dbObject) throws IOException {
+        return upsert(getCollection(), dbObject);
     }
 
-    private void upsert(DBCollection collection, DBObject dbObject) {
-        collection.update(dbObject, dbObject, true, false, WriteConcern.UNACKNOWLEDGED);
-    }
-
-    @Override
-    protected void doUpload(GlucoseDataSet glucoseDataSet) throws IOException {
-        upsert(toBasicDBObject(glucoseDataSet));
+    private boolean upsert(DBCollection collection, DBObject dbObject) {
+        WriteResult result = collection.update(dbObject, dbObject, true, false,
+                WriteConcern.UNACKNOWLEDGED);
+        return result.getError() == null;
     }
 
     @Override
-    protected void doUpload(MeterRecord meterRecord) throws IOException {
-        upsert(toBasicDBObject(meterRecord));
+    protected boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException {
+        return upsert(toBasicDBObject(glucoseDataSet));
     }
 
     @Override
-    protected void doUpload(CalRecord calRecord) throws IOException {
-        upsert(toBasicDBObject(calRecord));
+    protected boolean doUpload(MeterRecord meterRecord) throws IOException {
+        return upsert(toBasicDBObject(meterRecord));
     }
 
     @Override
-    protected void doUpload(DeviceStatus deviceStatus) {
-        upsert(getDeviceStatusCollection(), toBasicDBObject(deviceStatus));
+    protected boolean doUpload(CalRecord calRecord) throws IOException {
+        return upsert(toBasicDBObject(calRecord));
+    }
+
+    @Override
+    protected boolean doUpload(DeviceStatus deviceStatus) throws IOException {
+        return upsert(getDeviceStatusCollection(), toBasicDBObject(deviceStatus));
     }
 
 }
