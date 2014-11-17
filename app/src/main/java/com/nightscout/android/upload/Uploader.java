@@ -1,14 +1,13 @@
 package com.nightscout.android.upload;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.common.collect.Lists;
 import com.mongodb.MongoClientURI;
 import com.nightscout.android.MainActivity;
-import com.nightscout.android.preferences.AndroidPreferences;
+import com.nightscout.android.R;
+import com.nightscout.android.ToastReceiver;
 import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.MeterRecord;
@@ -29,20 +28,18 @@ public class Uploader {
     private final List<BaseUploader> uploaders;
     private int uploaderCount=0;
 
-    public Uploader(Context context) {
+    public Uploader(Context context, NightscoutPreferences preferences) {
         checkNotNull(context);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        NightscoutPreferences preferences = new AndroidPreferences(prefs);
         uploaders = Lists.newArrayList();
         if (preferences.isMongoUploadEnabled()) {
-            initializeMongoUploader(preferences);
+            initializeMongoUploader(context, preferences);
         }
         if (preferences.isRestApiEnabled()) {
-            initializeRestUploaders(preferences);
+            initializeRestUploaders(context, preferences);
         }
     }
 
-    private void initializeMongoUploader(NightscoutPreferences preferences) {
+    private void initializeMongoUploader(Context context, NightscoutPreferences preferences) {
         String dbURI = preferences.getMongoClientUri();
         String collectionName = preferences.getMongoCollection();
         String dsCollectionName = preferences.getMongoDeviceStatusCollection();
@@ -52,21 +49,29 @@ public class Uploader {
             uri = new MongoClientURI(dbURI);
         } catch (IllegalArgumentException e) {
             Log.e(LOG_TAG, "Error creating mongo client uri for " + dbURI + ".", e);
+            context.sendBroadcast(ToastReceiver.createIntent(context, R.string.unknown_mongo_host));
             return;
         } catch (NullPointerException e) {
             Log.e(LOG_TAG, "Error creating mongo client uri for null value.", e);
+            context.sendBroadcast(ToastReceiver.createIntent(context, R.string.unknown_mongo_host));
             return;
         }
         uploaders.add(new MongoUploader(preferences, uri, collectionName, dsCollectionName));
     }
 
-    private void initializeRestUploaders(NightscoutPreferences preferences) {
+    private void initializeRestUploaders(Context context, NightscoutPreferences preferences) {
         List<String> baseUrisSetting = preferences.getRestApiBaseUris();
         List<URI> baseUris = Lists.newArrayList();
         for (String baseURLSetting : baseUrisSetting) {
             String baseUriString = baseURLSetting.trim();
             if (baseUriString.isEmpty()) continue;
-            baseUris.add(URI.create(baseUriString));
+            try {
+                baseUris.add(URI.create(baseUriString));
+            } catch (IllegalArgumentException e) {
+                Log.e(LOG_TAG, "Error creating rest uri from preferences.", e);
+                context.sendBroadcast(
+                        ToastReceiver.createIntent(context, R.string.illegal_rest_url));
+            }
         }
 
         uploaderCount += baseUris.size();
@@ -76,6 +81,8 @@ public class Uploader {
                     uploaders.add(new RestV1Uploader(preferences, baseUri));
                 } catch (IllegalArgumentException e) {
                     Log.e(LOG_TAG, "Error initializing rest v1 uploader.", e);
+                    context.sendBroadcast(
+                            ToastReceiver.createIntent(context, R.string.illegal_rest_url));
                 }
             } else {
                 uploaders.add(new RestLegacyUploader(preferences, baseUri));
