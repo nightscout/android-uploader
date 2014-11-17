@@ -54,6 +54,8 @@ public class MainActivity extends Activity {
     // Receivers
     private CGMStatusReceiver mCGMStatusReceiver;
 
+    private ToastReceiver toastReceiver;
+
     // Member components
     private Handler mHandler = new Handler();
     private Context mContext;
@@ -101,6 +103,11 @@ public class MainActivity extends Activity {
         IntentFilter filter = new IntentFilter(CGMStatusReceiver.PROCESS_RESPONSE);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(mCGMStatusReceiver, filter);
+
+        toastReceiver = new ToastReceiver();
+        IntentFilter toastFilter = new IntentFilter(ToastReceiver.ACTION_SEND_NOTIFICATION);
+        toastFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(toastReceiver, toastFilter);
 
         // Setup UI components
         setContentView(R.layout.activity_main);
