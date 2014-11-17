@@ -9,13 +9,16 @@ import com.nightscout.core.upload.RestLegacyUploader;
 import com.nightscout.core.upload.RestV1Uploader;
 
 import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
-import org.hamcrest.core.Is;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class UploaderTest extends BaseTest {
     private Uploader uploader;
@@ -27,13 +30,13 @@ public class UploaderTest extends BaseTest {
 
     public void testInitialize_NoPrefs() {
         uploader = new Uploader(getContext());
-        assertThat(uploader.getUploaders(), Is.is(Matchers.empty()));
+        assertThat(uploader.getUploaders(), is(empty()));
     }
 
     public void testInitialize_MongoNoUri() {
         getPreferences().edit().putBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED, true).commit();
         uploader = new Uploader(getContext());
-        assertThat(uploader.getUploaders(), Is.is(Matchers.empty()));
+        assertThat(uploader.getUploaders(), is(empty()));
     }
 
     public void testInitialize_MongoInvalidUri() {
@@ -42,7 +45,7 @@ public class UploaderTest extends BaseTest {
                 .putString(PreferenceKeys.MONGO_URI, "http://test.com")
                 .commit();
         uploader = new Uploader(getContext());
-        assertThat(uploader.getUploaders(), Is.is(Matchers.empty()));
+        assertThat(uploader.getUploaders(), is(empty()));
     }
 
     public void testInitialize_MongoValidUri() {
@@ -51,7 +54,7 @@ public class UploaderTest extends BaseTest {
                 .putString(PreferenceKeys.MONGO_URI, "mongodb://test.com")
                 .commit();
         uploader = new Uploader(getContext());
-        assertThat(uploader.getUploaders(), Matchers.hasSize(1));
+        assertThat(uploader.getUploaders(), hasSize(1));
     }
 
     public void testInitialize_MongoValidCollection() {
@@ -62,9 +65,9 @@ public class UploaderTest extends BaseTest {
                 .commit();
         uploader = new Uploader(getContext());
         MongoUploader mongoUploader = (MongoUploader) uploader.getUploaders().get(0);
-        mongoUploader.setDB(Mockito.mock(DB.class));
+        mongoUploader.setDB(mock(DB.class));
         ArgumentCaptor<String> collectionName = ArgumentCaptor.forClass(String.class);
-        Mockito.when(mongoUploader.getDB().getCollection(collectionName.capture())).thenReturn(null);
+        when(mongoUploader.getDB().getCollection(collectionName.capture())).thenReturn(null);
         mongoUploader.getCollection();
         MatcherAssert.assertThat(collectionName.getValue(), is("collection"));
     }
@@ -77,9 +80,9 @@ public class UploaderTest extends BaseTest {
                 .commit();
         uploader = new Uploader(getContext());
         MongoUploader mongoUploader = (MongoUploader) uploader.getUploaders().get(0);
-        mongoUploader.setDB(Mockito.mock(DB.class));
+        mongoUploader.setDB(mock(DB.class));
         ArgumentCaptor<String> collectionName = ArgumentCaptor.forClass(String.class);
-        Mockito.when(mongoUploader.getDB().getCollection(collectionName.capture())).thenReturn(null);
+        when(mongoUploader.getDB().getCollection(collectionName.capture())).thenReturn(null);
         mongoUploader.getDeviceStatusCollection();
         MatcherAssert.assertThat(collectionName.getValue(), is("dscollection"));
     }
@@ -87,7 +90,7 @@ public class UploaderTest extends BaseTest {
     public void testInitialize_Api() {
         getPreferences().edit().putBoolean(PreferenceKeys.API_UPLOADER_ENABLED, true).commit();
         uploader = new Uploader(getContext());
-        assertThat(uploader.getUploaders(), Is.is(Matchers.empty()));
+        assertThat(uploader.getUploaders(), is(empty()));
     }
 
     public void testInitialize_ApiLegacy() {
@@ -96,9 +99,9 @@ public class UploaderTest extends BaseTest {
                 .putString(PreferenceKeys.API_URIS, "http://test.com/legacy")
                 .commit();
         uploader = new Uploader(getContext());
-        assertThat(uploader.getUploaders(), Matchers.hasSize(1));
+        assertThat(uploader.getUploaders(), hasSize(1));
         AbstractRestUploader restUploader = (AbstractRestUploader) uploader.getUploaders().get(0);
-        assertThat(restUploader, Is.is(Matchers.instanceOf(RestLegacyUploader.class)));
+        assertThat(restUploader, is(instanceOf(RestLegacyUploader.class)));
         assertThat(restUploader.getUri().toString(), is("http://test.com/legacy"));
     }
 
@@ -108,7 +111,7 @@ public class UploaderTest extends BaseTest {
                 .putString(PreferenceKeys.API_URIS, "http://test.com/v1")
                 .commit();
         uploader = new Uploader(getContext());
-        assertThat(uploader.getUploaders(), Matchers.hasSize(0));
+        assertThat(uploader.getUploaders(), hasSize(0));
     }
 
     public void testInitialize_Apiv1() {
@@ -117,9 +120,9 @@ public class UploaderTest extends BaseTest {
                 .putString(PreferenceKeys.API_URIS, "http://123@test.com/v1")
                 .commit();
         uploader = new Uploader(getContext());
-        assertThat(uploader.getUploaders(), Matchers.hasSize(1));
+        assertThat(uploader.getUploaders(), hasSize(1));
         AbstractRestUploader restUploader = (AbstractRestUploader) uploader.getUploaders().get(0);
-        assertThat(restUploader, Is.is(Matchers.instanceOf(RestV1Uploader.class)));
+        assertThat(restUploader, is(instanceOf(RestV1Uploader.class)));
         assertThat(restUploader.getUri().toString(), is("http://test.com/v1"));
     }
 
@@ -129,9 +132,9 @@ public class UploaderTest extends BaseTest {
                 .putString(PreferenceKeys.API_URIS, "http://123@test.com/v1 http://test.com/legacy")
                 .commit();
         uploader = new Uploader(getContext());
-        assertThat(uploader.getUploaders(), Matchers.hasSize(2));
-        assertThat(uploader.getUploaders(), Matchers.containsInAnyOrder(
-                Matchers.instanceOf(RestV1Uploader.class), Matchers.instanceOf(RestLegacyUploader.class)));
+        assertThat(uploader.getUploaders(), hasSize(2));
+        assertThat(uploader.getUploaders(), containsInAnyOrder(
+                instanceOf(RestV1Uploader.class), instanceOf(RestLegacyUploader.class)));
     }
 
     public void testInitialize_RestAndMongo() {
@@ -143,8 +146,8 @@ public class UploaderTest extends BaseTest {
                 .putString(PreferenceKeys.MONGO_COLLECTION, "collection")
                 .commit();
         uploader = new Uploader(getContext());
-        assertThat(uploader.getUploaders(), Matchers.hasSize(2));
-        assertThat(uploader.getUploaders(), Matchers.containsInAnyOrder(
-                Matchers.instanceOf(RestV1Uploader.class), Matchers.instanceOf(MongoUploader.class)));
+        assertThat(uploader.getUploaders(), hasSize(2));
+        assertThat(uploader.getUploaders(), containsInAnyOrder(
+                instanceOf(RestV1Uploader.class), instanceOf(MongoUploader.class)));
     }
 }

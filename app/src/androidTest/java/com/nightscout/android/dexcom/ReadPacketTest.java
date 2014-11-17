@@ -4,8 +4,9 @@ import com.google.common.primitives.UnsignedBytes;
 
 import junit.framework.TestCase;
 
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.core.Is;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+
 
 public class ReadPacketTest extends TestCase {
 
@@ -23,18 +24,18 @@ public class ReadPacketTest extends TestCase {
     };
 
     public void testReadPacket_command() {
-        MatcherAssert.assertThat(new ReadPacket(testPacket).getCommand(), Is.is(0x5));
+        assertThat(new ReadPacket(testPacket).getCommand(), is(0x5));
     }
 
     public void testReadPacket_data() {
-        MatcherAssert.assertThat(new ReadPacket(testPacket).getData(), Is.is(new byte[]{0x10, 0x15}));
+        assertThat(new ReadPacket(testPacket).getData(), is(new byte[]{0x10, 0x15}));
     }
 
     public void testReadPacket_noDataPacket_command() {
-        MatcherAssert.assertThat(new ReadPacket(testPacketNoData).getCommand(), Is.is(0x1A));
+        assertThat(new ReadPacket(testPacketNoData).getCommand(), is(0x1A));
     }
 
     public void testReadPacket_noDataPacket_emptyData() {
-        MatcherAssert.assertThat(new ReadPacket(testPacketNoData).getData(), Is.is(new byte[]{}));
+        assertThat(new ReadPacket(testPacketNoData).getData(), is(new byte[]{}));
     }
 }
