@@ -8,6 +8,9 @@ before_install:
 before_script:
 - "./ci/wait_for_emulator"
 - adb shell input keyevent 82 &
+cache:
+  directories:
+  - gradle/wrapper/dist
 android:
   components:
   - build-tools-19.1.0
