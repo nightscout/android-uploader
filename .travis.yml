@@ -5,6 +5,9 @@ env:
 before_install:
 - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
 - emulator -avd test -no-skin -no-audio -no-window &
+cache:
+  directories:
+    - $HOME/.gradle
 before_script:
 - "./ci/wait_for_emulator"
 - adb shell input keyevent 82 &
@@ -17,7 +20,7 @@ android:
   licenses:
   - android-sdk-license-5be876d5
   - ".*intel.+"
-script: TERM=dumb ./gradlew assembleDebug
+script: TERM=dumb ./gradlew test connectedAndroidTest
 deploy:
   provider: releases
   file: "./app/build/outputs/apk/app-debug.apk"

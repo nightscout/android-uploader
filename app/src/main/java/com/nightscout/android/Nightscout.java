@@ -27,7 +27,6 @@ import org.acra.annotation.*;
         mode = ReportingInteractionMode.TOAST,
         logcatArguments = { "-t", "250", "-v", "time" }
 )
-
 public class Nightscout extends Application {
     private final String TAG = MainActivity.class.getSimpleName();
     private Tracker tracker = null;

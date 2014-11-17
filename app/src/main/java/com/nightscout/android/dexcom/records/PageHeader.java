@@ -1,9 +1,9 @@
 package com.nightscout.android.dexcom.records;
 
-import com.nightscout.android.dexcom.CRC16;
-import com.nightscout.android.dexcom.CRCFailRuntimeException;
-import com.nightscout.android.dexcom.Constants;
-import com.nightscout.android.dexcom.Utils;
+import com.nightscout.core.dexcom.CRC16;
+import com.nightscout.core.dexcom.CRCFailRuntimeException;
+import com.nightscout.core.dexcom.Constants;
+import com.nightscout.core.dexcom.Utils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
