@@ -45,6 +45,7 @@ public class UploaderTest extends BaseTest {
                 .commit();
         uploader = new Uploader(getContext());
         assertThat(uploader.getUploaders(), is(empty()));
+        assertEquals(uploader.getUploaderCount(),1);
     }
 
     public void testInitialize_MongoValidUri() {

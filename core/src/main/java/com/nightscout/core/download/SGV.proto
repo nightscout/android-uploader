@@ -1,4 +1,4 @@
-option java_package = "com.nightscout.core.protobuf";
+option java_package = "com.nightscout.core.download";
 option java_outer_classname = "SGV";
 
 message CookieMonsterG4Download {
@@ -8,7 +8,8 @@ message CookieMonsterG4Download {
         MMOL = 1;
     }
     optional Unit units = 2; // Units reported by the device
-    required uint64 download_timestamp = 3;  // Timestamp of the download - should be UTC
+    required string download_timestamp = 3;  // ISO8601 timestamp reported by uploader
+    optional uint64 receiver_system_time = 4; // Raw value of the receiver's system time
     enum DownloadStatus {
         SUCCESS = 0;
         NO_DATA = 1;
@@ -18,12 +19,13 @@ message CookieMonsterG4Download {
         NONE = 6;
         UNKNOWN = 7;
     }
-    optional DownloadStatus download_status = 4 [default = NONE];  // Status of the download
-    optional uint32 receiver_battery = 5; // Battery level as reported by the receiver
-    optional uint32 uploader_battery = 6; // Battery level as reported by the uploader
-    repeated CookieMonsterG4Meter meter = 7;
-    repeated CookieMonsterG4Sensor sensor = 8;
-    repeated CookieMonsterG4Cal cal = 9;
+    optional DownloadStatus download_status = 5 [default = NONE];  // Status of the download
+    optional uint32 receiver_battery = 6; // Battery level as reported by the receiver
+    optional uint32 uploader_battery = 7; // Battery level as reported by the uploader
+    repeated CookieMonsterG4Meter meter = 8;
+    repeated CookieMonsterG4Sensor sensor = 9;
+    repeated CookieMonsterG4Cal cal = 10;
+    optional string patient_name = 11;
 }
 
 

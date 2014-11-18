@@ -58,6 +58,12 @@ public abstract class BaseUploader {
         return output;
     }
 
+    /**
+     * Uploads the meter records
+     *
+     * @param meterRecords
+     * @return True if the upload was successful, false if the upload was unsuccessful
+     */
     public final boolean uploadMeterRecords(List<MeterRecord> meterRecords) {
         if (meterRecords == null) {
             return true;
@@ -74,6 +80,12 @@ public abstract class BaseUploader {
         return output;
     }
 
+    /**
+     * Uploads the calibration records
+     *
+     * @param calRecords
+     * @return True if the upload was successful, false if the upload was unsuccessful
+     */
     public final boolean uploadCalRecords(List<CalRecord> calRecords) {
         if (calRecords == null) {
             return true;
@@ -92,6 +104,12 @@ public abstract class BaseUploader {
         return output;
     }
 
+    /**
+     * Uploads the device status
+     *
+     * @param deviceStatus
+     * @return True if the upload was successful or False if the upload was unsuccessful
+     */
     public final boolean uploadDeviceStatus(DeviceStatus deviceStatus) {
         if (deviceStatus == null) {
             return true;

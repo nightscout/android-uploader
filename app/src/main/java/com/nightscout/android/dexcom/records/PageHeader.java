@@ -1,7 +1,7 @@
 package com.nightscout.android.dexcom.records;
 
 import com.nightscout.core.dexcom.CRC16;
-import com.nightscout.core.dexcom.CRCFailRuntimeException;
+import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.Constants;
 import com.nightscout.core.dexcom.Utils;
 
@@ -43,7 +43,7 @@ public class PageHeader {
         System.arraycopy(packet,HEADER_SIZE-Constants.CRC_LEN,crc,0,Constants.CRC_LEN);
         byte[] crc_calc = CRC16.calculate(packet,0,HEADER_SIZE - Constants.CRC_LEN);
         if (!Arrays.equals(this.crc, crc_calc)) {
-            throw new CRCFailRuntimeException("CRC check failed: " + Utils.bytesToHex(this.crc) + " vs " + Utils.bytesToHex(crc_calc));
+            throw new CRCFailError("CRC check failed: " + Utils.bytesToHex(this.crc) + " vs " + Utils.bytesToHex(crc_calc));
         }
 
     }

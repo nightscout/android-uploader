@@ -27,7 +27,7 @@ public class SensorRecord extends GenericTimestampRecord {
         return filtered;
     }
 
-    public int getRSSI() {
+    public int getRssi() {
         return rssi;
     }
 }

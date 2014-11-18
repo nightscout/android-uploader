@@ -20,15 +20,15 @@ import com.nightscout.android.R;
 import com.nightscout.android.dexcom.USB.USBPower;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.USB.UsbSerialProber;
+import com.nightscout.android.upload.Uploader;
+import com.nightscout.core.dexcom.CRCFailError;
+import com.nightscout.core.dexcom.Constants;
+import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.SensorRecord;
-import com.nightscout.android.upload.Uploader;
-import com.nightscout.core.dexcom.CRCFailRuntimeException;
-import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.dexcom.Constants;
 
 import org.json.JSONArray;
 
@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import java.util.List;
 
 import static org.joda.time.Duration.standardMinutes;
@@ -194,7 +193,7 @@ public class SyncingService extends IntentService {
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("IndexOutOfBoundsException")
                         .setFatal(false)
                         .build());
-            } catch (CRCFailRuntimeException e){
+            } catch (CRCFailError e){
                 // FIXME: may consider localizing this catch at a lower level (like ReadData) so that
                 // if the CRC check fails on one type of record we can capture the values if it
                 // doesn't fail on other types of records. This means we'd need to broadcast back

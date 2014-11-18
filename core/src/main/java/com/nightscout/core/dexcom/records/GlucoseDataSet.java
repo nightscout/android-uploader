@@ -22,7 +22,7 @@ public class GlucoseDataSet {
         trend = egvRecord.getTrend();
         unfiltered = sensorRecord.getUnfiltered();
         filtered = sensorRecord.getFiltered();
-        rssi = sensorRecord.getRSSI();
+        rssi = sensorRecord.getRssi();
     }
 
     public Date getSystemTime() {

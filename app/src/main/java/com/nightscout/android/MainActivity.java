@@ -24,10 +24,10 @@ import android.widget.TextView;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.nightscout.core.dexcom.Constants;
 import com.nightscout.android.dexcom.SyncingService;
-import com.nightscout.core.dexcom.Utils;
 import com.nightscout.android.settings.SettingsActivity;
+import com.nightscout.core.dexcom.Constants;
+import com.nightscout.core.dexcom.Utils;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -313,18 +313,19 @@ public class MainActivity extends Activity {
     BroadcastReceiver mDeviceStatusReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
-                statusBarIcons.setUSB(false);
-                statusBarIcons.setUpload(false);
-                mHandler.removeCallbacks(syncCGM);
-            } else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
-                statusBarIcons.setUSB(true);
-                Log.d(TAG, "Starting syncing on USB attached...");
-                SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
-                //TODO: consider getting permission programmatically instead of user prompted
-                //if decided to need to add android.permission.USB_PERMISSION in manifest
-            } else if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
-                batLevel = intent.getIntExtra("level", 0);
+            switch (action) {
+                case UsbManager.ACTION_USB_DEVICE_DETACHED:
+                    statusBarIcons.setDefaults();
+                    mHandler.removeCallbacks(syncCGM);
+                    break;
+                case UsbManager.ACTION_USB_DEVICE_ATTACHED:
+                    statusBarIcons.setUSB(true);
+                    Log.d(TAG, "Starting syncing on USB attached...");
+                    SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
+                    break;
+                case Intent.ACTION_BATTERY_CHANGED:
+                    batLevel = intent.getIntExtra("level", 0);
+                    break;
             }
         }
     };
