@@ -97,7 +97,75 @@
         <item>1</item>
     </string-array>
     
-    
+    <!-- Low range setting (60-120)-->
+    <string name="pref_title_low_range">Low Range</string>
+    <string-array name="perf_low_range_entries">
+        <item>60</item>
+        <item>65</item>
+        <item>70</item>
+        <item>75</item>
+        <item>80</item>
+        <item>85</item>
+        <item>90</item>
+        <item>95</item>
+        <item>100</item>
+        <item>105</item>
+        <item>110</item>
+        <item>115</item>
+        <item>120</item>        
+    </string-array>
+
+    <!-- High range setting (160-250)-->
+    <string name="pref_title_high_range">High Range</string>
+    <string-array name="perf_high_range_entries">
+        <item>160</item>
+        <item>170</item>
+        <item>180</item>
+        <item>190</item>
+        <item>200</item>
+        <item>210</item>
+        <item>220</item>
+        <item>230</item>
+        <item>240</item>
+        <item>250</item>
+    </string-array>
+
+    <!-- Low range setting mmol(3.4-6.8)-->
+    <string-array name="perf_low_range_entries_mmol">
+        <item>3.4</item>
+        <item>3.6</item>
+        <item>3.8</item>
+        <item>4.0</item>
+        <item>4.2</item>
+        <item>4.4</item>
+        <item>4.6</item>
+        <item>4.8</item>
+        <item>5.0</item>
+        <item>5.2</item>
+        <item>5.4</item>
+        <item>5.6</item>
+        <item>5.8</item>        
+        <item>6.0</item>
+        <item>6.2</item>
+        <item>6.4</item>
+        <item>6.6</item>
+        <item>6.8</item>                
+        </string-array>
+
+    <!-- High range setting mmol (9.0-14)-->
+    <string-array name="perf_high_range_entries_mmol">
+        <item>9.0</item>
+        <item>9.5</item>
+        <item>10.0</item>
+        <item>10.5</item>
+        <item>11.0</item>
+        <item>11.5</item>
+        <item>12.0</item>
+        <item>12.5</item>
+        <item>13.0</item>
+        <item>13.5</item>
+        <item>14.0</item>        
+    </string-array>
     
 
     <!-- About Settings -->

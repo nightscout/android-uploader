@@ -22,4 +22,26 @@
         android:positiveButtonText="@null">
     </ListPreference>
 
+     <ListPreference
+        android:dependency="i_understand"
+        android:key="display_low_range"
+        android:title="@string/pref_title_low_range"
+        android:entries="@array/perf_low_range_entries"
+        android:entryValues="@array/perf_low_range_entries"
+        android:defaultValue="80"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null">
+     </ListPreference>    
+
+     <ListPreference
+        android:dependency="i_understand"
+        android:key="display_high_range"
+        android:title="@string/pref_title_high_range"
+        android:entries="@array/perf_high_range_entries"
+        android:entryValues="@array/perf_high_range_entries"
+        android:defaultValue="180"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null">
+     </ListPreference>    
+    
 </PreferenceScreen>
