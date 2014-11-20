@@ -217,7 +217,9 @@ public class MainActivity extends Activity {
         }
 
         mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) +"," + 
-                                                     Boolean.toString(isLogritmic) +")");
+                                                     Boolean.toString(isLogritmic) + ","+ 
+                                                     prefs.getString("display_low_range", "80") + "," +
+                                                     prefs.getString("display_high_range", "180") + ")");
 
         mHandler.post(updateTimeAgo);
         // FIXME: (klee) need to find a better way to do this. Too many things are hooking in here.
