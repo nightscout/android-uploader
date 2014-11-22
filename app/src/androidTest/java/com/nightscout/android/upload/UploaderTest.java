@@ -45,7 +45,15 @@ public class UploaderTest extends BaseTest {
                 .commit();
         uploader = new Uploader(getContext());
         assertThat(uploader.getUploaders(), is(empty()));
-        assertEquals(uploader.getUploaderCount(),1);
+    }
+
+    public void testInitialize_MongoInvalidUriFailsUpload() {
+        getPreferences().edit()
+                .putBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED, true)
+                .putString(PreferenceKeys.MONGO_URI, "http://test.com")
+                .commit();
+        uploader = new Uploader(getContext());
+        assertThat(uploader.areAllUploadersInitialized(), is(false));
     }
 
     public void testInitialize_MongoValidUri() {
