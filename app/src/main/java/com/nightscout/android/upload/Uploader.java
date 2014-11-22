@@ -5,402 +5,119 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.MongoClient;
+import com.google.common.collect.Lists;
 import com.mongodb.MongoClientURI;
-import com.mongodb.WriteConcern;
-
 import com.nightscout.android.MainActivity;
-import com.nightscout.android.dexcom.records.CalRecord;
-import com.nightscout.android.dexcom.records.GlucoseDataSet;
-import com.nightscout.android.dexcom.records.MeterRecord;
+import com.nightscout.android.preferences.AndroidPreferences;
+import com.nightscout.core.dexcom.records.CalRecord;
+import com.nightscout.core.dexcom.records.GlucoseDataSet;
+import com.nightscout.core.dexcom.records.MeterRecord;
+import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.records.DeviceStatus;
+import com.nightscout.core.upload.BaseUploader;
+import com.nightscout.core.upload.MongoUploader;
+import com.nightscout.core.upload.RestLegacyUploader;
+import com.nightscout.core.upload.RestV1Uploader;
 
-import org.apache.http.Header;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.json.JSONObject;
+import java.net.URI;
+import java.util.List;
 
-import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Date;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class Uploader {
-    private static final String TAG = Uploader.class.getSimpleName();
-    private static final int SOCKET_TIMEOUT = 60000;
-    private static final int CONNECTION_TIMEOUT = 30000;
-    private Context mContext;
-    private Boolean enableRESTUpload;
-    private Boolean enableMongoUpload;
-    private SharedPreferences prefs;
+    private static final String LOG_TAG = Uploader.class.getSimpleName();
+    private final List<BaseUploader> uploaders;
+    private int uploaderCount=0;
 
     public Uploader(Context context) {
-        mContext = context;
-        prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        enableRESTUpload = prefs.getBoolean("cloud_storage_api_enable", false);
-        enableMongoUpload = prefs.getBoolean("cloud_storage_mongodb_enable", false);
-    }
-
-    public boolean upload(GlucoseDataSet glucoseDataSet, MeterRecord meterRecord, CalRecord calRecord) {
-        GlucoseDataSet[] glucoseDataSets = new GlucoseDataSet[1];
-        glucoseDataSets[0] = glucoseDataSet;
-        MeterRecord[] meterRecords = new MeterRecord[1];
-        meterRecords[0] = meterRecord;
-        CalRecord[] calRecords = new CalRecord[1];
-        calRecords[0] = calRecord;
-        return upload(glucoseDataSets, meterRecords, calRecords);
-    }
-
-    public boolean upload(GlucoseDataSet[] glucoseDataSets, MeterRecord[] meterRecords, CalRecord[] calRecords) {
-
-        boolean mongoStatus = false;
-        boolean apiStatus = false;
-
-        if (enableRESTUpload) {
-            long start = System.currentTimeMillis();
-            Log.i(TAG, String.format("Starting upload of %s record using a REST API", glucoseDataSets.length));
-            apiStatus = doRESTUpload(prefs, glucoseDataSets, meterRecords, calRecords);
-            Log.i(TAG, String.format("Finished upload of %s record using a REST API in %s ms", glucoseDataSets.length, System.currentTimeMillis() - start));
+        checkNotNull(context);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        NightscoutPreferences preferences = new AndroidPreferences(prefs);
+        uploaders = Lists.newArrayList();
+        if (preferences.isMongoUploadEnabled()) {
+            initializeMongoUploader(preferences);
         }
-
-        if (enableMongoUpload) {
-            long start = System.currentTimeMillis();
-            Log.i(TAG, String.format("Starting upload of %s record using a Mongo", glucoseDataSets.length));
-            mongoStatus = doMongoUpload(prefs, glucoseDataSets, meterRecords, calRecords);
-            Log.i(TAG, String.format("Finished upload of %s record using a Mongo in %s ms", glucoseDataSets.length + meterRecords.length, System.currentTimeMillis() - start));
+        if (preferences.isRestApiEnabled()) {
+            initializeRestUploaders(preferences);
         }
-
-        return apiStatus || mongoStatus;
     }
 
-    private boolean doRESTUpload(SharedPreferences prefs, GlucoseDataSet[] glucoseDataSets, MeterRecord[] meterRecords, CalRecord[] calRecords) {
-        String baseURLSettings = prefs.getString("cloud_storage_api_base", "");
-        ArrayList<String> baseURIs = new ArrayList<String>();
-
+    private void initializeMongoUploader(NightscoutPreferences preferences) {
+        String dbURI = preferences.getMongoClientUri();
+        String collectionName = preferences.getMongoCollection();
+        String dsCollectionName = preferences.getMongoDeviceStatusCollection();
+        MongoClientURI uri;
         try {
-            for (String baseURLSetting : baseURLSettings.split(" ")) {
-                String baseURL = baseURLSetting.trim();
-                if (baseURL.isEmpty()) continue;
-                baseURIs.add(baseURL + (baseURL.endsWith("/") ? "" : "/"));
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Unable to process API Base URL setting: " + baseURLSettings, e);
-            return false;
+            uploaderCount+=1;
+            uri = new MongoClientURI(dbURI);
+        } catch (IllegalArgumentException e) {
+            Log.e(LOG_TAG, "Error creating mongo client uri for " + dbURI + ".", e);
+            return;
+        } catch (NullPointerException e) {
+            Log.e(LOG_TAG, "Error creating mongo client uri for null value.", e);
+            return;
         }
-
-        for (String baseURI : baseURIs) {
-            try {
-                doRESTUploadTo(baseURI, glucoseDataSets, meterRecords, calRecords);
-            } catch (Exception e) {
-                Log.e(TAG, "Unable to do REST API Upload to: " + baseURI, e);
-                return false;
-            }
-        }
-        return true;
+        uploaders.add(new MongoUploader(preferences, uri, collectionName, dsCollectionName));
     }
 
-    private void doRESTUploadTo(String baseURI, GlucoseDataSet[] glucoseDataSets, MeterRecord[] meterRecords, CalRecord[] calRecords) {
-        try {
-            int apiVersion = 0;
-            if (baseURI.endsWith("/v1/")) apiVersion = 1;
+    private void initializeRestUploaders(NightscoutPreferences preferences) {
+        List<String> baseUrisSetting = preferences.getRestApiBaseUris();
+        List<URI> baseUris = Lists.newArrayList();
+        for (String baseURLSetting : baseUrisSetting) {
+            String baseUriString = baseURLSetting.trim();
+            if (baseUriString.isEmpty()) continue;
+            baseUris.add(URI.create(baseUriString));
+        }
 
-            String baseURL = null;
-            String secret = null;
-            String[] uriParts = baseURI.split("@");
-
-            if (uriParts.length == 1 && apiVersion == 0) {
-                baseURL = uriParts[0];
-            } else if (uriParts.length == 1 && apiVersion > 0) {
-                throw new Exception("Starting with API v1, a pass phase is required");
-            } else if (uriParts.length == 2 && apiVersion > 0) {
-                secret = uriParts[0];
-                baseURL = uriParts[1];
+        uploaderCount += baseUris.size();
+        for (URI baseUri : baseUris) {
+            if (baseUri.getPath().contains("v1")) {
+                try {
+                    uploaders.add(new RestV1Uploader(preferences, baseUri));
+                } catch (IllegalArgumentException e) {
+                    Log.e(LOG_TAG, "Error initializing rest v1 uploader.", e);
+                }
             } else {
-                throw new Exception(String.format("Unexpected baseURI: %s, uriParts.length: %s, apiVersion: %s", baseURI, uriParts.length, apiVersion));
-            }
-
-            String postURL = baseURL + "entries";
-            Log.i(TAG, "postURL: " + postURL);
-
-            HttpParams params = new BasicHttpParams();
-            HttpConnectionParams.setSoTimeout(params, SOCKET_TIMEOUT);
-            HttpConnectionParams.setConnectionTimeout(params, CONNECTION_TIMEOUT);
-
-            DefaultHttpClient httpclient = new DefaultHttpClient(params);
-
-            HttpPost post = new HttpPost(postURL);
-
-            Header apiSecretHeader = null;
-
-            if (apiVersion > 0) {
-                if (secret == null || secret.isEmpty()) {
-                    throw new Exception("Starting with API v1, a pass phase is required");
-                } else {
-                    MessageDigest digest = MessageDigest.getInstance("SHA-1");
-                    byte[] bytes = secret.getBytes("UTF-8");
-                    digest.update(bytes, 0, bytes.length);
-                    bytes = digest.digest();
-                    StringBuilder sb = new StringBuilder(bytes.length * 2);
-                    for (byte b: bytes) {
-                        sb.append(String.format("%02x", b & 0xff));
-                    }
-                    String token = sb.toString();
-                    apiSecretHeader = new BasicHeader("api-secret", token);
-                }
-            }
-
-            if (apiSecretHeader != null) {
-                post.setHeader(apiSecretHeader);
-            }
-
-            for (GlucoseDataSet record : glucoseDataSets) {
-                JSONObject json = new JSONObject();
-
-                try {
-                    if (apiVersion >= 1)
-                        populateV1APIEntry(json, record);
-                    else
-                        populateLegacyAPIEntry(json, record);
-                } catch (Exception e) {
-                    Log.w(TAG, "Unable to populate entry, apiVersion: " + apiVersion, e);
-                    continue;
-                }
-
-                String jsonString = json.toString();
-
-                Log.i(TAG, "SGV JSON: " + jsonString);
-
-                try {
-                    StringEntity se = new StringEntity(jsonString);
-                    post.setEntity(se);
-                    post.setHeader("Accept", "application/json");
-                    post.setHeader("Content-type", "application/json");
-
-                    ResponseHandler responseHandler = new BasicResponseHandler();
-                    httpclient.execute(post, responseHandler);
-                } catch (Exception e) {
-                    Log.w(TAG, "Unable to post data to: '" + post.getURI().toString() + "'", e);
-                }
-            }
-
-            if (apiVersion >= 1) {
-                for (MeterRecord record : meterRecords) {
-                    JSONObject json = new JSONObject();
-
-                    try {
-                        populateV1APIEntry(json, record);
-                    } catch (Exception e) {
-                        Log.w(TAG, "Unable to populate entry, apiVersion: " + apiVersion, e);
-                        continue;
-                    }
-
-                    String jsonString = json.toString();
-                    Log.i(TAG, "MBG JSON: " + jsonString);
-
-                    try {
-                        StringEntity se = new StringEntity(jsonString);
-                        post.setEntity(se);
-                        post.setHeader("Accept", "application/json");
-                        post.setHeader("Content-type", "application/json");
-
-                        ResponseHandler responseHandler = new BasicResponseHandler();
-                        httpclient.execute(post, responseHandler);
-                    } catch (Exception e) {
-                        Log.w(TAG, "Unable to post data to: '" + post.getURI().toString() + "'", e);
-                    }
-                }
-            }
-
-            if (apiVersion >= 1 && prefs.getBoolean("cloud_cal_data", false)) {
-                for (CalRecord calRecord : calRecords) {
-
-                    JSONObject json = new JSONObject();
-
-                    try {
-                        populateV1APIEntry(json, calRecord);
-                    } catch (Exception e) {
-                        Log.w(TAG, "Unable to populate entry, apiVersion: " + apiVersion, e);
-                        continue;
-                    }
-
-                    String jsonString = json.toString();
-                    Log.i(TAG, "CAL JSON: " + jsonString);
-
-                    try {
-                        StringEntity se = new StringEntity(jsonString);
-                        post.setEntity(se);
-                        post.setHeader("Accept", "application/json");
-                        post.setHeader("Content-type", "application/json");
-
-                        ResponseHandler responseHandler = new BasicResponseHandler();
-                        httpclient.execute(post, responseHandler);
-                    } catch (Exception e) {
-                        Log.w(TAG, "Unable to post data to: '" + post.getURI().toString() + "'", e);
-                    }
-                }
-            }
-
-            // TODO: this is a quick port from the original code and needs to be checked before release
-            postDeviceStatus(baseURL, apiSecretHeader, httpclient);
-
-        } catch (Exception e) {
-            Log.e(TAG, "Unable to post data", e);
-        }
-    }
-
-    private void populateV1APIEntry(JSONObject json, GlucoseDataSet record) throws Exception {
-        json.put("device", "dexcom");
-        json.put("date", record.getDisplayTime().getTime());
-        json.put("dateString", record.getDisplayTime().toString());
-        json.put("sgv", Integer.parseInt(String.valueOf(record.getBGValue())));
-        json.put("direction", record.getTrend().friendlyTrendName());
-        json.put("type", "sgv");
-        if (prefs.getBoolean("cloud_sensor_data", false)) {
-            json.put("filtered", record.getFiltered());
-            json.put("unfiltered", record.getUnfiltered());
-            json.put("rssi", record.getRssi());
-        }
-    }
-
-    private void populateLegacyAPIEntry(JSONObject json, GlucoseDataSet record) throws Exception {
-        json.put("device", "dexcom");
-        json.put("date", record.getDisplayTime().getTime());
-        json.put("dateString", record.getDisplayTime().toString());
-        json.put("sgv", Integer.parseInt(String.valueOf(record.getBGValue())));
-        json.put("direction", record.getTrend().friendlyTrendName());
-    }
-
-    private void populateV1APIEntry(JSONObject json, MeterRecord record) throws Exception {
-        json.put("device", "dexcom");
-        json.put("type", "mbg");
-        json.put("date", record.getDisplayTime().getTime());
-        json.put("dateString", record.getDisplayTime().toString());
-        json.put("mbg", Integer.parseInt(String.valueOf(record.getMeterBG())));
-    }
-
-    private void populateV1APIEntry(JSONObject json, CalRecord record) throws Exception {
-        json.put("device", "dexcom");
-        json.put("type", "cal");
-        json.put("date", record.getDisplayTime().getTime());
-        json.put("dateString", record.getDisplayTime().toString());
-        json.put("slope", record.getSlope());
-        json.put("intercept", record.getIntercept());
-        json.put("scale", record.getScale());
-    }
-
-    // TODO: this is a quick port from original code and needs to be refactored before release
-    private void postDeviceStatus(String baseURL, Header apiSecretHeader, DefaultHttpClient httpclient) throws Exception {
-        String devicestatusURL = baseURL + "devicestatus";
-        Log.i(TAG, "devicestatusURL: " + devicestatusURL);
-
-        JSONObject json = new JSONObject();
-        json.put("uploaderBattery", MainActivity.batLevel);
-        String jsonString = json.toString();
-
-        HttpPost post = new HttpPost(devicestatusURL);
-
-        if (apiSecretHeader != null) {
-            post.setHeader(apiSecretHeader);
-        }
-
-        StringEntity se = new StringEntity(jsonString);
-        post.setEntity(se);
-        post.setHeader("Accept", "application/json");
-        post.setHeader("Content-type", "application/json");
-
-        ResponseHandler responseHandler = new BasicResponseHandler();
-        httpclient.execute(post, responseHandler);
-    }
-
-    private boolean doMongoUpload(SharedPreferences prefs, GlucoseDataSet[] glucoseDataSets,
-                               MeterRecord[] meterRecords, CalRecord[] calRecords) {
-
-        String dbURI = prefs.getString("cloud_storage_mongodb_uri", null);
-        String collectionName = prefs.getString("cloud_storage_mongodb_collection", null);
-        String dsCollectionName = prefs.getString("cloud_storage_mongodb_device_status_collection", "devicestatus");
-
-        if (dbURI != null && collectionName != null) {
-            try {
-
-                // connect to db
-                MongoClientURI uri = new MongoClientURI(dbURI.trim());
-                MongoClient client = new MongoClient(uri);
-
-                // get db
-                DB db = client.getDB(uri.getDatabase());
-
-                // get collection
-                DBCollection dexcomData = db.getCollection(collectionName.trim());
-                Log.i(TAG, "The number of EGV records being sent to MongoDB is " + glucoseDataSets.length);
-                for (GlucoseDataSet record : glucoseDataSets) {
-                    // make db object
-                    BasicDBObject testData = new BasicDBObject();
-                    testData.put("device", "dexcom");
-                    testData.put("date", record.getDisplayTime().getTime());
-                    testData.put("dateString", record.getDisplayTime().toString());
-                    testData.put("sgv", record.getBGValue());
-                    testData.put("direction", record.getTrend().friendlyTrendName());
-                    testData.put("type", "sgv");
-                    if (prefs.getBoolean("cloud_sensor_data", false)) {
-                        testData.put("filtered", record.getFiltered());
-                        testData.put("unfiltered", record.getUnfiltered());
-                        testData.put("rssi", record.getRssi());
-                    }
-                    dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
-                }
-
-                Log.i(TAG, "The number of MBG records being sent to MongoDB is " + meterRecords.length);
-                for (MeterRecord meterRecord : meterRecords) {
-                    // make db object
-                    BasicDBObject testData = new BasicDBObject();
-                    testData.put("device", "dexcom");
-                    testData.put("type", "mbg");
-                    testData.put("date", meterRecord.getDisplayTime().getTime());
-                    testData.put("dateString", meterRecord.getDisplayTime().toString());
-                    testData.put("mbg", meterRecord.getMeterBG());
-                    dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
-                }
-
-                // TODO: might be best to merge with the the glucose data but will require time
-                // analysis to match record with cal set, for now this will do
-                if (prefs.getBoolean("cloud_cal_data", false)) {
-                    for (CalRecord calRecord : calRecords) {
-                        // make db object
-                        BasicDBObject testData = new BasicDBObject();
-                        testData.put("device", "dexcom");
-                        testData.put("date", calRecord.getDisplayTime().getTime());
-                        testData.put("dateString", calRecord.getDisplayTime().toString());
-                        testData.put("slope", calRecord.getSlope());
-                        testData.put("intercept", calRecord.getIntercept());
-                        testData.put("scale", calRecord.getScale());
-                        testData.put("type", "cal");
-                        dexcomData.update(testData, testData, true, false, WriteConcern.UNACKNOWLEDGED);
-                    }
-                }
-
-                // TODO: quick port from original code, revisit before release
-                DBCollection dsCollection = db.getCollection(dsCollectionName);
-                BasicDBObject devicestatus = new BasicDBObject();
-                devicestatus.put("uploaderBattery", MainActivity.batLevel);
-                devicestatus.put("created_at", new Date());
-                dsCollection.insert(devicestatus, WriteConcern.UNACKNOWLEDGED);
-
-                client.close();
-
-                return true;
-
-            } catch (Exception e) {
-                Log.e(TAG, "Unable to upload data to mongo", e);
+                uploaders.add(new RestLegacyUploader(preferences, baseUri));
             }
         }
-        return false;
+    }
+
+    public boolean upload(GlucoseDataSet glucoseDataSet, MeterRecord meterRecord,
+                          CalRecord calRecord) {
+        return upload(Lists.newArrayList(glucoseDataSet), Lists.newArrayList(meterRecord),
+                Lists.newArrayList(calRecord));
+    }
+
+    public boolean upload(List<GlucoseDataSet> glucoseDataSets,
+                          List<MeterRecord> meterRecords,
+                          List<CalRecord> calRecords) {
+
+        DeviceStatus deviceStatus = new DeviceStatus();
+        // TODO(trhodeos): make this not static
+        deviceStatus.setBatteryLevel(MainActivity.batLevel);
+
+        boolean allSuccessful = true;
+        for (BaseUploader uploader : uploaders) {
+            // TODO(klee): capture any exceptions here so that all configured uploaders will attempt
+            // to upload
+            allSuccessful &= uploader.uploadGlucoseDataSets(glucoseDataSets);
+            allSuccessful &= uploader.uploadMeterRecords(meterRecords);
+            allSuccessful &= uploader.uploadCalRecords(calRecords);
+            allSuccessful &= uploader.uploadDeviceStatus(deviceStatus);
+        }
+
+        // Force a failure if an uploader was not properly initialized, but only after the other
+        // uploaders were executed.
+        Log.d("DEBUGING","returning: " + (uploaders.size() == uploaderCount && allSuccessful));
+        return uploaders.size() == uploaderCount && allSuccessful;
+    }
+
+    protected List<BaseUploader> getUploaders() {
+        return uploaders;
+    }
+
+    protected int getUploaderCount(){
+        return uploaderCount;
     }
 }
