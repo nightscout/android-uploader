@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">G4 Connector</string>
+    <string name="self_destruct">Close It</string>
     <string name="title_activity_main">Nightscout</string>
 
     <string name="action_settings">Settings</string>
@@ -12,7 +14,7 @@
     <string name="feedback_dialog_comment_prompt">Please add your comments below:</string>
     <string name="feedback_dialog_ok_toast">Thank you!</string>
     <string name="feedback_toast_text"/>
-    <string name="message_user_not_understand">Reading from device is disabled until you review and accept &#8220;I understand&#8221; in preferences</string>
+    <string name="message_user_not_understand">Reading from device is disabled until you review and accept \"I understand\" in preferences</string>
     <string name="button_force_sync">Force sync</string>
     <string name="acra_enabled_summary">Crash reporting is enabled</string>
     <string name="acra_disabled_summary">Crash reporting is disabled</string>
@@ -31,5 +33,10 @@
     <string name="TimeSyncLabelText">Time</string>
     <string name="unknown_mongo_host">Error resolving Mongo host. Double check mongo url.</string>
     <string name="illegal_rest_url">Could not create API uploader. Check your settings.</string>
-    <string name="auto_configure_title">Auto configure</string>
+
+    <string name="donate_dialog_title">Donate data?</string>
+    <string name="donate_dialog_summary">Will you anonymously donate your data for research in order to speed up diabetes innovation?</string>
+    <string name="donate_dialog_yes">Yes</string>
+    <string name="donate_dialog_no">No</string>
+
 </resources>
