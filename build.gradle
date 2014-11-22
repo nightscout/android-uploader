@@ -4,7 +4,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.+'
+        classpath 'com.android.tools.build:gradle:0.13.2'
     }
 }
 
@@ -12,5 +12,20 @@ allprojects {
     repositories {
         jcenter()
     }
+}
+
+subprojects {
+    tasks.withType(Test) {
+        beforeTest { desc ->
+            print "[${desc.className}] ${desc.name}: "
+        }
+        afterTest { desc, result ->
+            println "${result.resultType}"
+            if (result.resultType == TestResult.ResultType.FAILURE) {
+                println "${result.exception}"
+            }
+        }
+    }
+
 }
 
