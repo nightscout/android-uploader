@@ -24,6 +24,8 @@ import android.widget.TextView;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.core.dexcom.Constants;
@@ -396,9 +398,19 @@ public class MainActivity extends Activity {
         } else if (id == R.id.close_settings) {
             mHandler.removeCallbacks(syncCGM);
             finish();
+        } else if (id == R.id.barcode_scan) {
+            new IntentIntegrator(this).initiateScan();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+        if (scanResult != null) {
+            // handle scan result
+            Log.d("XXX",scanResult.getContents());
+        }
     }
 
     public class StatusBarIcons {

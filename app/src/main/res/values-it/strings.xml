@@ -31,4 +31,5 @@
     <string name="UploadLabelText">Upload</string>
     <string name="DexBatteryLabelText">Dex Battery</string>
     <string name="TimeSyncLabelText">Time</string>
+    <string name="auto_configure_title">Auto configure</string>
 </resources>
