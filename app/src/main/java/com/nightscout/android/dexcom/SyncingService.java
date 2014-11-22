@@ -20,6 +20,7 @@ import com.nightscout.android.R;
 import com.nightscout.android.dexcom.USB.USBPower;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.USB.UsbSerialProber;
+import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.upload.Uploader;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.Constants;
@@ -29,6 +30,7 @@ import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.SensorRecord;
+import com.nightscout.core.preferences.NightscoutPreferences;
 
 import org.json.JSONArray;
 
@@ -160,7 +162,8 @@ public class SyncingService extends IntentService {
                 JSONArray array = new JSONArray();
                 for (int i = 0; i < recentRecords.length; i++) array.put(recentRecords[i].toJSON());
 
-                Uploader uploader = new Uploader(mContext);
+                NightscoutPreferences preferences = new AndroidPreferences(prefs);
+                Uploader uploader = new Uploader(mContext, preferences);
                 // TODO: This should be cleaned up, 5 should be a constant, maybe handle in uploader,
                 // and maybe might not have to read 5 pages (that was only done for single sync for UI
                 // plot updating and might be able to be done in javascript d3 code as a FIFO array
@@ -259,6 +262,7 @@ public class SyncingService extends IntentService {
         // Allowing us to start to start syncing if the G4 is already connected
         // vendor-id="8867" product-id="71" class="2" subclass="0" protocol="0"
         UsbManager manager = (UsbManager) c.getSystemService(Context.USB_SERVICE);
+        if (manager == null) return false;
         HashMap<String, UsbDevice> deviceList = manager.getDeviceList();
         Iterator<UsbDevice> deviceIterator = deviceList.values().iterator();
         boolean g4Connected=false;

@@ -22,8 +22,10 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/title_activity_main"
         android:allowBackup="true">
+        <!-- Hard code this version for now. Robolectric has troubles starting when this is
+             a variable. See: https://github.com/robolectric/robolectric/issues/1025 -->
         <meta-data android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+            android:value="5089000" />
         <meta-data
             android:name="com.google.android.gms.analytics.globalConfigResource"
             android:resource="@xml/analytics_global_config" />
