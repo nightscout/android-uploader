@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/nightscout/android-uploader.png?label=ready&title=Ready)](https://waffle.io/nightscout/android-uploader)
 android-uploader
 ====================
 [![Build Status](https://travis-ci.org/nightscout/cgm-remote-monitor.png)](https://travis-ci.org/nightscout/android-uploader)
