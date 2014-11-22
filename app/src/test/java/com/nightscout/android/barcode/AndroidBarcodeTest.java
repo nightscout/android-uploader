@@ -3,6 +3,7 @@ package com.nightscout.android.barcode;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.app.FragmentActivity;
 
 import com.google.common.collect.Lists;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -23,6 +24,7 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowPreferenceManager;
+import org.robolectric.util.FragmentTestUtil;
 
 import java.util.List;
 
@@ -34,11 +36,14 @@ import static org.junit.Assert.assertThat;
 public class AndroidBarcodeTest extends RobolectricTestBase {
     Activity activity;
     SharedPreferences sharedPrefs;
+    private SettingsActivity.MainPreferenceFragment mainPreferenceFragment;
 
     @Before
     public void setUp() {
         activity = Robolectric.buildActivity(SettingsActivity.class).create().get();
         sharedPrefs = ShadowPreferenceManager.getDefaultSharedPreferences(Robolectric.application.getApplicationContext());
+        mainPreferenceFragment = new SettingsActivity.MainPreferenceFragment();
+        FragmentTestUtil.startFragment(mainPreferenceFragment, SettingsActivity.class);
     }
 
     @Test
@@ -54,7 +59,7 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
         json.put(NSBarcodeConfigKeys.MONGO_CONFIG,child);
         System.out.println(json.toString());
         Intent intent = createFakeScanIntent(json.toString());
-        new SettingsActivity().onActivityResult(IntentIntegrator.REQUEST_CODE, Activity.RESULT_OK, intent);
+        mainPreferenceFragment.onActivityResult(IntentIntegrator.REQUEST_CODE, Activity.RESULT_OK, intent);
         assertThat(sharedPrefs.getBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED, false), is(true));
         assertThat(sharedPrefs.getString(PreferenceKeys.MONGO_URI, null), is(mongoUri));
         assertThat(sharedPrefs.getString(PreferenceKeys.MONGO_COLLECTION, null), is(mongoCollection));
@@ -74,7 +79,7 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
         json.put(NSBarcodeConfigKeys.API_CONFIG,jsonArray);
 
         Intent intent = createFakeScanIntent(json.toString());
-        new SettingsActivity().onActivityResult(IntentIntegrator.REQUEST_CODE,Activity.RESULT_OK, intent);
+        mainPreferenceFragment.onActivityResult(IntentIntegrator.REQUEST_CODE, Activity.RESULT_OK, intent);
         assertThat(sharedPrefs.getBoolean(PreferenceKeys.API_UPLOADER_ENABLED,false),is(true));
         assertThat(sharedPrefs.getString(PreferenceKeys.API_URIS,null),is(apiUri));
 
@@ -98,7 +103,7 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
         json.put(NSBarcodeConfigKeys.API_CONFIG,jsonArray);
 
         Intent intent = createFakeScanIntent(json.toString());
-        new SettingsActivity().onActivityResult(IntentIntegrator.REQUEST_CODE,Activity.RESULT_OK, intent);
+        mainPreferenceFragment.onActivityResult(IntentIntegrator.REQUEST_CODE, Activity.RESULT_OK, intent);
         assertThat(sharedPrefs.getBoolean(PreferenceKeys.API_UPLOADER_ENABLED,false),is(true));
         // May not be good - lists don't have a guaranteed order?
         assertThat(Lists.newArrayList(sharedPrefs.getString(PreferenceKeys.API_URIS,null).split(" ")),is(uris));
@@ -126,7 +131,7 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
         json.put(NSBarcodeConfigKeys.MONGO_CONFIG, child);
 
         Intent intent = createFakeScanIntent(json.toString());
-        new SettingsActivity().onActivityResult(IntentIntegrator.REQUEST_CODE, Activity.RESULT_OK, intent);
+        mainPreferenceFragment.onActivityResult(IntentIntegrator.REQUEST_CODE, Activity.RESULT_OK, intent);
         assertThat(sharedPrefs.getBoolean(PreferenceKeys.API_UPLOADER_ENABLED,false), is(true));
         assertThat(sharedPrefs.getString(PreferenceKeys.API_URIS,null), is(apiUri));
 

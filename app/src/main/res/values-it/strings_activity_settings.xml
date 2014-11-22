@@ -50,7 +50,7 @@
     <string name="pref_title_api_url">URL di base</string>
     <string name="pref_dialog_api_url">Inserisci la URL API</string>
     <string name="pref_message_api_url">Questa è solo la URL di base, l\'uploader aggiungerà automaticamente /dati for il POST. API_SECRET sul server dovrebbe essere uguale a latuapassword in questa impostazione</string>
-    <string name="pref_default_api_url">latuapassword@http://{IL-TUO-SITO}.azurewebsites.net/api/v1</string>
+    <string name="pref_default_api_url">http://latuapassword@{IL-TUO-SITO}.azurewebsites.net/api/v1</string>
 
     <!-- Data To Upload Settings -->
     <string name="pref_title_data_to_upload">Dati da inviare</string>
