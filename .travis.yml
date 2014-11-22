@@ -19,8 +19,8 @@ before_script:
 android:
   components:
   - build-tools-19.1.0
-  - android-19
-  - sysimg-19
+  - android-21
+  - sysimg-21
   - extra-android-support
   licenses:
   - android-sdk-license-5be876d5
