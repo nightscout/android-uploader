@@ -27,6 +27,7 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.nightscout.android.dexcom.SyncingService;
+import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.core.dexcom.Constants;
 import com.nightscout.core.dexcom.Utils;
@@ -37,6 +38,8 @@ import org.acra.ACRAConfigurationException;
 import org.acra.ReportingInteractionMode;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -409,7 +412,25 @@ public class MainActivity extends Activity {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
         if (scanResult != null) {
             // handle scan result
-            Log.d("XXX",scanResult.getContents());
+            try {
+                JSONObject json=new JSONObject(scanResult.getContents());
+                if (json.has("mongo_settings")) {
+                    JSONObject mongoSettings = json.getJSONObject("mongo_settings");
+                    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+                    editor.putBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED, true);
+                    String mongoUri = "mongodb://" + mongoSettings.getString("user") + ":" + mongoSettings.getString("password") + "@" + mongoSettings.getString("host") + ":" + mongoSettings.getString("port") + "/" + mongoSettings.getString("database");
+                    Log.d(TAG, "Setting mongo uri to: " + mongoUri);
+                    editor.putString(PreferenceKeys.MONGO_URI, mongoUri);
+                    String collection = mongoSettings.getString("collection");
+                    String devColl = mongoSettings.getString("device_collection");
+                    editor.putString(PreferenceKeys.MONGO_COLLECTION, collection);
+                    editor.putString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION, devColl);
+                    editor.apply();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+//            Log.d("XXX", scanResult.getContents());
         }
     }
 
