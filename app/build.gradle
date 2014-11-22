@@ -29,7 +29,15 @@ android {
     }
 
     lintOptions {
-        abortOnError false
+        quiet false
+        checkAllWarnings true
+        abortOnError true
+        textReport true
+        textOutput 'stdout'
+        htmlOutput file("lint-report.html")
+        htmlReport true
+        checkReleaseBuilds true
+        warning 'ProtectedPermissions', 'InvalidPackage'
     }
 
     packagingOptions {

@@ -1,5 +1,6 @@
 package com.nightscout.android;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -72,6 +73,7 @@ public class MainActivity extends Activity {
     // TODO: should try and avoid use static
     public static int batLevel = 0;
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

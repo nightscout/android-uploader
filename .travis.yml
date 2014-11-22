@@ -1,22 +1,31 @@
 language: android
+
 jdk:
-    - oraclejdk7
+  - oraclejdk7
+
 env:
   matrix:
-  - ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
+    - ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
+
 cache:
   directories:
     - $HOME/.gradle
+
 android:
   components:
   - build-tools-19.1.0
   - android-19
   - sysimg-19
   - extra-android-support
+
   licenses:
   - android-sdk-license-5be876d5
   - ".*intel.+"
-script: TERM=dumb ./gradlew clean test
+
+script:
+  - TERM=dumb ./gradlew clean test
+  - TERM=dumb ./gradlew clean lint
+
 deploy:
   provider: releases
   file: "./app/build/outputs/apk/app-debug.apk"
