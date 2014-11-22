@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
+    compileSdkVersion 19
     buildToolsVersion "19.1.0"
 
     defaultConfig {
@@ -47,9 +47,9 @@ dependencies {
         exclude group: 'org.apache.httpcomponents'
     }
     compile files('libs/acra-4.5.0.jar')
-    compile 'com.android.support:appcompat-v7:21.0.2'
-    compile 'com.android.support:support-v4:21.0.2'
-    compile 'com.google.android.gms:play-services:6.1.71'
+    compile 'com.android.support:appcompat-v7:20.0.0'
+    compile 'com.android.support:support-v4:20.0.0'
+    compile 'com.google.android.gms:play-services:5.0.89'
     compile 'org.mongodb:mongo-java-driver:2.10.1'
     compile 'joda-time:joda-time:2.5'
     compile 'com.google.guava:guava:18.0'
