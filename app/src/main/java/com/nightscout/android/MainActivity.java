@@ -1,5 +1,6 @@
 package com.nightscout.android;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -25,11 +26,9 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.dexcom.SyncingService;
-import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.core.dexcom.Constants;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.preferences.NightscoutPreferences;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -38,8 +37,8 @@ import org.acra.ReportingInteractionMode;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
 
 import static org.joda.time.Duration.standardMinutes;
@@ -72,8 +71,7 @@ public class MainActivity extends Activity {
     // TODO: should try and avoid use static
     public static int batLevel = 0;
 
-    NightscoutPreferences prefs;
-
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,17 +130,21 @@ public class MainActivity extends Activity {
             statusBarIcons.setDefaults();
         }
 
-        prefs = new AndroidPreferences(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
         // Report API vs mongo stats once per session
-        if (prefs.isRestApiEnabled()) {
-            List<String> uris = prefs.getRestApiBaseUris();
-            for (String baseUri: uris){
-                baseUri+=baseUri.endsWith("/")?"":"/";
-                String apiVersion=(baseUri.endsWith("/v1/"))?"WebAPIv1":"Legacy WebAPI";
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        if (prefs.getBoolean("cloud_storage_api_enable", false)) {
+            String baseURLSettings = prefs.getString("cloud_storage_api_base", "");
+            ArrayList<String> baseURIs = new ArrayList<String>();
+            for (String baseURLSetting : baseURLSettings.split(" ")) {
+                String baseURL = baseURLSetting.trim();
+                if (baseURL.isEmpty()) continue;
+                baseURIs.add(baseURL + (baseURL.endsWith("/") ? "" : "/"));
+                String apiVersion;
+                apiVersion=(baseURL.endsWith("/v1/"))?"WebAPIv1":"Legacy WebAPI";
                 mTracker.send(new HitBuilders.EventBuilder("Upload", apiVersion).build());
             }
         }
-        if (prefs.isMongoUploadEnabled()) {
+        if (prefs.getBoolean("cloud_storage_mongodb_enable", false)) {
             mTracker.send(new HitBuilders.EventBuilder("Upload", "Mongo").build());
         }
     }
@@ -164,9 +166,9 @@ public class MainActivity extends Activity {
         mWebView.resumeTimers();
 
         // Set and deal with mmol/L<->mg/dL conversions
-        SharedPreferences myPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        Log.d(TAG,"display_options_units: "+myPrefs.getString("display_options_units", "0"));
-        currentUnits = myPrefs.getString("display_options_units", "0").equals("0") ? 1 : Constants.MG_DL_TO_MMOL_L;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        Log.d(TAG,"display_options_units: "+prefs.getString("display_options_units", "0"));
+        currentUnits = prefs.getString("display_options_units", "0").equals("0") ? 1 : Constants.MG_DL_TO_MMOL_L;
         int sgv = (Integer) mTextSGV.getTag(R.string.display_sgv);
 
         int direction = (Integer) mTextSGV.getTag(R.string.display_trend);
@@ -400,7 +402,6 @@ public class MainActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
-
 
     public class StatusBarIcons {
         private ImageView mImageViewUSB;
