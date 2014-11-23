@@ -1,8 +1,11 @@
 package com.nightscout.android;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -25,9 +28,12 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.dexcom.SyncingService;
+import com.nightscout.android.preferences.AndroidPreferences;
+import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.core.dexcom.Constants;
 import com.nightscout.core.dexcom.Utils;
+import com.nightscout.core.preferences.NightscoutPreferences;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -47,6 +53,8 @@ public class MainActivity extends Activity {
 
     // Receivers
     private CGMStatusReceiver mCGMStatusReceiver;
+
+    private ToastReceiver toastReceiver;
 
     // Member components
     private Handler mHandler = new Handler();
@@ -70,6 +78,7 @@ public class MainActivity extends Activity {
     // TODO: should try and avoid use static
     public static int batLevel = 0;
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +103,11 @@ public class MainActivity extends Activity {
         IntentFilter filter = new IntentFilter(CGMStatusReceiver.PROCESS_RESPONSE);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(mCGMStatusReceiver, filter);
+
+        toastReceiver = new ToastReceiver();
+        IntentFilter toastFilter = new IntentFilter(ToastReceiver.ACTION_SEND_NOTIFICATION);
+        toastFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(toastReceiver, toastFilter);
 
         // Setup UI components
         setContentView(R.layout.activity_main);
@@ -128,8 +142,40 @@ public class MainActivity extends Activity {
             statusBarIcons.setDefaults();
         }
 
-        // Report API vs mongo stats once per session
+        // Check (only once) to see if they have opted in to shared data for research
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        if (!prefs.getBoolean("donate_data_query", false)) {
+
+            final NightscoutPreferences preferences = new AndroidPreferences(prefs);
+
+            // Prompt user to ask to donate data to research
+            AlertDialog.Builder dataDialog = new AlertDialog.Builder(this)
+                    .setCancelable(false)
+                    .setTitle(R.string.donate_dialog_title)
+                    .setMessage(R.string.donate_dialog_summary)
+                    .setPositiveButton(R.string.donate_dialog_yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            mTracker.send(new HitBuilders.EventBuilder("DataDonateQuery", "Yes").build());
+                            preferences.setDataDonateEnabled(true);
+                        }
+                    })
+                    .setNegativeButton(R.string.donate_dialog_no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            mTracker.send(new HitBuilders.EventBuilder("DataDonateQuery", "No").build());
+                            preferences.setDataDonateEnabled(true);
+                        }
+                    })
+                    .setIcon(R.drawable.ic_launcher);
+
+            dataDialog.show();
+
+            SharedPreferences.Editor editor =
+                    PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+            editor.putBoolean("donate_data_query", true);
+            editor.apply();
+        }
+
+        // Report API vs mongo stats once per session
         if (prefs.getBoolean("cloud_storage_api_enable", false)) {
             String baseURLSettings = prefs.getString("cloud_storage_api_base", "");
             ArrayList<String> baseURIs = new ArrayList<String>();
