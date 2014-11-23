@@ -10,4 +10,10 @@
         android:summary="@string/pref_summary_i_understand">
     </com.nightscout.android.settings.CustomSwitchPreference>
 
+    <PreferenceScreen
+        android:title="@string/auto_configure_title"
+        android:key="auto_configure"
+        android:summary="Auto configure using a barcode. See http://nightscout.github.io/pages/mongostring/ for more details"
+        />
+
 </PreferenceScreen>

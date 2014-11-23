@@ -1,6 +1,7 @@
 package com.nightscout.android.settings;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -21,6 +22,7 @@ import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
+import com.google.zxing.integration.android.IntentIntegrator;
 import com.nightscout.android.R;
 
 import java.util.List;
@@ -143,6 +145,17 @@ public class SettingsActivity extends PreferenceActivity {
         bindPreferenceSummaryToValue(findPreference("cloud_storage_api_base"));
         bindPreferenceSummaryToValue(findPreference("acra.user.email"));
         bindPreferenceSummaryToValue(findPreference("display_options_units"));
+
+//        about_version_number
+        Preference autoConfigure = (Preference) findPreference("auto_configure");
+        final Activity activity = this;
+        autoConfigure.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new IntentIntegrator(activity).initiateScan();
+                return false;
+            }
+        });
 
         try {
             PackageInfo pInfo = null;
