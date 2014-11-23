@@ -3,13 +3,6 @@ apply plugin: 'java'
 sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
 
-test {
-    testLogging {
-        exceptionFormat = 'full'
-        events 'started', 'passed'
-    }
-}
-
 dependencies {
     compile 'joda-time:joda-time:2.5'
     compile 'com.google.guava:guava:18.0'
