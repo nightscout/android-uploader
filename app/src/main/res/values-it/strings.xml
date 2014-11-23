@@ -29,6 +29,12 @@
     <string name="UploadLabelText">Upload</string>
     <string name="DexBatteryLabelText">Dex Battery</string>
     <string name="TimeSyncLabelText">Time</string>
+
+    <string name="donate_dialog_title">Donate dati?</string>
+    <string name="donate_dialog_summary">Vuoi anonimo donare i vostri dati CGM per la ricerca , al fine di accelerare l\'innovazione del diabete ?</string>
+    <string name="donate_dialog_yes">Sì</string>
+    <string name="donate_dialog_no">No</string>
+
     <string name="unknown_mongo_host">Error resolving Mongo host. Double check mongo url.</string>
     <string name="illegal_rest_url">Could not create API uploader. Check your settings.</string>
 </resources>

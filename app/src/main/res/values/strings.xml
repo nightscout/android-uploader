@@ -31,4 +31,10 @@
     <string name="TimeSyncLabelText">Time</string>
     <string name="unknown_mongo_host">Error resolving Mongo host. Double check mongo url.</string>
     <string name="illegal_rest_url">Could not create API uploader. Check your settings.</string>
+
+    <string name="donate_dialog_title">Donate data?</string>
+    <string name="donate_dialog_summary">Will you anonymously donate your CGM data for research in order to speed up diabetes innovation?</string>
+    <string name="donate_dialog_yes">Yes</string>
+    <string name="donate_dialog_no">No</string>
+
 </resources>

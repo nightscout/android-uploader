@@ -2,7 +2,10 @@ package com.nightscout.android.preferences;
 
 import android.content.SharedPreferences;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.google.common.collect.Lists;
+import com.nightscout.android.Nightscout;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
 import java.util.List;
@@ -34,8 +37,18 @@ public class AndroidPreferences implements NightscoutPreferences {
     }
 
     @Override
+    public boolean isDataDonateEnabled() {
+        return preferences.getBoolean(PreferenceKeys.DATA_DONATE, false);
+    }
+
+    @Override
     public boolean isMongoUploadEnabled() {
         return preferences.getBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED, false);
+    }
+
+    @Override
+    public void setDataDonateEnabled(boolean toDonate) {
+        preferences.edit().putBoolean(PreferenceKeys.DATA_DONATE, toDonate).apply();
     }
 
     @Override
