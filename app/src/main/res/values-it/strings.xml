@@ -33,7 +33,7 @@
     <string name="TimeSyncLabelText">Time</string>
 
     <string name="donate_dialog_title">Donate dati?</string>
-    <string name="donate_dialog_summary">Vuoi anonimo donare i vostri dati CGM per la ricerca , al fine di accelerare l'innovazione del diabete ?</string>
+    <string name="donate_dialog_summary">Vuoi anonimo donare i vostri dati CGM per la ricerca , al fine di accelerare l\'innovazione del diabete ?</string>
     <string name="donate_dialog_yes">Sì</string>
     <string name="donate_dialog_no">No</string>
 
