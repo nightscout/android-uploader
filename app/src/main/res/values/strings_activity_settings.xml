@@ -13,7 +13,7 @@
     <string name="pref_acra_user_email">Email</string>
 
     <string name="pref_title_data_donate">Donate Data</string>
-    <string name="pref_summary_data_donate">Will you anonymously donate your data for research in order to speed up diabetes innovation?</string>
+    <string name="pref_summary_data_donate">Will you anonymously donate your CGM data for research in order to speed up diabetes innovation?</string>
     <string name="pref_switch_on_data_donate">YES</string>
     <string name="pref_switch_off_data_donate">NO</string>
 

@@ -12,6 +12,11 @@
     <string name="pref_switch_off_i_understand">NO</string>
     <string name="pref_acra_user_email">Email</string>
 
+    <string name="pref_title_data_donate">Donate dati</string>
+    <string name="pref_summary_data_donate">Vuoi anonimo donare i vostri dati CGM per la ricerca , al fine di accelerare l'innovazione del diabete?</string>
+    <string name="pref_switch_on_data_donate">Sì</string>
+    <string name="pref_switch_off_data_donate">NO</string>
+
     <!-- Settings for Cloud Storage -->
     <string name="pref_header_cloud_storage">Cloud Storage</string>
 

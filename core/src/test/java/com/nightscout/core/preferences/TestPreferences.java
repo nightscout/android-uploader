@@ -13,6 +13,7 @@ public class TestPreferences implements NightscoutPreferences {
     private String mongoClientUri = null;
     private String mongoCollection = null;
     private String mongoDeviceStatusCollection = null;
+    private boolean dataDonateEnabled;
 
     public boolean isRestApiEnabled() {
         return restApiEnabled;
@@ -48,6 +49,16 @@ public class TestPreferences implements NightscoutPreferences {
 
     public boolean isMongoUploadEnabled() {
         return mongoUploadEnabled;
+    }
+
+    @Override
+    public boolean isDataDonateEnabled() {
+        return dataDonateEnabled;
+    }
+
+    @Override
+    public void setDataDonateEnabled(boolean toDonate) {
+        this.dataDonateEnabled = toDonate;
     }
 
     public void setMongoUploadEnabled(boolean mongoUploadEnabled) {
