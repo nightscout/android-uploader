@@ -27,10 +27,12 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.nightscout.android.dexcom.SyncingService;
-import com.nightscout.android.preferences.PreferenceKeys;
+import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.settings.SettingsActivity;
+import com.nightscout.core.barcode.NSBarcodeConfig;
 import com.nightscout.core.dexcom.Constants;
 import com.nightscout.core.dexcom.Utils;
+import com.nightscout.core.preferences.NightscoutPreferences;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -38,11 +40,9 @@ import org.acra.ACRAConfigurationException;
 import org.acra.ReportingInteractionMode;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 import static org.joda.time.Duration.standardMinutes;
@@ -74,6 +74,8 @@ public class MainActivity extends Activity {
 
     // TODO: should try and avoid use static
     public static int batLevel = 0;
+
+    NightscoutPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,21 +135,17 @@ public class MainActivity extends Activity {
             statusBarIcons.setDefaults();
         }
 
+        prefs = new AndroidPreferences(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
         // Report API vs mongo stats once per session
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        if (prefs.getBoolean("cloud_storage_api_enable", false)) {
-            String baseURLSettings = prefs.getString("cloud_storage_api_base", "");
-            ArrayList<String> baseURIs = new ArrayList<String>();
-            for (String baseURLSetting : baseURLSettings.split(" ")) {
-                String baseURL = baseURLSetting.trim();
-                if (baseURL.isEmpty()) continue;
-                baseURIs.add(baseURL + (baseURL.endsWith("/") ? "" : "/"));
-                String apiVersion;
-                apiVersion=(baseURL.endsWith("/v1/"))?"WebAPIv1":"Legacy WebAPI";
+        if (prefs.isRestApiEnabled()) {
+            List<String> uris = prefs.getRestApiBaseUris();
+            for (String baseUri: uris){
+                baseUri+=baseUri.endsWith("/")?"":"/";
+                String apiVersion=(baseUri.endsWith("/v1/"))?"WebAPIv1":"Legacy WebAPI";
                 mTracker.send(new HitBuilders.EventBuilder("Upload", apiVersion).build());
             }
         }
-        if (prefs.getBoolean("cloud_storage_mongodb_enable", false)) {
+        if (prefs.isMongoUploadEnabled()) {
             mTracker.send(new HitBuilders.EventBuilder("Upload", "Mongo").build());
         }
     }
@@ -169,9 +167,9 @@ public class MainActivity extends Activity {
         mWebView.resumeTimers();
 
         // Set and deal with mmol/L<->mg/dL conversions
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        Log.d(TAG,"display_options_units: "+prefs.getString("display_options_units", "0"));
-        currentUnits = prefs.getString("display_options_units", "0").equals("0") ? 1 : Constants.MG_DL_TO_MMOL_L;
+        SharedPreferences myPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        Log.d(TAG,"display_options_units: "+myPrefs.getString("display_options_units", "0"));
+        currentUnits = myPrefs.getString("display_options_units", "0").equals("0") ? 1 : Constants.MG_DL_TO_MMOL_L;
         int sgv = (Integer) mTextSGV.getTag(R.string.display_sgv);
 
         int direction = (Integer) mTextSGV.getTag(R.string.display_trend);
@@ -408,31 +406,28 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    // TODO(klee): add tests for scan results
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
         if (scanResult != null) {
-            // handle scan result
-            try {
-                JSONObject json=new JSONObject(scanResult.getContents());
-                if (json.has("mongo_settings")) {
-                    JSONObject mongoSettings = json.getJSONObject("mongo_settings");
-                    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
-                    editor.putBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED, true);
-                    String mongoUri = "mongodb://" + mongoSettings.getString("user") + ":" + mongoSettings.getString("password") + "@" + mongoSettings.getString("host") + ":" + mongoSettings.getString("port") + "/" + mongoSettings.getString("database");
-                    Log.d(TAG, "Setting mongo uri to: " + mongoUri);
-                    editor.putString(PreferenceKeys.MONGO_URI, mongoUri);
-                    String collection = mongoSettings.getString("collection");
-                    String devColl = mongoSettings.getString("device_collection");
-                    editor.putString(PreferenceKeys.MONGO_COLLECTION, collection);
-                    editor.putString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION, devColl);
-                    editor.apply();
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            NSBarcodeConfig barcode=new NSBarcodeConfig(scanResult.getContents());
+            if (barcode.hasMongoUri()) {
+                prefs.setMongoUploadEnabled(true);
+                prefs.setMongoClientUri(barcode.getMongoUri());
+                prefs.setMongoCollection(barcode.getMongoCollection());
+                prefs.setMongoDeviceStatusCollection(barcode.getMongoDeviceStatusCollection());
+            } else {
+                prefs.setMongoUploadEnabled(false);
             }
-//            Log.d("XXX", scanResult.getContents());
+            if (barcode.hasApiUri()) {
+                prefs.setRestApiEnabled(true);
+                prefs.setRestApiBaseUris(barcode.getApiUris());
+            } else {
+                prefs.setRestApiEnabled(false);
+            }
         }
     }
+
 
     public class StatusBarIcons {
         private ImageView mImageViewUSB;

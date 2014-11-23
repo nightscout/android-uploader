@@ -1,6 +1,7 @@
 package com.nightscout.android.preferences;
 
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.google.common.collect.Lists;
 import com.nightscout.core.preferences.NightscoutPreferences;
@@ -52,4 +53,41 @@ public class AndroidPreferences implements NightscoutPreferences {
     public String getMongoDeviceStatusCollection() {
         return preferences.getString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION, "devicestatus");
     }
+
+    @Override
+    public void setMongoClientUri(String mongoClientUri) {
+        preferences.edit().putString(PreferenceKeys.MONGO_URI,mongoClientUri).apply();
+    }
+
+    @Override
+    public void setRestApiBaseUris(List<String> restApis) {
+        StringBuilder sb = new StringBuilder();
+        for (String restEndpoint:restApis){
+            sb.append(restEndpoint);
+            sb.append(" ");
+        }
+        Log.d("XXX","Rest String: "+sb.toString()+"|  "+restApis.size());
+        preferences.edit().putString(PreferenceKeys.API_URIS,sb.toString().trim()).apply();
+    }
+
+    @Override
+    public void setMongoDeviceStatusCollection(String deviceStatusCollection) {
+        preferences.edit().putString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION,deviceStatusCollection).apply();
+    }
+
+    @Override
+    public void setMongoCollection(String sgvCollection) {
+        preferences.edit().putString(PreferenceKeys.MONGO_COLLECTION,sgvCollection).apply();
+    }
+
+    @Override
+    public void setMongoUploadEnabled(boolean mongoUploadEnabled){
+        preferences.edit().putBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED,mongoUploadEnabled).apply();
+    }
+
+    @Override
+    public void setRestApiEnabled(boolean restApiEnabled){
+        preferences.edit().putBoolean(PreferenceKeys.API_UPLOADER_ENABLED,restApiEnabled).apply();
+    }
+
 }
