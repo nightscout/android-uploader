@@ -12,8 +12,9 @@
 
     <PreferenceScreen
         android:title="@string/auto_configure_title"
+        android:dependency="i_understand"
         android:key="auto_configure"
-        android:summary="Auto configure using a barcode. See http://nightscout.github.io/pages/mongostring/ for more details"
+        android:summary="@string/prefs_auto_config_summary"
         />
 
 </PreferenceScreen>

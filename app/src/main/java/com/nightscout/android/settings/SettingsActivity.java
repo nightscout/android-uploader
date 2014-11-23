@@ -3,6 +3,7 @@ package com.nightscout.android.settings;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -23,7 +24,11 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 
 import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.nightscout.android.R;
+import com.nightscout.android.preferences.AndroidPreferences;
+import com.nightscout.core.barcode.NSBarcodeConfig;
+import com.nightscout.core.preferences.NightscoutPreferences;
 
 import java.util.List;
 
@@ -153,7 +158,7 @@ public class SettingsActivity extends PreferenceActivity {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 new IntentIntegrator(activity).initiateScan();
-                return false;
+                return true;
             }
         });
 
@@ -379,5 +384,27 @@ public class SettingsActivity extends PreferenceActivity {
         }
     }
 
+    // TODO(klee): add tests for scan results
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+        NightscoutPreferences prefs = new AndroidPreferences(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
+        if (scanResult != null) {
+            NSBarcodeConfig barcode=new NSBarcodeConfig(scanResult.getContents());
+            if (barcode.hasMongoUri()) {
+                prefs.setMongoUploadEnabled(true);
+                prefs.setMongoClientUri(barcode.getMongoUri());
+                prefs.setMongoCollection(barcode.getMongoCollection());
+                prefs.setMongoDeviceStatusCollection(barcode.getMongoDeviceStatusCollection());
+            } else {
+                prefs.setMongoUploadEnabled(false);
+            }
+            if (barcode.hasApiUri()) {
+                prefs.setRestApiEnabled(true);
+                prefs.setRestApiBaseUris(barcode.getApiUris());
+            } else {
+                prefs.setRestApiEnabled(false);
+            }
+        }
+    }
 
 }
