@@ -13,7 +13,9 @@ var padding = { top: 20, right: 0, bottom: 10, left: 0 },
     clip,
     FOCUS_DATA_RANGE_MS = 14400000,
     updateTimer,
-    units = "mg/dL";
+    units = "mg/dL",
+    lowRange = 80,
+    highRange = 180;
 
     // Tick Values
     var tickValues = [40, 60, 80, 120, 180, 300, 400];
@@ -65,11 +67,11 @@ var padding = { top: 20, right: 0, bottom: 10, left: 0 },
             .tickValues(tickValues)
             .orient('left');
 
-        updateChart(true);
+        updateChart(true, false);
     }
 
     // called for initial update and updates for resize
-    function updateChart(init) {
+    function updateChart(init, unitsChanged) {
 
         console.log("Updating chart...");
 
@@ -87,7 +89,7 @@ var padding = { top: 20, right: 0, bottom: 10, left: 0 },
         focusHeight = chartHeight;
 
         // only redraw chart if chart size has changed
-        if ((prevChartWidth != chartWidth) || (prevChartHeight != chartHeight)) {
+        if ((prevChartWidth != chartWidth) || (prevChartHeight != chartHeight) || unitsChanged) {
 
             prevChartWidth = chartWidth;
             prevChartHeight = chartHeight;
@@ -123,9 +125,9 @@ var padding = { top: 20, right: 0, bottom: 10, left: 0 },
                 focus.append('line')
                     .attr('class', 'high-line')
                     .attr('x1', xScale(new Date(Date.now() - FOCUS_DATA_RANGE_MS)))
-                    .attr('y1', yScale(scaleBg(180)))
+                    .attr('y1', yScale(scaleBg(highRange)))
                     .attr('x2', xScale(new Date(Date.now())))
-                    .attr('y2', yScale(scaleBg(180)))
+                    .attr('y2', yScale(scaleBg(highRange)))
                     .style('stroke-dasharray', ('3, 3'))
                     .attr('stroke', 'grey');
 
@@ -133,9 +135,9 @@ var padding = { top: 20, right: 0, bottom: 10, left: 0 },
                 focus.append('line')
                     .attr('class', 'low-line')
                     .attr('x1', xScale(new Date(Date.now() - FOCUS_DATA_RANGE_MS)))
-                    .attr('y1', yScale(scaleBg(80)))
+                    .attr('y1', yScale(scaleBg(lowRange)))
                     .attr('x2', xScale(new Date(Date.now())))
-                    .attr('y2', yScale(scaleBg(80)))
+                    .attr('y2', yScale(scaleBg(lowRange)))
                     .style('stroke-dasharray', ('3, 3'))
                     .attr('stroke', 'grey');
 
@@ -157,18 +159,18 @@ var padding = { top: 20, right: 0, bottom: 10, left: 0 },
                     .transition()
                     .duration(UPDATE_TRANS_MS)
                     .attr('x1', xScale(new Date(Date.now() - FOCUS_DATA_RANGE_MS)))
-                    .attr('y1', yScale(scaleBg(180)))
+                    .attr('y1', yScale(scaleBg(highRange)))
                     .attr('x2', xScale(new Date(Date.now())))
-                    .attr('y2', yScale(scaleBg(180)));
+                    .attr('y2', yScale(scaleBg(highRange)));
 
                 // transition low line to correct location
                 focus.select('.low-line')
                     .transition()
                     .duration(UPDATE_TRANS_MS)
                     .attr('x1', xScale(new Date(Date.now() - FOCUS_DATA_RANGE_MS)))
-                    .attr('y1', yScale(scaleBg(80)))
+                    .attr('y1', yScale(scaleBg(lowRange)))
                     .attr('x2', xScale(new Date(Date.now())))
-                    .attr('y2', yScale(scaleBg(80)));
+                    .attr('y2', yScale(scaleBg(lowRange)));
             }
         }
 
@@ -213,7 +215,7 @@ var padding = { top: 20, right: 0, bottom: 10, left: 0 },
     window.onresize = function () {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(function () {
-            updateChart(false);
+            updateChart(false, false);
         }, 100);
     };
 
@@ -270,7 +272,7 @@ var padding = { top: 20, right: 0, bottom: 10, left: 0 },
 
     function updateChartWithTimer() {
         console.log("Timer expired...updating chart...");
-        updateChart(false);
+        updateChart(false, false);
         updateTimer = setTimeout(updateChartWithTimer, 60000);
     }
 
@@ -282,12 +284,14 @@ var padding = { top: 20, right: 0, bottom: 10, left: 0 },
             });
         }
         isInitialData = false;
-        updateChart(false);
+        updateChart(false, false);
         updateTimer = setTimeout(updateChartWithTimer, 60000);
     }
 
-    function updateUnits(isMmol) {
-        // only update if units have changed
+    function updateUnits(isMmol, isLogaritmic, lRange, hRange) {
+        lowRange = lRange;
+        highRange = hRange;
+        // only update if units have changed 
         if (isMmol && units != "mmol")  {
             console.log("changing to mmol");
             tickValues = [2.0, 3.0, 4.0, 6.0, 10.0, 15.0, 22.0];
@@ -308,8 +312,11 @@ var padding = { top: 20, right: 0, bottom: 10, left: 0 },
         // remove the data that was staled when timers were paused
         focus.selectAll('circle').data([], dateFn).exit().remove();
 
-        yScale = d3.scale.log()
-            .domain([scaleBg(30), scaleBg(510)]);
+        if (isLogaritmic) {
+            yScale = d3.scale.log().domain([scaleBg(30), scaleBg(510)]);
+        } else {
+            yScale = d3.scale.linear().domain([scaleBg(30), scaleBg(450)]);            
+        }
 
         yAxis = d3.svg.axis()
             .scale(yScale)
@@ -329,7 +336,7 @@ var padding = { top: 20, right: 0, bottom: 10, left: 0 },
             .call(yAxis);
 
         isInitialData = false;
-        updateChart(false);
+        updateChart(false, true);
     }
 
     // Initialize Charts
