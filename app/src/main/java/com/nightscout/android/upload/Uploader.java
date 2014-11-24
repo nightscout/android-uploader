@@ -26,42 +26,43 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Uploader {
     private static final String LOG_TAG = Uploader.class.getSimpleName();
     private final List<BaseUploader> uploaders;
-    private int uploaderCount=0;
+    private boolean allUploadersInitalized = true;
 
     public Uploader(Context context, NightscoutPreferences preferences) {
         checkNotNull(context);
         uploaders = Lists.newArrayList();
         if (preferences.isMongoUploadEnabled()) {
-            initializeMongoUploader(context, preferences);
+            allUploadersInitalized &= initializeMongoUploader(context, preferences);            
         }
         if (preferences.isRestApiEnabled()) {
-            initializeRestUploaders(context, preferences);
+            allUploadersInitalized &= initializeRestUploaders(context, preferences);            
         }
     }
 
-    private void initializeMongoUploader(Context context, NightscoutPreferences preferences) {
+    private boolean initializeMongoUploader(Context context,NightscoutPreferences preferences) {
         String dbURI = preferences.getMongoClientUri();
         String collectionName = preferences.getMongoCollection();
         String dsCollectionName = preferences.getMongoDeviceStatusCollection();
         MongoClientURI uri;
         try {
-            uploaderCount+=1;
             uri = new MongoClientURI(dbURI);
         } catch (IllegalArgumentException e) {
             Log.e(LOG_TAG, "Error creating mongo client uri for " + dbURI + ".", e);
             context.sendBroadcast(ToastReceiver.createIntent(context, R.string.unknown_mongo_host));
-            return;
+            return false;
         } catch (NullPointerException e) {
             Log.e(LOG_TAG, "Error creating mongo client uri for null value.", e);
             context.sendBroadcast(ToastReceiver.createIntent(context, R.string.unknown_mongo_host));
-            return;
+            return false;
         }
         uploaders.add(new MongoUploader(preferences, uri, collectionName, dsCollectionName));
+        return true;
     }
 
-    private void initializeRestUploaders(Context context, NightscoutPreferences preferences) {
+    private boolean initializeRestUploaders(Context context ,NightscoutPreferences preferences) {
         List<String> baseUrisSetting = preferences.getRestApiBaseUris();
         List<URI> baseUris = Lists.newArrayList();
+        boolean allInitialized = true;
         for (String baseURLSetting : baseUrisSetting) {
             String baseUriString = baseURLSetting.trim();
             if (baseUriString.isEmpty()) continue;
@@ -74,13 +75,13 @@ public class Uploader {
             }
         }
 
-        uploaderCount += baseUris.size();
         for (URI baseUri : baseUris) {
             if (baseUri.getPath().contains("v1")) {
                 try {
                     uploaders.add(new RestV1Uploader(preferences, baseUri));
                 } catch (IllegalArgumentException e) {
                     Log.e(LOG_TAG, "Error initializing rest v1 uploader.", e);
+                    allInitialized &= false;
                     context.sendBroadcast(
                             ToastReceiver.createIntent(context, R.string.illegal_rest_url));
                 }
@@ -88,6 +89,7 @@ public class Uploader {
                 uploaders.add(new RestLegacyUploader(preferences, baseUri));
             }
         }
+        return allInitialized;
     }
 
     public boolean upload(GlucoseDataSet glucoseDataSet, MeterRecord meterRecord,
@@ -116,15 +118,14 @@ public class Uploader {
 
         // Force a failure if an uploader was not properly initialized, but only after the other
         // uploaders were executed.
-        Log.d("DEBUGING","returning: " + (uploaders.size() == uploaderCount && allSuccessful));
-        return uploaders.size() == uploaderCount && allSuccessful;
+        return allUploadersInitalized && allSuccessful;
     }
 
     protected List<BaseUploader> getUploaders() {
         return uploaders;
     }
 
-    protected int getUploaderCount(){
-        return uploaderCount;
+    protected boolean areAllUploadersInitialized() {
+        return allUploadersInitalized;
     }
 }
