@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">G4 Connector</string>
-    <string name="self_destruct">Chiudi</string>
     <string name="title_activity_main">Nightscout</string>
 
     <string name="action_settings">Configurazione</string>
 
     <string name="unknown_values">---</string>
 
-    <string name="crash_toast_text">Oops! É crashato il software. Sto mandando un rapporto a Nightscout così magari lo possono sistemare!</string>
+    <string name="crash_toast_text">Oops! È crashato il software. Sto mandando un rapporto a Nightscout così magari lo possono sistemare!</string>
     <string name="feedback_dialog_title">Feedback a Nightscout</string>
     <string name="feebback_dialog_text">Per favore facci sapere cosa ne pensi</string>
     <string name="feedback_dialog_comment_prompt">Aggiungi i tuoi commenti qui sotto:</string>
@@ -37,4 +35,7 @@
     <string name="donate_dialog_yes">Sì</string>
     <string name="donate_dialog_no">No</string>
 
+    <string name="unknown_mongo_host">Error resolving Mongo host. Double check mongo url.</string>
+    <string name="illegal_rest_url">Could not create API uploader. Check your settings.</string>
+    <string name="auto_configure_title">Auto configure</string>
 </resources>

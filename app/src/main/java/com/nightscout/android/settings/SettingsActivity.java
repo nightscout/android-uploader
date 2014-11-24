@@ -26,6 +26,7 @@ import android.view.MenuItem;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.nightscout.android.R;
+import com.nightscout.android.barcode.AndroidBarcode;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.core.barcode.NSBarcodeConfig;
 import com.nightscout.core.preferences.NightscoutPreferences;
@@ -157,7 +158,7 @@ public class SettingsActivity extends PreferenceActivity {
         autoConfigure.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new IntentIntegrator(activity).initiateScan();
+                new AndroidBarcode(activity).scan();
                 return true;
             }
         });
@@ -384,10 +385,10 @@ public class SettingsActivity extends PreferenceActivity {
         }
     }
 
-    // TODO(klee): add tests for scan results
+    // Specific to the barcode scanner
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-        NightscoutPreferences prefs = new AndroidPreferences(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
+        NightscoutPreferences prefs = new AndroidPreferences(PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()));
         if (scanResult != null) {
             NSBarcodeConfig barcode=new NSBarcodeConfig(scanResult.getContents());
             if (barcode.hasMongoUri()) {

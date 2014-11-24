@@ -30,7 +30,7 @@ public class NSBarcodeConfig {
         try {
             this.config = new JSONObject(jsonConfig);
         } catch (JSONException e) {
-            throw new IllegalArgumentException("Invalid barcode");
+            throw new IllegalArgumentException("Invalid configuration from barcode: "+jsonConfig);
         }
     }
 

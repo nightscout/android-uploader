@@ -3,10 +3,7 @@ package com.nightscout.android.preferences;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.common.collect.Lists;
-import com.nightscout.android.Nightscout;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
 import java.util.List;
