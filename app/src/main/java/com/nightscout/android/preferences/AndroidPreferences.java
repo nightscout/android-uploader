@@ -1,11 +1,9 @@
 package com.nightscout.android.preferences;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.common.collect.Lists;
-import com.nightscout.android.Nightscout;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
 import java.util.List;
@@ -16,6 +14,7 @@ public class AndroidPreferences implements NightscoutPreferences {
     public AndroidPreferences(SharedPreferences preferences) {
         this.preferences = preferences;
     }
+
     @Override
     public boolean isRestApiEnabled() {
         return preferences.getBoolean(PreferenceKeys.API_UPLOADER_ENABLED, false);
@@ -61,8 +60,59 @@ public class AndroidPreferences implements NightscoutPreferences {
         return preferences.getString(PreferenceKeys.MONGO_COLLECTION, "dexcom");
     }
 
+    /**
+     * Getter method to return the mongo device status collection
+     *
+     * @return MongoDB device status collection name
+     */
     @Override
     public String getMongoDeviceStatusCollection() {
         return preferences.getString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION, "devicestatus");
+    }
+
+    /**
+     * Enable mongo upload in shared preferences
+     *
+     * @param mongoUploadEnabled whether or not to upload directly to mongo
+     */
+    @SuppressLint("CommitPrefEdits")
+    @Override
+    public void setMongoUploadEnabled(boolean mongoUploadEnabled){
+        preferences.edit().putBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED,mongoUploadEnabled).commit();
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    @Override
+    public void setRestApiEnabled(boolean restApiEnabled){
+        preferences.edit().putBoolean(PreferenceKeys.API_UPLOADER_ENABLED,restApiEnabled).commit();
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    @Override
+    public void setMongoClientUri(String mongoClientUri) {
+        preferences.edit().putString(PreferenceKeys.MONGO_URI, mongoClientUri).commit();
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    @Override
+    public void setRestApiBaseUris(List<String> restApis) {
+        StringBuilder sb = new StringBuilder();
+        for (String restEndpoint:restApis){
+            sb.append(restEndpoint);
+            sb.append(" ");
+        }
+        preferences.edit().putString(PreferenceKeys.API_URIS,sb.toString().trim()).commit();
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    @Override
+    public void setMongoDeviceStatusCollection(String deviceStatusCollection) {
+        preferences.edit().putString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION,deviceStatusCollection).commit();
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    @Override
+    public void setMongoCollection(String sgvCollection) {
+        preferences.edit().putString(PreferenceKeys.MONGO_COLLECTION,sgvCollection).commit();
     }
 }
