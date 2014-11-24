@@ -40,6 +40,15 @@ public class UploaderTest extends RobolectricTestBase {
     }
 
     @Test
+    public void initializeShouldFailOnInvalidMongoUri() throws Exception {
+        TestPreferences prefs = new TestPreferences();
+        prefs.setMongoUploadEnabled(true);
+        prefs.setMongoClientUri("http://test.com");
+        Uploader uploader = new Uploader(getContext(),prefs);
+        assertThat(uploader.areAllUploadersInitialized(), is(false));
+    }
+
+    @Test
     public void shouldSendToastIntentOnInvalidRestv1Uri() throws Exception {
         TestPreferences prefs = new TestPreferences();
         prefs.setRestApiEnabled(true);
