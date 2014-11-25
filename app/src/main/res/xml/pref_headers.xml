@@ -15,6 +15,10 @@
         android:title="@string/pref_header_display_options" />
 
     <header
+        android:fragment="com.nightscout.android.settings.SettingsActivity$DisplayYAxis"
+        android:title="@string/pref_title_chart_y_axis" />
+
+    <header
         android:fragment="com.nightscout.android.settings.SettingsActivity$AboutPreferenceFragment"
         android:title="@string/pref_header_about" />
 
