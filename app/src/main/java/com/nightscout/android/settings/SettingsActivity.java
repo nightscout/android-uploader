@@ -389,16 +389,16 @@ public class SettingsActivity extends PreferenceActivity {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
         NightscoutPreferences prefs = new AndroidPreferences(PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()));
         if (scanResult != null && scanResult.getContents() != null) {
-            NSBarcodeConfig barcode=new NSBarcodeConfig(scanResult.getContents());
-            if (barcode.hasMongoUri()) {
+            NSBarcodeConfig barcode=new NSBarcodeConfig(scanResult.getContents(),prefs);
+            if (barcode.hasMongoConfig()) {
                 prefs.setMongoUploadEnabled(true);
-                prefs.setMongoClientUri(barcode.getMongoUri());
+                prefs.setMongoClientUri(barcode.getMongoUri().get());
                 prefs.setMongoCollection(barcode.getMongoCollection());
                 prefs.setMongoDeviceStatusCollection(barcode.getMongoDeviceStatusCollection());
             } else {
                 prefs.setMongoUploadEnabled(false);
             }
-            if (barcode.hasApiUri()) {
+            if (barcode.hasApiConfig()) {
                 prefs.setRestApiEnabled(true);
                 prefs.setRestApiBaseUris(barcode.getApiUris());
             } else {

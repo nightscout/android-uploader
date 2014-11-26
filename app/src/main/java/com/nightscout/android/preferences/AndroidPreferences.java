@@ -3,6 +3,7 @@ package com.nightscout.android.preferences;
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
@@ -57,7 +58,7 @@ public class AndroidPreferences implements NightscoutPreferences {
 
     @Override
     public String getMongoCollection() {
-        return preferences.getString(PreferenceKeys.MONGO_COLLECTION, "dexcom");
+        return preferences.getString(PreferenceKeys.MONGO_COLLECTION, getDefaultMongoCollection());
     }
 
     /**
@@ -67,7 +68,7 @@ public class AndroidPreferences implements NightscoutPreferences {
      */
     @Override
     public String getMongoDeviceStatusCollection() {
-        return preferences.getString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION, "devicestatus");
+        return preferences.getString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION, getDefaultMongoDeviceStatusCollection());
     }
 
     /**
@@ -87,6 +88,18 @@ public class AndroidPreferences implements NightscoutPreferences {
         preferences.edit().putBoolean(PreferenceKeys.API_UPLOADER_ENABLED,restApiEnabled).commit();
     }
 
+    // Can't get Robolectric to read from resources
+    @Override
+    public String getDefaultMongoCollection() {
+        return DEFAULT_MONGO_COLLECTION;
+    }
+
+    // Can't get Robolectric to read from resources
+    @Override
+    public String getDefaultMongoDeviceStatusCollection() {
+        return DEFAULT_MONGO_DEVICE_STATUS_COLLECTION;
+    }
+
     @SuppressLint("CommitPrefEdits")
     @Override
     public void setMongoClientUri(String mongoClientUri) {
@@ -96,12 +109,7 @@ public class AndroidPreferences implements NightscoutPreferences {
     @SuppressLint("CommitPrefEdits")
     @Override
     public void setRestApiBaseUris(List<String> restApis) {
-        StringBuilder sb = new StringBuilder();
-        for (String restEndpoint:restApis){
-            sb.append(restEndpoint);
-            sb.append(" ");
-        }
-        preferences.edit().putString(PreferenceKeys.API_URIS,sb.toString().trim()).commit();
+        preferences.edit().putString(PreferenceKeys.API_URIS, Joiner.on(' ').join(restApis)).commit();
     }
 
     @SuppressLint("CommitPrefEdits")

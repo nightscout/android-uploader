@@ -6,16 +6,22 @@ import android.content.SharedPreferences;
 
 import com.google.common.collect.Lists;
 import com.google.zxing.integration.android.IntentIntegrator;
+import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.android.test.RobolectricTestBase;
+import com.nightscout.core.barcode.NSBarcodeConfig;
 import com.nightscout.core.barcode.NSBarcodeConfigKeys;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowPreferenceManager;
 
 import java.util.List;
@@ -23,41 +29,42 @@ import java.util.List;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+@Config(emulateSdk = 16)
+@RunWith(RobolectricTestRunner.class)
 public class AndroidBarcodeTest extends RobolectricTestBase {
     Activity activity;
+    SharedPreferences sharedPrefs;
 
     @Before
     public void setUp() {
         activity = Robolectric.buildActivity(SettingsActivity.class).create().get();
+        sharedPrefs = ShadowPreferenceManager.getDefaultSharedPreferences(Robolectric.application.getApplicationContext());
     }
 
     @Test
     public void shouldSetMongoPrefsOnScanResult() throws Exception {
-        SharedPreferences sharedPrefs = ShadowPreferenceManager.getDefaultSharedPreferences(Robolectric.application.getApplicationContext());
         String mongoUri = "mongodb://user:pass@test.com/cgm_data";
         String mongoCollection = "cgm_data";
         String deviceStatusCollection = "devicestatus";
         JSONObject json = new JSONObject();
         JSONObject child = new JSONObject();
-        child.put(NSBarcodeConfigKeys.MONGO_URI,mongoUri);
+        child.put(NSBarcodeConfigKeys.MONGO_URI, mongoUri);
         child.put(NSBarcodeConfigKeys.MONGO_COLLECTION, mongoCollection);
-        child.put(NSBarcodeConfigKeys.MONGO_DEVICE_STATUS_COLLECTION,deviceStatusCollection);
+        child.put(NSBarcodeConfigKeys.MONGO_DEVICE_STATUS_COLLECTION, deviceStatusCollection);
         json.put(NSBarcodeConfigKeys.MONGO_CONFIG,child);
         System.out.println(json.toString());
         Intent intent = createFakeScanIntent(json.toString());
-        new SettingsActivity().onActivityResult(IntentIntegrator.REQUEST_CODE,Activity.RESULT_OK, intent);
-        assertThat(sharedPrefs.getBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED,false),is(true));
-        assertThat(sharedPrefs.getString(PreferenceKeys.MONGO_URI,null),is(mongoUri));
-        assertThat(sharedPrefs.getString(PreferenceKeys.MONGO_COLLECTION,null),is(mongoCollection));
-        assertThat(sharedPrefs.getString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION,null),is(deviceStatusCollection));
+        new SettingsActivity().onActivityResult(IntentIntegrator.REQUEST_CODE, Activity.RESULT_OK, intent);
+        assertThat(sharedPrefs.getBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED, false), is(true));
+        assertThat(sharedPrefs.getString(PreferenceKeys.MONGO_URI, null), is(mongoUri));
+        assertThat(sharedPrefs.getString(PreferenceKeys.MONGO_COLLECTION, null), is(mongoCollection));
+        assertThat(sharedPrefs.getString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION, null), is(deviceStatusCollection));
 
-        assertThat(sharedPrefs.getBoolean(PreferenceKeys.API_UPLOADER_ENABLED,true),is(false));
+        assertThat(sharedPrefs.getBoolean(PreferenceKeys.API_UPLOADER_ENABLED, true), is(false));
     }
 
     @Test
     public void shouldSetApiPrefsOnScanResult() throws Exception{
-        SharedPreferences sharedPrefs = ShadowPreferenceManager.getDefaultSharedPreferences(Robolectric.application.getApplicationContext());
-
         String apiUri="http://abc@test.com/v1";
         JSONObject json = new JSONObject();
         JSONObject child = new JSONObject();
@@ -77,7 +84,6 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
 
     @Test
     public void shouldSetMultipleApiPrefsOnScanResult() throws Exception {
-        SharedPreferences sharedPrefs = ShadowPreferenceManager.getDefaultSharedPreferences(Robolectric.application.getApplicationContext());
         List<String> uris=Lists.newArrayList();
         uris.add("http://abc@test.com/v1");
         uris.add("http://test.com/");
@@ -103,27 +109,26 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
 
     @Test
     public void shouldSetMongoAndApiPrefsOnScanResult() throws Exception {
-        SharedPreferences sharedPrefs = ShadowPreferenceManager.getDefaultSharedPreferences(Robolectric.application.getApplicationContext());
         String apiUri="http://abc@test.com/";
         String mongoUri = "mongodb://user:pass@test.com/cgm_data";
         String mongoCollection = "cgm_data";
         String deviceStatusCollection = "devicestatus";
         JSONObject json = new JSONObject();
         JSONObject child = new JSONObject();
-        child.put(NSBarcodeConfigKeys.MONGO_URI,mongoUri);
+        child.put(NSBarcodeConfigKeys.MONGO_URI, mongoUri);
         child.put(NSBarcodeConfigKeys.MONGO_COLLECTION, mongoCollection);
-        child.put(NSBarcodeConfigKeys.MONGO_DEVICE_STATUS_COLLECTION,deviceStatusCollection);
-        json.put(NSBarcodeConfigKeys.MONGO_CONFIG,child);
-        child.put(NSBarcodeConfigKeys.API_URI,apiUri);
+        child.put(NSBarcodeConfigKeys.MONGO_DEVICE_STATUS_COLLECTION, deviceStatusCollection);
+        json.put(NSBarcodeConfigKeys.MONGO_CONFIG, child);
+        child.put(NSBarcodeConfigKeys.API_URI, apiUri);
         JSONArray jsonArray = new JSONArray();
-        jsonArray.put(0,child);
-        json.put(NSBarcodeConfigKeys.API_CONFIG,jsonArray);
-        json.put(NSBarcodeConfigKeys.MONGO_CONFIG,child);
+        jsonArray.put(0, child);
+        json.put(NSBarcodeConfigKeys.API_CONFIG, jsonArray);
+        json.put(NSBarcodeConfigKeys.MONGO_CONFIG, child);
 
         Intent intent = createFakeScanIntent(json.toString());
-        new SettingsActivity().onActivityResult(IntentIntegrator.REQUEST_CODE,Activity.RESULT_OK, intent);
-        assertThat(sharedPrefs.getBoolean(PreferenceKeys.API_UPLOADER_ENABLED,false),is(true));
-        assertThat(sharedPrefs.getString(PreferenceKeys.API_URIS,null),is(apiUri));
+        new SettingsActivity().onActivityResult(IntentIntegrator.REQUEST_CODE, Activity.RESULT_OK, intent);
+        assertThat(sharedPrefs.getBoolean(PreferenceKeys.API_UPLOADER_ENABLED,false), is(true));
+        assertThat(sharedPrefs.getString(PreferenceKeys.API_URIS,null), is(apiUri));
 
         // Check to make sure that the mongo uploader was not enabled
         assertThat(sharedPrefs.getBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED,false),is(true));
@@ -134,16 +139,30 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
         AndroidBarcode barcode = new AndroidBarcode(activity);
         barcode.scan();
         Intent intent = getShadowApplication().getNextStartedActivity();
-        assertThat(intent.getComponent().getClassName(),is(com.google.zxing.client.android.CaptureActivity.class.getName()));
+        assertThat(intent.getComponent().getClassName(), is(com.google.zxing.client.android.CaptureActivity.class.getName()));
+    }
+
+    @Test
+    public void shouldSetDefaultCollectionsForOnlyMongoUriSet(){
+        String jsonConfig = "{\"mongo_settings\":{\"mongo_uri\":\"mongodb://user:pass@test.com/cgm_data\"}}";
+        AndroidPreferences androidPreferences = new AndroidPreferences(sharedPrefs);
+        NSBarcodeConfig barcode = new NSBarcodeConfig(jsonConfig, androidPreferences);
+        assertThat(barcode.getMongoCollection(), is(androidPreferences.getDefaultMongoCollection()));
+        assertThat(barcode.getMongoDeviceStatusCollection(), is(androidPreferences.getDefaultMongoDeviceStatusCollection()));
     }
 
     private Intent createFakeScanIntent(String jsonString){
         Intent intent = new Intent(AndroidBarcode.SCAN_INTENT);
         intent.putExtra("SCAN_RESULT",jsonString);
-        intent.putExtra("SCAN_RESULT_FORMAT","");
-        intent.putExtra("SCAN_RESULT_BYTES",new byte[0]);
-        intent.putExtra("SCAN_RESULT_ORIENTATION",Integer.MIN_VALUE);
-        intent.putExtra("SCAN_RESULT_ERROR_CORRECTION_LEVEL","");
+        intent.putExtra("SCAN_RESULT_FORMAT", "");
+        intent.putExtra("SCAN_RESULT_BYTES", new byte[0]);
+        intent.putExtra("SCAN_RESULT_ORIENTATION", Integer.MIN_VALUE);
+        intent.putExtra("SCAN_RESULT_ERROR_CORRECTION_LEVEL", "");
         return intent;
+    }
+
+    @After
+    public void tearDown(){
+        sharedPrefs = null;
     }
 }

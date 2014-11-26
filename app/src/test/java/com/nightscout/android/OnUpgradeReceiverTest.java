@@ -38,4 +38,5 @@ public class OnUpgradeReceiverTest extends RobolectricTestBase {
         assertThat(anIntent.getComponent().getClassName(), is(MainActivity.class.getName()));
     }
 
+    //TODO: need a test to make sure that activity is not started if another package is replaced
 }

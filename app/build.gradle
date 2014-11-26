@@ -12,13 +12,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'robolectric'
 
 android {
-    compileSdkVersion 19
+    compileSdkVersion 21
     buildToolsVersion "19.1.0"
 
     defaultConfig {
         applicationId "com.nightscout.android"
         minSdkVersion 12
-        targetSdkVersion 12
+        targetSdkVersion 18
     }
 
     buildTypes {

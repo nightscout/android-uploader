@@ -1,6 +1,8 @@
 package com.nightscout.core.barcode;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.nightscout.core.preferences.NightscoutPreferences;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,20 +16,17 @@ import java.util.List;
  * A class to manage barcode configuration of the uploader
  */
 public class NSBarcodeConfig {
-    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+    protected static final Logger log = LoggerFactory.getLogger(NSBarcodeConfig.class);
     private JSONObject config;
-    private final String TAG = NSBarcodeConfig.class.getSimpleName();
+    private NightscoutPreferences prefs;
 
-    public NSBarcodeConfig(String decodeResults) {
+    public NSBarcodeConfig(String decodeResults, NightscoutPreferences prefs) {
+        this.prefs = prefs;
         configureBarcode(decodeResults);
     }
 
-    public NSBarcodeConfig(){
-        this.config=new JSONObject();
-    }
-
     public void configureBarcode(String jsonConfig){
-        if (jsonConfig==null){
+        if (jsonConfig == null){
             return;
         }
         try {
@@ -37,17 +36,19 @@ public class NSBarcodeConfig {
         }
     }
 
-    public String getMongoUri() {
+    public Optional<String> getMongoUri() {
         String mongoUri = null;
         try {
             if (config.has(NSBarcodeConfigKeys.MONGO_CONFIG) &&
                     config.getJSONObject(NSBarcodeConfigKeys.MONGO_CONFIG).has(NSBarcodeConfigKeys.MONGO_URI)) {
                 mongoUri = config.getJSONObject(NSBarcodeConfigKeys.MONGO_CONFIG).getString(NSBarcodeConfigKeys.MONGO_URI);
+            } else {
+                return Optional.absent();
             }
         } catch (JSONException e) {
-            return null;
+            return Optional.absent();
         }
-        return mongoUri;
+        return Optional.of(mongoUri);
     }
 
     public List<String> getApiUris() {
@@ -57,14 +58,14 @@ public class NSBarcodeConfig {
             try {
                 childNode = config.getJSONArray(NSBarcodeConfigKeys.API_CONFIG);
             } catch (JSONException e) {
-                log.error(TAG, "Invalid json array: "+ config.toString());
+                log.error("Invalid json array: "+ config.toString());
                 return apiUris;
             }
             for (int index = 0; index < childNode.length(); index++) {
                 try {
-                    apiUris.add(new JSONObject(childNode.getString(index)).getString(NSBarcodeConfigKeys.API_URI));
+                    apiUris.add(childNode.getJSONObject(index).getString(NSBarcodeConfigKeys.API_URI));
                 } catch (JSONException e) {
-                    log.error(TAG, "Invalid child json object: "+ config.toString());
+                    log.error("Invalid child json object: "+ config.toString());
                 }
             }
         }
@@ -72,36 +73,42 @@ public class NSBarcodeConfig {
     }
 
     public String getMongoCollection(){
-        String mongoCollection = null;
+        if (! config.has(NSBarcodeConfigKeys.MONGO_CONFIG)) {
+            return null;
+        }
+        String mongoCollection = prefs.getDefaultMongoCollection();
         try {
             if (config.has(NSBarcodeConfigKeys.MONGO_CONFIG) &&
                     config.getJSONObject(NSBarcodeConfigKeys.MONGO_CONFIG).has(NSBarcodeConfigKeys.MONGO_COLLECTION)) {
                 mongoCollection = config.getJSONObject(NSBarcodeConfigKeys.MONGO_CONFIG).getString(NSBarcodeConfigKeys.MONGO_COLLECTION);
             }
         } catch (JSONException e) {
-            return null;
+            return mongoCollection;
         }
         return mongoCollection;
     }
 
     public String getMongoDeviceStatusCollection(){
-        String deviceStatusCollection = null;
+        if (! config.has(NSBarcodeConfigKeys.MONGO_CONFIG)) {
+            return null;
+        }
+        String deviceStatusCollection = prefs.getDefaultMongoDeviceStatusCollection();
         try {
             if (config.has(NSBarcodeConfigKeys.MONGO_CONFIG) &&
                     config.getJSONObject(NSBarcodeConfigKeys.MONGO_CONFIG).has(NSBarcodeConfigKeys.MONGO_COLLECTION)) {
                 deviceStatusCollection = config.getJSONObject(NSBarcodeConfigKeys.MONGO_CONFIG).getString(NSBarcodeConfigKeys.MONGO_DEVICE_STATUS_COLLECTION);
             }
         } catch (JSONException e) {
-            return null;
+            return deviceStatusCollection;
         }
         return deviceStatusCollection;
     }
 
-    public boolean hasMongoUri(){
+    public boolean hasMongoConfig(){
         return config.has(NSBarcodeConfigKeys.MONGO_CONFIG);
     }
 
-    public boolean hasApiUri(){
+    public boolean hasApiConfig(){
         return config.has(NSBarcodeConfigKeys.API_CONFIG);
     }
 }

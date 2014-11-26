@@ -19,4 +19,11 @@ public interface NightscoutPreferences {
     void setMongoDeviceStatusCollection(String deviceStatusCollection);
     void setMongoUploadEnabled(boolean mongoUploadEnabled);
     void setRestApiEnabled(boolean restApiEnabled);
+    // Unable to load values from res files for Robolectric tests
+    public static final String DEFAULT_MONGO_COLLECTION = "cgm_data";
+    public static final String DEFAULT_MONGO_DEVICE_STATUS_COLLECTION = "devicestatus";
+
+
+    String getDefaultMongoCollection();
+    String getDefaultMongoDeviceStatusCollection();
 }
