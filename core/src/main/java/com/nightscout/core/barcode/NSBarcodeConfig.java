@@ -72,9 +72,10 @@ public class NSBarcodeConfig {
         return apiUris;
     }
 
-    public String getMongoCollection(){
+    public Optional<String> getMongoCollection(){
         if (! config.has(NSBarcodeConfigKeys.MONGO_CONFIG)) {
-            return null;
+            System.out.println("Has no config");
+            return Optional.absent();
         }
         String mongoCollection = prefs.getDefaultMongoCollection();
         try {
@@ -83,14 +84,15 @@ public class NSBarcodeConfig {
                 mongoCollection = config.getJSONObject(NSBarcodeConfigKeys.MONGO_CONFIG).getString(NSBarcodeConfigKeys.MONGO_COLLECTION);
             }
         } catch (JSONException e) {
-            return mongoCollection;
+            // Should not see this
+            log.warn("JSON exception: ",e);
         }
-        return mongoCollection;
+        return Optional.of(mongoCollection);
     }
 
-    public String getMongoDeviceStatusCollection(){
+    public Optional<String> getMongoDeviceStatusCollection(){
         if (! config.has(NSBarcodeConfigKeys.MONGO_CONFIG)) {
-            return null;
+            return Optional.absent();
         }
         String deviceStatusCollection = prefs.getDefaultMongoDeviceStatusCollection();
         try {
@@ -99,9 +101,10 @@ public class NSBarcodeConfig {
                 deviceStatusCollection = config.getJSONObject(NSBarcodeConfigKeys.MONGO_CONFIG).getString(NSBarcodeConfigKeys.MONGO_DEVICE_STATUS_COLLECTION);
             }
         } catch (JSONException e) {
-            return deviceStatusCollection;
+            // Should not see this
+            log.warn("JSON exception: ",e);
         }
-        return deviceStatusCollection;
+        return Optional.of(deviceStatusCollection);
     }
 
     public boolean hasMongoConfig(){

@@ -392,9 +392,15 @@ public class SettingsActivity extends PreferenceActivity {
             NSBarcodeConfig barcode=new NSBarcodeConfig(scanResult.getContents(),prefs);
             if (barcode.hasMongoConfig()) {
                 prefs.setMongoUploadEnabled(true);
-                prefs.setMongoClientUri(barcode.getMongoUri().get());
-                prefs.setMongoCollection(barcode.getMongoCollection());
-                prefs.setMongoDeviceStatusCollection(barcode.getMongoDeviceStatusCollection());
+                if (barcode.getMongoUri().isPresent()) {
+                    prefs.setMongoClientUri(barcode.getMongoUri().get());
+                    if (barcode.getMongoCollection().isPresent()) {
+                        prefs.setMongoCollection(barcode.getMongoCollection().get());
+                    }
+                    if (barcode.getMongoDeviceStatusCollection().isPresent()) {
+                        prefs.setMongoDeviceStatusCollection(barcode.getMongoDeviceStatusCollection().get());
+                    }
+                }
             } else {
                 prefs.setMongoUploadEnabled(false);
             }

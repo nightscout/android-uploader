@@ -144,11 +144,13 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
 
     @Test
     public void shouldSetDefaultCollectionsForOnlyMongoUriSet(){
-        String jsonConfig = "{\"mongo_settings\":{\"mongo_uri\":\"mongodb://user:pass@test.com/cgm_data\"}}";
+        String jsonConfig = "{\""+NSBarcodeConfigKeys.MONGO_CONFIG+"\":{\""+NSBarcodeConfigKeys.MONGO_URI+"\":\"mongodb://user:pass@test.com/cgm_data\"}}";
         AndroidPreferences androidPreferences = new AndroidPreferences(sharedPrefs);
         NSBarcodeConfig barcode = new NSBarcodeConfig(jsonConfig, androidPreferences);
-        assertThat(barcode.getMongoCollection(), is(androidPreferences.getDefaultMongoCollection()));
-        assertThat(barcode.getMongoDeviceStatusCollection(), is(androidPreferences.getDefaultMongoDeviceStatusCollection()));
+        assertThat(barcode.getMongoCollection().isPresent(),is(true));
+        assertThat(barcode.getMongoDeviceStatusCollection().isPresent(),is(true));
+        assertThat(barcode.getMongoCollection().get(), is(androidPreferences.getDefaultMongoCollection()));
+        assertThat(barcode.getMongoDeviceStatusCollection().get(), is(androidPreferences.getDefaultMongoDeviceStatusCollection()));
     }
 
     private Intent createFakeScanIntent(String jsonString){

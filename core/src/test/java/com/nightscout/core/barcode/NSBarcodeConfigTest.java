@@ -16,8 +16,6 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
@@ -43,8 +41,8 @@ public class NSBarcodeConfigTest {
         NSBarcodeConfig barcode = new NSBarcodeConfig(json.toString(), prefs);
         String mongo = barcode.getMongoUri().get();
         assertThat(mongo, is(mongoUri));
-        assertEquals(barcode.getMongoCollection(), mongoCollection);
-        assertEquals(barcode.getMongoDeviceStatusCollection(), deviceStatusCollection);
+        assertThat(barcode.getMongoCollection().get(), is(mongoCollection));
+        assertThat(barcode.getMongoDeviceStatusCollection().get(), is(deviceStatusCollection));
     }
 
     @Test
@@ -128,8 +126,8 @@ public class NSBarcodeConfigTest {
         json.put(NSBarcodeConfigKeys.API_CONFIG,jsonArray);
         NSBarcodeConfig barcode = new NSBarcodeConfig(json.toString(), prefs);
         assertThat(barcode.getMongoUri().isPresent(), is(false));
-        assertThat(barcode.getMongoCollection(), nullValue());
-        assertThat(barcode.getMongoDeviceStatusCollection(), nullValue());
+        assertThat(barcode.getMongoCollection().isPresent(), is(false));
+        assertThat(barcode.getMongoDeviceStatusCollection().isPresent(), is(false));
     }
 
     @Test
@@ -163,10 +161,12 @@ public class NSBarcodeConfigTest {
 
     @Test
     public void testMongoConfigWithNoCollectionReturnsDefaults(){
-        String jsonConfig = "{\"mongo_settings\":{\"mongo_uri\":\"mongodb://user:pass@test.com/cgm_data\"}}";
+        String jsonConfig = "{\""+NSBarcodeConfigKeys.MONGO_CONFIG+"\":{\""+NSBarcodeConfigKeys.MONGO_URI+"\":\"mongodb://user:pass@test.com/cgm_data\"}}";
         NSBarcodeConfig barcode = new NSBarcodeConfig(jsonConfig, prefs);
-        assertThat(barcode.getMongoCollection(), is(TestPreferences.DEFAULT_MONGO_COLLECTION));
-        assertThat(barcode.getMongoDeviceStatusCollection(), is(TestPreferences.DEFAULT_MONGO_DEVICE_STATUS_COLLECTION));
+        assertThat(barcode.getMongoCollection().isPresent(), is(true));
+        assertThat(barcode.getMongoDeviceStatusCollection().isPresent(), is(true));
+        assertThat(barcode.getMongoCollection().get(), is(TestPreferences.DEFAULT_MONGO_COLLECTION));
+        assertThat(barcode.getMongoDeviceStatusCollection().get(), is(TestPreferences.DEFAULT_MONGO_DEVICE_STATUS_COLLECTION));
     }
 
     @After
