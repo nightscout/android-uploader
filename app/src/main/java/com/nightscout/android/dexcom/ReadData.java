@@ -5,6 +5,7 @@ import android.util.Log;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.records.PageHeader;
 import com.nightscout.core.dexcom.Constants;
+import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.PacketBuilder;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.CalRecord;
@@ -62,7 +63,7 @@ public class ReadData {
     }
 
     public long getTimeSinceEGVRecord(EGVRecord egvRecord) {
-        return readSystemTime() - egvRecord.getSystemTimeSeconds();
+        return readSystemTime() - egvRecord.getRawSystemTimeSeconds();
     }
 
     public MeterRecord[] getRecentMeterRecords() {
@@ -219,45 +220,57 @@ public class ReadData {
         PageHeader pageHeader=new PageHeader(data);
         int NUM_REC_OFFSET = 4;
         int numRec = data[NUM_REC_OFFSET];
-        int rec_len;
 
         switch (Constants.RECORD_TYPES.values()[recordType]) {
             case MANUFACTURING_DATA:
                 GenericXMLRecord xmlRecord = new GenericXMLRecord(Arrays.copyOfRange(data, HEADER_LEN, data.length - 1));
                 return (T) xmlRecord;
             case SENSOR_DATA:
-                rec_len = 20;
                 SensorRecord[] sensorRecords = new SensorRecord[numRec];
                 for (int i = 0; i < numRec; i++) {
-                    int startIdx = HEADER_LEN + rec_len * i;
-                    sensorRecords[i] = new SensorRecord(Arrays.copyOfRange(data, startIdx, startIdx + rec_len - 1));
+                    int startIdx = HEADER_LEN + (SensorRecord.RECORD_SIZE + 1) * i;
+                    try {
+                        sensorRecords[i] = new SensorRecord(Arrays.copyOfRange(data, startIdx, startIdx + SensorRecord.RECORD_SIZE));
+                    } catch (InvalidRecordLengthException e) {
+                        e.printStackTrace();
+                    }
                 }
                 return (T) sensorRecords;
             case EGV_DATA:
-                rec_len = 13;
                 EGVRecord[] egvRecords = new EGVRecord[numRec];
                 for (int i = 0; i < numRec; i++) {
-                    int startIdx = HEADER_LEN + rec_len * i;
-                    egvRecords[i] = new EGVRecord(Arrays.copyOfRange(data, startIdx, startIdx + rec_len - 1));
+                    int startIdx = HEADER_LEN + (EGVRecord.RECORD_SIZE + 1) * i;
+                    try {
+                        egvRecords[i] = new EGVRecord(Arrays.copyOfRange(data, startIdx, startIdx + EGVRecord.RECORD_SIZE));
+                    } catch (InvalidRecordLengthException e) {
+                        e.printStackTrace();
+                    }
                 }
                 return (T) egvRecords;
             case METER_DATA:
-                rec_len = 16;
                 MeterRecord[] meterRecords = new MeterRecord[numRec];
                 for (int i = 0; i < numRec; i++) {
-                    int startIdx = HEADER_LEN + rec_len * i;
-                    meterRecords[i] = new MeterRecord(Arrays.copyOfRange(data, startIdx, startIdx + rec_len - 1));
+                    int startIdx = HEADER_LEN + (MeterRecord.RECORD_SIZE + 1) * i;
+                    try {
+                        meterRecords[i] = new MeterRecord(Arrays.copyOfRange(data, startIdx, startIdx + MeterRecord.RECORD_SIZE));
+                    } catch (InvalidRecordLengthException e) {
+                        e.printStackTrace();
+                    }
                 }
                 return (T) meterRecords;
             case CAL_SET:
-                rec_len = 249;
+                int rec_len = CalRecord.RECORD_V2_SIZE;
                 if (pageHeader.getRevision()<=2) {
-                    rec_len = 148;
+                    rec_len = CalRecord.RECORD_SIZE;
                 }
                 CalRecord[] calRecords = new CalRecord[numRec];
                 for (int i = 0; i < numRec; i++) {
-                    int startIdx = HEADER_LEN + rec_len * i;
-                    calRecords[i] = new CalRecord(Arrays.copyOfRange(data, startIdx, startIdx + rec_len - 1));
+                    int startIdx = HEADER_LEN + (rec_len + 1) * i;
+                    try {
+                        calRecords[i] = new CalRecord(Arrays.copyOfRange(data, startIdx, startIdx + rec_len));
+                    } catch (InvalidRecordLengthException e) {
+                        e.printStackTrace();
+                    }
                 }
                 return (T) calRecords;
             default:

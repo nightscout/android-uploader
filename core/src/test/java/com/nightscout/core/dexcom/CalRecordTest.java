@@ -1,81 +1,153 @@
-//11-27 11:20:21.598  25772-26077/com.nightscout.android D/ReadData﹕ Reading EGV page range...
-//        11-27 11:20:21.626  25772-26077/com.nightscout.android D/ReadData﹕ Command: ReadDatabasePageRange
-//        11-27 11:20:21.627  25772-26077/com.nightscout.android D/ReadData﹕ Write data: 01 07 00 10 04 8b b8
-//        11-27 11:20:21.664  25772-26077/com.nightscout.android D/ReadData﹕ Read 14 byte(s) complete.
-//        11-27 11:20:21.916  25772-26077/com.nightscout.android D/ReadData﹕ Read data: 01 0e 00 01 39 05 00 00 1f 06 00 00 b7 a0
-//        11-27 11:20:21.916  25772-26077/com.nightscout.android D/ReadData﹕ Reading 2 EGV page(s)...
-//        11-27 11:20:21.916  25772-26077/com.nightscout.android D/ReadData﹕ Reading #1 EGV pages (page number 1566)
-//        11-27 11:20:21.916  25772-26077/com.nightscout.android D/ReadData﹕ Command: ReadDatabasePages
-//        11-27 11:20:21.922  25772-26077/com.nightscout.android D/ReadData﹕ Write data: 01 0c 00 11 04 1e 06 00 00 01 a4 af
-//        11-27 11:20:21.963  25772-26077/com.nightscout.android D/ReadData﹕ Read 534 byte(s) complete.
-//        11-27 11:20:22.345  25772-26077/com.nightscout.android D/ReadData﹕ Read data: 01 16 02 01 74 e8 00 00 26 00 00 00 04 02 1e 06 00 00 00 00 00 00 00 00 00 00 00 00 00 00 5b dd 7d 4d 1b 0b 38 d0 1a 0b 6e 00 15 58 1b aa 4e 1b 0b 65 d1 1a 0b 69 00 15 c5 db d5 4f 1b 0b 90 d2 1a 0b 64 00 15 af 5e 02 51 1b 0b bd d3 1a 0b 61 00 14 bf 78 2d 52 1b 0b e8 d4 1a 0b 5f 00 14 ec 6d 59 53 1b 0b 14 d6 1a 0b 5d 00 14 af 70 85 54 1b 0b 40 d7 1a 0b 5c 00 14 1f 5e b1 55 1b 0b 6c d8 1a 0b 5f 00 14 94 3f dd 56 1b 0b 98 d9 1a 0b 68 00 14 f6 78 09 58 1b 0b c4 da 1a 0b 70 00 13 3e 64 35 59 1b 0b f0 db 1a 0b 7c 00 12 5e bf 61 5a 1b 0b 1c dd 1a 0b 83 00 12 34 46 8d 5b 1b 0b 48 de 1a 0b 89 00 13 ec 8f b9 5c 1b 0b 74 df 1a 0b 8b 00 13 30 1d e5 5d 1b 0b a0 e0 1a 0b 89 00 14 f4 e4 11 5f 1b 0b cc e1 1a 0b 88 00 14 e0 ca 3d 60 1b 0b f8 e2 1a 0b 86 00 14 d3 25 69 61 1b 0b 24 e4 1a 0b 83 00 14 2d 7f 95 62 1b 0b 50 e5 1a 0b 81 00 14 74 61 c1 63 1b 0b 7c e6 1a 0b 81 00 14 e3 bc ed 64 1b 0b a8 e7 1a 0b 82 00 14 f2 65 19 66 1b 0b d4 e8 1a 0b 85 00 14 9e 4e 45 67 1b 0b 00 ea 1a 0b 87 00 14 72 a6 9e 69 1b 0b 59 ec 1a 0b 8a 00 24 08 e5 c9 6a 1b 0b 84 ed 1a 0b 8f 00 24 a6 69 f5 6b 1b 0b b0 ee 1a 0b 90 00 38 29 e0 21 6d 1b 0b dc ef 1a 0b 8a 00 38 e0 7a 4d 6e 1b 0b 08 f1 1a 0b 7c 00 38 34 9d 79 6f 1b 0b 34 f2 1a 0b 6c 00 38 14 da a5 70 1b 0b 60 f3 1a 0b 5f 00 38 bc 81 d1 71 1b 0b 8c f4 1a 0b 56 00 26 8b eb fd 72 1b 0b b8 f5 1a 0b 52 00 26 dc 02 29 74 1b 0b e4 f6 1a 0b 4e 00 25 1b c8 55 75 1b 0b 10 f8 1a 0b 4a 00 24 19 4d 81 76 1b 0b 3c f9 1a 0b 44 00 24 ef 57 ad 77 1b 0b 68 fa 1a 0b 3d 00 25 10 d2 d9 78 1b 0b 94 fb 1a 0b 31 00 14 34 05 05 7a 1b 0b c0 fc 1a 0b 2e 00 14 77 3c ff ff ff ff ff ff 1f 46
-//        11-27 11:20:22.488  25772-26077/com.nightscout.android D/ReadData﹕ Reading #0 EGV pages (page number 1567)
-//        11-27 11:20:22.488  25772-26077/com.nightscout.android D/ReadData﹕ Command: ReadDatabasePages
-//        11-27 11:20:22.489  25772-26077/com.nightscout.android D/ReadData﹕ Write data: 01 0c 00 11 04 1f 06 00 00 01 f5 05
-//        11-27 11:20:22.507  25772-26077/com.nightscout.android D/ReadData﹕ Read 534 byte(s) complete.
-//        11-27 11:20:22.829  25772-26077/com.nightscout.android D/ReadData﹕ Read data: 01 16 02 01 9a e8 00 00 03 00 00 00 04 02 1f 06 00 00 00 00 00 00 00 00 00 00 00 00 00 00 8d 76 31 7b 1b 0b ec fd 1a 0b 2b 00 14 ff 6f 5d 7c 1b 0b 18 ff 1a 0b 29 00 14 1d 65 89 7d 1b 0b 44 00 1b 0b 32 00 14 dd 36 ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff a5 b2
-//        11-27 11:20:22.830  25772-26077/com.nightscout.android D/ReadData﹕ Read complete of EGV pages.
-//        11-27 11:20:22.830  25772-26077/com.nightscout.android D/ReadData﹕ Reading Meter page...
-//        11-27 11:20:22.830  25772-26077/com.nightscout.android D/ReadData﹕ Command: ReadDatabasePageRange
-//        11-27 11:20:22.831  25772-26077/com.nightscout.android D/ReadData﹕ Write data: 01 07 00 10 0a 45 59
-//        11-27 11:20:22.846  25772-26077/com.nightscout.android D/ReadData﹕ Read 14 byte(s) complete.
-//        11-27 11:20:23.104  25772-26077/com.nightscout.android D/ReadData﹕ Read data: 01 0e 00 01 0a 00 00 00 0d 00 00 00 d6 13
-//        11-27 11:20:23.104  25772-26077/com.nightscout.android D/ReadData﹕ Command: ReadDatabasePages
-//        11-27 11:20:23.107  25772-26077/com.nightscout.android D/ReadData﹕ Write data: 01 0c 00 11 0a 0d 00 00 00 01 16 e2
-//        11-27 11:20:23.136  25772-26077/com.nightscout.android D/ReadData﹕ Read 534 byte(s) complete.
-//        11-27 11:20:23.519  25772-26077/com.nightscout.android D/ReadData﹕ Read data: 01 16 02 01 93 01 00 00 13 00 00 00 0a 01 0d 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 4c ef 1b 3f 09 0b d6 c1 08 0b a6 00 fd 3e 09 0b f7 a8 2a 3f 09 0b e5 c1 08 0b 98 00 0c 3f 09 0b 1c e5 d4 02 0a 0b 8f 85 09 0b 81 00 b6 02 0a 0b b6 15 17 82 0b 0b d2 04 0b 0b 92 00 f9 81 0b 0b ac d8 de 39 0c 0b 99 bc 0b 0b eb 00 c0 39 0c 0b 57 81 6a 78 0d 0b 25 fb 0c 0b 18 01 4c 78 0d 0b 62 95 30 53 10 0b eb d5 0f 0b b2 00 12 53 10 0b 6b 04 cb ff 10 0b 86 82 10 0b 8b 00 ad ff 10 0b 1f c3 e0 7f 11 0b 9b 02 11 0b d8 00 c2 7f 11 0b 22 51 f2 7f 11 0b ad 02 11 0b e8 00 d4 7f 11 0b 81 ac 20 0e 12 0b db 90 11 0b b3 00 02 0e 12 0b 57 c1 8d 11 13 0b 48 94 12 0b 87 00 6f 11 13 0b 37 32 31 c4 14 0b ec 46 14 0b ab 00 13 c4 14 0b 94 38 8e 8d 16 0b 49 10 16 0b b3 00 70 8d 16 0b 6a 4b ec e7 16 0b a7 6a 16 0b 76 00 ce e7 16 0b 78 dd f9 a8 18 0b b4 2b 18 0b 71 00 db a8 18 0b dd 64 2a de 1a 0b e5 60 1a 0b 46 00 0c de 1a 0b e1 f4 41 de 1a 0b fc 60 1a 0b 48 00 23 de 1a 0b c2 f6 fe f7 1a 0b b9 7a 1a 0b 06 01 e0 f7 1a 0b 79 7e ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 34 19
-//        11-27 11:20:23.523  25772-26077/com.nightscout.android D/ReadData﹕ Reading Sensor page range...
-//        11-27 11:20:23.523  25772-26077/com.nightscout.android D/ReadData﹕ Command: ReadDatabasePageRange
-//        11-27 11:20:23.523  25772-26077/com.nightscout.android D/ReadData﹕ Write data: 01 07 00 10 03 6c c8
-//        11-27 11:20:23.545  25772-26077/com.nightscout.android D/ReadData﹕ Read 14 byte(s) complete.
-//        11-27 11:20:23.802  25772-26077/com.nightscout.android D/ReadData﹕ Read data: 01 0e 00 01 e3 07 00 00 3d 09 00 00 da 91
-//        11-27 11:20:23.803  25772-26077/com.nightscout.android D/ReadData﹕ Reading 2 Sensor page(s)...
-//        11-27 11:20:23.803  25772-26077/com.nightscout.android D/ReadData﹕ Reading #1 Sensor pages (page number 2364)
-//        11-27 11:20:23.803  25772-26077/com.nightscout.android D/ReadData﹕ Command: ReadDatabasePages
-//        11-27 11:20:23.809  25772-26077/com.nightscout.android D/ReadData﹕ Write data: 01 0c 00 11 03 3c 09 00 00 01 3c ff
-//        11-27 11:20:23.827  25772-26077/com.nightscout.android D/ReadData﹕ Read 534 byte(s) complete.
-//        11-27 11:20:24.140  25772-26077/com.nightscout.android D/ReadData﹕ Read data: 01 16 02 01 dc e6 00 00 19 00 00 00 03 01 3c 09 00 00 00 00 00 00 00 00 00 00 00 00 00 00 b7 aa d5 4f 1b 0b 90 d2 1a 0b 80 e2 01 00 a0 f9 01 00 a3 00 90 05 01 51 1b 0b bc d3 1a 0b c0 d8 01 00 b0 e9 01 00 b0 01 28 1f 2d 52 1b 0b e8 d4 1a 0b 10 d2 01 00 60 dd 01 00 ad 00 8e a9 59 53 1b 0b 14 d6 1a 0b 20 c9 01 00 30 d4 01 00 a8 00 46 d3 85 54 1b 0b 40 d7 1a 0b 70 c6 01 00 60 cd 01 00 a8 00 bb b9 b1 55 1b 0b 6c d8 1a 0b 10 d4 01 00 00 ca 01 00 a6 00 c0 d1 dd 56 1b 0b 98 d9 1a 0b 30 f4 01 00 b0 ce 01 00 a5 00 59 c9 09 58 1b 0b c4 da 1a 0b 80 12 02 00 a0 df 01 00 a7 00 d6 48 35 59 1b 0b f0 db 1a 0b c0 3b 02 00 50 fd 01 00 ae 00 0b cd 61 5a 1b 0b 1c dd 1a 0b 20 58 02 00 80 22 02 00 a2 01 3c 3f 8c 5b 1b 0b 47 de 1a 0b 40 6d 02 00 a0 46 02 00 a8 00 bc e1 b8 5c 1b 0b 73 df 1a 0b a0 74 02 00 e0 62 02 00 a9 00 f9 61 e4 5d 1b 0b 9f e0 1a 0b 60 70 02 00 a0 72 02 00 a7 00 79 33 10 5f 1b 0b cb e1 1a 0b c0 6d 02 00 80 76 02 00 a8 00 f0 d0 3c 60 1b 0b f7 e2 1a 0b e0 65 02 00 20 72 02 00 b1 00 3e b0 68 61 1b 0b 23 e4 1a 0b a0 5b 02 00 e0 69 02 00 b3 00 7b 54 94 62 1b 0b 4f e5 1a 0b 20 57 02 00 40 61 02 00 aa 00 22 91 c0 63 1b 0b 7b e6 1a 0b 60 59 02 00 80 5a 02 00 ab 00 42 7d ec 64 1b 0b a7 e7 1a 0b 40 5b 02 00 60 57 02 00 a0 00 b2 9b 18 66 1b 0b d3 e8 1a 0b 80 67 02 00 40 59 02 00 a7 00 0a a9 44 67 1b 0b ff e9 1a 0b c0 6f 02 00 e0 5f 02 00 ae 00 f2 b2 9d 69 1b 0b 58 ec 1a 0b c0 a4 02 00 a0 7d 02 00 ad 02 10 f5 c8 6a 1b 0b 83 ed 1a 0b 80 91 02 00 00 90 02 00 b1 00 8b 38 f4 6b 1b 0b af ee 1a 0b 20 5b 02 00 40 95 02 00 ad 00 b6 b7 20 6d 1b 0b db ef 1a 0b 00 24 02 00 e0 7f 02 00 a0 00 37 e3 08 e6
-//        11-27 11:20:24.143  25772-26077/com.nightscout.android D/ReadData﹕ Reading #0 Sensor pages (page number 2365)
-//        11-27 11:20:24.143  25772-26077/com.nightscout.android D/ReadData﹕ Command: ReadDatabasePages
-//        11-27 11:20:24.144  25772-26077/com.nightscout.android D/ReadData﹕ Write data: 01 0c 00 11 03 3d 09 00 00 01 6d 55
-//        11-27 11:20:24.170  25772-26077/com.nightscout.android D/ReadData﹕ Read 534 byte(s) complete.
-//        11-27 11:20:24.467  25772-26077/com.nightscout.android D/ReadData﹕ Read data: 01 16 02 01 f5 e6 00 00 0e 00 00 00 03 01 3d 09 00 00 00 00 00 00 00 00 00 00 00 00 00 00 84 ff 4c 6e 1b 0b 07 f1 1a 0b f0 f3 01 00 e0 4f 02 00 a8 00 5d 97 78 6f 1b 0b 33 f2 1a 0b 00 d5 01 00 40 15 02 00 af 00 e2 f4 a4 70 1b 0b 5f f3 1a 0b a0 c1 01 00 b0 e3 01 00 aa 00 59 00 d0 71 1b 0b 8b f4 1a 0b b0 b2 01 00 50 c4 01 00 ad 00 fe fe fc 72 1b 0b b7 f5 1a 0b 60 a2 01 00 f0 b3 01 00 aa 00 f1 60 28 74 1b 0b e3 f6 1a 0b 80 8f 01 00 d0 a8 01 00 ad 00 fb d1 54 75 1b 0b 0f f8 1a 0b 00 7c 01 00 30 9b 01 00 a6 00 78 27 80 76 1b 0b 3b f9 1a 0b 30 6a 01 00 10 89 01 00 a5 00 17 6f ac 77 1b 0b 67 fa 1a 0b 50 5e 01 00 70 75 01 00 a2 00 c9 ee d8 78 1b 0b 93 fb 1a 0b f0 50 01 00 e0 63 01 00 b1 00 45 77 04 7a 1b 0b bf fc 1a 0b d0 45 01 00 00 56 01 00 a3 00 90 24 30 7b 1b 0b eb fd 1a 0b 10 3d 01 00 10 4b 01 00 a5 00 73 17 5c 7c 1b 0b 17 ff 1a 0b 00 3a 01 00 40 42 01 00 b4 00 33 1c 89 7d 1b 0b 44 00 1b 0b c0 54 01 00 e0 3e 01 00 b1 01 75 11 ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff e5 2f
-//        11-27 11:20:24.471  25772-26077/com.nightscout.android D/ReadData﹕ Read complete of Sensor pages.
-//        11-27 11:20:24.481  25772-26077/com.nightscout.android D/ReadData﹕ Reading Cal Records page range...
-//        11-27 11:20:24.481  25772-26077/com.nightscout.android D/ReadData﹕ Command: ReadDatabasePageRange
-//        11-27 11:20:24.482  25772-26077/com.nightscout.android D/ReadData﹕ Write data: 01 07 00 10 05 aa a8
-//        11-27 11:20:24.497  25772-26077/com.nightscout.android D/ReadData﹕ Read 14 byte(s) complete.
-//        11-27 11:20:24.748  25772-26077/com.nightscout.android D/ReadData﹕ Read data: 01 0e 00 01 06 01 00 00 22 01 00 00 90 6e
-//        11-27 11:20:24.748  25772-26077/com.nightscout.android D/ReadData﹕ Reading Cal Records page...
-//        11-27 11:20:24.748  25772-26077/com.nightscout.android D/ReadData﹕ Command: ReadDatabasePages
-//        11-27 11:20:24.749  25772-26077/com.nightscout.android D/ReadData﹕ Write data: 01 0c 00 11 05 22 01 00 00 01 ec 3c
-//        11-27 11:20:24.769  25772-26077/com.nightscout.android D/ReadData﹕ Read 534 byte(s) complete.
-//        11-27 11:20:25.086  25772-26077/com.nightscout.android D/ReadData﹕ Read data: 01 16 02 01 66 03 00 00 01 00 00 00 05 02 22 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0f b0 1e f9 1a 0b d9 7b 1a 0b 92 ee 4c 6b 71 77 88 40 58 e9 c6 b1 02 0c dc 40 00 00 00 00 00 00 f0 3f 03 06 01 ab aa aa aa aa aa 00 40 03 0c de 1a 0b 46 00 00 00 50 49 01 00 56 df 1a 0b 00 23 de 1a 0b 48 00 00 00 50 49 01 00 56 df 1a 0b 00 e0 f7 1a 0b 06 01 00 00 80 91 03 00 1d f9 1a 0b 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 c7 b3 ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff d9 bc
-//        11-27 11:20:25.087  25772-26077/com.nightscout.android D/ReadData﹕ Cal record Version: pre-505
-//        11-27 11:20:25.089  25772-26077/com.nightscout.android D/ReadData﹕ Cal Record: 1EF91A0BD97B1A0B92EE4C6B7177884058E9C6B1020CDC40000000000000F03F030601ABAAAAAAAAAA0040030CDE1A0B460000005049010056DF1A0B0023DE1A0B480000005049010056DF1A0B00E0F71A0B06010000809103001DF91A0B00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000C7
-//        11-27 11:20:25.098  25772-26077/com.nightscout.android D/ReadData﹕ Record Cal Slope: 1.0 Intercept: 28720.042100646853 Scale: 1.0 Decay: 2.0833333333333335 Num records: 3 display time: 1417078217000 system time: 186317086
-//        11-27 11:20:25.098  25772-26077/com.nightscout.android D/ReadData﹕ Reading system time...
-//        11-27 11:20:25.098  25772-26077/com.nightscout.android D/ReadData﹕ Command: ReadSystemTime
-//        11-27 11:20:25.098  25772-26077/com.nightscout.android D/ReadData﹕ Write data: 01 06 00 22 34 c0
-//        11-27 11:20:25.112  25772-26077/com.nightscout.android D/ReadData﹕ Read 10 byte(s) complete.
-//        11-27 11:20:25.364  25772-26077/com.nightscout.android D/ReadData﹕ Read data: 01 0a 00 01 9c 7e 1b 0b 8a 3a
-//        11-27 11:20:25.364  25772-26077/com.nightscout.android D/ReadData﹕ Reading system time...
-//        11-27 11:20:25.364  25772-26077/com.nightscout.android D/ReadData﹕ Command: ReadSystemTime
-//        11-27 11:20:25.366  25772-26077/com.nightscout.android D/ReadData﹕ Write data: 01 06 00 22 34 c0
-//        11-27 11:20:25.374  25772-26077/com.nightscout.android D/ReadData﹕ Read 10 byte(s) complete.
-//        11-27 11:20:25.628  25772-26077/com.nightscout.android D/ReadData﹕ Read data: 01 0a 00 01 9d 7e 1b 0b 3e 4c
-//        11-27 11:20:25.628  25772-26077/com.nightscout.android D/ReadData﹕ Reading system time...
-//        11-27 11:20:25.629  25772-26077/com.nightscout.android D/ReadData﹕ Command: ReadSystemTime
-//        11-27 11:20:25.631  25772-26077/com.nightscout.android D/ReadData﹕ Write data: 01 06 00 22 34 c0
-//        11-27 11:20:25.649  25772-26077/com.nightscout.android D/ReadData﹕ Read 10 byte(s) complete.
-//        11-27 11:20:25.902  25772-26077/com.nightscout.android D/ReadData﹕ Read data: 01 0a 00 01 9d 7e 1b 0b 3e 4c
-//        11-27 11:20:25.902  25772-26077/com.nightscout.android D/ReadData﹕ Reading display time offset...
-//        11-27 11:20:25.902  25772-26077/com.nightscout.android D/ReadData﹕ Command: ReadDisplayTimeOffset
-//        11-27 11:20:25.904  25772-26077/com.nightscout.android D/ReadData﹕ Write data: 01 06 00 1d 88 07
-//        11-27 11:20:25.921  25772-26077/com.nightscout.android D/ReadData﹕ Read 10 byte(s) complete.
-//        11-27 11:20:26.175  25772-26077/com.nightscout.android D/ReadData﹕ Read data: 01 0a 00 01 bb 82 ff ff 37 b9
+package com.nightscout.core.dexcom;
 
-        package com.nightscout.core.dexcom;
+import com.nightscout.core.dexcom.records.CalRecord;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+
+import java.util.Arrays;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+
+@RunWith(JUnit4.class)
 public class CalRecordTest {
+    private byte[] record505;
+    private byte[] recordPre505;
+    @Before
+    public void setUp(){
+        record505 = new byte[]{(byte) 0x1E, (byte) 0xF9, (byte) 0x1A, (byte) 0x0B, (byte) 0xD9,
+                (byte) 0x7B, (byte) 0x1A, (byte) 0x0B, (byte) 0x92, (byte) 0xEE, (byte) 0x4C,
+                (byte) 0x6B, (byte) 0x71, (byte) 0x77, (byte) 0x88, (byte) 0x40, (byte) 0x58,
+                (byte) 0xE9, (byte) 0xC6, (byte) 0xB1, (byte) 0x02, (byte) 0x0C, (byte) 0xDC,
+                (byte) 0x40, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0xF0, (byte) 0x3F, (byte) 0x03, (byte) 0x06, (byte) 0x01,
+                (byte) 0xAB, (byte) 0xAA, (byte) 0xAA, (byte) 0xAA, (byte) 0xAA, (byte) 0xAA,
+                (byte) 0x00, (byte) 0x40, (byte) 0x03, (byte) 0x0C, (byte) 0xDE, (byte) 0x1A,
+                (byte) 0x0B, (byte) 0x46, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x50,
+                (byte) 0x49, (byte) 0x01, (byte) 0x00, (byte) 0x56, (byte) 0xDF, (byte) 0x1A,
+                (byte) 0x0B, (byte) 0x00, (byte) 0x23, (byte) 0xDE, (byte) 0x1A, (byte) 0x0B,
+                (byte) 0x48, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x50, (byte) 0x49,
+                (byte) 0x01, (byte) 0x00, (byte) 0x56, (byte) 0xDF, (byte) 0x1A, (byte) 0x0B,
+                (byte) 0x00, (byte) 0xE0, (byte) 0xF7, (byte) 0x1A, (byte) 0x0B, (byte) 0x06,
+                (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x80, (byte) 0x91, (byte) 0x03,
+                (byte) 0x00, (byte) 0x1D, (byte) 0xF9, (byte) 0x1A, (byte) 0x0B, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xC7};
+        recordPre505 = new byte[]{(byte) 0x6B, (byte) 0xD1, (byte) 0x1A, (byte) 0x0B, (byte) 0x09,
+                (byte) 0x7D, (byte) 0x1A, (byte) 0x0B, (byte) 0xD1, (byte) 0x3C, (byte) 0xE9,
+                (byte) 0x4A, (byte) 0xB3, (byte) 0x6C, (byte) 0x89, (byte) 0x40, (byte) 0x64,
+                (byte) 0x75, (byte) 0x6A, (byte) 0xCF, (byte) 0xE2, (byte) 0xEB, (byte) 0xD9,
+                (byte) 0x40, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0xF0, (byte) 0x3F, (byte) 0x03, (byte) 0x06, (byte) 0x01,
+                (byte) 0x1E, (byte) 0x10, (byte) 0x09, (byte) 0xD2, (byte) 0xA6, (byte) 0x30,
+                (byte) 0xF2, (byte) 0x3F, (byte) 0x03, (byte) 0x2E, (byte) 0xB5, (byte) 0x1A,
+                (byte) 0x0B, (byte) 0x46, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x50,
+                (byte) 0x49, (byte) 0x01, (byte) 0x00, (byte) 0x77, (byte) 0xB6, (byte) 0x1A,
+                (byte) 0x0B, (byte) 0x00, (byte) 0x45, (byte) 0xB5, (byte) 0x1A, (byte) 0x0B,
+                (byte) 0x48, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x50, (byte) 0x49,
+                (byte) 0x01, (byte) 0x00, (byte) 0x77, (byte) 0xB6, (byte) 0x1A, (byte) 0x0B,
+                (byte) 0x00, (byte) 0x5E, (byte) 0xD0, (byte) 0x1A, (byte) 0x0B, (byte) 0x06,
+                (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x60, (byte) 0xA8, (byte) 0x03,
+                (byte) 0x00, (byte) 0x6B, (byte) 0xD1, (byte) 0x1A, (byte) 0x0B, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x33, (byte) 0x33,
+                (byte) 0x33, (byte) 0x33, (byte) 0x33, (byte) 0x33, (byte) 0xD3, (byte) 0x3F,
+                (byte) 0x55, (byte) 0x55, (byte) 0x55, (byte) 0x55, (byte) 0x55, (byte) 0x55,
+                (byte) 0xE5, (byte) 0x3F, (byte) 0x03};
+    }
+
+    // Cal record Version: pre-505
+    // Cal Record: 1EF91A0BD97B1A0B92EE4C6B7177884058E9C6B1020CDC40000000000000F03F030601ABAAAAAAAAAA0040030CDE1A0B460000005049010056DF1A0B0023DE1A0B480000005049010056DF1A0B00E0F71A0B06010000809103001DF91A0B00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000C7
+    // Record Cal Slope: 813.5875452253041 Intercept: 26543.54390965904 Scale: 1.0 Decay: 1.1368778423793695 Num records: 3 display time: 186285321L system time: 186306923
+    @Test
+    public void shouldParsePre505CalRecord() throws Exception {
+        CalRecord calRecord = new CalRecord(recordPre505);
+        assertThat(calRecord.getSlope(), is(813.5875452253041));
+        assertThat(calRecord.getIntercept(), is(26543.54390965904));
+        assertThat(calRecord.getScale(), is(1.0));
+        assertThat(calRecord.getDecay(), is(1.1368778423793695));
+        assertThat(calRecord.getNumRecords(),is(3));
+        assertThat(calRecord.getRawDisplayTimeSeconds(), is(186285321L));
+        assertThat(calRecord.getRawSystemTimeSeconds(), is(186306923));
+    }
+
+    // Cal record Version: 505
+    // Cal Record: 6BD11A0B097D1A0BD13CE94AB36C894064756ACFE2EBD940000000000000F03F0306011E1009D2A630F23F032EB51A0B460000005049010077B61A0B0045B51A0B480000005049010077B61A0B005ED01A0B0601000060A803006BD11A0B0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000333333333333D33F555555555555E53F03
+    // Record Cal Slope: 782.9303804407411 Intercept: 28720.042100646853 Scale: 1.0 Decay: 2.0833333333333335 Num records: 3 display time: 186285017L system time: 186317086
+    @Test
+    public void shouldParse505CalRecord() throws Exception {
+        CalRecord calRecord = new CalRecord(record505);
+        assertThat(calRecord.getSlope(), is(782.9303804407411));
+        assertThat(calRecord.getIntercept(), is(28720.042100646853));
+        assertThat(calRecord.getScale(), is(1.0));
+        assertThat(calRecord.getNumRecords(),is(3));
+        assertThat(calRecord.getDecay(), is(2.0833333333333335));
+        assertThat(calRecord.getRawDisplayTimeSeconds(), is(186285017L));
+        assertThat(calRecord.getRawSystemTimeSeconds(), is(186317086));
+    }
+
+    @Test(expected = InvalidRecordLengthException.class)
+    public void shouldNotParseSmallCal505Record() throws Exception {
+        record505=Arrays.copyOfRange(record505,0,record505.length - 1);
+        CalRecord calRecord = new CalRecord(record505);
+    }
+
+    @Test(expected = InvalidRecordLengthException.class)
+    public void shouldNotParseSmallCalPre505Record() throws Exception {
+        recordPre505=Arrays.copyOfRange(recordPre505, 0, recordPre505.length - 1);
+        CalRecord calRecord = new CalRecord(recordPre505);
+    }
+
+
+    @Test(expected = InvalidRecordLengthException.class)
+    public void shouldNotParseLargeCal505Record() throws Exception {
+        record505 = Arrays.copyOf(record505, record505.length + 1);
+        CalRecord calRecord = new CalRecord(record505);
+    }
+
+    @Test(expected = InvalidRecordLengthException.class)
+    public void shouldNotParseLargeCalPre505Record() throws Exception {
+        recordPre505 = Arrays.copyOf(recordPre505, recordPre505.length + 1);
+        CalRecord calRecord = new CalRecord(recordPre505);
+    }
+
+
+    @After
+    public void tearDown(){
+        recordPre505 = null;
+        record505 = null;
+    }
+
 }

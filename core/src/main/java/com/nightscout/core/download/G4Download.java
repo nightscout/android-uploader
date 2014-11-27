@@ -128,7 +128,7 @@ public class G4Download extends Download {
             SGV.CookieMonsterG4EGV.Direction direction =
                     SGV.CookieMonsterG4EGV.Direction.values()[record.getTrend().ordinal()];
             sgvBuilder.setSgv(record.getBGValue())
-                    .setTimestamp(record.getSystemTimeSeconds())
+                    .setTimestamp(record.getRawSystemTimeSeconds())
                     .setDirection(direction);
             builder.addSgv(sgvBuilder);
         }
@@ -142,7 +142,7 @@ public class G4Download extends Download {
             SGV.CookieMonsterG4Meter.Builder meterBuilder = SGV.CookieMonsterG4Meter.newBuilder();
             meterBuilder.setMeterBg(record.getMeterBG())
                     .setMeterTime(record.getMeterTime())
-                    .setTimestamp(record.getSystemTimeSeconds());
+                    .setTimestamp(record.getRawSystemTimeSeconds());
             builder.addMeter(meterBuilder);
         }
         for (SensorRecord record: sensorRecords) {
@@ -151,7 +151,7 @@ public class G4Download extends Download {
             sensorBuilder.setFiltered(record.getFiltered())
                     .setUnfiltered(record.getUnfiltered())
                     .setRssi(record.getRssi())
-                    .setTimestamp(record.getSystemTimeSeconds());
+                    .setTimestamp(record.getRawSystemTimeSeconds());
             builder.addSensor(sensorBuilder);
         }
         for (CalRecord record:calRecords) {
@@ -159,7 +159,7 @@ public class G4Download extends Download {
             calBuilder.setSlope(record.getSlope())
                     .setIntercept(record.getIntercept())
                     .setScale(record.getScale())
-                    .setTimestamp(record.getSystemTimeSeconds());
+                    .setTimestamp(record.getRawSystemTimeSeconds());
             builder.addCal(calBuilder);
         }
         builder.setPatientName(name);

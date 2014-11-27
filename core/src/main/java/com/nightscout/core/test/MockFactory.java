@@ -1,5 +1,6 @@
 package com.nightscout.core.test;
 
+import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.EGVRecord;
@@ -11,22 +12,22 @@ import com.nightscout.core.records.DeviceStatus;
 import org.joda.time.DateTime;
 
 public class MockFactory {
-    public static GlucoseDataSet mockGlucoseDataSet() {
+    public static GlucoseDataSet mockGlucoseDataSet() throws InvalidRecordLengthException {
         EGVRecord egvRecord = new EGVRecord(
                 1,
                 TrendArrow.DOUBLE_DOWN,
                 new DateTime(0).toDate(),
                 new DateTime(5).toDate());
-        SensorRecord sensorRecord = new SensorRecord(new byte[128]);
+        SensorRecord sensorRecord = new SensorRecord(new byte[SensorRecord.RECORD_SIZE]);
         return new GlucoseDataSet(egvRecord, sensorRecord);
     }
 
-    public static MeterRecord mockMeterRecord() {
-        return new MeterRecord(new byte[128]);
+    public static MeterRecord mockMeterRecord() throws InvalidRecordLengthException {
+        return new MeterRecord(new byte[MeterRecord.RECORD_SIZE]);
     }
 
-    public static CalRecord mockCalRecord() {
-        return new CalRecord(new byte[128]);
+    public static CalRecord mockCalRecord() throws InvalidRecordLengthException {
+        return new CalRecord(new byte[CalRecord.RECORD_SIZE]);
     }
 
     public static DeviceStatus mockDeviceStatus() {

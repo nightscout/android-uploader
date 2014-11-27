@@ -19,8 +19,8 @@ public class EgvRecordTest {
 //    EGV: 120 Trend: DOUBLE_UP display time: 1417069821000 system time: 186301824 noise level: None
 
     @Test
-    public void isSpecialValue() {
-        byte[] record = new byte[]{ (byte) 0xC4,(byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
+    public void isSpecialValue() throws Exception {
+        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
                 (byte) 0x34, (byte) 0x1A, (byte) 0x0B, (byte) 0x05, (byte) 0x00, (byte) 0x58,
                 (byte) 0x3E };
         EGVRecord egvRecord=new EGVRecord(record);
@@ -28,15 +28,30 @@ public class EgvRecordTest {
     }
 
     @Test
-    public void shouldParseRecord() {
-        byte[] record = new byte[]{ (byte) 0xC4,(byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
+    public void shouldParseEgvRecord() throws Exception {
+        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
                 (byte) 0x34, (byte) 0x1A, (byte) 0x0B, (byte) 0x05, (byte) 0x00, (byte) 0x58,
                 (byte) 0x3E };
         EGVRecord egvRecord=new EGVRecord(record);
         assertThat(egvRecord.getBGValue(), is(5));
         assertThat(egvRecord.getTrend(), is(TrendArrow.NOT_COMPUTABLE));
-        assertThat(egvRecord.getDisplayTimeSeconds(), is(1417056321000L));
-        assertThat(egvRecord.getSystemTimeSeconds(), is(186288324));
+        assertThat(egvRecord.getRawDisplayTimeSeconds(), is(186266721L));
+        assertThat(egvRecord.getRawSystemTimeSeconds(), is(186288324));
         assertThat(egvRecord.getNoiseMode(), is (NoiseMode.None));
+    }
+
+    @Test(expected = InvalidRecordLengthException.class)
+    public void shouldNotParseSmallEgvRecord() throws Exception {
+        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
+                (byte) 0x34, (byte) 0x1A, (byte) 0x0B, (byte) 0x05, (byte) 0x00, (byte) 0x58};
+        EGVRecord egvRecord = new EGVRecord(record);
+    }
+
+    @Test(expected = InvalidRecordLengthException.class)
+    public void shouldNotParseLargeEgvRecord() throws Exception {
+        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
+                (byte) 0x34, (byte) 0x1A, (byte) 0x0B, (byte) 0x05, (byte) 0x00, (byte) 0x58,
+                (byte) 0x3E, (byte) 0x00, (byte) 0x00 };
+        EGVRecord egvRecord = new EGVRecord(record);
     }
 }
