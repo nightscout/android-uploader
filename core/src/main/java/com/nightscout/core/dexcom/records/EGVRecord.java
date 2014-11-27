@@ -1,6 +1,9 @@
 package com.nightscout.core.dexcom.records;
 
 import com.nightscout.core.dexcom.Constants;
+import com.nightscout.core.dexcom.NoiseMode;
+import com.nightscout.core.dexcom.SpecialValue;
+import com.nightscout.core.dexcom.TrendArrow;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,18 +15,22 @@ import java.util.Date;
 public class EGVRecord extends GenericTimestampRecord {
 
     private int bGValue;
-    private Constants.TREND_ARROW_VALUES trend;
+    private TrendArrow trend;
+    private NoiseMode noiseMode;
 
     public EGVRecord(byte[] packet) {
         // system_time (UInt), display_time (UInt), glucose (UShort), trend_arrow (Byte), crc (UShort))
         super(packet);
         int eGValue = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8);
         bGValue = eGValue & Constants.EGV_VALUE_MASK;
-        int trendValue = ByteBuffer.wrap(packet).get(10) & Constants.EGV_TREND_ARROW_MASK;
-        trend = Constants.TREND_ARROW_VALUES.values()[trendValue];
+        int trendAndNoise = ByteBuffer.wrap(packet).get(10);
+        int trendValue = trendAndNoise & Constants.EGV_TREND_ARROW_MASK;
+        byte noiseValue = (byte) ((trendAndNoise & 0xF) >> 4);
+        trend = TrendArrow.values()[trendValue];
+        noiseMode = NoiseMode.values()[noiseValue];
     }
 
-    public EGVRecord(int bGValue,Constants.TREND_ARROW_VALUES trend,Date displayTime, Date systemTime){
+    public EGVRecord(int bGValue, TrendArrow trend, Date displayTime, Date systemTime){
         super(displayTime, systemTime);
         this.bGValue=bGValue;
         this.trend=trend;
@@ -33,10 +40,13 @@ public class EGVRecord extends GenericTimestampRecord {
         return bGValue;
     }
 
-    public Constants.TREND_ARROW_VALUES getTrend() {
+    public TrendArrow getTrend() {
         return trend;
     }
 
+    public NoiseMode getNoiseMode(){
+        return noiseMode;
+    }
     public JSONObject toJSON() {
         JSONObject obj = new JSONObject();
         try {
@@ -46,5 +56,14 @@ public class EGVRecord extends GenericTimestampRecord {
             e.printStackTrace();
         }
         return obj;
+    }
+
+    public boolean isSpecialValue(){
+        for (SpecialValue specialValue:SpecialValue.values()){
+            if (specialValue.getValue()==bGValue){
+                return true;
+            }
+        }
+        return false;
     }
 }
