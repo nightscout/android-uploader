@@ -11,37 +11,43 @@
         android:positiveButtonText="@null">
     </ListPreference>
 
-    <ListPreference
+        <PreferenceScreen
         android:dependency="i_understand"
-        android:title="@string/pref_title_chart_y_axis"
-        android:key="display_verticle_axis"
-        android:entries="@array/perf_verticle_axis"
-        android:entryValues="@array/perf_verticle_axis_values"
-        android:defaultValue="0"
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null">
-    </ListPreference>
-
-     <ListPreference
-        android:dependency="i_understand"
-        android:key="display_low_range"
-        android:title="@string/pref_title_low_range"
-        android:entries="@array/perf_low_range_entries"
-        android:entryValues="@array/perf_low_range_entries"
-        android:defaultValue="80"
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null">
-     </ListPreference>    
-
-     <ListPreference
-        android:dependency="i_understand"
-        android:key="display_high_range"
-        android:title="@string/pref_title_high_range"
-        android:entries="@array/perf_high_range_entries"
-        android:entryValues="@array/perf_high_range_entries"
-        android:defaultValue="180"
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null">
-     </ListPreference>    
-    
+        android:key="pref_title_chart_key"
+        android:title="@string/pref_title_chart_options"
+        android:summary="@string/pref_summary_chart_options">
+        
+	    <ListPreference
+	        android:dependency="i_understand"
+	        android:title="@string/pref_title_chart_y_axis"
+	        android:key="display_verticle_axis"
+	        android:entries="@array/perf_verticle_axis"
+	        android:entryValues="@array/perf_verticle_axis_values"
+	        android:defaultValue="0"
+	        android:negativeButtonText="@null"
+	        android:positiveButtonText="@null">
+	    </ListPreference>
+	
+	     <ListPreference
+	        android:dependency="i_understand"
+	        android:key="display_low_range"
+	        android:title="@string/pref_title_low_range"
+	        android:entries="@array/perf_low_range_entries"
+	        android:entryValues="@array/perf_low_range_entries"
+	        android:defaultValue="80"
+	        android:negativeButtonText="@null"
+	        android:positiveButtonText="@null">
+	     </ListPreference>    
+	
+	     <ListPreference
+	        android:dependency="i_understand"
+	        android:key="display_high_range"
+	        android:title="@string/pref_title_high_range"
+	        android:entries="@array/perf_high_range_entries"
+	        android:entryValues="@array/perf_high_range_entries"
+	        android:defaultValue="180"
+	        android:negativeButtonText="@null"
+	        android:positiveButtonText="@null">
+	     </ListPreference>    
+    </PreferenceScreen>
 </PreferenceScreen>
