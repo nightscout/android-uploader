@@ -3,7 +3,7 @@ package com.nightscout.android.dexcom;
 import android.util.Log;
 
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
-import com.nightscout.core.dexcom.Constants;
+import com.nightscout.core.dexcom.Command;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.PacketBuilder;
 import com.nightscout.core.dexcom.ReadPacket;
@@ -36,12 +36,12 @@ public class ReadData {
         mSerialDevice = device;
     }
 
-    public EGVRecord[] getRecentEGVs() throws InvalidRecordLengthException {
+    public EGVRecord[] getRecentEGVs() {
         int endPage = readDataBasePageRange(RecordType.EGV_DATA);
         return readDataBasePage(RecordType.EGV_DATA, endPage);
     }
 
-    public EGVRecord[] getRecentEGVsPages(int numOfRecentPages) throws InvalidRecordLengthException {
+    public EGVRecord[] getRecentEGVsPages(int numOfRecentPages) {
         if (numOfRecentPages < 1) {
             throw new IllegalArgumentException("Number of pages must be greater than 1.");
         }
@@ -66,13 +66,13 @@ public class ReadData {
         return readSystemTime() - egvRecord.getRawSystemTimeSeconds();
     }
 
-    public MeterRecord[] getRecentMeterRecords() throws InvalidRecordLengthException {
+    public MeterRecord[] getRecentMeterRecords() {
         Log.d(TAG, "Reading Meter page...");
         int endPage = readDataBasePageRange(RecordType.METER_DATA);
         return readDataBasePage(RecordType.METER_DATA, endPage);
     }
 
-    public SensorRecord[] getRecentSensorRecords(int numOfRecentPages) throws InvalidRecordLengthException {
+    public SensorRecord[] getRecentSensorRecords(int numOfRecentPages) {
         if (numOfRecentPages < 1) {
             throw new IllegalArgumentException("Number of pages must be greater than 1.");
         }
@@ -93,7 +93,7 @@ public class ReadData {
         return allPages;
     }
 
-    public CalRecord[] getRecentCalRecords() throws InvalidRecordLengthException {
+    public CalRecord[] getRecentCalRecords() {
         Log.d(TAG, "Reading Cal Records page range...");
         int endPage = readDataBasePageRange(RecordType.CAL_SET);
         Log.d(TAG, "Reading Cal Records page...");
@@ -101,18 +101,18 @@ public class ReadData {
     }
 
     public boolean ping() {
-        writeCommand(Constants.PING);
-        return read(MIN_LEN).getCommand() == Constants.ACK;
+        writeCommand(Command.PING);
+        return read(MIN_LEN).getCommand() == Command.ACK;
     }
 
     public int readBatteryLevel() {
         Log.d(TAG, "Reading battery level...");
-        writeCommand(Constants.READ_BATTERY_LEVEL);
+        writeCommand(Command.READ_BATTERY_LEVEL);
         byte[] readData = read(MIN_LEN).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
-    public String readSerialNumber() throws InvalidRecordLengthException {
+    public String readSerialNumber() {
         int PAGE_OFFSET = 0;
         byte[] readData = readDataBasePage(RecordType.MANUFACTURING_DATA, PAGE_OFFSET);
         Element md = ParsePage(readData, RecordType.MANUFACTURING_DATA);
@@ -125,14 +125,14 @@ public class ReadData {
 
     public long readSystemTime() {
         Log.d(TAG, "Reading system time...");
-        writeCommand(Constants.READ_SYSTEM_TIME);
+        writeCommand(Command.READ_SYSTEM_TIME);
         byte[] readData = read(MIN_LEN).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
     public int readDisplayTimeOffset() {
         Log.d(TAG, "Reading display time offset...");
-        writeCommand(Constants.READ_DISPLAY_TIME_OFFSET);
+        writeCommand(Command.READ_DISPLAY_TIME_OFFSET);
         byte[] readData = read(MIN_LEN).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
@@ -140,12 +140,12 @@ public class ReadData {
     private int readDataBasePageRange(RecordType recordType) {
         ArrayList<Byte> payload = new ArrayList<Byte>();
         payload.add((byte) recordType.ordinal());
-        writeCommand(Constants.READ_DATABASE_PAGE_RANGE, payload);
+        writeCommand(Command.READ_DATABASE_PAGE_RANGE, payload);
         byte[] readData = read(MIN_LEN).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt(4);
     }
 
-    private <T> T readDataBasePage(RecordType recordType, int page) throws InvalidRecordLengthException {
+    private <T> T readDataBasePage(RecordType recordType, int page) {
         byte numOfPages = 1;
         if (page < 0){
             throw new IllegalArgumentException("Invalid page requested:" + page);
@@ -158,12 +158,12 @@ public class ReadData {
         payload.add(pageInt[1]);
         payload.add(pageInt[0]);
         payload.add(numOfPages);
-        writeCommand(Constants.READ_DATABASE_PAGES, payload);
+        writeCommand(Command.READ_DATABASE_PAGES, payload);
         byte[] readData = read(2122).getData();
         return ParsePage(readData, recordType);
     }
 
-    private void writeCommand(int command, ArrayList<Byte> payload) {
+    private void writeCommand(Command command, ArrayList<Byte> payload) {
         byte[] packet = new PacketBuilder(command, payload).build();
         if (mSerialDevice != null) {
             try {
@@ -174,7 +174,7 @@ public class ReadData {
         }
     }
 
-    private void writeCommand(int command) {
+    private void writeCommand(Command command) {
         byte[] packet = new PacketBuilder(command).build();
         if (mSerialDevice != null) {
             try {
@@ -212,7 +212,7 @@ public class ReadData {
         return new ReadPacket(data);
     }
 
-    private <T> T ParsePage(byte[] data, RecordType recordType) throws InvalidRecordLengthException {
+    private <T> T ParsePage(byte[] data, RecordType recordType) {
         PageHeader pageHeader=new PageHeader(data);
         int NUM_REC_OFFSET = 4;
         int numRec = data[NUM_REC_OFFSET];

@@ -115,14 +115,14 @@ public class BaseUploaderTest {
     }
 
     @Test
-    public void testUploadGlucoseDataSets_One() throws InvalidRecordLengthException {
+    public void testUploadGlucoseDataSets_One() {
         List<GlucoseDataSet> list = Lists.newArrayList(mockGlucoseDataSet());
         mockUploader.uploadGlucoseDataSets(list);
         assertThat(mockUploader.glucoseDataSets, hasSize(1));
     }
 
     @Test
-    public void testUploadGlucoseDataSets_Many() throws InvalidRecordLengthException {
+    public void testUploadGlucoseDataSets_Many() {
         List<GlucoseDataSet> list = Lists.newArrayList(
                 mockGlucoseDataSet(),
                 mockGlucoseDataSet(),

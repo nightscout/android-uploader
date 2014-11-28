@@ -20,7 +20,7 @@ public class EGVRecord extends GenericTimestampRecord {
     private TrendArrow trend;
     private NoiseMode noiseMode;
 
-    public EGVRecord(byte[] packet) throws InvalidRecordLengthException {
+    public EGVRecord(byte[] packet) {
         // system_time (UInt), display_time (UInt), glucose (UShort), trend_arrow (Byte), crc (UShort))
         super(packet);
         if (packet.length != RECORD_SIZE){

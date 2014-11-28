@@ -155,8 +155,8 @@ public class SyncingService extends IntentService {
                 long nextUploadTime = standardMinutes(5).minus(standardSeconds(timeSinceLastRecord)).getMillis();
                 long displayTime = readData.readDisplayTime().getTime();
                 // FIXME: Device seems to flake out on battery level reads. Removing for now.
-//                int batLevel = readData.readBatteryLevel();
-                int batLevel = 100;
+                int batLevel = readData.readBatteryLevel();
+//                int batLevel = 100;
 
                 // convert into json for d3 plot
                 JSONArray array = new JSONArray();

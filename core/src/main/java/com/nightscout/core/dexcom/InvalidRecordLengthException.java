@@ -1,6 +1,6 @@
 package com.nightscout.core.dexcom;
 
-public class InvalidRecordLengthException extends Exception{
+public class InvalidRecordLengthException extends Error {
     public InvalidRecordLengthException(String message){
         super(message);
     }

@@ -31,6 +31,7 @@ import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.core.dexcom.Constants;
+import com.nightscout.core.dexcom.SpecialValue;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.preferences.NightscoutPreferences;
@@ -232,7 +233,7 @@ public class MainActivity extends Activity {
         else
             sgvStr=String.valueOf(sgv);
         return (sgv!=-1)?
-                (Constants.SPECIALBGVALUES_MGDL.isSpecialValue(sgv))?Constants.SPECIALBGVALUES_MGDL.getEGVSpecialValue(sgv).toString():sgvStr+" "+trend.symbol():"---";
+                (SpecialValue.isSpecialValue(sgv))?SpecialValue.getEGVSpecialValue(sgv).toString():sgvStr+" "+trend.symbol():"---";
     }
 
     @Override

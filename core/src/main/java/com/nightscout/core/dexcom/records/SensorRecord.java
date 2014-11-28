@@ -16,7 +16,7 @@ public class SensorRecord extends GenericTimestampRecord {
     private int OFFSET_FILTERED = 12;
     private int OFFSET_RSSI = 16;
 
-    public SensorRecord(byte[] packet) throws InvalidRecordLengthException {
+    public SensorRecord(byte[] packet) {
         super(packet);
         if (packet.length != RECORD_SIZE) {
             try {

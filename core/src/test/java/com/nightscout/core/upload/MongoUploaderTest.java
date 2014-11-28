@@ -109,13 +109,13 @@ public class MongoUploaderTest {
     }
 
     @Test
-    public void testUploadGlucoseDataSets() throws InvalidRecordLengthException {
+    public void testUploadGlucoseDataSets() {
         mongoUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
         verifyGlucoseDataSet(false);
     }
 
     @Test
-    public void testUploadGlucoseDataSets_CloudSensorData() throws InvalidRecordLengthException {
+    public void testUploadGlucoseDataSets_CloudSensorData() {
         preferences.setSensorUploadEnabled(true);
         mongoUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
         verifyGlucoseDataSet(true);

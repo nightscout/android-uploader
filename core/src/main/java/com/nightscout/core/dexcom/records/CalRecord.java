@@ -24,7 +24,7 @@ public class CalRecord extends GenericTimestampRecord {
     private CalSubrecord[] calSubrecords = new CalSubrecord[12];
     private int SUB_LEN = 17;
 
-    public CalRecord(byte[] packet) throws InvalidRecordLengthException {
+    public CalRecord(byte[] packet) {
         super(packet);
         if (packet.length != RECORD_SIZE && packet.length != RECORD_V2_SIZE) {
             try {

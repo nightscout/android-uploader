@@ -11,7 +11,7 @@ public class MeterRecord extends GenericTimestampRecord {
     private int meterBG;
     private int meterTime;
 
-    public MeterRecord(byte[] packet) throws InvalidRecordLengthException {
+    public MeterRecord(byte[] packet) {
         super(packet);
         if (packet.length != RECORD_SIZE){
             try {

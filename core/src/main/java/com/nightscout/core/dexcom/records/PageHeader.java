@@ -34,7 +34,7 @@ public class PageHeader {
     protected byte[] crc=new byte[2];
 
 
-    public PageHeader(byte[] packet) throws InvalidRecordLengthException {
+    public PageHeader(byte[] packet) {
         if (packet.length < HEADER_SIZE){
             try {
                 throw new InvalidRecordLengthException("Data smaller than expected: "+packet.length+". Expected size: "+HEADER_SIZE+"+. Unparsed record: "+new String(packet,"UTF-8"));

@@ -1,16 +1,17 @@
-package com.nightscout.android.dexcom;
+package com.nightscout.core.dexcom;
 
 import com.google.common.primitives.UnsignedBytes;
-import com.nightscout.core.dexcom.CRCFailError;
-import com.nightscout.core.dexcom.ReadPacket;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
-
-public class ReadPacketTest extends TestCase {
+@RunWith(JUnit4.class)
+public class ReadPacketTest {
 
     byte[] testPacket = new byte[] {
             /** HEADER **/ 0x1, 0x1, 0x1,
@@ -31,22 +32,27 @@ public class ReadPacketTest extends TestCase {
             /** CRC **/ UnsignedBytes.checkedCast(0xCE), UnsignedBytes.checkedCast(0xC0)
     };
 
+    @Test
     public void testReadPacket_command() {
-        assertThat(new ReadPacket(testPacket).getCommand(), is(0x5));
+        assertThat(new ReadPacket(testPacket).getCommand().getValue(), is(0x5));
     }
 
+    @Test
     public void testReadPacket_data() {
         assertThat(new ReadPacket(testPacket).getData(), is(new byte[]{0x10, 0x15}));
     }
 
+    @Test
     public void testReadPacket_noDataPacket_command() {
-        assertThat(new ReadPacket(testPacketNoData).getCommand(), is(0x1A));
+        assertThat(new ReadPacket(testPacketNoData).getCommand().getValue(), is(0x1A));
     }
 
+    @Test
     public void testReadPacket_noDataPacket_emptyData() {
         assertThat(new ReadPacket(testPacketNoData).getData(), is(new byte[]{}));
     }
 
+    @Test
     public void testReadPacket_badCrc() throws Exception {
         try {
             new ReadPacket(testPacketBadCrc);
