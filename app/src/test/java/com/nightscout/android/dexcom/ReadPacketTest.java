@@ -1,6 +1,8 @@
 package com.nightscout.android.dexcom;
 
 import com.google.common.primitives.UnsignedBytes;
+import com.nightscout.core.dexcom.CRCFailError;
+import com.nightscout.core.dexcom.ReadPacket;
 
 import junit.framework.TestCase;
 
@@ -23,6 +25,12 @@ public class ReadPacketTest extends TestCase {
         /** CRC **/ UnsignedBytes.checkedCast(0xCE), UnsignedBytes.checkedCast(0xC1)
     };
 
+    byte[] testPacketBadCrc = new byte[] {
+            /** HEADER **/ 0x1, 0x1, 0x1,
+            /** COMMAND **/ 0x1A,
+            /** CRC **/ UnsignedBytes.checkedCast(0xCE), UnsignedBytes.checkedCast(0xC0)
+    };
+
     public void testReadPacket_command() {
         assertThat(new ReadPacket(testPacket).getCommand(), is(0x5));
     }
@@ -37,5 +45,14 @@ public class ReadPacketTest extends TestCase {
 
     public void testReadPacket_noDataPacket_emptyData() {
         assertThat(new ReadPacket(testPacketNoData).getData(), is(new byte[]{}));
+    }
+
+    public void testReadPacket_badCrc() throws Exception {
+        try {
+            new ReadPacket(testPacketBadCrc);
+            fail("Should receive CRC error");
+        } catch(CRCFailError error){
+            // Hi
+        }
     }
 }

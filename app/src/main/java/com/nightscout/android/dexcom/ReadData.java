@@ -3,15 +3,17 @@ package com.nightscout.android.dexcom;
 import android.util.Log;
 
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
-import com.nightscout.android.dexcom.records.PageHeader;
 import com.nightscout.core.dexcom.Constants;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.PacketBuilder;
+import com.nightscout.core.dexcom.ReadPacket;
+import com.nightscout.core.dexcom.RecordType;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.dexcom.records.GenericXMLRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
+import com.nightscout.core.dexcom.records.PageHeader;
 import com.nightscout.core.dexcom.records.SensorRecord;
 
 import org.w3c.dom.Element;
@@ -34,26 +36,24 @@ public class ReadData {
         mSerialDevice = device;
     }
 
-    public EGVRecord[] getRecentEGVs() {
-        int recordType = Constants.RECORD_TYPES.EGV_DATA.ordinal();
-        int endPage = readDataBasePageRange(recordType);
-        return readDataBasePage(recordType, endPage);
+    public EGVRecord[] getRecentEGVs() throws InvalidRecordLengthException {
+        int endPage = readDataBasePageRange(RecordType.EGV_DATA);
+        return readDataBasePage(RecordType.EGV_DATA, endPage);
     }
 
-    public EGVRecord[] getRecentEGVsPages(int numOfRecentPages) {
+    public EGVRecord[] getRecentEGVsPages(int numOfRecentPages) throws InvalidRecordLengthException {
         if (numOfRecentPages < 1) {
             throw new IllegalArgumentException("Number of pages must be greater than 1.");
         }
         Log.d(TAG, "Reading EGV page range...");
-        int recordType = Constants.RECORD_TYPES.EGV_DATA.ordinal();
-        int endPage = readDataBasePageRange(recordType);
+        int endPage = readDataBasePageRange(RecordType.EGV_DATA);
         Log.d(TAG, "Reading " + numOfRecentPages + " EGV page(s)...");
         numOfRecentPages = numOfRecentPages - 1;
         EGVRecord[] allPages = new EGVRecord[0];
         for (int i = Math.min(numOfRecentPages,endPage); i >= 0; i--) {
             int nextPage = endPage - i;
             Log.d(TAG, "Reading #" + i + " EGV pages (page number " + nextPage + ")");
-            EGVRecord[] ithEGVRecordPage = readDataBasePage(recordType, nextPage);
+            EGVRecord[] ithEGVRecordPage = readDataBasePage(RecordType.EGV_DATA, nextPage);
             EGVRecord[] result = Arrays.copyOf(allPages, allPages.length + ithEGVRecordPage.length);
             System.arraycopy(ithEGVRecordPage, 0, result, allPages.length, ithEGVRecordPage.length);
             allPages = result;
@@ -66,27 +66,25 @@ public class ReadData {
         return readSystemTime() - egvRecord.getRawSystemTimeSeconds();
     }
 
-    public MeterRecord[] getRecentMeterRecords() {
+    public MeterRecord[] getRecentMeterRecords() throws InvalidRecordLengthException {
         Log.d(TAG, "Reading Meter page...");
-        int recordType = Constants.RECORD_TYPES.METER_DATA.ordinal();
-        int endPage = readDataBasePageRange(recordType);
-        return readDataBasePage(recordType, endPage);
+        int endPage = readDataBasePageRange(RecordType.METER_DATA);
+        return readDataBasePage(RecordType.METER_DATA, endPage);
     }
 
-    public SensorRecord[] getRecentSensorRecords(int numOfRecentPages) {
+    public SensorRecord[] getRecentSensorRecords(int numOfRecentPages) throws InvalidRecordLengthException {
         if (numOfRecentPages < 1) {
             throw new IllegalArgumentException("Number of pages must be greater than 1.");
         }
         Log.d(TAG, "Reading Sensor page range...");
-        int recordType = Constants.RECORD_TYPES.SENSOR_DATA.ordinal();
-        int endPage = readDataBasePageRange(recordType);
+        int endPage = readDataBasePageRange(RecordType.SENSOR_DATA);
         Log.d(TAG, "Reading " + numOfRecentPages + " Sensor page(s)...");
         numOfRecentPages = numOfRecentPages - 1;
         SensorRecord[] allPages = new SensorRecord[0];
         for (int i = Math.min(numOfRecentPages,endPage); i >= 0; i--) {
             int nextPage = endPage - i;
             Log.d(TAG, "Reading #" + i + " Sensor pages (page number " + nextPage + ")");
-            SensorRecord[] ithSensorRecordPage = readDataBasePage(recordType, nextPage);
+            SensorRecord[] ithSensorRecordPage = readDataBasePage(RecordType.SENSOR_DATA, nextPage);
             SensorRecord[] result = Arrays.copyOf(allPages, allPages.length + ithSensorRecordPage.length);
             System.arraycopy(ithSensorRecordPage, 0, result, allPages.length, ithSensorRecordPage.length);
             allPages = result;
@@ -95,12 +93,11 @@ public class ReadData {
         return allPages;
     }
 
-    public CalRecord[] getRecentCalRecords() {
+    public CalRecord[] getRecentCalRecords() throws InvalidRecordLengthException {
         Log.d(TAG, "Reading Cal Records page range...");
-        int recordType = Constants.RECORD_TYPES.CAL_SET.ordinal();
-        int endPage = readDataBasePageRange(recordType);
+        int endPage = readDataBasePageRange(RecordType.CAL_SET);
         Log.d(TAG, "Reading Cal Records page...");
-        return readDataBasePage(recordType, endPage);
+        return readDataBasePage(RecordType.CAL_SET, endPage);
     }
 
     public boolean ping() {
@@ -115,10 +112,10 @@ public class ReadData {
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
-    public String readSerialNumber() {
+    public String readSerialNumber() throws InvalidRecordLengthException {
         int PAGE_OFFSET = 0;
-        byte[] readData = readDataBasePage(Constants.RECORD_TYPES.MANUFACTURING_DATA.ordinal(), PAGE_OFFSET);
-        Element md = ParsePage(readData, Constants.RECORD_TYPES.MANUFACTURING_DATA.ordinal());
+        byte[] readData = readDataBasePage(RecordType.MANUFACTURING_DATA, PAGE_OFFSET);
+        Element md = ParsePage(readData, RecordType.MANUFACTURING_DATA);
         return md.getAttribute("SerialNumber");
     }
 
@@ -130,31 +127,31 @@ public class ReadData {
         Log.d(TAG, "Reading system time...");
         writeCommand(Constants.READ_SYSTEM_TIME);
         byte[] readData = read(MIN_LEN).getData();
-        return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt() & 0xffffffff;
+        return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
     public int readDisplayTimeOffset() {
         Log.d(TAG, "Reading display time offset...");
         writeCommand(Constants.READ_DISPLAY_TIME_OFFSET);
         byte[] readData = read(MIN_LEN).getData();
-        return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt() & 0xffffffff;
+        return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
-    private int readDataBasePageRange(int recordType) {
+    private int readDataBasePageRange(RecordType recordType) {
         ArrayList<Byte> payload = new ArrayList<Byte>();
-        payload.add((byte) recordType);
+        payload.add((byte) recordType.ordinal());
         writeCommand(Constants.READ_DATABASE_PAGE_RANGE, payload);
         byte[] readData = read(MIN_LEN).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt(4);
     }
 
-    private <T> T readDataBasePage(int recordType, int page) {
+    private <T> T readDataBasePage(RecordType recordType, int page) throws InvalidRecordLengthException {
         byte numOfPages = 1;
         if (page < 0){
             throw new IllegalArgumentException("Invalid page requested:" + page);
         }
-        ArrayList<Byte> payload = new ArrayList<Byte>();
-        payload.add((byte) recordType);
+        ArrayList<Byte> payload = new ArrayList<>();
+        payload.add((byte) recordType.ordinal());
         byte[] pageInt = ByteBuffer.allocate(4).putInt(page).array();
         payload.add(pageInt[3]);
         payload.add(pageInt[2]);
@@ -215,20 +212,19 @@ public class ReadData {
         return new ReadPacket(data);
     }
 
-    private <T> T ParsePage(byte[] data, int recordType) {
-        int HEADER_LEN = 28;
+    private <T> T ParsePage(byte[] data, RecordType recordType) throws InvalidRecordLengthException {
         PageHeader pageHeader=new PageHeader(data);
         int NUM_REC_OFFSET = 4;
         int numRec = data[NUM_REC_OFFSET];
 
-        switch (Constants.RECORD_TYPES.values()[recordType]) {
+        switch (recordType) {
             case MANUFACTURING_DATA:
-                GenericXMLRecord xmlRecord = new GenericXMLRecord(Arrays.copyOfRange(data, HEADER_LEN, data.length - 1));
+                GenericXMLRecord xmlRecord = new GenericXMLRecord(Arrays.copyOfRange(data, PageHeader.HEADER_SIZE, data.length - 1));
                 return (T) xmlRecord;
             case SENSOR_DATA:
                 SensorRecord[] sensorRecords = new SensorRecord[numRec];
                 for (int i = 0; i < numRec; i++) {
-                    int startIdx = HEADER_LEN + (SensorRecord.RECORD_SIZE + 1) * i;
+                    int startIdx = PageHeader.HEADER_SIZE + (SensorRecord.RECORD_SIZE + 1) * i;
                     try {
                         sensorRecords[i] = new SensorRecord(Arrays.copyOfRange(data, startIdx, startIdx + SensorRecord.RECORD_SIZE));
                     } catch (InvalidRecordLengthException e) {
@@ -239,7 +235,7 @@ public class ReadData {
             case EGV_DATA:
                 EGVRecord[] egvRecords = new EGVRecord[numRec];
                 for (int i = 0; i < numRec; i++) {
-                    int startIdx = HEADER_LEN + (EGVRecord.RECORD_SIZE + 1) * i;
+                    int startIdx = PageHeader.HEADER_SIZE + (EGVRecord.RECORD_SIZE + 1) * i;
                     try {
                         egvRecords[i] = new EGVRecord(Arrays.copyOfRange(data, startIdx, startIdx + EGVRecord.RECORD_SIZE));
                     } catch (InvalidRecordLengthException e) {
@@ -250,7 +246,7 @@ public class ReadData {
             case METER_DATA:
                 MeterRecord[] meterRecords = new MeterRecord[numRec];
                 for (int i = 0; i < numRec; i++) {
-                    int startIdx = HEADER_LEN + (MeterRecord.RECORD_SIZE + 1) * i;
+                    int startIdx = PageHeader.HEADER_SIZE + (MeterRecord.RECORD_SIZE + 1) * i;
                     try {
                         meterRecords[i] = new MeterRecord(Arrays.copyOfRange(data, startIdx, startIdx + MeterRecord.RECORD_SIZE));
                     } catch (InvalidRecordLengthException e) {
@@ -265,7 +261,7 @@ public class ReadData {
                 }
                 CalRecord[] calRecords = new CalRecord[numRec];
                 for (int i = 0; i < numRec; i++) {
-                    int startIdx = HEADER_LEN + (rec_len + 1) * i;
+                    int startIdx = PageHeader.HEADER_SIZE + (rec_len + 1) * i;
                     try {
                         calRecords[i] = new CalRecord(Arrays.copyOfRange(data, startIdx, startIdx + rec_len));
                     } catch (InvalidRecordLengthException e) {

@@ -1,8 +1,4 @@
-package com.nightscout.android.dexcom;
-
-import com.nightscout.core.dexcom.CRC16;
-import com.nightscout.core.dexcom.CRCFailError;
-import com.nightscout.core.dexcom.Utils;
+package com.nightscout.core.dexcom;
 
 import java.util.Arrays;
 

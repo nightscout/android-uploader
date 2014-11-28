@@ -1,16 +1,19 @@
-package com.nightscout.android.dexcom.records;
+package com.nightscout.core.dexcom.records;
 
 import com.nightscout.core.dexcom.CRC16;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.Constants;
+import com.nightscout.core.dexcom.InvalidRecordLengthException;
+import com.nightscout.core.dexcom.RecordType;
 import com.nightscout.core.dexcom.Utils;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
 public class PageHeader {
-    protected final int HEADER_SIZE=28;
+    public static final int HEADER_SIZE=28;
     protected final int FIRSTRECORDINDEX_OFFSET=0;
     protected final int NUMRECS_OFFSET=4;
     protected final int RECTYPE_OFFSET=8;
@@ -22,7 +25,7 @@ public class PageHeader {
 
     protected int firstRecordIndex;
     protected int numOfRecords;
-    protected Constants.RECORD_TYPES recordType;
+    protected RecordType recordType;
     protected byte revision;
     protected int pageNumber;
     protected int reserved2;
@@ -31,10 +34,17 @@ public class PageHeader {
     protected byte[] crc=new byte[2];
 
 
-    public PageHeader(byte[] packet) {
+    public PageHeader(byte[] packet) throws InvalidRecordLengthException {
+        if (packet.length < HEADER_SIZE){
+            try {
+                throw new InvalidRecordLengthException("Data smaller than expected: "+packet.length+". Expected size: "+HEADER_SIZE+"+. Unparsed record: "+new String(packet,"UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                // nom
+            }
+        }
         firstRecordIndex = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(FIRSTRECORDINDEX_OFFSET);
         numOfRecords = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(NUMRECS_OFFSET);
-        recordType = Constants.RECORD_TYPES.values()[packet[RECTYPE_OFFSET]];
+        recordType = RecordType.values()[packet[RECTYPE_OFFSET]];
         revision = packet[REV_OFFSET];
         pageNumber = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(PAGENUMBER_OFFSET);
         reserved2 = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(RESERVED2_OFFSET);
@@ -52,7 +62,7 @@ public class PageHeader {
         return revision;
     }
 
-    public Constants.RECORD_TYPES getRecordType() {
+    public RecordType getRecordType() {
         return recordType;
     }
 
