@@ -294,20 +294,30 @@ var padding = { top: 20, right: 0, bottom: 10, left: 0 },
         // only update if units have changed 
         if (isMmol && units != "mmol")  {
             console.log("changing to mmol");
-            tickValues = [2.0, 3.0, 4.0, 6.0, 10.0, 15.0, 22.0];
             units = "mmol";
             data = data.map(function (obj) {
                 return { date: new Date(obj.date), sgv: (Math.round((obj.sgv / 18) * 10) / 10).toFixed(1), type: 'sgv'}
             });
         } else if (!isMmol && units != "mg/dL") {
             console.log("changing to mg/dl");
-            tickValues = [40, 60, 80, 120, 180, 300, 400];
             units = "mg/dL";
             data = data.map(function (obj) {
                 return { date: new Date(obj.date), sgv: obj.sgv * 18, type: 'sgv'}
             });
         }
-
+         if (isMmol)  {
+            if(isLogaritmic) {
+                tickValues = [2.0, 3.0, 4.0, 6.0, 10.0, 15.0, 22.0];
+            } else {
+                tickValues = [2.0, 3.0, 4.0, 5.0, 8.0, 11.0, 14.0, 17.0, 20.0, 23.0];
+            }
+         } else {
+            if(isLogaritmic) {
+                tickValues = [40, 60, 80, 120, 180, 300, 400];
+            } else {
+                tickValues = [40, 60, 80, 100, 150, 200, 250, 300, 350, 400];
+            }
+        }
 
         // remove the data that was staled when timers were paused
         focus.selectAll('circle').data([], dateFn).exit().remove();
