@@ -1,13 +1,9 @@
 package com.nightscout.core.test;
 
+import com.nightscout.core.dexcom.NoiseMode;
 import com.nightscout.core.dexcom.TrendArrow;
-import com.nightscout.core.dexcom.records.CalRecord;
-import com.nightscout.core.dexcom.records.EGVRecord;
-import com.nightscout.core.dexcom.records.GlucoseDataSet;
-import com.nightscout.core.dexcom.records.MeterRecord;
-import com.nightscout.core.dexcom.records.SensorRecord;
+import com.nightscout.core.dexcom.records.*;
 import com.nightscout.core.records.DeviceStatus;
-
 import org.joda.time.DateTime;
 
 public class MockFactory {
@@ -16,7 +12,8 @@ public class MockFactory {
                 1,
                 TrendArrow.DOUBLE_DOWN,
                 new DateTime(0).toDate(),
-                new DateTime(5).toDate());
+                new DateTime(5).toDate(),
+                NoiseMode.Clean);
         SensorRecord sensorRecord = new SensorRecord(new byte[SensorRecord.RECORD_SIZE]);
         return new GlucoseDataSet(egvRecord, sensorRecord);
     }

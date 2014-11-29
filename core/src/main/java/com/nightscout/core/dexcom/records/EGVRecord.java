@@ -1,11 +1,6 @@
 package com.nightscout.core.dexcom.records;
 
-import com.nightscout.core.dexcom.Constants;
-import com.nightscout.core.dexcom.InvalidRecordLengthException;
-import com.nightscout.core.dexcom.NoiseMode;
-import com.nightscout.core.dexcom.SpecialValue;
-import com.nightscout.core.dexcom.TrendArrow;
-
+import com.nightscout.core.dexcom.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,10 +34,11 @@ public class EGVRecord extends GenericTimestampRecord {
         noiseMode = NoiseMode.values()[noiseValue];
     }
 
-    public EGVRecord(int bGValue, TrendArrow trend, Date displayTime, Date systemTime){
+    public EGVRecord(int bGValue, TrendArrow trend, Date displayTime, Date systemTime, NoiseMode noise){
         super(displayTime, systemTime);
-        this.bGValue=bGValue;
-        this.trend=trend;
+        this.bGValue = bGValue;
+        this.trend = trend;
+        this.noiseMode = noise;
     }
 
     public int getBGValue() {
