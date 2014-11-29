@@ -20,7 +20,7 @@ public enum NoiseMode {
 
     public static NoiseMode getNoiseMode(int val){
         for (NoiseMode e: values()){
-            if (e.getValue()==val)
+            if (e.getValue() == val)
                 return e;
         }
         return null;

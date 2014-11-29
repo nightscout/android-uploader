@@ -105,6 +105,7 @@ public class MongoUploader extends BaseUploader {
             output.put("filtered", glucoseDataSet.getFiltered());
             output.put("unfiltered", glucoseDataSet.getUnfiltered());
             output.put("rssi", glucoseDataSet.getRssi());
+            output.put("noise", glucoseDataSet.getNoise());
         }
         return output;
     }

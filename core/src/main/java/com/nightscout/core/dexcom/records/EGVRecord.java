@@ -56,6 +56,7 @@ public class EGVRecord extends GenericTimestampRecord {
     public NoiseMode getNoiseMode(){
         return noiseMode;
     }
+
     public JSONObject toJSON() {
         JSONObject obj = new JSONObject();
         try {

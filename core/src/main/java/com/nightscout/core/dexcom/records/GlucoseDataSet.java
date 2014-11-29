@@ -10,6 +10,7 @@ public class GlucoseDataSet {
     private Date displayTime;
     private int bGValue;
     private TrendArrow trend;
+    private int noise;
     private long unfiltered;
     private long filtered;
     private int rssi;
@@ -20,6 +21,7 @@ public class GlucoseDataSet {
         displayTime = egvRecord.getDisplayTime();
         bGValue = egvRecord.getBGValue();
         trend = egvRecord.getTrend();
+        noise = egvRecord.getNoiseMode().getValue();
         unfiltered = sensorRecord.getUnfiltered();
         filtered = sensorRecord.getFiltered();
         rssi = sensorRecord.getRssi();
@@ -43,6 +45,10 @@ public class GlucoseDataSet {
 
     public String getTrendSymbol() {
         return trend.symbol();
+    }
+
+    public int getNoise() {
+        return noise;
     }
 
     public long getUnfiltered() {
