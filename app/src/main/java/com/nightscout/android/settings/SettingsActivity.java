@@ -2,6 +2,7 @@ package com.nightscout.android.settings;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -19,6 +20,7 @@ import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.nightscout.android.R;
@@ -44,6 +46,7 @@ public class SettingsActivity extends PreferenceActivity {
      * shown on tablets.
      */
     private static final boolean ALWAYS_SIMPLE_PREFS = true;
+    private final String TAG = SettingsActivity.class.getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +87,14 @@ public class SettingsActivity extends PreferenceActivity {
         super.onPostCreate(savedInstanceState);
 
         setupSimplePreferencesScreen();
+    }
+    private String [] convertToMmol(String [] bg) {
+        int i;
+        String [] new_bg = new String[bg.length];
+        for (i=0; i < bg.length; i++) {
+                new_bg[i] = Float.toString(18 * Float.parseFloat(bg[i]));
+        }
+        return new_bg;
     }
 
     /**
@@ -133,7 +144,10 @@ public class SettingsActivity extends PreferenceActivity {
         getPreferenceScreen().addPreference(fakeHeader);
         addPreferencesFromResource(R.xml.pref_labs);
 
-
+        
+        SharedPreferences prefs = 
+                PreferenceManager.getDefaultSharedPreferences(findPreference("display_options_units").getContext());
+        
         // Bind the summaries of EditText/List/Dialog/Ringtone preferences to
         // their values. When their values change, their summaries are updated
         // to reflect the new value, per the Android Design guidelines.
@@ -143,6 +157,9 @@ public class SettingsActivity extends PreferenceActivity {
         bindPreferenceSummaryToValue(findPreference("cloud_storage_api_base"));
         bindPreferenceSummaryToValue(findPreference("acra.user.email"));
         bindPreferenceSummaryToValue(findPreference("display_options_units"));
+        bindPreferenceSummaryToValue(findPreference("display_verticle_axis"));
+        bindPreferenceSummaryToValue(findPreference("display_low_range"));
+        bindPreferenceSummaryToValue(findPreference("display_high_range"));
 
         try {
             PackageInfo pInfo = null;
@@ -195,7 +212,7 @@ public class SettingsActivity extends PreferenceActivity {
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
+    private Preference.OnPreferenceChangeListener BindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
@@ -211,6 +228,7 @@ public class SettingsActivity extends PreferenceActivity {
                         index >= 0
                                 ? listPreference.getEntries()[index]
                                 : null);
+                FixMmol(preference, stringValue);
 
             } else if (preference instanceof RingtonePreference) {
                 // For ringtone preferences, look up the correct display value
@@ -241,6 +259,36 @@ public class SettingsActivity extends PreferenceActivity {
             }
             return true;
         }
+        
+        private void FixMmol(Preference preference, String stringValue) {
+            if(preference.getKey().equals("display_options_units") ) {
+                boolean isMmol = stringValue.equals("0") ? false : true;
+                Log.i(TAG, "onPreferenceChange" + isMmol);
+                if(isMmol) {
+                    ListPreference lp = (ListPreference)findPreference("display_low_range");
+
+                    String [] entries = getResources().getStringArray(R.array.perf_low_range_entries_mmol);
+                    lp.setEntries(entries);
+                    lp.setEntryValues(convertToMmol(entries));
+                    
+                    lp = (ListPreference)findPreference("display_high_range");
+                    entries = getResources().getStringArray(R.array.perf_high_range_entries_mmol);
+                    lp.setEntries(entries);
+                    lp.setEntryValues(convertToMmol( entries));
+                } else {
+                    ListPreference lp = (ListPreference)findPreference("display_low_range");
+
+                    String [] entries = getResources().getStringArray(R.array.perf_low_range_entries);
+                    lp.setEntries(entries);
+                    lp.setEntryValues(entries);
+                    
+                    lp = (ListPreference)findPreference("display_high_range");
+                    entries = getResources().getStringArray(R.array.perf_high_range_entries);
+                    lp.setEntries(entries);
+                    lp.setEntryValues(entries);
+                }
+            }
+        }
     };
 
     /**
@@ -250,15 +298,15 @@ public class SettingsActivity extends PreferenceActivity {
      * immediately updated upon calling this method. The exact display format is
      * dependent on the type of preference.
      *
-     * @see #sBindPreferenceSummaryToValueListener
+     * @see #BindPreferenceSummaryToValueListener
      */
-    private static void bindPreferenceSummaryToValue(Preference preference) {
+    private void bindPreferenceSummaryToValue(Preference preference) {
         // Set the listener to watch for value changes.
-        preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+        preference.setOnPreferenceChangeListener(BindPreferenceSummaryToValueListener);
 
         // Trigger the listener immediately with the preference's
         // current value.
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
+        BindPreferenceSummaryToValueListener.onPreferenceChange(preference,
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
