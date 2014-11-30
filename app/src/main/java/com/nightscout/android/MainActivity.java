@@ -29,9 +29,10 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.preferences.AndroidPreferences;
-import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.core.dexcom.Constants;
+import com.nightscout.core.dexcom.SpecialValue;
+import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
@@ -217,7 +218,7 @@ public class MainActivity extends Activity {
 
         int direction = (Integer) mTextSGV.getTag(R.string.display_trend);
         if (sgv != -1) {
-            mTextSGV.setText(getSGVStringByUnit(sgv, Constants.TREND_ARROW_VALUES.values()[direction]));
+            mTextSGV.setText(getSGVStringByUnit(sgv, TrendArrow.values()[direction]));
         }
 
         mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) +  ")");
@@ -225,14 +226,14 @@ public class MainActivity extends Activity {
         mHandler.post(updateTimeAgo);
     }
 
-    private String getSGVStringByUnit(int sgv,Constants.TREND_ARROW_VALUES trend){
+    private String getSGVStringByUnit(int sgv, TrendArrow trend){
         String sgvStr;
         if (currentUnits!=1)
-            sgvStr=String.format("%.1f",sgv*currentUnits);
+            sgvStr=String.format("%.1f",sgv * currentUnits);
         else
             sgvStr=String.valueOf(sgv);
         return (sgv!=-1)?
-                (Constants.SPECIALBGVALUES_MGDL.isSpecialValue(sgv))?Constants.SPECIALBGVALUES_MGDL.getEGVSpecialValue(sgv).toString():sgvStr+" "+trend.Symbol():"---";
+                (SpecialValue.isSpecialValue(sgv))?SpecialValue.getEGVSpecialValue(sgv).toString():sgvStr+" "+trend.symbol():"---";
     }
 
     @Override
@@ -289,7 +290,7 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             // Get response messages from broadcast
             int responseSGV = intent.getIntExtra(SyncingService.RESPONSE_SGV, -1);
-            Constants.TREND_ARROW_VALUES trend = Constants.TREND_ARROW_VALUES.values()[intent.getIntExtra(SyncingService.RESPONSE_TREND,0)];
+            TrendArrow trend = TrendArrow.values()[intent.getIntExtra(SyncingService.RESPONSE_TREND,0)];
             long responseSGVTimestamp = intent.getLongExtra(SyncingService.RESPONSE_TIMESTAMP,-1L);
             boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
             long responseNextUploadTime = intent.getLongExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);

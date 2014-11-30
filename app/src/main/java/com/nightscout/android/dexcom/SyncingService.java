@@ -10,7 +10,6 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.common.collect.Lists;
@@ -23,15 +22,11 @@ import com.nightscout.android.dexcom.USB.UsbSerialProber;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.upload.Uploader;
 import com.nightscout.core.dexcom.CRCFailError;
-import com.nightscout.core.dexcom.Constants;
+import com.nightscout.core.dexcom.NoiseMode;
+import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.dexcom.records.CalRecord;
-import com.nightscout.core.dexcom.records.EGVRecord;
-import com.nightscout.core.dexcom.records.GlucoseDataSet;
-import com.nightscout.core.dexcom.records.MeterRecord;
-import com.nightscout.core.dexcom.records.SensorRecord;
+import com.nightscout.core.dexcom.records.*;
 import com.nightscout.core.preferences.NightscoutPreferences;
-
 import org.json.JSONArray;
 
 import java.io.IOException;
@@ -155,8 +150,8 @@ public class SyncingService extends IntentService {
                 long nextUploadTime = standardMinutes(5).minus(standardSeconds(timeSinceLastRecord)).getMillis();
                 long displayTime = readData.readDisplayTime().getTime();
                 // FIXME: Device seems to flake out on battery level reads. Removing for now.
-//                int batLevel = readData.readBatteryLevel();
-                int batLevel = 100;
+                int batLevel = readData.readBatteryLevel();
+//                int batLevel = 100;
 
                 // convert into json for d3 plot
                 JSONArray array = new JSONArray();
@@ -297,7 +292,7 @@ public class SyncingService extends IntentService {
     }
 
     private void broadcastSGVToUI() {
-        EGVRecord record=new EGVRecord(-1, Constants.TREND_ARROW_VALUES.NONE,new Date(),new Date());
+        EGVRecord record=new EGVRecord(-1, TrendArrow.NONE,new Date(),new Date(), NoiseMode.None);
         broadcastSGVToUI(record, false, standardMinutes(5).getMillis() + TIME_SYNC_OFFSET, new Date().getTime(), null, 0);
     }
 

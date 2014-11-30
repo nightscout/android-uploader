@@ -1,13 +1,11 @@
-package com.nightscout.android.dexcom;
+package com.nightscout.core.dexcom;
 
-import com.nightscout.core.dexcom.CRC16;
-import com.nightscout.core.dexcom.CRCFailError;
-import com.nightscout.core.dexcom.Utils;
+import com.google.common.base.Optional;
 
 import java.util.Arrays;
 
 public class ReadPacket {
-    private int command;
+    private Command command;
     private byte[] data;
     private byte[] crc_calc;
     private byte[] crc;
@@ -16,7 +14,12 @@ public class ReadPacket {
     private int CRC_LEN = 2;
 
     public ReadPacket(byte[] readPacket) {
-        this.command = readPacket[OFFSET_CMD];
+        Optional<Command> optCmd = Command.getCommandByValue(readPacket[OFFSET_CMD]);
+        if (optCmd.isPresent()){
+            this.command = optCmd.get();
+        } else {
+            throw new IllegalArgumentException("Unknown command: "+readPacket[OFFSET_CMD]);
+        }
         this.data = Arrays.copyOfRange(readPacket, OFFSET_DATA, readPacket.length - CRC_LEN);
         this.crc = Arrays.copyOfRange(readPacket, readPacket.length - CRC_LEN, readPacket.length);
         this.crc_calc = CRC16.calculate(readPacket, 0, readPacket.length - 2);
@@ -25,7 +28,7 @@ public class ReadPacket {
         }
     }
 
-    public int getCommand() {
+    public Command getCommand() {
         return command;
     }
 

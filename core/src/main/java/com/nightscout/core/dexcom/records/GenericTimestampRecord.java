@@ -6,19 +6,19 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
 
-public class GenericTimestampRecord {
-
+abstract public class GenericTimestampRecord {
     protected final int OFFSET_SYS_TIME = 0;
     protected final int OFFSET_DISPLAY_TIME = 4;
     protected Date systemTime;
-    protected int systemTimeSeconds;
+    protected int rawSystemTimeSeconds;
     protected Date displayTime;
+    protected long rawDisplayTimeSeconds;
 
     public GenericTimestampRecord(byte[] packet) {
-        systemTimeSeconds = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(OFFSET_SYS_TIME);
-        systemTime = Utils.receiverTimeToDate(systemTimeSeconds);
-        int dt = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(OFFSET_DISPLAY_TIME);
-        displayTime = Utils.receiverTimeToDate(dt);
+        rawSystemTimeSeconds = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(OFFSET_SYS_TIME);
+        systemTime = Utils.receiverTimeToDate(rawSystemTimeSeconds);
+        rawDisplayTimeSeconds = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(OFFSET_DISPLAY_TIME);
+        displayTime = Utils.receiverTimeToDate(rawDisplayTimeSeconds);
     }
 
     public GenericTimestampRecord(Date displayTime, Date systemTime){
@@ -30,15 +30,16 @@ public class GenericTimestampRecord {
         return systemTime;
     }
 
-    public int getSystemTimeSeconds() {
-        return systemTimeSeconds;
+    public int getRawSystemTimeSeconds() {
+        return rawSystemTimeSeconds;
     }
 
     public Date getDisplayTime() {
         return displayTime;
     }
-    public long getDisplayTimeSeconds() {
-        return displayTime.getTime();
+
+    public long getRawDisplayTimeSeconds() {
+        return rawDisplayTimeSeconds;
     }
 
 }

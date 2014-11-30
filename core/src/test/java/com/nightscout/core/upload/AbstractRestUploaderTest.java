@@ -2,6 +2,7 @@ package com.nightscout.core.upload;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
+import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.preferences.TestPreferences;
@@ -120,7 +121,7 @@ public class AbstractRestUploaderTest {
     }
 
     @Test
-    public void testUploads_setsEntity() throws IOException {
+    public void testUploads_setsEntity() throws IOException, InvalidRecordLengthException {
         setUpExecuteCaptor();
         restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
         HttpPost post = (HttpPost) captor.getValue();
@@ -130,7 +131,7 @@ public class AbstractRestUploaderTest {
     }
 
     @Test
-    public void testUploads_2XXStatusCodeReturnsTrue() throws IOException {
+    public void testUploads_2XXStatusCodeReturnsTrue() throws IOException, InvalidRecordLengthException {
         setUpExecuteCaptor(251);
         boolean result = restUploader.uploadGlucoseDataSets(
                 Lists.newArrayList(mockGlucoseDataSet()));
@@ -138,7 +139,7 @@ public class AbstractRestUploaderTest {
     }
 
     @Test
-    public void testUploads_Non200StatusCodeReturnsFalse() throws IOException {
+    public void testUploads_Non200StatusCodeReturnsFalse() throws IOException, InvalidRecordLengthException {
         setUpExecuteCaptor(400);
         boolean result = restUploader.uploadGlucoseDataSets(
                 Lists.newArrayList(mockGlucoseDataSet()));
