@@ -50,14 +50,10 @@ public class EGVRecord extends GenericTimestampRecord {
         return noiseMode;
     }
 
-    public JSONObject toJSON() {
+    public JSONObject toJSON() throws JSONException{
         JSONObject obj = new JSONObject();
-        try {
-            obj.put("sgv", getBGValue());
-            obj.put("date", getDisplayTime());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        obj.put("sgv", getBGValue());
+        obj.put("date", getDisplayTime());
         return obj;
     }
 
