@@ -58,7 +58,7 @@ public class ReadPacketTest {
             new ReadPacket(testPacketBadCrc);
             fail("Should receive CRC error");
         } catch(CRCFailError error){
-            // Hi
+            // nom
         }
     }
 }

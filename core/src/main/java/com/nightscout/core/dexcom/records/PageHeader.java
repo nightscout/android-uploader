@@ -36,10 +36,9 @@ public class PageHeader {
 
     public PageHeader(byte[] packet) {
         if (packet.length < HEADER_SIZE){
-            try {
-                throw new InvalidRecordLengthException("Data smaller than expected: "+packet.length+". Expected size: "+HEADER_SIZE+"+. Unparsed record: "+new String(packet,"UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                // nom
+            if (packet.length != HEADER_SIZE) {
+                throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
+                        ". Expected size: " + HEADER_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
             }
         }
         firstRecordIndex = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(FIRSTRECORDINDEX_OFFSET);

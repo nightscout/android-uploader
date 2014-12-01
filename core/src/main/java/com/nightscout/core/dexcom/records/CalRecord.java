@@ -1,6 +1,7 @@
 package com.nightscout.core.dexcom.records;
 
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
+import com.nightscout.core.dexcom.Utils;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
@@ -27,11 +28,8 @@ public class CalRecord extends GenericTimestampRecord {
     public CalRecord(byte[] packet) {
         super(packet);
         if (packet.length != RECORD_SIZE && packet.length != RECORD_V2_SIZE) {
-            try {
-                throw new InvalidRecordLengthException("Unexpected record size: "+packet.length+". Expected size: "+RECORD_SIZE+". Unparsed record: "+new String(packet,"UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                // nom
-            }
+            throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
+                    ". Expected size: " + RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
         }
         slope = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getDouble(8);
         intercept = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getDouble(16);
