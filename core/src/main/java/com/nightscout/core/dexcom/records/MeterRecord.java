@@ -1,6 +1,7 @@
 package com.nightscout.core.dexcom.records;
 
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
+import com.nightscout.core.dexcom.Utils;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -14,11 +15,8 @@ public class MeterRecord extends GenericTimestampRecord {
     public MeterRecord(byte[] packet) {
         super(packet);
         if (packet.length != RECORD_SIZE){
-            try {
-                throw new InvalidRecordLengthException("Unexpected record size: "+packet.length+". Expected size: "+RECORD_SIZE+" record: "+new String(packet,"UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                // nom
-            }
+            throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
+                    ". Expected size: " + RECORD_SIZE + " record: " + Utils.bytesToHex(packet));
         }
         meterBG = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8);
         meterTime = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(10);
