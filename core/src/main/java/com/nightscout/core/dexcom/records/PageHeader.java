@@ -36,10 +36,8 @@ public class PageHeader {
 
     public PageHeader(byte[] packet) {
         if (packet.length < HEADER_SIZE){
-            if (packet.length != HEADER_SIZE) {
-                throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
-                        ". Expected size: " + HEADER_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
-            }
+            throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
+                    ". Expected size: " + HEADER_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
         }
         firstRecordIndex = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(FIRSTRECORDINDEX_OFFSET);
         numOfRecords = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(NUMRECS_OFFSET);
