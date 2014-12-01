@@ -62,8 +62,8 @@ public class EGVRecord extends GenericTimestampRecord {
     }
 
     public boolean isSpecialValue(){
-        for (SpecialValue specialValue:SpecialValue.values()){
-            if (specialValue.getValue()==bGValue){
+        for (SpecialValue specialValue : SpecialValue.values()){
+            if (specialValue.getValue() == bGValue){
                 return true;
             }
         }
