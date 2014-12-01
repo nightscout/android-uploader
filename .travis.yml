@@ -42,5 +42,5 @@ before_install:
 
 after_success:
   - cp app/build/jacoco/jacocoTestReport/*.xml jacoco.xml
-  - cp app/build/jacoco/jacocoTestReport/*.xml jacoco2.xml
+  - cp core/build/reports/jacoco/test/*.xml jacoco2.xml
   - codecov

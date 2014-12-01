@@ -19,85 +19,6 @@ public class EgvRecordTest {
 //    EGV Record: 80BD1A0B1D691A0B7800217D
 //    EGV: 120 Trend: DOUBLE_UP display time: 1417069821000 system time: 186301824 noise level: None
 
-    @Test
-    public void isSpecialValue_0() throws Exception {
-        byte specialValue = 0x00;
-        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
-                (byte) 0x34, (byte) 0x1A, (byte) 0x0B, specialValue, (byte) 0x00, (byte) 0x58,
-                (byte) 0x3E };
-        EGVRecord egvRecord = new EGVRecord(record);
-        assertThat(egvRecord.isSpecialValue(), is(true));
-    }
-
-    @Test
-    public void isSpecialValue_1() throws Exception {
-        byte specialValue = 0x01;
-        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
-                (byte) 0x34, (byte) 0x1A, (byte) 0x0B, specialValue, (byte) 0x00, (byte) 0x58,
-                (byte) 0x3E };
-        EGVRecord egvRecord = new EGVRecord(record);
-        assertThat(egvRecord.isSpecialValue(), is(true));
-    }
-
-    @Test
-    public void isSpecialValue_2() throws Exception {
-        byte specialValue = 0x02;
-        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
-                (byte) 0x34, (byte) 0x1A, (byte) 0x0B, specialValue, (byte) 0x00, (byte) 0x58,
-                (byte) 0x3E };
-        EGVRecord egvRecord = new EGVRecord(record);
-        assertThat(egvRecord.isSpecialValue(), is(true));
-    }
-
-    @Test
-    public void isSpecialValue_3() throws Exception {
-        byte specialValue = 0x03;
-        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
-                (byte) 0x34, (byte) 0x1A, (byte) 0x0B, specialValue, (byte) 0x00, (byte) 0x58,
-                (byte) 0x3E };
-        EGVRecord egvRecord = new EGVRecord(record);
-        assertThat(egvRecord.isSpecialValue(), is(true));
-    }
-
-    @Test
-    public void isSpecialValue_5() throws Exception {
-        byte specialValue = 0x05;
-        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
-                (byte) 0x34, (byte) 0x1A, (byte) 0x0B, specialValue, (byte) 0x00, (byte) 0x58,
-                (byte) 0x3E };
-        EGVRecord egvRecord = new EGVRecord(record);
-        assertThat(egvRecord.isSpecialValue(), is(true));
-    }
-
-    @Test
-    public void isSpecialValue_6() throws Exception {
-        byte specialValue = 0x06;
-        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
-                (byte) 0x34, (byte) 0x1A, (byte) 0x0B, specialValue, (byte) 0x00, (byte) 0x58,
-                (byte) 0x3E };
-        EGVRecord egvRecord = new EGVRecord(record);
-        assertThat(egvRecord.isSpecialValue(), is(true));
-    }
-
-    @Test
-    public void isSpecialValue_9() throws Exception {
-        byte specialValue = 0x09;
-        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
-                (byte) 0x34, (byte) 0x1A, (byte) 0x0B, specialValue, (byte) 0x00, (byte) 0x58,
-                (byte) 0x3E };
-        EGVRecord egvRecord = new EGVRecord(record);
-        assertThat(egvRecord.isSpecialValue(), is(true));
-    }
-
-    @Test
-    public void isSpecialValue_10() throws Exception {
-        byte specialValue = 0x0A;
-        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
-                (byte) 0x34, (byte) 0x1A, (byte) 0x0B, specialValue, (byte) 0x00, (byte) 0x58,
-                (byte) 0x3E };
-        EGVRecord egvRecord = new EGVRecord(record);
-        assertThat(egvRecord.isSpecialValue(), is(true));
-    }
 
     @Test
     public void shouldParseEgvRecord() throws Exception {
@@ -141,5 +62,25 @@ public class EgvRecordTest {
         }
         EGVRecord egvRecord = new EGVRecord(record);
         assertThat(egvRecord.toJSON().toString(), is(obj.toString()));
+    }
+
+    @Test
+    public void isSpecialValue() throws Exception {
+        byte specialValue = 0x00;
+        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
+                (byte) 0x34, (byte) 0x1A, (byte) 0x0B, specialValue, (byte) 0x00, (byte) 0x58,
+                (byte) 0x3E };
+        EGVRecord egvRecord = new EGVRecord(record);
+        assertThat(egvRecord.isSpecialValue(), is(true));
+    }
+
+    @Test
+    public void isNotSpecialValue() throws Exception {
+        byte sgValue = 0x64;
+        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
+                (byte) 0x34, (byte) 0x1A, (byte) 0x0B, sgValue, (byte) 0x00, (byte) 0x58,
+                (byte) 0x3E };
+        EGVRecord egvRecord = new EGVRecord(record);
+        assertThat(egvRecord.isSpecialValue(), is(false));
     }
 }
