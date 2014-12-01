@@ -18,12 +18,9 @@ public class EGVRecord extends GenericTimestampRecord {
     public EGVRecord(byte[] packet) {
         // system_time (UInt), display_time (UInt), glucose (UShort), trend_arrow (Byte), crc (UShort))
         super(packet);
-        if (packet.length != RECORD_SIZE){
-            try {
-                throw new InvalidRecordLengthException("Unexpected record size: "+packet.length+". Expected size: "+RECORD_SIZE+". Unparsed record: "+new String(packet,"UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                // nom
-            }
+        if (packet.length != RECORD_SIZE) {
+            throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
+                    ". Expected size: " + RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
         }
         int eGValue = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8);
         bGValue = eGValue & Constants.EGV_VALUE_MASK;
