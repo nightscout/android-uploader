@@ -112,4 +112,5 @@
     <!-- Privacy -->
     <string name="pref_header_privacy">Privacy</string>
     <string name="pref_enable_acra">Enable crash reporting</string>
+    <string name="prefs_auto_config_summary">Auto configure using a barcode. http://nightscout.github.io/pages/configure/ for more details</string>
 </resources>

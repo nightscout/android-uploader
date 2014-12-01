@@ -36,5 +36,6 @@
     <string name="donate_dialog_summary">Will you anonymously donate your CGM data for research in order to speed up diabetes innovation?</string>
     <string name="donate_dialog_yes">Yes</string>
     <string name="donate_dialog_no">No</string>
+    <string name="auto_configure_title">Auto configure</string>
 
 </resources>

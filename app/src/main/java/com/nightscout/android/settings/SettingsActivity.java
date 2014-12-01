@@ -1,7 +1,9 @@
 package com.nightscout.android.settings;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -21,7 +23,13 @@ import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.nightscout.android.R;
+import com.nightscout.android.barcode.AndroidBarcode;
+import com.nightscout.android.preferences.AndroidPreferences;
+import com.nightscout.core.barcode.NSBarcodeConfig;
+import com.nightscout.core.preferences.NightscoutPreferences;
 
 import java.util.List;
 
@@ -143,6 +151,16 @@ public class SettingsActivity extends PreferenceActivity {
         bindPreferenceSummaryToValue(findPreference("cloud_storage_api_base"));
         bindPreferenceSummaryToValue(findPreference("acra.user.email"));
         bindPreferenceSummaryToValue(findPreference("display_options_units"));
+
+        Preference autoConfigure = (Preference) findPreference("auto_configure");
+        final Activity activity = this;
+        autoConfigure.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new AndroidBarcode(activity).scan();
+                return true;
+            }
+        });
 
         try {
             PackageInfo pInfo = null;
@@ -366,5 +384,32 @@ public class SettingsActivity extends PreferenceActivity {
         }
     }
 
-
+    // Specific to the barcode scanner
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+        NightscoutPreferences prefs = new AndroidPreferences(PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()));
+        if (scanResult != null && scanResult.getContents() != null) {
+            NSBarcodeConfig barcode=new NSBarcodeConfig(scanResult.getContents(),prefs);
+            if (barcode.hasMongoConfig()) {
+                prefs.setMongoUploadEnabled(true);
+                if (barcode.getMongoUri().isPresent()) {
+                    prefs.setMongoClientUri(barcode.getMongoUri().get());
+                    if (barcode.getMongoCollection().isPresent()) {
+                        prefs.setMongoCollection(barcode.getMongoCollection().get());
+                    }
+                    if (barcode.getMongoDeviceStatusCollection().isPresent()) {
+                        prefs.setMongoDeviceStatusCollection(barcode.getMongoDeviceStatusCollection().get());
+                    }
+                }
+            } else {
+                prefs.setMongoUploadEnabled(false);
+            }
+            if (barcode.hasApiConfig()) {
+                prefs.setRestApiEnabled(true);
+                prefs.setRestApiBaseUris(barcode.getApiUris());
+            } else {
+                prefs.setRestApiEnabled(false);
+            }
+        }
+    }
 }

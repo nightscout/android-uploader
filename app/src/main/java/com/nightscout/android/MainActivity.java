@@ -242,6 +242,7 @@ public class MainActivity extends Activity {
         super.onDestroy();
         unregisterReceiver(mCGMStatusReceiver);
         unregisterReceiver(mDeviceStatusReceiver);
+        unregisterReceiver(toastReceiver);
     }
 
     @Override

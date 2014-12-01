@@ -23,6 +23,16 @@ public class TestPreferences implements NightscoutPreferences {
         this.restApiEnabled = restApiEnabled;
     }
 
+    @Override
+    public String getDefaultMongoCollection() {
+        return DEFAULT_MONGO_COLLECTION;
+    }
+
+    @Override
+    public String getDefaultMongoDeviceStatusCollection() {
+        return TestPreferences.DEFAULT_MONGO_DEVICE_STATUS_COLLECTION;
+    }
+
     public List<String> getRestApiBaseUris() {
         return restApiBaseUris;
     }
