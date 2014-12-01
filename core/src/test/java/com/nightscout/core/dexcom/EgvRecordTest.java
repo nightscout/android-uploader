@@ -1,7 +1,6 @@
 package com.nightscout.core.dexcom;
 
 import com.nightscout.core.dexcom.records.EGVRecord;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -37,7 +36,7 @@ public class EgvRecordTest {
         assertThat(egvRecord.getTrend(), is(TrendArrow.NOT_COMPUTABLE));
         assertThat(egvRecord.getRawDisplayTimeSeconds(), is(186266721L));
         assertThat(egvRecord.getRawSystemTimeSeconds(), is(186288324));
-        assertThat(egvRecord.getNoiseMode(), is (NoiseMode.None));
+        assertThat(egvRecord.getNoiseMode(), is (NoiseMode.NotComputed));
     }
 
     @Test(expected = InvalidRecordLengthException.class)
@@ -54,4 +53,6 @@ public class EgvRecordTest {
                 (byte) 0x3E, (byte) 0x00, (byte) 0x00 };
         EGVRecord egvRecord = new EGVRecord(record);
     }
+
+    //TODO (klee) Add tests for different trend arrows and noise modes
 }

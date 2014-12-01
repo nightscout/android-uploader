@@ -27,9 +27,9 @@ public class EGVRecord extends GenericTimestampRecord {
         }
         int eGValue = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8);
         bGValue = eGValue & Constants.EGV_VALUE_MASK;
-        int trendAndNoise = ByteBuffer.wrap(packet).get(10);
+        byte trendAndNoise = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).get(10);
         int trendValue = trendAndNoise & Constants.EGV_TREND_ARROW_MASK;
-        byte noiseValue = (byte) ((trendAndNoise & 0xF) >> 4);
+        int noiseValue = trendAndNoise >> 4;
         trend = TrendArrow.values()[trendValue];
         noiseMode = NoiseMode.values()[noiseValue];
     }
