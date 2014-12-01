@@ -57,7 +57,7 @@ public class EGVRecord extends GenericTimestampRecord {
         JSONObject obj = new JSONObject();
         try {
             obj.put("sgv", getBGValue());
-            obj.put("date", getRawDisplayTimeSeconds());
+            obj.put("date", getDisplayTime());
         } catch (JSONException e) {
             e.printStackTrace();
         }
