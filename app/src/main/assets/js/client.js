@@ -309,13 +309,13 @@ var padding = { top: 20, right: 0, bottom: 10, left: 0 },
             if(isLogaritmic) {
                 tickValues = [2.0, 3.0, 4.0, 6.0, 10.0, 15.0, 22.0];
             } else {
-                tickValues = [2.0, 3.0, 4.0, 5.0, 8.0, 11.0, 14.0, 17.0, 20.0, 23.0];
+                tickValues = [3.0, 6.0, 9.0, 12.0, 15.0, 18.0, 21.0];
             }
          } else {
             if(isLogaritmic) {
                 tickValues = [40, 60, 80, 120, 180, 300, 400];
             } else {
-                tickValues = [40, 60, 80, 100, 150, 200, 250, 300, 350, 400];
+                tickValues = [50, 100, 150, 200, 250, 300, 350, 400];
             }
         }
 
