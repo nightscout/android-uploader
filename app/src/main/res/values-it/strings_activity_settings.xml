@@ -13,7 +13,7 @@
     <string name="pref_acra_user_email">Email</string>
 
     <!-- Settings for Cloud Storage -->
-    <string name="pref_header_cloud_storage">Cloud Storage</string>
+    <string name="pref_header_cloud_storage">Codice di autorizzazione</string>
 
     <!-- MongoDB Settings -->
     <string name="pref_title_mongodb">MongoDB</string>
@@ -26,10 +26,10 @@
     <string name="pref_message_mongodb_uri">Sostituisci i valori di esemprio tra le {} con i tuoi valori</string>
     <string name="pref_default_mongodb_uri">mongodb://{utente}:{password}@{iltuosito}.mongolab.com:{11111}/{databasedeituoidati}</string>
 
-    <string name="pref_title_mongodb_collection">Nome della collection</string>
-    <string name="pref_dialog_mongodb_collection">Inserisci il nome della collection</string>
-    <string name="pref_message_mongodb_collection">Questo è il nome della collection dove i dati CGM saranno archiviati</string>
-    <string name="pref_default_mongodb_collection">dati</string>
+    <string name="pref_title_mongodb_collection">Codice di autorizzazione</string>
+    <string name="pref_dialog_mongodb_collection">Inserisci il codice</string>
+    <string name="pref_message_mongodb_collection">Questo è il codice di autorizzazione</string>
+    <string name="pref_default_mongodb_collection">Codice?</string>
 
     <string name="pref_title_mongodb_device_status_collection">Nome della collezione dello Stato Del Trasmettitore</string>
     <string name="pref_dialog_mongodb_device_status_collection">Inserisci il nome della collezione dello Stato Del Trasmettitore</string>
@@ -67,14 +67,14 @@
     <string name="pref_summary_cal_data">Dati di calibrazione usati nella conversione dai dati ISI del sensore in valori di glicemia</string>
 
     <!-- Settings for Display Options -->
-    <string name="pref_header_display_options">Display Options</string>
+    <string name="pref_header_display_options">Opzioni di visualizzazione</string>
 
     <!-- Chart Settings -->
-    <string name="pref_title_chart_options">Chart Options</string>
-    <string name="pref_summary_chart_options">Various configurations for chart</string>
+    <string name="pref_title_chart_options">Opzioni del grafico</string>
+    <string name="pref_summary_chart_options">Varie configurazioni per il grafico</string>
 
     <!-- Chart Units Settings -->
-    <string name="pref_title_chart_units_options">Unit Options</string>
+    <string name="pref_title_chart_units_options">Opzioni delle unità di misura</string>
     <string-array name="pref_options_units">
         <item>mg/dL</item>
         <item>mmol/L</item>
@@ -101,10 +101,10 @@
     <!-- Lab settings -->
     <string name="pref_header_labs">Labs</string>
 
-    <string name="pref_title_root">Root support</string>
-    <string name="pref_summary_root">Select if phone is rooted</string>
+    <string name="pref_title_root">Support per il Root</string>
+    <string name="pref_summary_root">Selezionare se il cellulare è Rootato</string>
 
     <!-- Privacy -->
     <string name="pref_header_privacy">Privacy</string>
-    <string name="pref_enable_acra">Enable crash reporting</string>
+    <string name="pref_enable_acra">Abilita il reporting dei crash</string>
 </resources>
