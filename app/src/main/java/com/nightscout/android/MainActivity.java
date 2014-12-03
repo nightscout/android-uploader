@@ -345,7 +345,7 @@ public class MainActivity extends Activity {
                 timeAgoStr = "---";
             }
             else if (delta < 0) {
-                timeAgoStr = "Time change detected";
+                timeAgoStr = getString(R.string.TimeChangeDetected);
             }
             else {
                 timeAgoStr = Utils.getTimeString(delta);
