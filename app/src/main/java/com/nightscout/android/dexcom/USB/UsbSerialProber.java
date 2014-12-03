@@ -38,8 +38,6 @@ import java.util.Map;
  */
 public enum UsbSerialProber {
 
-    // TODO(mikey): Too much boilerplate.
-
     /**
      * Prober for {@link FtdiSerialDriver}.
      *

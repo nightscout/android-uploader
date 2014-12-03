@@ -1,9 +1,7 @@
 package com.nightscout.android.dexcom.records;
 
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 
 public class MeterRecord extends GenericTimestampRecord {
 

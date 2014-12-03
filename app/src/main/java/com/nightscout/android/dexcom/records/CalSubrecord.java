@@ -1,5 +1,7 @@
 package com.nightscout.android.dexcom.records;
 
+import android.util.Log;
+
 import com.nightscout.android.dexcom.Utils;
 
 import java.nio.ByteBuffer;
@@ -7,6 +9,7 @@ import java.nio.ByteOrder;
 import java.util.Date;
 
 public class CalSubrecord {
+    private static final String TAG = CalSubrecord.class.getSimpleName();
     private Date dateEntered;
     private int calBGL;
     private int calRaw;
