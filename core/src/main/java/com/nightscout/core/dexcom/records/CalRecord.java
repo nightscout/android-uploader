@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 import java.util.Date;
 
 public class CalRecord extends GenericTimestampRecord {
@@ -120,7 +119,7 @@ public class CalRecord extends GenericTimestampRecord {
         if (numRecords != calRecord.numRecords) return false;
         if (Double.compare(calRecord.scale, scale) != 0) return false;
         if (Double.compare(calRecord.slope, slope) != 0) return false;
-        if (!Arrays.equals(calSubrecords, calRecord.calSubrecords)) return false;
+//        if (!Arrays.equals(calSubrecords, calRecord.calSubrecords)) return false;
 
         return true;
     }
@@ -138,7 +137,7 @@ public class CalRecord extends GenericTimestampRecord {
         temp = Double.doubleToLongBits(decay);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + numRecords;
-        result = 31 * result + Arrays.hashCode(calSubrecords);
+//        result = 31 * result + Arrays.hashCode(calSubrecords);
         return result;
     }
 }
