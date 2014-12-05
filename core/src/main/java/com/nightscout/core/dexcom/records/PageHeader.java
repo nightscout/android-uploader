@@ -1,13 +1,7 @@
 package com.nightscout.core.dexcom.records;
 
-import com.nightscout.core.dexcom.CRC16;
-import com.nightscout.core.dexcom.CRCFailError;
-import com.nightscout.core.dexcom.Constants;
-import com.nightscout.core.dexcom.InvalidRecordLengthException;
-import com.nightscout.core.dexcom.RecordType;
-import com.nightscout.core.dexcom.Utils;
+import com.nightscout.core.dexcom.*;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -36,11 +30,7 @@ public class PageHeader {
 
     public PageHeader(byte[] packet) {
         if (packet.length < HEADER_SIZE){
-            try {
-                throw new InvalidRecordLengthException("Data smaller than expected: "+packet.length+". Expected size: "+HEADER_SIZE+"+. Unparsed record: "+new String(packet,"UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                // nom
-            }
+            throw new InvalidRecordLengthException("Data smaller than expected: "+packet.length+". Expected size: "+HEADER_SIZE+"+. Unparsed record: "+Utils.bytesToHex(packet));
         }
         firstRecordIndex = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(FIRSTRECORDINDEX_OFFSET);
         numOfRecords = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(NUMRECS_OFFSET);
@@ -50,8 +40,8 @@ public class PageHeader {
         reserved2 = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(RESERVED2_OFFSET);
         reserved3 = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(RESERVED3_OFFSET);
         reserved4 = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(RESERVED4_OFFSET);
-        System.arraycopy(packet,HEADER_SIZE-Constants.CRC_LEN,crc,0,Constants.CRC_LEN);
-        byte[] crc_calc = CRC16.calculate(packet,0,HEADER_SIZE - Constants.CRC_LEN);
+        System.arraycopy(packet, HEADER_SIZE-Constants.CRC_LEN, crc, 0, Constants.CRC_LEN);
+        byte[] crc_calc = CRC16.calculate(packet, 0, HEADER_SIZE - Constants.CRC_LEN);
         if (!Arrays.equals(this.crc, crc_calc)) {
             throw new CRCFailError("CRC check failed: " + Utils.bytesToHex(this.crc) + " vs " + Utils.bytesToHex(crc_calc));
         }

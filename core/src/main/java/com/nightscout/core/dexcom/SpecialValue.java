@@ -2,14 +2,14 @@ package com.nightscout.core.dexcom;
 
 public enum SpecialValue {
     NONE("??0", 0),
-    SENSORNOTACTIVE("?SN", 1),
-    MINIMALLYEGVAB("??2", 2),
-    NOANTENNA("?NA", 3),
-    SENSOROUTOFCAL("?NC", 5),
-    COUNTSAB("?CD", 6),
-    ABSOLUTEAB("?AD", 9),
-    POWERAB("???", 10),
-    RFBADSTATUS("?RF", 12);
+    SENSOR_NOT_ACTIVE("?SN", 1),
+    MINIMALLY_EGV_AB("??2", 2),
+    NO_ANTENNA("?NA", 3),
+    SENSOR_OUT_OF_CAL("?NC", 5),
+    COUNTS_AB("?CD", 6),
+    ABSOLUTE_AB("?AD", 9),
+    POWER_AB("???", 10),
+    RF_BAD_STATUS("?RF", 12);
 
 
     private String name;

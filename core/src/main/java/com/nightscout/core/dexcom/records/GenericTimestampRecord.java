@@ -1,12 +1,13 @@
 package com.nightscout.core.dexcom.records;
 
 import com.nightscout.core.dexcom.Utils;
+import com.nightscout.core.protobuf.ProtobufRecord;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
 
-abstract public class GenericTimestampRecord {
+abstract public class GenericTimestampRecord implements ProtobufRecord {
     protected final int OFFSET_SYS_TIME = 0;
     protected final int OFFSET_DISPLAY_TIME = 4;
     protected Date systemTime;
@@ -42,4 +43,25 @@ abstract public class GenericTimestampRecord {
         return rawDisplayTimeSeconds;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GenericTimestampRecord that = (GenericTimestampRecord) o;
+
+        if (displayTime != null ? !displayTime.equals(that.displayTime) : that.displayTime != null) return false;
+        if (!systemTime.equals(that.systemTime)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = systemTime.hashCode();
+//        result = 31 * result + rawSystemTimeSeconds;
+        result = 31 * result + (displayTime != null ? displayTime.hashCode() : 0);
+//        result = 31 * result + (int) (rawDisplayTimeSeconds ^ (rawDisplayTimeSeconds >>> 32));
+        return result;
+    }
 }

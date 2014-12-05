@@ -1,6 +1,7 @@
 package com.nightscout.core.dexcom.records;
 
 import com.nightscout.core.dexcom.*;
+import com.nightscout.core.protobuf.G4Download;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -71,5 +72,39 @@ public class EGVRecord extends GenericTimestampRecord {
             }
         }
         return false;
+    }
+
+    @Override
+    public G4Download.CookieMonsterG4EGV toProtobuf() {
+        G4Download.CookieMonsterG4EGV.Builder builder = G4Download.CookieMonsterG4EGV.newBuilder();
+        return builder.setTimestamp(rawSystemTimeSeconds)
+                .setSgv(bGValue)
+                .setTrend(trend.toProtobuf())
+                .setNoise(noiseMode.toProtobuf())
+                .build();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        // TODO - re-enable
+//        if (!super.equals(o)) return false;
+
+        EGVRecord egvRecord = (EGVRecord) o;
+
+        if (bGValue != egvRecord.bGValue) return false;
+        if (noiseMode != egvRecord.noiseMode) return false;
+        if (trend != egvRecord.trend) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = bGValue;
+        result = 31 * result + trend.hashCode();
+        result = 31 * result + noiseMode.hashCode();
+        return result;
     }
 }

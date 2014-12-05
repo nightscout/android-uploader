@@ -6,11 +6,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
-import java.io.StringReader;
-import java.util.Arrays;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.StringReader;
+import java.util.Arrays;
 
 public class GenericXMLRecord extends GenericTimestampRecord {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -37,6 +36,11 @@ public class GenericXMLRecord extends GenericTimestampRecord {
             // TODO(trhodeos): DONT DO THIS
             log.error(TAG, "Unable to build xml element", e);
         }
+    }
+
+    @Override
+    public <T> T toProtobuf() {
+        return null;
     }
 
     // example: String sn = getXmlElement().getAttribute("SerialNumber");

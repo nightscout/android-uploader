@@ -23,6 +23,13 @@ public class CalSubrecord {
         unk = packet[16];
     }
 
+    public CalSubrecord(int calBGL, int calRaw, Date dateApplied, Date dateEntered) {
+        this.calBGL = calBGL;
+        this.calRaw = calRaw;
+        this.dateEntered = dateEntered;
+        this.dateApplied = dateApplied;
+    }
+
     public Date getDateEntered() {
         return dateEntered;
     }
@@ -41,5 +48,29 @@ public class CalSubrecord {
 
     public byte getUnk() {
         return unk;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CalSubrecord that = (CalSubrecord) o;
+
+        if (calBGL != that.calBGL) return false;
+        if (calRaw != that.calRaw) return false;
+        if (dateApplied != null ? !dateApplied.equals(that.dateApplied) : that.dateApplied != null) return false;
+        if (dateEntered != null ? !dateEntered.equals(that.dateEntered) : that.dateEntered != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = dateEntered != null ? dateEntered.hashCode() : 0;
+        result = 31 * result + calBGL;
+        result = 31 * result + calRaw;
+        result = 31 * result + (dateApplied != null ? dateApplied.hashCode() : 0);
+        return result;
     }
 }

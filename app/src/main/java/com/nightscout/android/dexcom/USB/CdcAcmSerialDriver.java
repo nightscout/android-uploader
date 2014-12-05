@@ -81,6 +81,13 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
         mConnection.close();
     }
 
+    public ReadResponse read(int size, int timeoutMillis) throws IOException {
+        byte[] data = new byte[size];
+        int readSize = read(data, timeoutMillis);
+
+        return new ReadResponse(data, readSize);
+    }
+
     @Override
     public int read(byte[] dest, int timeoutMillis) throws IOException {
         final int numBytesRead;

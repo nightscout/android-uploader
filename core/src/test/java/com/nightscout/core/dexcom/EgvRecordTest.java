@@ -23,7 +23,7 @@ public class EgvRecordTest {
                 (byte) 0x34, (byte) 0x1A, (byte) 0x0B, (byte) 0x05, (byte) 0x00, (byte) 0x58,
                 (byte) 0x3E };
         EGVRecord egvRecord=new EGVRecord(record);
-        assertThat(egvRecord.isSpecialValue(),is(true));
+        assertThat(egvRecord.isSpecialValue(), is(true));
     }
 
     @Test
@@ -36,7 +36,7 @@ public class EgvRecordTest {
         assertThat(egvRecord.getTrend(), is(TrendArrow.NOT_COMPUTABLE));
         assertThat(egvRecord.getRawDisplayTimeSeconds(), is(186266721L));
         assertThat(egvRecord.getRawSystemTimeSeconds(), is(186288324));
-        assertThat(egvRecord.getNoiseMode(), is (NoiseMode.NotComputed));
+        assertThat(egvRecord.getNoiseMode(), is(NoiseMode.NOT_COMPUTED));
     }
 
     @Test(expected = InvalidRecordLengthException.class)
