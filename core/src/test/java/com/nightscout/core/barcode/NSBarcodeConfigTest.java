@@ -3,9 +3,6 @@ package com.nightscout.core.barcode;
 
 import com.google.common.collect.Lists;
 import com.nightscout.core.preferences.TestPreferences;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,163 +11,220 @@ import org.junit.runners.JUnit4;
 
 import java.util.List;
 
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class NSBarcodeConfigTest {
     TestPreferences prefs;
+    String jsonConfig = "";
+    NSBarcodeConfig barcode;
 
     @Before
     public void setUp() {
         prefs = new TestPreferences();
     }
 
-    @Test
-    public void testMongoSet() throws Exception {
-        String mongoUri = "mongodb://user:pass@test.com/cgm_data";
-        String mongoCollection = "cgm_data";
-        String deviceStatusCollection = "devicestatus";
-        JSONObject json = new JSONObject();
-        JSONObject child = new JSONObject();
-        child.put(NSBarcodeConfigKeys.MONGO_URI, mongoUri);
-        child.put(NSBarcodeConfigKeys.MONGO_COLLECTION, mongoCollection);
-        child.put(NSBarcodeConfigKeys.MONGO_DEVICE_STATUS_COLLECTION, deviceStatusCollection);
-        json.put(NSBarcodeConfigKeys.MONGO_CONFIG, child);
-        NSBarcodeConfig barcode = new NSBarcodeConfig(json.toString(), prefs);
-        String mongo = barcode.getMongoUri().get();
-        assertThat(mongo, is(mongoUri));
-        assertThat(barcode.getMongoCollection().get(), is(mongoCollection));
-        assertThat(barcode.getMongoDeviceStatusCollection().get(), is(deviceStatusCollection));
+    private void setBarcode(){
+        barcode = new NSBarcodeConfig(jsonConfig, prefs);
     }
 
-    @Test
-    public void testValidLegacyApiBarcode() throws Exception {
-        String legacyApiUri="https://test.com/";
-        JSONObject json = new JSONObject();
-        JSONObject child = new JSONObject();
-        child.put(NSBarcodeConfigKeys.API_URI, legacyApiUri);
-        JSONArray jsonArray = new JSONArray();
-        jsonArray.put(0, child);
-        json.put(NSBarcodeConfigKeys.API_CONFIG, jsonArray);
-        NSBarcodeConfig barcode = new NSBarcodeConfig(json.toString(), prefs);
-        assertThat(barcode.getApiUris().size(), is(1));
-        assertThat(barcode.getApiUris().get(0), is(legacyApiUri));
+    private void setValidMongoOnlyNoCollections(){
+        jsonConfig = "{\"mongo\":{\"uri\":\"mongodb://user:pass@test.com/cgm_data\"}}";
+        setBarcode();
     }
 
-    // This should be different as it will have its own validators
-    @Test
-    public void testValidApiV1Barcode() throws Exception {
-        String apiUri="http://abc@test.com/v1";
-        JSONObject json = new JSONObject();
-        JSONObject child = new JSONObject();
-        child.put(NSBarcodeConfigKeys.API_URI, apiUri);
-        JSONArray jsonArray = new JSONArray();
-        jsonArray.put(0, child);
-        json.put(NSBarcodeConfigKeys.API_CONFIG, jsonArray);
-        NSBarcodeConfig barcode = new NSBarcodeConfig(json.toString(), prefs);
-        assertThat(barcode.getApiUris().size(), is(1));
-        assertThat(barcode.getApiUris().get(0), is(apiUri));
+    private void setSingleValidApiOnly(){
+        jsonConfig = "{\"rest\":{\"endpoint\":[\"http://abc@test.com/v1\"]}}";
+        setBarcode();
     }
 
-    @Test
-    public void testMultipleRest() throws Exception {
-        List<String> uris=Lists.newArrayList();
-        uris.add("http://abc@test.com/v1");
-        uris.add("http://test.com/");
-        JSONObject json = new JSONObject();
-        JSONObject child = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
-        child.put(NSBarcodeConfigKeys.API_URI, uris.get(0));
-        jsonArray.put(0,child);
-        child = new JSONObject();
-        child.put(NSBarcodeConfigKeys.API_URI, uris.get(1));
-        jsonArray.put(1, child);
-        json.put(NSBarcodeConfigKeys.API_CONFIG, jsonArray);
-        NSBarcodeConfig barcode = new NSBarcodeConfig(json.toString(), prefs);
-        assertThat(barcode.getApiUris().size(), is(2));
+    private void setSingleValidApiAndMongo(){
+        jsonConfig = "{\"mongo\":{\"uri\":\"mongodb://user:pass@test.com/cgm_data\"}, \"rest\":{\"endpoint\":[\"http://abc@test.com/v1\"]}}";
+        setBarcode();
+    }
+
+    private void setMultipleValidApiOnly(){
+        jsonConfig = "{\"rest\":{\"endpoint\":[\"http://abc@test.com/v1\", \"http://test.com/\"]}}";
+        setBarcode();
+    }
+
+    private void setEmptyValidApiOnly(){
+        jsonConfig = "{\"rest\":{\"endpoint\":[]}}";
+        setBarcode();
+    }
+
+    private void setEmptyValidMongoOnly(){
+        jsonConfig = "{\"mongo\":{}";
+        setBarcode();
+    }
+
+    private void setInvalidConfigWithValidJson(){
+        jsonConfig = "{\"some\":{\"random\":[\"values\"]}}";
+        setBarcode();
+    }
+
+    private void setInvalidJson(){
+        jsonConfig = "{foo bar";
+        setBarcode();
+    }
+
+    private void verifySingleApiUri(){
+        List<String> uris = Lists.newArrayList("http://abc@test.com/v1");
         assertThat(barcode.getApiUris(), is(uris));
     }
 
-    @Test
-    public void testMongoAndRestV1() throws Exception {
-        String apiUri="http://abc@test.com/";
-        String mongoUri = "mongodb://user:pass@test.com/cgm_data";
-        String mongoCollection = "cgm_data";
-        String deviceStatusCollection = "devicestatus";
-        JSONObject json = new JSONObject();
-        JSONObject child = new JSONObject();
-        child.put(NSBarcodeConfigKeys.MONGO_URI, mongoUri);
-        child.put(NSBarcodeConfigKeys.MONGO_COLLECTION, mongoCollection);
-        child.put(NSBarcodeConfigKeys.MONGO_DEVICE_STATUS_COLLECTION, deviceStatusCollection);
-        json.put(NSBarcodeConfigKeys.MONGO_CONFIG, child);
-        child.put(NSBarcodeConfigKeys.API_URI, apiUri);
-        JSONArray jsonArray = new JSONArray();
-        jsonArray.put(0,child);
-        json.put(NSBarcodeConfigKeys.API_CONFIG, jsonArray);
-        json.put(NSBarcodeConfigKeys.MONGO_CONFIG, child);
-        NSBarcodeConfig barcode = new NSBarcodeConfig(json.toString(), prefs);
-        assertThat(barcode.getMongoUri().get(), is(mongoUri));
-        assertThat(barcode.getApiUris().get(0), is(apiUri));
+    private void verifyMultipleApiUri(){
+        List<String> uris = Lists.newArrayList("http://abc@test.com/v1", "http://test.com/");
+        assertThat(barcode.getApiUris(), is(uris));
+    }
+
+    private void verifyMongoUri(){
+        assertThat(barcode.getMongoUri().get(), is("mongodb://user:pass@test.com/cgm_data"));
     }
 
     @Test
-    public void testNoMongoSet() throws Exception {
-        String apiUri="http://abc@test.com/v1";
-        JSONObject json = new JSONObject();
-        JSONObject child = new JSONObject();
-        child.put(NSBarcodeConfigKeys.API_URI,apiUri);
-        JSONArray jsonArray = new JSONArray();
-        jsonArray.put(0,child);
-        json.put(NSBarcodeConfigKeys.API_CONFIG,jsonArray);
-        NSBarcodeConfig barcode = new NSBarcodeConfig(json.toString(), prefs);
-        assertThat(barcode.getMongoUri().isPresent(), is(false));
-        assertThat(barcode.getMongoCollection().isPresent(), is(false));
-        assertThat(barcode.getMongoDeviceStatusCollection().isPresent(), is(false));
+    public void testMongoEnabledWithMongoConfig() {
+        setValidMongoOnlyNoCollections();
+        assertThat(barcode.hasMongoConfig(), is(true));
     }
 
     @Test
-    public void testNoApiSet() throws Exception {
-        String mongoUri = "mongodb://user:pass@test.com/cgm_data";
-        String mongoCollection = "cgm_data";
-        String deviceStatusCollection = "devicestatus";
-        JSONObject json = new JSONObject();
-        JSONObject child = new JSONObject();
-        child.put(NSBarcodeConfigKeys.MONGO_URI, mongoUri);
-        child.put(NSBarcodeConfigKeys.MONGO_COLLECTION, mongoCollection);
-        child.put(NSBarcodeConfigKeys.MONGO_DEVICE_STATUS_COLLECTION, deviceStatusCollection);
-        json.put(NSBarcodeConfigKeys.MONGO_CONFIG, child);
-        NSBarcodeConfig barcode = new NSBarcodeConfig(json.toString(), prefs);
-        assertThat(barcode.getApiUris(), is(empty()));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidJsonConfig() throws Exception {
-        String foo = "bar";
-        new NSBarcodeConfig(foo, prefs);
+    public void testApiNotEnabledWithMongoConfig() {
+        setValidMongoOnlyNoCollections();
+        assertThat(barcode.hasApiConfig(), is(false));
     }
 
     @Test
-    public void testNoApiUrisReturnsEmptyList() throws Exception {
-        String mongoUri = "mongodb://user:pass@test.com/cgm_data";
-        String configString = "{\"" + NSBarcodeConfigKeys.MONGO_CONFIG + "\":{"+ NSBarcodeConfigKeys.MONGO_URI + ":\"" + mongoUri + "\"}}";
-        NSBarcodeConfig barcode = new NSBarcodeConfig(configString, prefs);
-        assertThat(barcode.getApiUris(), is(empty()));
+    public void testMongoUriSetWithMongoConfig(){
+        setValidMongoOnlyNoCollections();
+        verifyMongoUri();
     }
 
     @Test
-    public void testMongoConfigWithNoCollectionReturnsDefaults(){
-        String jsonConfig = "{\""+NSBarcodeConfigKeys.MONGO_CONFIG+"\":{\""+NSBarcodeConfigKeys.MONGO_URI+"\":\"mongodb://user:pass@test.com/cgm_data\"}}";
-        NSBarcodeConfig barcode = new NSBarcodeConfig(jsonConfig, prefs);
-        assertThat(barcode.getMongoCollection().isPresent(), is(true));
-        assertThat(barcode.getMongoDeviceStatusCollection().isPresent(), is(true));
-        assertThat(barcode.getMongoCollection().get(), is(TestPreferences.DEFAULT_MONGO_COLLECTION));
-        assertThat(barcode.getMongoDeviceStatusCollection().get(), is(TestPreferences.DEFAULT_MONGO_DEVICE_STATUS_COLLECTION));
+    public void testMongoDefaultCollectionSetWithMongoConfig() {
+        setValidMongoOnlyNoCollections();
+        assertThat(barcode.getMongoCollection().get(), is("cgm_data"));
+    }
+
+    @Test
+    public void testMongoDefaultDeviceStatusCollectionSetWithMongoConfig() {
+        setValidMongoOnlyNoCollections();
+        assertThat(barcode.getMongoDeviceStatusCollection().get(), is("devicestatus"));
+    }
+
+    @Test
+    public void testApiEnabledWithApiConfig(){
+        setSingleValidApiOnly();
+        assertThat(barcode.hasApiConfig(), is(true));
+    }
+
+    @Test
+    public void testMongoIsNotEnabledWithApiConfig(){
+        setSingleValidApiOnly();
+        assertThat(barcode.hasMongoConfig(), is(false));
+    }
+
+    @Test
+    public void testApiUriIsSetWithApiConfig(){
+        setSingleValidApiOnly();
+        verifySingleApiUri();
+    }
+
+    @Test
+    public void testSingleApiUriAndMongoEnablesMongoWithApiAndMongoConfig(){
+        setSingleValidApiAndMongo();
+        assertThat(barcode.hasMongoConfig(), is(true));
+    }
+
+    @Test
+    public void testSingleApiUriAndMongoEnablesApiWithApiAndMongoConfig(){
+        setSingleValidApiAndMongo();
+        assertThat(barcode.hasApiConfig(), is(true));
+    }
+
+    @Test
+    public void testSingleApiUriAndMongoSetsApiWithApiAndMongoConfig(){
+        setSingleValidApiAndMongo();
+        verifySingleApiUri();
+    }
+
+    @Test
+    public void testSingleApiUriAndMongoSetsMongoWithApiAndMongoConfig(){
+        setSingleValidApiAndMongo();
+        verifyMongoUri();
+    }
+
+    @Test
+    public void testMultipleValidApiUriEnablesApiWithApiConfig(){
+        setMultipleValidApiOnly();
+        assertThat(barcode.hasApiConfig(), is(true));
+    }
+
+    @Test
+    public void testMultipleValidApiUriDoesNotEnableMongoWithApiConfig(){
+        setMultipleValidApiOnly();
+        assertThat(barcode.hasMongoConfig(), is(false));
+    }
+
+    @Test
+    public void testMultipleValidApiUriSetsApiWithApiConfig(){
+        setMultipleValidApiOnly();
+        verifyMultipleApiUri();
+    }
+
+    @Test
+    public void testEmptyValidApiDoesNotEnableApiWithApiConfig(){
+        setEmptyValidApiOnly();
+        assertThat(barcode.hasApiConfig(), is(false));
+    }
+
+    @Test
+    public void testEmptyValidApiDoesNotEnableMongoWithApiConfig(){
+        setEmptyValidApiOnly();
+        assertThat(barcode.hasMongoConfig(), is(false));
+    }
+
+    @Test
+    public void testEmptyValidMongoDoesNotEnableApiWithApiConfig(){
+        setEmptyValidMongoOnly();
+        assertThat(barcode.hasApiConfig(), is(false));
+    }
+
+    @Test
+    public void testEmptyValidMongoDoesNotEnableMongoWithApiConfig(){
+        setEmptyValidMongoOnly();
+        assertThat(barcode.hasMongoConfig(), is(false));
+    }
+
+    @Test
+    public void testInvalidConfigWithValidJsonDoesNotEnableMongo(){
+        setInvalidConfigWithValidJson();
+        assertThat(barcode.hasMongoConfig(), is(false));
+    }
+
+    @Test
+    public void testInvalidConfigWithValidJsonDoesNotEnableApi(){
+        setInvalidConfigWithValidJson();
+        assertThat(barcode.hasApiConfig(), is(false));
+    }
+
+    @Test
+    public void testInvalidJsonDoesNotEnableMongo(){
+        setInvalidJson();
+        assertThat(barcode.hasMongoConfig(), is(false));
+    }
+
+    @Test
+    public void testInvalidJsonDoesNotEnableApi(){
+        setInvalidJson();
+        assertThat(barcode.hasApiConfig(), is(false));
     }
 
     @After
     public void tearDown(){
         prefs = null;
+        jsonConfig = "";
+        barcode = null;
     }
 }

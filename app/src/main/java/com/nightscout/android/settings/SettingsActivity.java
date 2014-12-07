@@ -12,17 +12,10 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
+import android.preference.*;
 import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
 import android.view.MenuItem;
-
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.nightscout.android.R;
@@ -152,7 +145,7 @@ public class SettingsActivity extends PreferenceActivity {
         bindPreferenceSummaryToValue(findPreference("acra.user.email"));
         bindPreferenceSummaryToValue(findPreference("display_options_units"));
 
-        Preference autoConfigure = (Preference) findPreference("auto_configure");
+        Preference autoConfigure = findPreference("auto_configure");
         final Activity activity = this;
         autoConfigure.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -389,18 +382,12 @@ public class SettingsActivity extends PreferenceActivity {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
         NightscoutPreferences prefs = new AndroidPreferences(PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()));
         if (scanResult != null && scanResult.getContents() != null) {
-            NSBarcodeConfig barcode=new NSBarcodeConfig(scanResult.getContents(),prefs);
+            NSBarcodeConfig barcode=new NSBarcodeConfig(scanResult.getContents(), prefs);
             if (barcode.hasMongoConfig()) {
                 prefs.setMongoUploadEnabled(true);
-                if (barcode.getMongoUri().isPresent()) {
-                    prefs.setMongoClientUri(barcode.getMongoUri().get());
-                    if (barcode.getMongoCollection().isPresent()) {
-                        prefs.setMongoCollection(barcode.getMongoCollection().get());
-                    }
-                    if (barcode.getMongoDeviceStatusCollection().isPresent()) {
-                        prefs.setMongoDeviceStatusCollection(barcode.getMongoDeviceStatusCollection().get());
-                    }
-                }
+                prefs.setMongoClientUri(barcode.getMongoUri().get());
+                prefs.setMongoCollection(barcode.getMongoCollection().get());
+                prefs.setMongoDeviceStatusCollection(barcode.getMongoDeviceStatusCollection().get());
             } else {
                 prefs.setMongoUploadEnabled(false);
             }
