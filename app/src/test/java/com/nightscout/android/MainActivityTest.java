@@ -15,6 +15,7 @@ public class MainActivityTest extends RobolectricTestBase {
     MainActivity activity;
     @Before
     public void setUp() {
+        activity.notTesting = false;
         activity = Robolectric.buildActivity(MainActivity.class).create().get();
     }
 

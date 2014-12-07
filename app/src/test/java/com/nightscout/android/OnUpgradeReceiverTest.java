@@ -18,6 +18,7 @@ public class OnUpgradeReceiverTest extends RobolectricTestBase {
 
     @Before
     public void setUp() {
+        activity.notTesting = false;
         activity = Robolectric.buildActivity(MainActivity.class).create().get();
     }
 

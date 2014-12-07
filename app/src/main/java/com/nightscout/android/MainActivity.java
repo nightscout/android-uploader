@@ -80,6 +80,8 @@ public class MainActivity extends Activity {
     // TODO: should try and avoid use static
     public static int batLevel = 0;
 
+    public static boolean notTesting = true;
+
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,8 +197,10 @@ public class MainActivity extends Activity {
             mTracker.send(new HitBuilders.EventBuilder("Upload", "Mongo").build());
         }
 
-        Tutorial tutorial = new Tutorial(MainActivity.this);
-        tutorial.startTutorial();
+        if (notTesting) {
+            Tutorial tutorial = new Tutorial(MainActivity.this);
+            tutorial.startTutorial();
+        }
     }
 
     @Override
