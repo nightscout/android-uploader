@@ -1,7 +1,6 @@
 package com.nightscout.core.dexcom;
 
 import com.google.common.primitives.UnsignedBytes;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -34,7 +33,7 @@ public class ReadPacketTest {
 
     @Test
     public void testReadPacket_command() {
-        assertThat(new ReadPacket(testPacket).getCommand().getValue(), is(0x5));
+        assertThat(new ReadPacket(testPacket).getCommand().getValue(), is((byte) 0x05));
     }
 
     @Test
@@ -44,7 +43,7 @@ public class ReadPacketTest {
 
     @Test
     public void testReadPacket_noDataPacket_command() {
-        assertThat(new ReadPacket(testPacketNoData).getCommand().getValue(), is(0x1A));
+        assertThat(new ReadPacket(testPacketNoData).getCommand().getValue(), is((byte) 0x1A));
     }
 
     @Test

@@ -19,6 +19,14 @@ public class EgvRecordTest {
 //    EGV Record: 80BD1A0B1D691A0B7800217D
 //    EGV: 120 Trend: DOUBLE_UP display time: 1417069821000 system time: 186301824 noise level: None
 
+    @Test
+    public void isSpecialValue() throws Exception {
+        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
+                (byte) 0x34, (byte) 0x1A, (byte) 0x0B, (byte) 0x05, (byte) 0x00, (byte) 0x58,
+                (byte) 0x3E };
+        EGVRecord egvRecord=new EGVRecord(record);
+        assertThat(egvRecord.isSpecialValue(), is(true));
+    }
 
     @Test
     public void shouldParseEgvRecord() throws Exception {
@@ -30,7 +38,7 @@ public class EgvRecordTest {
         assertThat(egvRecord.getTrend(), is(TrendArrow.NOT_COMPUTABLE));
         assertThat(egvRecord.getRawDisplayTimeSeconds(), is(186266721L));
         assertThat(egvRecord.getRawSystemTimeSeconds(), is(186288324));
-        assertThat(egvRecord.getNoiseMode(), is(NoiseMode.None));
+        assertThat(egvRecord.getNoiseMode(), is(NoiseMode.NOT_COMPUTED));
     }
 
     @Test(expected = InvalidRecordLengthException.class)
@@ -83,4 +91,6 @@ public class EgvRecordTest {
         EGVRecord egvRecord = new EGVRecord(record);
         assertThat(egvRecord.isSpecialValue(), is(false));
     }
+
+    //TODO (klee) Add tests for different trend arrows and noise modes
 }

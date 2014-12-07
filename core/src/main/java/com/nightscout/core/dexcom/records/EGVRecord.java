@@ -1,6 +1,7 @@
 package com.nightscout.core.dexcom.records;
 
 import com.nightscout.core.dexcom.*;
+import com.nightscout.core.protobuf.G4Download;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,14 +25,21 @@ public class EGVRecord extends GenericTimestampRecord {
         }
         int eGValue = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8);
         bGValue = eGValue & Constants.EGV_VALUE_MASK;
-        int trendAndNoise = ByteBuffer.wrap(packet).get(10);
+        byte trendAndNoise = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).get(10);
         int trendValue = trendAndNoise & Constants.EGV_TREND_ARROW_MASK;
-        byte noiseValue = (byte) ((trendAndNoise & 0xF) >> 4);
+        byte noiseValue = (byte) ((trendAndNoise & Constants.EGV_NOISE_MASK) >> 4);
         trend = TrendArrow.values()[trendValue];
         noiseMode = NoiseMode.values()[noiseValue];
     }
 
     public EGVRecord(int bGValue, TrendArrow trend, Date displayTime, Date systemTime, NoiseMode noise){
+        super(displayTime, systemTime);
+        this.bGValue = bGValue;
+        this.trend = trend;
+        this.noiseMode = noise;
+    }
+
+    public EGVRecord(int bGValue, TrendArrow trend, long displayTime, int systemTime, NoiseMode noise){
         super(displayTime, systemTime);
         this.bGValue = bGValue;
         this.trend = trend;
@@ -64,5 +72,38 @@ public class EGVRecord extends GenericTimestampRecord {
             }
         }
         return false;
+    }
+
+    @Override
+    public G4Download.CookieMonsterG4EGV toProtobuf() {
+        G4Download.CookieMonsterG4EGV.Builder builder = G4Download.CookieMonsterG4EGV.newBuilder();
+        return builder.setTimestampSec(rawSystemTimeSeconds)
+                .setSgvMgdl(bGValue)
+                .setTrend(trend.toProtobuf())
+                .setNoise(noiseMode.toProtobuf())
+                .build();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        EGVRecord egvRecord = (EGVRecord) o;
+
+        if (bGValue != egvRecord.bGValue) return false;
+        if (noiseMode != egvRecord.noiseMode) return false;
+        if (trend != egvRecord.trend) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = bGValue;
+        result = 31 * result + trend.hashCode();
+        result = 31 * result + noiseMode.hashCode();
+        return result;
     }
 }

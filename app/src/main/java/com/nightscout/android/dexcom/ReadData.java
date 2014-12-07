@@ -1,21 +1,9 @@
 package com.nightscout.android.dexcom;
 
 import android.util.Log;
-
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
-import com.nightscout.core.dexcom.Command;
-import com.nightscout.core.dexcom.InvalidRecordLengthException;
-import com.nightscout.core.dexcom.PacketBuilder;
-import com.nightscout.core.dexcom.ReadPacket;
-import com.nightscout.core.dexcom.RecordType;
-import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.dexcom.records.CalRecord;
-import com.nightscout.core.dexcom.records.EGVRecord;
-import com.nightscout.core.dexcom.records.GenericXMLRecord;
-import com.nightscout.core.dexcom.records.MeterRecord;
-import com.nightscout.core.dexcom.records.PageHeader;
-import com.nightscout.core.dexcom.records.SensorRecord;
-
+import com.nightscout.core.dexcom.*;
+import com.nightscout.core.dexcom.records.*;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
@@ -174,7 +162,7 @@ public class ReadData {
         }
     }
 
-    private void writeCommand(Command command) {
+    public void writeCommand(Command command) {
         byte[] packet = new PacketBuilder(command).build();
         if (mSerialDevice != null) {
             try {
@@ -186,10 +174,12 @@ public class ReadData {
     }
 
     private ReadPacket read(int numOfBytes) {
-        byte[] readData = new byte[numOfBytes];
+//        byte[] readData = new byte[numOfBytes];
+        byte[] response = new byte[numOfBytes];
         int len = 0;
         try {
-            len = mSerialDevice.read(readData, IO_TIMEOUT);
+            response = mSerialDevice.read(numOfBytes, IO_TIMEOUT);
+            len = response.length;
             Log.d(TAG, "Read " + len + " byte(s) complete.");
 
             // Add a 100ms delay for when multiple write/reads are occurring in series
@@ -199,17 +189,16 @@ public class ReadData {
             // finding the source of the reading issue
             String bytes = "";
             int readAmount = len;
-            for (int i = 0; i < readAmount; i++) bytes += String.format("%02x", readData[i]) + " ";
+            for (int i = 0; i < readAmount; i++) bytes += String.format("%02x", response[i]) + " ";
             Log.d(TAG, "Read data: " + bytes);
             ////////////////////////////////////////////////////////////////////////////////////////
-
         } catch (IOException e) {
             Log.e(TAG, "Unable to read from serial device.", e);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        byte[] data = Arrays.copyOfRange(readData, 0, len);
-        return new ReadPacket(data);
+//        byte[] data = Arrays.copyOfRange(readData, 0, len);
+        return new ReadPacket(response);
     }
 
     private <T> T ParsePage(byte[] data, RecordType recordType) {
@@ -274,6 +263,6 @@ public class ReadData {
                 break;
         }
 
-        return (T) null;
+        return null;
     }
 }
