@@ -288,7 +288,7 @@ var padding = { top: 20, right: 0, bottom: 10, left: 0 },
         updateTimer = setTimeout(updateChartWithTimer, 60000);
     }
 
-    function updateUnits(isMmol, isLogaritmic, lRange, hRange) {
+    function updateUnits(isMmol, isLogarithmic, lRange, hRange) {
         lowRange = lRange;
         highRange = hRange;
         // only update if units have changed 
@@ -306,13 +306,13 @@ var padding = { top: 20, right: 0, bottom: 10, left: 0 },
             });
         }
          if (isMmol)  {
-            if(isLogaritmic) {
+            if(isLogarithmic) {
                 tickValues = [2.0, 3.0, 4.0, 6.0, 10.0, 15.0, 22.0];
             } else {
                 tickValues = [3.0, 6.0, 9.0, 12.0, 15.0, 18.0, 21.0];
             }
          } else {
-            if(isLogaritmic) {
+            if(isLogarithmic) {
                 tickValues = [40, 60, 80, 120, 180, 300, 400];
             } else {
                 tickValues = [50, 100, 150, 200, 250, 300, 350, 400];
@@ -322,8 +322,8 @@ var padding = { top: 20, right: 0, bottom: 10, left: 0 },
         // remove the data that was staled when timers were paused
         focus.selectAll('circle').data([], dateFn).exit().remove();
 
-        if (isLogaritmic) {
-            yScale = d3.scale.log().domain([scaleBg(30), scaleBg(510)]);
+        if (isLogarithmic) {
+            yScale = d3.scale.log().domain([scaleBg(30), scaleBg(450)]);
         } else {
             yScale = d3.scale.linear().domain([scaleBg(30), scaleBg(450)]);            
         }
