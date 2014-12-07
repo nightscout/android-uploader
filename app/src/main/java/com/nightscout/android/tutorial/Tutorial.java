@@ -18,7 +18,7 @@ public class Tutorial {
     TextView mTextSGV;
     TextView mTextTimeAgo;
     private WebView mWebView;
-    private int TUTORIAL_VERSION = 1;
+    private final int TUTORIAL_VERSION = 1;
 
     public Tutorial(MainActivity activity) {
         mActivity = activity;
@@ -38,7 +38,7 @@ public class Tutorial {
         new ShowcaseView.Builder(mActivity)
             .setContentTitle(R.string.tutorial_one_title)
             .setContentText(R.string.tutorial_one_summary)
-//            .singleShot(TUTORIAL_VERSION)
+            .singleShot(TUTORIAL_VERSION)
             .setShowcaseEventListener(new OnShowcaseEventListener() {
 
                 @Override
