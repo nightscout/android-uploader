@@ -672,21 +672,21 @@ public final class G4Download {
         getDownloadTimestampBytes();
 
     /**
-     * <code>optional uint64 receiver_system_time = 4;</code>
+     * <code>optional uint64 receiver_system_time_sec = 4;</code>
      *
      * <pre>
      * Raw value of the receiver's system time
      * </pre>
      */
-    boolean hasReceiverSystemTime();
+    boolean hasReceiverSystemTimeSec();
     /**
-     * <code>optional uint64 receiver_system_time = 4;</code>
+     * <code>optional uint64 receiver_system_time_sec = 4;</code>
      *
      * <pre>
      * Raw value of the receiver's system time
      * </pre>
      */
-    long getReceiverSystemTime();
+    long getReceiverSystemTimeSec();
 
     /**
      * <code>optional .DownloadStatus download_status = 5 [default = NA];</code>
@@ -810,20 +810,6 @@ public final class G4Download {
      */
     com.nightscout.core.protobuf.G4Download.CookieMonsterG4CalOrBuilder getCalOrBuilder(
         int index);
-
-    /**
-     * <code>optional string patient_name = 11;</code>
-     */
-    boolean hasPatientName();
-    /**
-     * <code>optional string patient_name = 11;</code>
-     */
-    java.lang.String getPatientName();
-    /**
-     * <code>optional string patient_name = 11;</code>
-     */
-    com.google.protobuf.ByteString
-        getPatientNameBytes();
   }
   /**
    * Protobuf type {@code CookieMonsterG4Download}
@@ -904,7 +890,7 @@ public final class G4Download {
             }
             case 32: {
               bitField0_ |= 0x00000004;
-              receiverSystemTime_ = input.readUInt64();
+              receiverSystemTimeSec_ = input.readUInt64();
               break;
             }
             case 40: {
@@ -950,12 +936,6 @@ public final class G4Download {
                 mutable_bitField0_ |= 0x00000200;
               }
               cal_.add(input.readMessage(com.nightscout.core.protobuf.G4Download.CookieMonsterG4Cal.PARSER, extensionRegistry));
-              break;
-            }
-            case 90: {
-              com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x00000040;
-              patientName_ = bs;
               break;
             }
           }
@@ -1142,27 +1122,27 @@ public final class G4Download {
       }
     }
 
-    public static final int RECEIVER_SYSTEM_TIME_FIELD_NUMBER = 4;
-    private long receiverSystemTime_;
+    public static final int RECEIVER_SYSTEM_TIME_SEC_FIELD_NUMBER = 4;
+    private long receiverSystemTimeSec_;
     /**
-     * <code>optional uint64 receiver_system_time = 4;</code>
+     * <code>optional uint64 receiver_system_time_sec = 4;</code>
      *
      * <pre>
      * Raw value of the receiver's system time
      * </pre>
      */
-    public boolean hasReceiverSystemTime() {
+    public boolean hasReceiverSystemTimeSec() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional uint64 receiver_system_time = 4;</code>
+     * <code>optional uint64 receiver_system_time_sec = 4;</code>
      *
      * <pre>
      * Raw value of the receiver's system time
      * </pre>
      */
-    public long getReceiverSystemTime() {
-      return receiverSystemTime_;
+    public long getReceiverSystemTimeSec() {
+      return receiverSystemTimeSec_;
     }
 
     public static final int DOWNLOAD_STATUS_FIELD_NUMBER = 5;
@@ -1339,60 +1319,17 @@ public final class G4Download {
       return cal_.get(index);
     }
 
-    public static final int PATIENT_NAME_FIELD_NUMBER = 11;
-    private java.lang.Object patientName_;
-    /**
-     * <code>optional string patient_name = 11;</code>
-     */
-    public boolean hasPatientName() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
-    }
-    /**
-     * <code>optional string patient_name = 11;</code>
-     */
-    public java.lang.String getPatientName() {
-      java.lang.Object ref = patientName_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          patientName_ = s;
-        }
-        return s;
-      }
-    }
-    /**
-     * <code>optional string patient_name = 11;</code>
-     */
-    public com.google.protobuf.ByteString
-        getPatientNameBytes() {
-      java.lang.Object ref = patientName_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        patientName_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
     private void initFields() {
       sgv_ = java.util.Collections.emptyList();
       units_ = com.nightscout.core.protobuf.G4Download.GlucoseUnit.MGDL;
       downloadTimestamp_ = "";
-      receiverSystemTime_ = 0L;
+      receiverSystemTimeSec_ = 0L;
       downloadStatus_ = com.nightscout.core.protobuf.G4Download.DownloadStatus.NA;
       receiverBattery_ = 0;
       uploaderBattery_ = 0;
       meter_ = java.util.Collections.emptyList();
       sensor_ = java.util.Collections.emptyList();
       cal_ = java.util.Collections.emptyList();
-      patientName_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -1445,7 +1382,7 @@ public final class G4Download {
         output.writeBytes(3, getDownloadTimestampBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeUInt64(4, receiverSystemTime_);
+        output.writeUInt64(4, receiverSystemTimeSec_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeEnum(5, downloadStatus_.getNumber());
@@ -1464,9 +1401,6 @@ public final class G4Download {
       }
       for (int i = 0; i < cal_.size(); i++) {
         output.writeMessage(10, cal_.get(i));
-      }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeBytes(11, getPatientNameBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -1491,7 +1425,7 @@ public final class G4Download {
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(4, receiverSystemTime_);
+          .computeUInt64Size(4, receiverSystemTimeSec_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
@@ -1516,10 +1450,6 @@ public final class G4Download {
       for (int i = 0; i < cal_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(10, cal_.get(i));
-      }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(11, getPatientNameBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1652,7 +1582,7 @@ public final class G4Download {
         bitField0_ = (bitField0_ & ~0x00000002);
         downloadTimestamp_ = "";
         bitField0_ = (bitField0_ & ~0x00000004);
-        receiverSystemTime_ = 0L;
+        receiverSystemTimeSec_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000008);
         downloadStatus_ = com.nightscout.core.protobuf.G4Download.DownloadStatus.NA;
         bitField0_ = (bitField0_ & ~0x00000010);
@@ -1678,8 +1608,6 @@ public final class G4Download {
         } else {
           calBuilder_.clear();
         }
-        patientName_ = "";
-        bitField0_ = (bitField0_ & ~0x00000400);
         return this;
       }
 
@@ -1728,7 +1656,7 @@ public final class G4Download {
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.receiverSystemTime_ = receiverSystemTime_;
+        result.receiverSystemTimeSec_ = receiverSystemTimeSec_;
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000008;
         }
@@ -1768,10 +1696,6 @@ public final class G4Download {
         } else {
           result.cal_ = calBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
-          to_bitField0_ |= 0x00000040;
-        }
-        result.patientName_ = patientName_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1822,8 +1746,8 @@ public final class G4Download {
           downloadTimestamp_ = other.downloadTimestamp_;
           onChanged();
         }
-        if (other.hasReceiverSystemTime()) {
-          setReceiverSystemTime(other.getReceiverSystemTime());
+        if (other.hasReceiverSystemTimeSec()) {
+          setReceiverSystemTimeSec(other.getReceiverSystemTimeSec());
         }
         if (other.hasDownloadStatus()) {
           setDownloadStatus(other.getDownloadStatus());
@@ -1911,11 +1835,6 @@ public final class G4Download {
               calBuilder_.addAllMessages(other.cal_);
             }
           }
-        }
-        if (other.hasPatientName()) {
-          bitField0_ |= 0x00000400;
-          patientName_ = other.patientName_;
-          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -2435,50 +2354,50 @@ public final class G4Download {
         return this;
       }
 
-      private long receiverSystemTime_ ;
+      private long receiverSystemTimeSec_ ;
       /**
-       * <code>optional uint64 receiver_system_time = 4;</code>
+       * <code>optional uint64 receiver_system_time_sec = 4;</code>
        *
        * <pre>
        * Raw value of the receiver's system time
        * </pre>
        */
-      public boolean hasReceiverSystemTime() {
+      public boolean hasReceiverSystemTimeSec() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional uint64 receiver_system_time = 4;</code>
+       * <code>optional uint64 receiver_system_time_sec = 4;</code>
        *
        * <pre>
        * Raw value of the receiver's system time
        * </pre>
        */
-      public long getReceiverSystemTime() {
-        return receiverSystemTime_;
+      public long getReceiverSystemTimeSec() {
+        return receiverSystemTimeSec_;
       }
       /**
-       * <code>optional uint64 receiver_system_time = 4;</code>
+       * <code>optional uint64 receiver_system_time_sec = 4;</code>
        *
        * <pre>
        * Raw value of the receiver's system time
        * </pre>
        */
-      public Builder setReceiverSystemTime(long value) {
+      public Builder setReceiverSystemTimeSec(long value) {
         bitField0_ |= 0x00000008;
-        receiverSystemTime_ = value;
+        receiverSystemTimeSec_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional uint64 receiver_system_time = 4;</code>
+       * <code>optional uint64 receiver_system_time_sec = 4;</code>
        *
        * <pre>
        * Raw value of the receiver's system time
        * </pre>
        */
-      public Builder clearReceiverSystemTime() {
+      public Builder clearReceiverSystemTimeSec() {
         bitField0_ = (bitField0_ & ~0x00000008);
-        receiverSystemTime_ = 0L;
+        receiverSystemTimeSec_ = 0L;
         onChanged();
         return this;
       }
@@ -3350,82 +3269,6 @@ public final class G4Download {
         return calBuilder_;
       }
 
-      private java.lang.Object patientName_ = "";
-      /**
-       * <code>optional string patient_name = 11;</code>
-       */
-      public boolean hasPatientName() {
-        return ((bitField0_ & 0x00000400) == 0x00000400);
-      }
-      /**
-       * <code>optional string patient_name = 11;</code>
-       */
-      public java.lang.String getPatientName() {
-        java.lang.Object ref = patientName_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          if (bs.isValidUtf8()) {
-            patientName_ = s;
-          }
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>optional string patient_name = 11;</code>
-       */
-      public com.google.protobuf.ByteString
-          getPatientNameBytes() {
-        java.lang.Object ref = patientName_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          patientName_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string patient_name = 11;</code>
-       */
-      public Builder setPatientName(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000400;
-        patientName_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string patient_name = 11;</code>
-       */
-      public Builder clearPatientName() {
-        bitField0_ = (bitField0_ & ~0x00000400);
-        patientName_ = getDefaultInstance().getPatientName();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string patient_name = 11;</code>
-       */
-      public Builder setPatientNameBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000400;
-        patientName_ = value;
-        onChanged();
-        return this;
-      }
-
       // @@protoc_insertion_point(builder_scope:CookieMonsterG4Download)
     }
 
@@ -3442,38 +3285,38 @@ public final class G4Download {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required uint32 sgv = 1;</code>
+     * <code>required uint32 sgv_mgdl = 1;</code>
      *
      * <pre>
      * Glucose value
      * </pre>
      */
-    boolean hasSgv();
+    boolean hasSgvMgdl();
     /**
-     * <code>required uint32 sgv = 1;</code>
+     * <code>required uint32 sgv_mgdl = 1;</code>
      *
      * <pre>
      * Glucose value
      * </pre>
      */
-    int getSgv();
+    int getSgvMgdl();
 
     /**
-     * <code>optional uint64 timestamp = 2;</code>
+     * <code>optional uint64 timestamp_sec = 2;</code>
      *
      * <pre>
-     * timestamp of the record
+     * system timestamp of the record
      * </pre>
      */
-    boolean hasTimestamp();
+    boolean hasTimestampSec();
     /**
-     * <code>optional uint64 timestamp = 2;</code>
+     * <code>optional uint64 timestamp_sec = 2;</code>
      *
      * <pre>
-     * timestamp of the record
+     * system timestamp of the record
      * </pre>
      */
-    long getTimestamp();
+    long getTimestampSec();
 
     /**
      * <code>optional .Trend trend = 3;</code>
@@ -3555,12 +3398,12 @@ public final class G4Download {
             }
             case 8: {
               bitField0_ |= 0x00000001;
-              sgv_ = input.readUInt32();
+              sgvMgdl_ = input.readUInt32();
               break;
             }
             case 16: {
               bitField0_ |= 0x00000002;
-              timestamp_ = input.readUInt64();
+              timestampSec_ = input.readUInt64();
               break;
             }
             case 24: {
@@ -3625,50 +3468,50 @@ public final class G4Download {
     }
 
     private int bitField0_;
-    public static final int SGV_FIELD_NUMBER = 1;
-    private int sgv_;
+    public static final int SGV_MGDL_FIELD_NUMBER = 1;
+    private int sgvMgdl_;
     /**
-     * <code>required uint32 sgv = 1;</code>
+     * <code>required uint32 sgv_mgdl = 1;</code>
      *
      * <pre>
      * Glucose value
      * </pre>
      */
-    public boolean hasSgv() {
+    public boolean hasSgvMgdl() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required uint32 sgv = 1;</code>
+     * <code>required uint32 sgv_mgdl = 1;</code>
      *
      * <pre>
      * Glucose value
      * </pre>
      */
-    public int getSgv() {
-      return sgv_;
+    public int getSgvMgdl() {
+      return sgvMgdl_;
     }
 
-    public static final int TIMESTAMP_FIELD_NUMBER = 2;
-    private long timestamp_;
+    public static final int TIMESTAMP_SEC_FIELD_NUMBER = 2;
+    private long timestampSec_;
     /**
-     * <code>optional uint64 timestamp = 2;</code>
+     * <code>optional uint64 timestamp_sec = 2;</code>
      *
      * <pre>
-     * timestamp of the record
+     * system timestamp of the record
      * </pre>
      */
-    public boolean hasTimestamp() {
+    public boolean hasTimestampSec() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional uint64 timestamp = 2;</code>
+     * <code>optional uint64 timestamp_sec = 2;</code>
      *
      * <pre>
-     * timestamp of the record
+     * system timestamp of the record
      * </pre>
      */
-    public long getTimestamp() {
-      return timestamp_;
+    public long getTimestampSec() {
+      return timestampSec_;
     }
 
     public static final int TREND_FIELD_NUMBER = 3;
@@ -3710,8 +3553,8 @@ public final class G4Download {
     }
 
     private void initFields() {
-      sgv_ = 0;
-      timestamp_ = 0L;
+      sgvMgdl_ = 0;
+      timestampSec_ = 0L;
       trend_ = com.nightscout.core.protobuf.G4Download.Trend.NONE;
       noise_ = com.nightscout.core.protobuf.G4Download.Noise.NO_NOISE;
     }
@@ -3721,7 +3564,7 @@ public final class G4Download {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      if (!hasSgv()) {
+      if (!hasSgvMgdl()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -3733,10 +3576,10 @@ public final class G4Download {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeUInt32(1, sgv_);
+        output.writeUInt32(1, sgvMgdl_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeUInt64(2, timestamp_);
+        output.writeUInt64(2, timestampSec_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeEnum(3, trend_.getNumber());
@@ -3755,11 +3598,11 @@ public final class G4Download {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(1, sgv_);
+          .computeUInt32Size(1, sgvMgdl_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(2, timestamp_);
+          .computeUInt64Size(2, timestampSec_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
@@ -3886,9 +3729,9 @@ public final class G4Download {
 
       public Builder clear() {
         super.clear();
-        sgv_ = 0;
+        sgvMgdl_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
-        timestamp_ = 0L;
+        timestampSec_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000002);
         trend_ = com.nightscout.core.protobuf.G4Download.Trend.NONE;
         bitField0_ = (bitField0_ & ~0x00000004);
@@ -3925,11 +3768,11 @@ public final class G4Download {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.sgv_ = sgv_;
+        result.sgvMgdl_ = sgvMgdl_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.timestamp_ = timestamp_;
+        result.timestampSec_ = timestampSec_;
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
@@ -3954,11 +3797,11 @@ public final class G4Download {
 
       public Builder mergeFrom(com.nightscout.core.protobuf.G4Download.CookieMonsterG4EGV other) {
         if (other == com.nightscout.core.protobuf.G4Download.CookieMonsterG4EGV.getDefaultInstance()) return this;
-        if (other.hasSgv()) {
-          setSgv(other.getSgv());
+        if (other.hasSgvMgdl()) {
+          setSgvMgdl(other.getSgvMgdl());
         }
-        if (other.hasTimestamp()) {
-          setTimestamp(other.getTimestamp());
+        if (other.hasTimestampSec()) {
+          setTimestampSec(other.getTimestampSec());
         }
         if (other.hasTrend()) {
           setTrend(other.getTrend());
@@ -3971,7 +3814,7 @@ public final class G4Download {
       }
 
       public final boolean isInitialized() {
-        if (!hasSgv()) {
+        if (!hasSgvMgdl()) {
           
           return false;
         }
@@ -3997,98 +3840,98 @@ public final class G4Download {
       }
       private int bitField0_;
 
-      private int sgv_ ;
+      private int sgvMgdl_ ;
       /**
-       * <code>required uint32 sgv = 1;</code>
+       * <code>required uint32 sgv_mgdl = 1;</code>
        *
        * <pre>
        * Glucose value
        * </pre>
        */
-      public boolean hasSgv() {
+      public boolean hasSgvMgdl() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required uint32 sgv = 1;</code>
+       * <code>required uint32 sgv_mgdl = 1;</code>
        *
        * <pre>
        * Glucose value
        * </pre>
        */
-      public int getSgv() {
-        return sgv_;
+      public int getSgvMgdl() {
+        return sgvMgdl_;
       }
       /**
-       * <code>required uint32 sgv = 1;</code>
+       * <code>required uint32 sgv_mgdl = 1;</code>
        *
        * <pre>
        * Glucose value
        * </pre>
        */
-      public Builder setSgv(int value) {
+      public Builder setSgvMgdl(int value) {
         bitField0_ |= 0x00000001;
-        sgv_ = value;
+        sgvMgdl_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required uint32 sgv = 1;</code>
+       * <code>required uint32 sgv_mgdl = 1;</code>
        *
        * <pre>
        * Glucose value
        * </pre>
        */
-      public Builder clearSgv() {
+      public Builder clearSgvMgdl() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        sgv_ = 0;
+        sgvMgdl_ = 0;
         onChanged();
         return this;
       }
 
-      private long timestamp_ ;
+      private long timestampSec_ ;
       /**
-       * <code>optional uint64 timestamp = 2;</code>
+       * <code>optional uint64 timestamp_sec = 2;</code>
        *
        * <pre>
-       * timestamp of the record
+       * system timestamp of the record
        * </pre>
        */
-      public boolean hasTimestamp() {
+      public boolean hasTimestampSec() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional uint64 timestamp = 2;</code>
+       * <code>optional uint64 timestamp_sec = 2;</code>
        *
        * <pre>
-       * timestamp of the record
+       * system timestamp of the record
        * </pre>
        */
-      public long getTimestamp() {
-        return timestamp_;
+      public long getTimestampSec() {
+        return timestampSec_;
       }
       /**
-       * <code>optional uint64 timestamp = 2;</code>
+       * <code>optional uint64 timestamp_sec = 2;</code>
        *
        * <pre>
-       * timestamp of the record
+       * system timestamp of the record
        * </pre>
        */
-      public Builder setTimestamp(long value) {
+      public Builder setTimestampSec(long value) {
         bitField0_ |= 0x00000002;
-        timestamp_ = value;
+        timestampSec_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional uint64 timestamp = 2;</code>
+       * <code>optional uint64 timestamp_sec = 2;</code>
        *
        * <pre>
-       * timestamp of the record
+       * system timestamp of the record
        * </pre>
        */
-      public Builder clearTimestamp() {
+      public Builder clearTimestampSec() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        timestamp_ = 0L;
+        timestampSec_ = 0L;
         onChanged();
         return this;
       }
@@ -4195,13 +4038,13 @@ public final class G4Download {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required uint32 meter_bg = 1;</code>
+     * <code>required uint32 meter_bg_mgdl = 1;</code>
      */
-    boolean hasMeterBg();
+    boolean hasMeterBgMgdl();
     /**
-     * <code>required uint32 meter_bg = 1;</code>
+     * <code>required uint32 meter_bg_mgdl = 1;</code>
      */
-    int getMeterBg();
+    int getMeterBgMgdl();
 
     /**
      * <code>optional uint32 meter_time = 2;</code>
@@ -4213,13 +4056,13 @@ public final class G4Download {
     int getMeterTime();
 
     /**
-     * <code>optional uint64 timestamp = 3;</code>
+     * <code>optional uint64 timestamp_sec = 3;</code>
      */
-    boolean hasTimestamp();
+    boolean hasTimestampSec();
     /**
-     * <code>optional uint64 timestamp = 3;</code>
+     * <code>optional uint64 timestamp_sec = 3;</code>
      */
-    long getTimestamp();
+    long getTimestampSec();
   }
   /**
    * Protobuf type {@code CookieMonsterG4Meter}
@@ -4275,7 +4118,7 @@ public final class G4Download {
             }
             case 8: {
               bitField0_ |= 0x00000001;
-              meterBg_ = input.readUInt32();
+              meterBgMgdl_ = input.readUInt32();
               break;
             }
             case 16: {
@@ -4285,7 +4128,7 @@ public final class G4Download {
             }
             case 24: {
               bitField0_ |= 0x00000004;
-              timestamp_ = input.readUInt64();
+              timestampSec_ = input.readUInt64();
               break;
             }
           }
@@ -4328,19 +4171,19 @@ public final class G4Download {
     }
 
     private int bitField0_;
-    public static final int METER_BG_FIELD_NUMBER = 1;
-    private int meterBg_;
+    public static final int METER_BG_MGDL_FIELD_NUMBER = 1;
+    private int meterBgMgdl_;
     /**
-     * <code>required uint32 meter_bg = 1;</code>
+     * <code>required uint32 meter_bg_mgdl = 1;</code>
      */
-    public boolean hasMeterBg() {
+    public boolean hasMeterBgMgdl() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required uint32 meter_bg = 1;</code>
+     * <code>required uint32 meter_bg_mgdl = 1;</code>
      */
-    public int getMeterBg() {
-      return meterBg_;
+    public int getMeterBgMgdl() {
+      return meterBgMgdl_;
     }
 
     public static final int METER_TIME_FIELD_NUMBER = 2;
@@ -4358,25 +4201,25 @@ public final class G4Download {
       return meterTime_;
     }
 
-    public static final int TIMESTAMP_FIELD_NUMBER = 3;
-    private long timestamp_;
+    public static final int TIMESTAMP_SEC_FIELD_NUMBER = 3;
+    private long timestampSec_;
     /**
-     * <code>optional uint64 timestamp = 3;</code>
+     * <code>optional uint64 timestamp_sec = 3;</code>
      */
-    public boolean hasTimestamp() {
+    public boolean hasTimestampSec() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional uint64 timestamp = 3;</code>
+     * <code>optional uint64 timestamp_sec = 3;</code>
      */
-    public long getTimestamp() {
-      return timestamp_;
+    public long getTimestampSec() {
+      return timestampSec_;
     }
 
     private void initFields() {
-      meterBg_ = 0;
+      meterBgMgdl_ = 0;
       meterTime_ = 0;
-      timestamp_ = 0L;
+      timestampSec_ = 0L;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -4384,7 +4227,7 @@ public final class G4Download {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      if (!hasMeterBg()) {
+      if (!hasMeterBgMgdl()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -4396,13 +4239,13 @@ public final class G4Download {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeUInt32(1, meterBg_);
+        output.writeUInt32(1, meterBgMgdl_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeUInt32(2, meterTime_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeUInt64(3, timestamp_);
+        output.writeUInt64(3, timestampSec_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -4415,7 +4258,7 @@ public final class G4Download {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(1, meterBg_);
+          .computeUInt32Size(1, meterBgMgdl_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
@@ -4423,7 +4266,7 @@ public final class G4Download {
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(3, timestamp_);
+          .computeUInt64Size(3, timestampSec_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -4542,11 +4385,11 @@ public final class G4Download {
 
       public Builder clear() {
         super.clear();
-        meterBg_ = 0;
+        meterBgMgdl_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
         meterTime_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
-        timestamp_ = 0L;
+        timestampSec_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
@@ -4579,7 +4422,7 @@ public final class G4Download {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.meterBg_ = meterBg_;
+        result.meterBgMgdl_ = meterBgMgdl_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
@@ -4587,7 +4430,7 @@ public final class G4Download {
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.timestamp_ = timestamp_;
+        result.timestampSec_ = timestampSec_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -4604,21 +4447,21 @@ public final class G4Download {
 
       public Builder mergeFrom(com.nightscout.core.protobuf.G4Download.CookieMonsterG4Meter other) {
         if (other == com.nightscout.core.protobuf.G4Download.CookieMonsterG4Meter.getDefaultInstance()) return this;
-        if (other.hasMeterBg()) {
-          setMeterBg(other.getMeterBg());
+        if (other.hasMeterBgMgdl()) {
+          setMeterBgMgdl(other.getMeterBgMgdl());
         }
         if (other.hasMeterTime()) {
           setMeterTime(other.getMeterTime());
         }
-        if (other.hasTimestamp()) {
-          setTimestamp(other.getTimestamp());
+        if (other.hasTimestampSec()) {
+          setTimestampSec(other.getTimestampSec());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
       public final boolean isInitialized() {
-        if (!hasMeterBg()) {
+        if (!hasMeterBgMgdl()) {
           
           return false;
         }
@@ -4644,34 +4487,34 @@ public final class G4Download {
       }
       private int bitField0_;
 
-      private int meterBg_ ;
+      private int meterBgMgdl_ ;
       /**
-       * <code>required uint32 meter_bg = 1;</code>
+       * <code>required uint32 meter_bg_mgdl = 1;</code>
        */
-      public boolean hasMeterBg() {
+      public boolean hasMeterBgMgdl() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required uint32 meter_bg = 1;</code>
+       * <code>required uint32 meter_bg_mgdl = 1;</code>
        */
-      public int getMeterBg() {
-        return meterBg_;
+      public int getMeterBgMgdl() {
+        return meterBgMgdl_;
       }
       /**
-       * <code>required uint32 meter_bg = 1;</code>
+       * <code>required uint32 meter_bg_mgdl = 1;</code>
        */
-      public Builder setMeterBg(int value) {
+      public Builder setMeterBgMgdl(int value) {
         bitField0_ |= 0x00000001;
-        meterBg_ = value;
+        meterBgMgdl_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required uint32 meter_bg = 1;</code>
+       * <code>required uint32 meter_bg_mgdl = 1;</code>
        */
-      public Builder clearMeterBg() {
+      public Builder clearMeterBgMgdl() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        meterBg_ = 0;
+        meterBgMgdl_ = 0;
         onChanged();
         return this;
       }
@@ -4708,34 +4551,34 @@ public final class G4Download {
         return this;
       }
 
-      private long timestamp_ ;
+      private long timestampSec_ ;
       /**
-       * <code>optional uint64 timestamp = 3;</code>
+       * <code>optional uint64 timestamp_sec = 3;</code>
        */
-      public boolean hasTimestamp() {
+      public boolean hasTimestampSec() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional uint64 timestamp = 3;</code>
+       * <code>optional uint64 timestamp_sec = 3;</code>
        */
-      public long getTimestamp() {
-        return timestamp_;
+      public long getTimestampSec() {
+        return timestampSec_;
       }
       /**
-       * <code>optional uint64 timestamp = 3;</code>
+       * <code>optional uint64 timestamp_sec = 3;</code>
        */
-      public Builder setTimestamp(long value) {
+      public Builder setTimestampSec(long value) {
         bitField0_ |= 0x00000004;
-        timestamp_ = value;
+        timestampSec_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional uint64 timestamp = 3;</code>
+       * <code>optional uint64 timestamp_sec = 3;</code>
        */
-      public Builder clearTimestamp() {
+      public Builder clearTimestampSec() {
         bitField0_ = (bitField0_ & ~0x00000004);
-        timestamp_ = 0L;
+        timestampSec_ = 0L;
         onChanged();
         return this;
       }
@@ -4783,13 +4626,13 @@ public final class G4Download {
     int getRssi();
 
     /**
-     * <code>optional uint64 timestamp = 4;</code>
+     * <code>optional uint64 timestamp_sec = 4;</code>
      */
-    boolean hasTimestamp();
+    boolean hasTimestampSec();
     /**
-     * <code>optional uint64 timestamp = 4;</code>
+     * <code>optional uint64 timestamp_sec = 4;</code>
      */
-    long getTimestamp();
+    long getTimestampSec();
   }
   /**
    * Protobuf type {@code CookieMonsterG4Sensor}
@@ -4860,7 +4703,7 @@ public final class G4Download {
             }
             case 32: {
               bitField0_ |= 0x00000008;
-              timestamp_ = input.readUInt64();
+              timestampSec_ = input.readUInt64();
               break;
             }
           }
@@ -4948,26 +4791,26 @@ public final class G4Download {
       return rssi_;
     }
 
-    public static final int TIMESTAMP_FIELD_NUMBER = 4;
-    private long timestamp_;
+    public static final int TIMESTAMP_SEC_FIELD_NUMBER = 4;
+    private long timestampSec_;
     /**
-     * <code>optional uint64 timestamp = 4;</code>
+     * <code>optional uint64 timestamp_sec = 4;</code>
      */
-    public boolean hasTimestamp() {
+    public boolean hasTimestampSec() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional uint64 timestamp = 4;</code>
+     * <code>optional uint64 timestamp_sec = 4;</code>
      */
-    public long getTimestamp() {
-      return timestamp_;
+    public long getTimestampSec() {
+      return timestampSec_;
     }
 
     private void initFields() {
       filtered_ = 0L;
       unfiltered_ = 0L;
       rssi_ = 0;
-      timestamp_ = 0L;
+      timestampSec_ = 0L;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -4996,7 +4839,7 @@ public final class G4Download {
         output.writeUInt32(3, rssi_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeUInt64(4, timestamp_);
+        output.writeUInt64(4, timestampSec_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -5021,7 +4864,7 @@ public final class G4Download {
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(4, timestamp_);
+          .computeUInt64Size(4, timestampSec_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -5146,7 +4989,7 @@ public final class G4Download {
         bitField0_ = (bitField0_ & ~0x00000002);
         rssi_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
-        timestamp_ = 0L;
+        timestampSec_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
@@ -5191,7 +5034,7 @@ public final class G4Download {
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
         }
-        result.timestamp_ = timestamp_;
+        result.timestampSec_ = timestampSec_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -5217,8 +5060,8 @@ public final class G4Download {
         if (other.hasRssi()) {
           setRssi(other.getRssi());
         }
-        if (other.hasTimestamp()) {
-          setTimestamp(other.getTimestamp());
+        if (other.hasTimestampSec()) {
+          setTimestampSec(other.getTimestampSec());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -5347,34 +5190,34 @@ public final class G4Download {
         return this;
       }
 
-      private long timestamp_ ;
+      private long timestampSec_ ;
       /**
-       * <code>optional uint64 timestamp = 4;</code>
+       * <code>optional uint64 timestamp_sec = 4;</code>
        */
-      public boolean hasTimestamp() {
+      public boolean hasTimestampSec() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional uint64 timestamp = 4;</code>
+       * <code>optional uint64 timestamp_sec = 4;</code>
        */
-      public long getTimestamp() {
-        return timestamp_;
+      public long getTimestampSec() {
+        return timestampSec_;
       }
       /**
-       * <code>optional uint64 timestamp = 4;</code>
+       * <code>optional uint64 timestamp_sec = 4;</code>
        */
-      public Builder setTimestamp(long value) {
+      public Builder setTimestampSec(long value) {
         bitField0_ |= 0x00000008;
-        timestamp_ = value;
+        timestampSec_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional uint64 timestamp = 4;</code>
+       * <code>optional uint64 timestamp_sec = 4;</code>
        */
-      public Builder clearTimestamp() {
+      public Builder clearTimestampSec() {
         bitField0_ = (bitField0_ & ~0x00000008);
-        timestamp_ = 0L;
+        timestampSec_ = 0L;
         onChanged();
         return this;
       }
@@ -5422,13 +5265,13 @@ public final class G4Download {
     double getScale();
 
     /**
-     * <code>optional uint64 timestamp = 4;</code>
+     * <code>optional uint64 timestamp_sec = 4;</code>
      */
-    boolean hasTimestamp();
+    boolean hasTimestampSec();
     /**
-     * <code>optional uint64 timestamp = 4;</code>
+     * <code>optional uint64 timestamp_sec = 4;</code>
      */
-    long getTimestamp();
+    long getTimestampSec();
   }
   /**
    * Protobuf type {@code CookieMonsterG4Cal}
@@ -5499,7 +5342,7 @@ public final class G4Download {
             }
             case 32: {
               bitField0_ |= 0x00000008;
-              timestamp_ = input.readUInt64();
+              timestampSec_ = input.readUInt64();
               break;
             }
           }
@@ -5587,26 +5430,26 @@ public final class G4Download {
       return scale_;
     }
 
-    public static final int TIMESTAMP_FIELD_NUMBER = 4;
-    private long timestamp_;
+    public static final int TIMESTAMP_SEC_FIELD_NUMBER = 4;
+    private long timestampSec_;
     /**
-     * <code>optional uint64 timestamp = 4;</code>
+     * <code>optional uint64 timestamp_sec = 4;</code>
      */
-    public boolean hasTimestamp() {
+    public boolean hasTimestampSec() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional uint64 timestamp = 4;</code>
+     * <code>optional uint64 timestamp_sec = 4;</code>
      */
-    public long getTimestamp() {
-      return timestamp_;
+    public long getTimestampSec() {
+      return timestampSec_;
     }
 
     private void initFields() {
       slope_ = 0D;
       intercept_ = 0D;
       scale_ = 0D;
-      timestamp_ = 0L;
+      timestampSec_ = 0L;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -5635,7 +5478,7 @@ public final class G4Download {
         output.writeDouble(3, scale_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeUInt64(4, timestamp_);
+        output.writeUInt64(4, timestampSec_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -5660,7 +5503,7 @@ public final class G4Download {
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(4, timestamp_);
+          .computeUInt64Size(4, timestampSec_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -5785,7 +5628,7 @@ public final class G4Download {
         bitField0_ = (bitField0_ & ~0x00000002);
         scale_ = 0D;
         bitField0_ = (bitField0_ & ~0x00000004);
-        timestamp_ = 0L;
+        timestampSec_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
@@ -5830,7 +5673,7 @@ public final class G4Download {
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
         }
-        result.timestamp_ = timestamp_;
+        result.timestampSec_ = timestampSec_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -5856,8 +5699,8 @@ public final class G4Download {
         if (other.hasScale()) {
           setScale(other.getScale());
         }
-        if (other.hasTimestamp()) {
-          setTimestamp(other.getTimestamp());
+        if (other.hasTimestampSec()) {
+          setTimestampSec(other.getTimestampSec());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -5986,34 +5829,34 @@ public final class G4Download {
         return this;
       }
 
-      private long timestamp_ ;
+      private long timestampSec_ ;
       /**
-       * <code>optional uint64 timestamp = 4;</code>
+       * <code>optional uint64 timestamp_sec = 4;</code>
        */
-      public boolean hasTimestamp() {
+      public boolean hasTimestampSec() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional uint64 timestamp = 4;</code>
+       * <code>optional uint64 timestamp_sec = 4;</code>
        */
-      public long getTimestamp() {
-        return timestamp_;
+      public long getTimestampSec() {
+        return timestampSec_;
       }
       /**
-       * <code>optional uint64 timestamp = 4;</code>
+       * <code>optional uint64 timestamp_sec = 4;</code>
        */
-      public Builder setTimestamp(long value) {
+      public Builder setTimestampSec(long value) {
         bitField0_ |= 0x00000008;
-        timestamp_ = value;
+        timestampSec_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional uint64 timestamp = 4;</code>
+       * <code>optional uint64 timestamp_sec = 4;</code>
        */
-      public Builder clearTimestamp() {
+      public Builder clearTimestampSec() {
         bitField0_ = (bitField0_ & ~0x00000008);
-        timestamp_ = 0L;
+        timestampSec_ = 0L;
         onChanged();
         return this;
       }
@@ -6034,13 +5877,13 @@ public final class G4Download {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required uint64 timestamp = 1;</code>
+     * <code>required uint64 timestamp_ms = 1;</code>
      */
-    boolean hasTimestamp();
+    boolean hasTimestampMs();
     /**
-     * <code>required uint64 timestamp = 1;</code>
+     * <code>required uint64 timestamp_ms = 1;</code>
      */
-    long getTimestamp();
+    long getTimestampMs();
 
     /**
      * <code>repeated .ReceiverStatus event = 2;</code>
@@ -6109,7 +5952,7 @@ public final class G4Download {
             }
             case 8: {
               bitField0_ |= 0x00000001;
-              timestamp_ = input.readUInt64();
+              timestampMs_ = input.readUInt64();
               break;
             }
             case 16: {
@@ -6188,19 +6031,19 @@ public final class G4Download {
     }
 
     private int bitField0_;
-    public static final int TIMESTAMP_FIELD_NUMBER = 1;
-    private long timestamp_;
+    public static final int TIMESTAMP_MS_FIELD_NUMBER = 1;
+    private long timestampMs_;
     /**
-     * <code>required uint64 timestamp = 1;</code>
+     * <code>required uint64 timestamp_ms = 1;</code>
      */
-    public boolean hasTimestamp() {
+    public boolean hasTimestampMs() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required uint64 timestamp = 1;</code>
+     * <code>required uint64 timestamp_ms = 1;</code>
      */
-    public long getTimestamp() {
-      return timestamp_;
+    public long getTimestampMs() {
+      return timestampMs_;
     }
 
     public static final int EVENT_FIELD_NUMBER = 2;
@@ -6225,7 +6068,7 @@ public final class G4Download {
     }
 
     private void initFields() {
-      timestamp_ = 0L;
+      timestampMs_ = 0L;
       event_ = java.util.Collections.emptyList();
     }
     private byte memoizedIsInitialized = -1;
@@ -6234,7 +6077,7 @@ public final class G4Download {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      if (!hasTimestamp()) {
+      if (!hasTimestampMs()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -6246,7 +6089,7 @@ public final class G4Download {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeUInt64(1, timestamp_);
+        output.writeUInt64(1, timestampMs_);
       }
       for (int i = 0; i < event_.size(); i++) {
         output.writeEnum(2, event_.get(i).getNumber());
@@ -6262,7 +6105,7 @@ public final class G4Download {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(1, timestamp_);
+          .computeUInt64Size(1, timestampMs_);
       }
       {
         int dataSize = 0;
@@ -6390,7 +6233,7 @@ public final class G4Download {
 
       public Builder clear() {
         super.clear();
-        timestamp_ = 0L;
+        timestampMs_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000001);
         event_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -6425,7 +6268,7 @@ public final class G4Download {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.timestamp_ = timestamp_;
+        result.timestampMs_ = timestampMs_;
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
           event_ = java.util.Collections.unmodifiableList(event_);
           bitField0_ = (bitField0_ & ~0x00000002);
@@ -6447,8 +6290,8 @@ public final class G4Download {
 
       public Builder mergeFrom(com.nightscout.core.protobuf.G4Download.CookieMonsterReceiverStatus other) {
         if (other == com.nightscout.core.protobuf.G4Download.CookieMonsterReceiverStatus.getDefaultInstance()) return this;
-        if (other.hasTimestamp()) {
-          setTimestamp(other.getTimestamp());
+        if (other.hasTimestampMs()) {
+          setTimestampMs(other.getTimestampMs());
         }
         if (!other.event_.isEmpty()) {
           if (event_.isEmpty()) {
@@ -6465,7 +6308,7 @@ public final class G4Download {
       }
 
       public final boolean isInitialized() {
-        if (!hasTimestamp()) {
+        if (!hasTimestampMs()) {
           
           return false;
         }
@@ -6491,34 +6334,34 @@ public final class G4Download {
       }
       private int bitField0_;
 
-      private long timestamp_ ;
+      private long timestampMs_ ;
       /**
-       * <code>required uint64 timestamp = 1;</code>
+       * <code>required uint64 timestamp_ms = 1;</code>
        */
-      public boolean hasTimestamp() {
+      public boolean hasTimestampMs() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required uint64 timestamp = 1;</code>
+       * <code>required uint64 timestamp_ms = 1;</code>
        */
-      public long getTimestamp() {
-        return timestamp_;
+      public long getTimestampMs() {
+        return timestampMs_;
       }
       /**
-       * <code>required uint64 timestamp = 1;</code>
+       * <code>required uint64 timestamp_ms = 1;</code>
        */
-      public Builder setTimestamp(long value) {
+      public Builder setTimestampMs(long value) {
         bitField0_ |= 0x00000001;
-        timestamp_ = value;
+        timestampMs_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required uint64 timestamp = 1;</code>
+       * <code>required uint64 timestamp_ms = 1;</code>
        */
-      public Builder clearTimestamp() {
+      public Builder clearTimestampMs() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        timestamp_ = 0L;
+        timestampMs_ = 0L;
         onChanged();
         return this;
       }
@@ -6645,41 +6488,42 @@ public final class G4Download {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\020G4Download.proto\"\372\002\n\027CookieMonsterG4Do" +
+      "\n\020G4Download.proto\"\350\002\n\027CookieMonsterG4Do" +
       "wnload\022 \n\003sgv\030\001 \003(\0132\023.CookieMonsterG4EGV" +
       "\022\033\n\005units\030\002 \001(\0162\014.GlucoseUnit\022\032\n\022downloa" +
-      "d_timestamp\030\003 \002(\t\022\034\n\024receiver_system_tim" +
-      "e\030\004 \001(\004\022,\n\017download_status\030\005 \001(\0162\017.Downl" +
-      "oadStatus:\002NA\022\030\n\020receiver_battery\030\006 \001(\r\022" +
-      "\030\n\020uploader_battery\030\007 \001(\r\022$\n\005meter\030\010 \003(\013" +
-      "2\025.CookieMonsterG4Meter\022&\n\006sensor\030\t \003(\0132" +
-      "\026.CookieMonsterG4Sensor\022 \n\003cal\030\n \003(\0132\023.C" +
-      "ookieMonsterG4Cal\022\024\n\014patient_name\030\013 \001(\t\"",
-      "b\n\022CookieMonsterG4EGV\022\013\n\003sgv\030\001 \002(\r\022\021\n\tti" +
-      "mestamp\030\002 \001(\004\022\025\n\005trend\030\003 \001(\0162\006.Trend\022\025\n\005" +
-      "noise\030\004 \001(\0162\006.Noise\"O\n\024CookieMonsterG4Me" +
-      "ter\022\020\n\010meter_bg\030\001 \002(\r\022\022\n\nmeter_time\030\002 \001(" +
-      "\r\022\021\n\ttimestamp\030\003 \001(\004\"^\n\025CookieMonsterG4S" +
+      "d_timestamp\030\003 \002(\t\022 \n\030receiver_system_tim" +
+      "e_sec\030\004 \001(\004\022,\n\017download_status\030\005 \001(\0162\017.D" +
+      "ownloadStatus:\002NA\022\030\n\020receiver_battery\030\006 " +
+      "\001(\r\022\030\n\020uploader_battery\030\007 \001(\r\022$\n\005meter\030\010" +
+      " \003(\0132\025.CookieMonsterG4Meter\022&\n\006sensor\030\t " +
+      "\003(\0132\026.CookieMonsterG4Sensor\022 \n\003cal\030\n \003(\013" +
+      "2\023.CookieMonsterG4Cal\"k\n\022CookieMonsterG4",
+      "EGV\022\020\n\010sgv_mgdl\030\001 \002(\r\022\025\n\rtimestamp_sec\030\002" +
+      " \001(\004\022\025\n\005trend\030\003 \001(\0162\006.Trend\022\025\n\005noise\030\004 \001" +
+      "(\0162\006.Noise\"X\n\024CookieMonsterG4Meter\022\025\n\rme" +
+      "ter_bg_mgdl\030\001 \002(\r\022\022\n\nmeter_time\030\002 \001(\r\022\025\n" +
+      "\rtimestamp_sec\030\003 \001(\004\"b\n\025CookieMonsterG4S" +
       "ensor\022\020\n\010filtered\030\001 \002(\004\022\022\n\nunfiltered\030\002 " +
-      "\001(\004\022\014\n\004rssi\030\003 \001(\r\022\021\n\ttimestamp\030\004 \001(\004\"X\n\022" +
-      "CookieMonsterG4Cal\022\r\n\005slope\030\001 \002(\001\022\021\n\tint" +
-      "ercept\030\002 \001(\001\022\r\n\005scale\030\003 \001(\001\022\021\n\ttimestamp" +
-      "\030\004 \001(\004\"P\n\033CookieMonsterReceiverStatus\022\021\n",
-      "\ttimestamp\030\001 \002(\004\022\036\n\005event\030\002 \003(\0162\017.Receiv" +
-      "erStatus*!\n\013GlucoseUnit\022\010\n\004MGDL\020\000\022\010\n\004MMO" +
-      "L\020\001*z\n\016DownloadStatus\022\013\n\007SUCCESS\020\000\022\013\n\007NO" +
-      "_DATA\020\001\022\024\n\020DEVICE_NOT_FOUND\020\002\022\014\n\010IO_ERRO" +
-      "R\020\003\022\025\n\021APPLICATION_ERROR\020\004\022\006\n\002NA\020\006\022\013\n\007UN" +
-      "KNOWN\020\007*\256\001\n\005Trend\022\010\n\004NONE\020\000\022\r\n\tDOUBLE_UP" +
-      "\020\001\022\r\n\tSINGLE_UP\020\002\022\021\n\rFORTY_FIVE_UP\020\003\022\010\n\004" +
-      "FLAT\020\004\022\023\n\017FORTY_FIVE_DOWN\020\005\022\017\n\013SINGLE_DO" +
-      "WN\020\006\022\017\n\013DOUBLE_DOWN\020\007\022\022\n\016NOT_COMPUTABLE\020" +
-      "\010\022\025\n\021RATE_OUT_OF_RANGE\020\t*]\n\005Noise\022\014\n\010NO_",
-      "NOISE\020\000\022\t\n\005CLEAN\020\001\022\t\n\005LIGHT\020\002\022\n\n\006MEDIUM\020" +
-      "\003\022\t\n\005HEAVY\020\004\022\020\n\014NOT_COMPUTED\020\005\022\007\n\003MAX\020\006*" +
-      "A\n\016ReceiverStatus\022\025\n\021RECEIVERCONNECTED\020\000" +
-      "\022\030\n\024RECEIVERDISCONNECTED\020\001B*\n\034com.nights" +
-      "cout.core.protobufB\nG4Download"
+      "\001(\004\022\014\n\004rssi\030\003 \001(\r\022\025\n\rtimestamp_sec\030\004 \001(\004" +
+      "\"\\\n\022CookieMonsterG4Cal\022\r\n\005slope\030\001 \002(\001\022\021\n" +
+      "\tintercept\030\002 \001(\001\022\r\n\005scale\030\003 \001(\001\022\025\n\rtimes" +
+      "tamp_sec\030\004 \001(\004\"S\n\033CookieMonsterReceiverS",
+      "tatus\022\024\n\014timestamp_ms\030\001 \002(\004\022\036\n\005event\030\002 \003" +
+      "(\0162\017.ReceiverStatus*!\n\013GlucoseUnit\022\010\n\004MG" +
+      "DL\020\000\022\010\n\004MMOL\020\001*z\n\016DownloadStatus\022\013\n\007SUCC" +
+      "ESS\020\000\022\013\n\007NO_DATA\020\001\022\024\n\020DEVICE_NOT_FOUND\020\002" +
+      "\022\014\n\010IO_ERROR\020\003\022\025\n\021APPLICATION_ERROR\020\004\022\006\n" +
+      "\002NA\020\006\022\013\n\007UNKNOWN\020\007*\256\001\n\005Trend\022\010\n\004NONE\020\000\022\r" +
+      "\n\tDOUBLE_UP\020\001\022\r\n\tSINGLE_UP\020\002\022\021\n\rFORTY_FI" +
+      "VE_UP\020\003\022\010\n\004FLAT\020\004\022\023\n\017FORTY_FIVE_DOWN\020\005\022\017" +
+      "\n\013SINGLE_DOWN\020\006\022\017\n\013DOUBLE_DOWN\020\007\022\022\n\016NOT_" +
+      "COMPUTABLE\020\010\022\025\n\021RATE_OUT_OF_RANGE\020\t*]\n\005N",
+      "oise\022\014\n\010NO_NOISE\020\000\022\t\n\005CLEAN\020\001\022\t\n\005LIGHT\020\002" +
+      "\022\n\n\006MEDIUM\020\003\022\t\n\005HEAVY\020\004\022\020\n\014NOT_COMPUTED\020" +
+      "\005\022\007\n\003MAX\020\006*A\n\016ReceiverStatus\022\025\n\021RECEIVER" +
+      "CONNECTED\020\000\022\030\n\024RECEIVERDISCONNECTED\020\001B*\n" +
+      "\034com.nightscout.core.protobufB\nG4Downloa" +
+      "d"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -6698,37 +6542,37 @@ public final class G4Download {
     internal_static_CookieMonsterG4Download_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_CookieMonsterG4Download_descriptor,
-        new java.lang.String[] { "Sgv", "Units", "DownloadTimestamp", "ReceiverSystemTime", "DownloadStatus", "ReceiverBattery", "UploaderBattery", "Meter", "Sensor", "Cal", "PatientName", });
+        new java.lang.String[] { "Sgv", "Units", "DownloadTimestamp", "ReceiverSystemTimeSec", "DownloadStatus", "ReceiverBattery", "UploaderBattery", "Meter", "Sensor", "Cal", });
     internal_static_CookieMonsterG4EGV_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_CookieMonsterG4EGV_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_CookieMonsterG4EGV_descriptor,
-        new java.lang.String[] { "Sgv", "Timestamp", "Trend", "Noise", });
+        new java.lang.String[] { "SgvMgdl", "TimestampSec", "Trend", "Noise", });
     internal_static_CookieMonsterG4Meter_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_CookieMonsterG4Meter_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_CookieMonsterG4Meter_descriptor,
-        new java.lang.String[] { "MeterBg", "MeterTime", "Timestamp", });
+        new java.lang.String[] { "MeterBgMgdl", "MeterTime", "TimestampSec", });
     internal_static_CookieMonsterG4Sensor_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_CookieMonsterG4Sensor_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_CookieMonsterG4Sensor_descriptor,
-        new java.lang.String[] { "Filtered", "Unfiltered", "Rssi", "Timestamp", });
+        new java.lang.String[] { "Filtered", "Unfiltered", "Rssi", "TimestampSec", });
     internal_static_CookieMonsterG4Cal_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_CookieMonsterG4Cal_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_CookieMonsterG4Cal_descriptor,
-        new java.lang.String[] { "Slope", "Intercept", "Scale", "Timestamp", });
+        new java.lang.String[] { "Slope", "Intercept", "Scale", "TimestampSec", });
     internal_static_CookieMonsterReceiverStatus_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_CookieMonsterReceiverStatus_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_CookieMonsterReceiverStatus_descriptor,
-        new java.lang.String[] { "Timestamp", "Event", });
+        new java.lang.String[] { "TimestampMs", "Event", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

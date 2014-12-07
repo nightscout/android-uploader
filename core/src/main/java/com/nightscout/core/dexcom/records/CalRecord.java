@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.Date;
 
 public class CalRecord extends GenericTimestampRecord {
@@ -67,10 +68,20 @@ public class CalRecord extends GenericTimestampRecord {
         this.calSubrecords = subrecord;
     }
 
+    public CalRecord(double intercept, double slope, double scale, double decay, long displayTime, int systemTime, CalSubrecord[] subrecord) {
+        super(displayTime, systemTime);
+        this.intercept = intercept;
+        this.slope = slope;
+        this.scale = scale;
+        this.decay = decay;
+        this.numRecords = subrecord.length;
+        this.calSubrecords = subrecord;
+    }
+
     @Override
     public G4Download.CookieMonsterG4Cal toProtobuf() {
         G4Download.CookieMonsterG4Cal.Builder builder = G4Download.CookieMonsterG4Cal.newBuilder();
-        return builder.setTimestamp(rawSystemTimeSeconds)
+        return builder.setTimestampSec(rawSystemTimeSeconds)
                 .setIntercept(intercept)
                 .setScale(scale)
                 .setSlope(slope)
@@ -109,8 +120,7 @@ public class CalRecord extends GenericTimestampRecord {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        // TODO - re-enable
-//        if (!super.equals(o)) return false;
+        if (!super.equals(o)) return false;
 
         CalRecord calRecord = (CalRecord) o;
 
@@ -119,7 +129,7 @@ public class CalRecord extends GenericTimestampRecord {
         if (numRecords != calRecord.numRecords) return false;
         if (Double.compare(calRecord.scale, scale) != 0) return false;
         if (Double.compare(calRecord.slope, slope) != 0) return false;
-//        if (!Arrays.equals(calSubrecords, calRecord.calSubrecords)) return false;
+        if (!Arrays.equals(calSubrecords, calRecord.calSubrecords)) return false;
 
         return true;
     }
@@ -137,7 +147,7 @@ public class CalRecord extends GenericTimestampRecord {
         temp = Double.doubleToLongBits(decay);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + numRecords;
-//        result = 31 * result + Arrays.hashCode(calSubrecords);
+        result = 31 * result + Arrays.hashCode(calSubrecords);
         return result;
     }
 }

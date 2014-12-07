@@ -26,6 +26,10 @@ abstract public class GenericTimestampRecord implements ProtobufRecord {
         this.displayTime=displayTime;
         this.systemTime=systemTime;
     }
+    public GenericTimestampRecord(long rawDisplayTimeSeconds, int rawSystemTimeSeconds){
+        this.rawDisplayTimeSeconds = rawDisplayTimeSeconds;
+        this.rawSystemTimeSeconds = rawSystemTimeSeconds;
+    }
 
     public Date getSystemTime() {
         return systemTime;
@@ -50,18 +54,16 @@ abstract public class GenericTimestampRecord implements ProtobufRecord {
 
         GenericTimestampRecord that = (GenericTimestampRecord) o;
 
-        if (displayTime != null ? !displayTime.equals(that.displayTime) : that.displayTime != null) return false;
-        if (!systemTime.equals(that.systemTime)) return false;
+        if (rawDisplayTimeSeconds != that.rawDisplayTimeSeconds) return false;
+        if (rawSystemTimeSeconds != that.rawSystemTimeSeconds) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = systemTime.hashCode();
-//        result = 31 * result + rawSystemTimeSeconds;
-        result = 31 * result + (displayTime != null ? displayTime.hashCode() : 0);
-//        result = 31 * result + (int) (rawDisplayTimeSeconds ^ (rawDisplayTimeSeconds >>> 32));
+        int result = rawSystemTimeSeconds;
+        result = 31 * result + (int) (rawDisplayTimeSeconds ^ (rawDisplayTimeSeconds >>> 32));
         return result;
     }
 }

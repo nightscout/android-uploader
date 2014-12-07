@@ -42,6 +42,13 @@ public class EGVRecord extends GenericTimestampRecord {
         this.noiseMode = noise;
     }
 
+    public EGVRecord(int bGValue, TrendArrow trend, long displayTime, int systemTime, NoiseMode noise){
+        super(displayTime, systemTime);
+        this.bGValue = bGValue;
+        this.trend = trend;
+        this.noiseMode = noise;
+    }
+
     public int getBGValue() {
         return bGValue;
     }
@@ -77,8 +84,8 @@ public class EGVRecord extends GenericTimestampRecord {
     @Override
     public G4Download.CookieMonsterG4EGV toProtobuf() {
         G4Download.CookieMonsterG4EGV.Builder builder = G4Download.CookieMonsterG4EGV.newBuilder();
-        return builder.setTimestamp(rawSystemTimeSeconds)
-                .setSgv(bGValue)
+        return builder.setTimestampSec(rawSystemTimeSeconds)
+                .setSgvMgdl(bGValue)
                 .setTrend(trend.toProtobuf())
                 .setNoise(noiseMode.toProtobuf())
                 .build();
@@ -88,8 +95,7 @@ public class EGVRecord extends GenericTimestampRecord {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        // TODO - re-enable
-//        if (!super.equals(o)) return false;
+        if (!super.equals(o)) return false;
 
         EGVRecord egvRecord = (EGVRecord) o;
 

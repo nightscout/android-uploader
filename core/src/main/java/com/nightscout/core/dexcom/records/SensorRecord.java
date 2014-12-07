@@ -40,6 +40,13 @@ public class SensorRecord extends GenericTimestampRecord {
         this.rssi = rssi;
     }
 
+    public SensorRecord(int filtered, int unfiltered, int rssi, long displayTime, int systemTime){
+        super(displayTime, systemTime);
+        this.filtered = filtered;
+        this.unfiltered = unfiltered;
+        this.rssi = rssi;
+    }
+
     public long getUnfiltered() {
         return unfiltered;
     }
@@ -55,7 +62,7 @@ public class SensorRecord extends GenericTimestampRecord {
     @Override
     public G4Download.CookieMonsterG4Sensor toProtobuf() {
         G4Download.CookieMonsterG4Sensor.Builder builder = G4Download.CookieMonsterG4Sensor.newBuilder();
-        return builder.setTimestamp(rawSystemTimeSeconds)
+        return builder.setTimestampSec(rawSystemTimeSeconds)
                 .setRssi(rssi)
                 .setFiltered(filtered)
                 .setUnfiltered(unfiltered)
@@ -67,8 +74,7 @@ public class SensorRecord extends GenericTimestampRecord {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        // TODO - re-enable
-//        if (!super.equals(o)) return false;
+        if (!super.equals(o)) return false;
 
         SensorRecord that = (SensorRecord) o;
 

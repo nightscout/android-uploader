@@ -21,7 +21,6 @@
 package com.nightscout.android.dexcom.USB;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * Driver interface for a USB serial device.
@@ -114,24 +113,7 @@ public interface UsbSerialDriver {
      * @return the actual number of bytes read
      * @throws java.io.IOException if an error occurred during reading
      */
-    public ReadResponse read(int size, final int timeoutMillis) throws IOException;
-
-    public class ReadResponse {
-        public int size;
-        public byte[] data;
-
-        public ReadResponse(){
-
-        }
-
-        public ReadResponse(byte[] data, int readSize){
-//            this.data = data;
-            this.data = Arrays.copyOfRange(data, 0, readSize);
-            this.size = readSize;
-        }
-    }
-
-
+    public byte[] read(int size, final int timeoutMillis) throws IOException;
 
     /**
      * Writes as many bytes as possible from the source buffer.

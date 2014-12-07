@@ -155,8 +155,6 @@ public class ReadData {
         byte[] packet = new PacketBuilder(command, payload).build();
         if (mSerialDevice != null) {
             try {
-                Log.d("XXX","Command: "+command.name());
-                Log.d("XXX", "Payload: " + Utils.bytesToHex(packet));
                 mSerialDevice.write(packet, IO_TIMEOUT);
             } catch (IOException e) {
                 Log.e(TAG, "Unable to write to serial device.", e);
@@ -168,8 +166,6 @@ public class ReadData {
         byte[] packet = new PacketBuilder(command).build();
         if (mSerialDevice != null) {
             try {
-                Log.d("XXX","Command: "+command.name());
-                Log.d("XXX", "Payload: " + Utils.bytesToHex(packet));
                 mSerialDevice.write(packet, IO_TIMEOUT);
             } catch (IOException e) {
                 Log.e(TAG, "Unable to write to serial device.", e);
@@ -178,12 +174,12 @@ public class ReadData {
     }
 
     private ReadPacket read(int numOfBytes) {
-        byte[] readData = new byte[numOfBytes];
-        UsbSerialDriver.ReadResponse response = new UsbSerialDriver.ReadResponse();
+//        byte[] readData = new byte[numOfBytes];
+        byte[] response = new byte[numOfBytes];
         int len = 0;
         try {
             response = mSerialDevice.read(numOfBytes, IO_TIMEOUT);
-            len = response.size;
+            len = response.length;
             Log.d(TAG, "Read " + len + " byte(s) complete.");
 
             // Add a 100ms delay for when multiple write/reads are occurring in series
@@ -193,7 +189,7 @@ public class ReadData {
             // finding the source of the reading issue
             String bytes = "";
             int readAmount = len;
-            for (int i = 0; i < readAmount; i++) bytes += String.format("%02x", response.data[i]) + " ";
+            for (int i = 0; i < readAmount; i++) bytes += String.format("%02x", response[i]) + " ";
             Log.d(TAG, "Read data: " + bytes);
             ////////////////////////////////////////////////////////////////////////////////////////
         } catch (IOException e) {
@@ -202,7 +198,7 @@ public class ReadData {
             e.printStackTrace();
         }
 //        byte[] data = Arrays.copyOfRange(readData, 0, len);
-        return new ReadPacket(response.data);
+        return new ReadPacket(response);
     }
 
     private <T> T ParsePage(byte[] data, RecordType recordType) {

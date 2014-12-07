@@ -32,12 +32,18 @@ public class MeterRecord extends GenericTimestampRecord {
         this.meterTime = meterTime;
     }
 
+    public MeterRecord(int meterBG, int meterTime, long displayTime, int systemTime){
+        super(displayTime, systemTime);
+        this.meterBG = meterBG;
+        this.meterTime = meterTime;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        // TODO - re-enable
-//        if (!super.equals(o)){ return false;}
+        if (!super.equals(o)){ return false;}
 
         MeterRecord that = (MeterRecord) o;
 
@@ -66,9 +72,9 @@ public class MeterRecord extends GenericTimestampRecord {
     @Override
     public G4Download.CookieMonsterG4Meter toProtobuf() {
         G4Download.CookieMonsterG4Meter.Builder builder = G4Download.CookieMonsterG4Meter.newBuilder();
-        return builder.setTimestamp(rawSystemTimeSeconds)
+        return builder.setTimestampSec(rawSystemTimeSeconds)
                 .setMeterTime(meterTime)
-                .setMeterBg(meterBG)
+                .setMeterBgMgdl(meterBG)
                 .build();
     }
 }

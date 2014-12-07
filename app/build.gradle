@@ -153,6 +153,8 @@ task jacocoTestReport(type:JacocoReport, dependsOn: "testDebug") {
                        '**/R$*.class',
                        '**/*$ViewInjector*.*',
                        '**/BuildConfig.*',
+                       '**/USB/*.*',
+                       '**/proto/*.*',
                        '**/Manifest*.*']
     )
 
