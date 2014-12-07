@@ -17,7 +17,7 @@ import java.util.Date;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.joda.time.Duration.standardSeconds;
 
-public class Utils {
+public final class Utils {
     public static final DateTime DEXCOM_EPOCH = new DateTime(2009, 1, 1, 0, 0, 0, 0);
 
     private static final String PRIMARY_SEPARATOR = ", ";

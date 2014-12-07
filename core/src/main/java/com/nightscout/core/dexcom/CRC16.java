@@ -1,6 +1,6 @@
 package com.nightscout.core.dexcom;
 
-public class CRC16 {
+public final class CRC16 {
     public static byte[] calculate(byte[] buff, int start, int end) {
         int crcShort = 0;
         for (int i = start; i < end; i++) {
