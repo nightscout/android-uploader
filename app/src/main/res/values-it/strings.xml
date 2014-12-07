@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">G4 Connector</string>
-    <string name="self_destruct">Chiudi</string>
     <string name="title_activity_main">Nightscout</string>
 
     <string name="action_settings">Configurazione</string>
 
     <string name="unknown_values">---</string>
 
-    <string name="crash_toast_text">Oops! É crashato il software. Sto mandando un rapporto a Nightscout così magari lo possono sistemare!</string>
+    <string name="crash_toast_text">Oops! È crashato il software. Sto mandando un rapporto a Nightscout così magari lo possono sistemare!</string>
     <string name="feedback_dialog_title">Feedback a Nightscout</string>
     <string name="feebback_dialog_text">Per favore facci sapere cosa ne pensi</string>
     <string name="feedback_dialog_comment_prompt">Aggiungi i tuoi commenti qui sotto:</string>
@@ -31,4 +29,31 @@
     <string name="UploadLabelText">Upload</string>
     <string name="DexBatteryLabelText">Dex Battery</string>
     <string name="TimeSyncLabelText">Time</string>
+
+    <string name="donate_dialog_title">Donate dati?</string>
+    <string name="donate_dialog_summary">Vuoi anonimo donare i vostri dati CGM per la ricerca , al fine di accelerare l\'innovazione del diabete ?</string>
+    <string name="donate_dialog_yes">Sì</string>
+    <string name="donate_dialog_no">No</string>
+
+    <string name="unknown_mongo_host">Error resolving Mongo host. Double check mongo url.</string>
+    <string name="illegal_rest_url">Could not create API uploader. Check your settings.</string>
+    <string name="auto_configure_title">Auto configure</string>
+
+    <string name="tutorial_one_title">Welcome!</string>
+    <string name="tutorial_one_summary">Lets show you around...</string>
+    <string name="tutorial_two_title">Current Sensor Value"</string>
+    <string name="tutorial_two_summary">Once the receiver is connected, the SG will show here.</string>
+    <string name="tutorial_three_title">Time Ago</string>
+    <string name="tutorial_three_summary">Right below the sensor value is the time it was downloaded</string>
+    <string name="tutorial_four_title">USB Status Icon</string>
+    <string name="tutorial_four_summary">If red, then the receiver is not connected, if green then good to go!</string>
+    <string name="tutorial_five_title">Upload Status Icon</string>
+    <string name="tutorial_five_summary">If red, then not uploading to the cloud and you need to check you preferences, if green then good to go!</string>
+    <string name="tutorial_six_title">Dex Battery Level Icon</string>
+    <string name="tutorial_six_summary">Shows the Dex battery level.</string>
+    <string name="tutorial_seven_title">Time Status Icon</string>
+    <string name="tutorial_seven_summary">If red, then the receiver and Android have different times and you need to check the receivers time in its settings, if green then good to go!</string>
+    <string name="tutorial_eight_title">Now your ready!</string>
+    <string name="tutorial_eight_summary">Go to the preferences to get started.</string>
+
 </resources>

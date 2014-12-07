@@ -2,6 +2,31 @@
 
     <PreferenceScreen
         android:dependency="i_understand"
+        android:key="cloud_storage_api"
+        android:title="@string/pref_title_api"
+        android:summary="@string/pref_summary_api_enabled">
+
+        <SwitchPreference
+            android:dependency="i_understand"
+            android:title="@string/pref_title_api_enabled"
+            android:key="cloud_storage_api_enable"
+            android:disableDependentsState="false"
+            android:summary="@string/pref_summary_api_enabled">
+        </SwitchPreference>
+
+        <EditTextPreference
+            android:dependency="cloud_storage_api_enable"
+            android:title="@string/pref_title_api_url"
+            android:key="cloud_storage_api_base"
+            android:dialogTitle="@string/pref_dialog_api_url"
+            android:dialogMessage="@string/pref_message_api_url"
+            android:defaultValue="@string/pref_default_api_url">
+        </EditTextPreference>
+
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:dependency="i_understand"
         android:key="cloud_storage_mongo"
         android:title="@string/pref_title_mongodb"
         android:summary="@string/pref_summary_mongodb_enabled">
@@ -39,31 +64,6 @@
             android:dialogTitle="@string/pref_dialog_mongodb_device_status_collection"
             android:dialogMessage="@string/pref_message_mongodb_device_status_collection"
             android:defaultValue="@string/pref_default_mongodb_device_status_collection">
-        </EditTextPreference>
-
-    </PreferenceScreen>
-
-    <PreferenceScreen
-        android:dependency="i_understand"
-        android:key="cloud_storage_api"
-        android:title="@string/pref_title_api"
-        android:summary="@string/pref_summary_api_enabled">
-
-        <SwitchPreference
-            android:dependency="i_understand"
-            android:title="@string/pref_title_api_enabled"
-            android:key="cloud_storage_api_enable"
-            android:disableDependentsState="false"
-            android:summary="@string/pref_summary_api_enabled">
-        </SwitchPreference>
-
-        <EditTextPreference
-            android:dependency="cloud_storage_api_enable"
-            android:title="@string/pref_title_api_url"
-            android:key="cloud_storage_api_base"
-            android:dialogTitle="@string/pref_dialog_api_url"
-            android:dialogMessage="@string/pref_message_api_url"
-            android:defaultValue="@string/pref_default_api_url">
         </EditTextPreference>
 
     </PreferenceScreen>
