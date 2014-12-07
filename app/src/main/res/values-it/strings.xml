@@ -55,5 +55,7 @@
     <string name="tutorial_seven_summary">If red, then the receiver and Android have different times and you need to check the receivers time in its settings, if green then good to go!</string>
     <string name="tutorial_eight_title">Now your ready!</string>
     <string name="tutorial_eight_summary">Go to the preferences to get started.</string>
+    <string name="tutorial_next">Next</string>
+    <string name="tutorial_done">Done</string>
 
 </resources>
