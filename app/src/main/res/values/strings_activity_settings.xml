@@ -90,10 +90,10 @@
         <item>1</item>
     </string-array>
 
-    <!-- Y axis setting (Linear/analog)-->
-    <string name="pref_title_chart_y_axis">verticale axis</string>
+    <!-- Y axis setting (Linear/logarithmic)-->
+    <string name="pref_title_chart_y_axis">vertical axis</string>
     <string-array name="perf_verticle_axis">
-        <item>Logaritmic</item>
+        <item>Logarithmic</item>
         <item>Linear</item>
     </string-array>
 

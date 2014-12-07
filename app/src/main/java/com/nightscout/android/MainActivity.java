@@ -136,9 +136,9 @@ public class MainActivity extends Activity {
             {
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
                 currentUnits = prefs.getString("display_options_units", "0").equals("0") ? 1 : Constants.MG_DL_TO_MMOL_L;
-                boolean isLogritmic = prefs.getString("display_verticle_axis", "0").equals("0") ? true : false;
+                boolean isLogarithmic = prefs.getString("display_verticle_axis", "0").equals("0") ? true : false;
                 mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) +"," + 
-                        Boolean.toString(isLogritmic) + ","+ 
+                        Boolean.toString(isLogarithmic) + ","+ 
                         prefs.getString("display_low_range", "80") + "," +
                         prefs.getString("display_high_range", "180") + ")");
             }  
@@ -236,9 +236,9 @@ public class MainActivity extends Activity {
         }
 
         currentUnits = prefs.getString("display_options_units", "0").equals("0") ? 1 : Constants.MG_DL_TO_MMOL_L;
-        boolean isLogritmic = prefs.getString("display_verticle_axis", "0").equals("0") ? true : false;
+        boolean isLogarithmic = prefs.getString("display_verticle_axis", "0").equals("0") ? true : false;
         mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) +"," + 
-                                                     Boolean.toString(isLogritmic) + ","+ 
+                                                     Boolean.toString(isLogarithmic) + ","+ 
                                                      prefs.getString("display_low_range", "80") + "," +
                                                      prefs.getString("display_high_range", "180") + ")");
 
