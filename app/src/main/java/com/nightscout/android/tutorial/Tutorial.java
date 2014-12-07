@@ -1,6 +1,8 @@
 package com.nightscout.android.tutorial;
 
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import com.github.amlcurran.showcaseview.OnShowcaseEventListener;
 import com.github.amlcurran.showcaseview.ShowcaseView;
@@ -30,6 +32,7 @@ public class Tutorial {
 
                 @Override
                 public void onShowcaseViewShow(final ShowcaseView scv) {
+                    scv.setButtonText("Next");
                 }
 
                 @Override
@@ -55,6 +58,7 @@ public class Tutorial {
 
                 @Override
                 public void onShowcaseViewShow(final ShowcaseView scv) {
+                    scv.setButtonText("Next");
                 }
 
                 @Override
@@ -79,7 +83,9 @@ public class Tutorial {
             .setShowcaseEventListener(new OnShowcaseEventListener() {
 
                 @Override
-                public void onShowcaseViewShow(final ShowcaseView scv) { }
+                public void onShowcaseViewShow(final ShowcaseView scv) {
+                    scv.setButtonText("Next");
+                }
 
                 @Override
                 public void onShowcaseViewHide(final ShowcaseView scv) {
@@ -102,7 +108,9 @@ public class Tutorial {
             .setShowcaseEventListener(new OnShowcaseEventListener() {
 
                 @Override
-                public void onShowcaseViewShow(final ShowcaseView scv) { }
+                public void onShowcaseViewShow(final ShowcaseView scv) {
+                    scv.setButtonText("Next");
+                }
 
                 @Override
                 public void onShowcaseViewHide(final ShowcaseView scv) {
@@ -125,7 +133,9 @@ public class Tutorial {
             .setShowcaseEventListener(new OnShowcaseEventListener() {
 
                 @Override
-                public void onShowcaseViewShow(final ShowcaseView scv) { }
+                public void onShowcaseViewShow(final ShowcaseView scv) {
+                    scv.setButtonText("Next");
+                }
 
                 @Override
                 public void onShowcaseViewHide(final ShowcaseView scv) {
@@ -148,7 +158,9 @@ public class Tutorial {
             .setShowcaseEventListener(new OnShowcaseEventListener() {
 
                 @Override
-                public void onShowcaseViewShow(final ShowcaseView scv) { }
+                public void onShowcaseViewShow(final ShowcaseView scv) {
+                    scv.setButtonText("Next");
+                }
 
                 @Override
                 public void onShowcaseViewHide(final ShowcaseView scv) {
@@ -171,7 +183,15 @@ public class Tutorial {
             .setShowcaseEventListener(new OnShowcaseEventListener() {
 
                 @Override
-                public void onShowcaseViewShow(final ShowcaseView scv) { }
+                public void onShowcaseViewShow(final ShowcaseView scv) {
+                    scv.setButtonText("Next");
+                    int margin = (int) mActivity.getApplicationContext().getResources().getDimension(R.dimen.button_margin);
+                    RelativeLayout.LayoutParams lps = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    lps.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                    lps.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                    lps.setMargins(margin, margin, margin, margin);
+                    scv.setButtonPosition(lps);
+                }
 
                 @Override
                 public void onShowcaseViewHide(final ShowcaseView scv) {
@@ -193,7 +213,9 @@ public class Tutorial {
             .setShowcaseEventListener(new OnShowcaseEventListener() {
 
                 @Override
-                public void onShowcaseViewShow(final ShowcaseView scv) { }
+                public void onShowcaseViewShow(final ShowcaseView scv) {
+                    scv.setButtonText("Done");
+                }
 
                 @Override
                 public void onShowcaseViewHide(final ShowcaseView scv) {
