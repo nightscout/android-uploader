@@ -30,6 +30,7 @@ import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.settings.SettingsActivity;
+import com.nightscout.android.tutorial.Tutorial;
 import com.nightscout.core.dexcom.Constants;
 import com.nightscout.core.dexcom.SpecialValue;
 import com.nightscout.core.dexcom.TrendArrow;
@@ -189,9 +190,13 @@ public class MainActivity extends Activity {
                 mTracker.send(new HitBuilders.EventBuilder("Upload", apiVersion).build());
             }
         }
+
         if (prefs.getBoolean("cloud_storage_mongodb_enable", false)) {
             mTracker.send(new HitBuilders.EventBuilder("Upload", "Mongo").build());
         }
+
+        Tutorial tutorial = new Tutorial(MainActivity.this);
+        tutorial.startTutorial();
     }
 
     @Override
