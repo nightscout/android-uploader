@@ -1,5 +1,7 @@
 package com.nightscout.core.preferences;
 
+import com.nightscout.core.download.GlucoseUnits;
+
 import java.util.List;
 
 public interface NightscoutPreferences {
@@ -13,6 +15,7 @@ public interface NightscoutPreferences {
     String getMongoClientUri();
     String getMongoCollection();
     String getMongoDeviceStatusCollection();
+
     void setMongoClientUri(String mongoClientUri);
     void setRestApiBaseUris(List<String> restApis);
     void setMongoCollection(String sgvCollection);
@@ -23,7 +26,12 @@ public interface NightscoutPreferences {
     public static final String DEFAULT_MONGO_COLLECTION = "cgm_data";
     public static final String DEFAULT_MONGO_DEVICE_STATUS_COLLECTION = "devicestatus";
 
-
     String getDefaultMongoCollection();
     String getDefaultMongoDeviceStatusCollection();
+
+    GlucoseUnits getPreferredUnits();
+    void setPreferredUnits(GlucoseUnits units);
+
+    String getPwdName();
+    void setPwdName(String pwdName);
 }

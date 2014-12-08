@@ -3,12 +3,7 @@ package com.nightscout.android;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
+import android.content.*;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,19 +18,18 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.settings.SettingsActivity;
+import com.nightscout.android.wearables.Pebble;
 import com.nightscout.core.dexcom.Constants;
 import com.nightscout.core.dexcom.SpecialValue;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.preferences.NightscoutPreferences;
-
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.acra.ACRAConfigurationException;
@@ -72,6 +66,7 @@ public class MainActivity extends Activity {
     private TextView mTextSGV;
     private TextView mTextTimestamp;
     StatusBarIcons statusBarIcons;
+    Pebble pebble;
 
     // Display options
     private float currentUnits = 1;
@@ -145,10 +140,8 @@ public class MainActivity extends Activity {
 
         // Check (only once) to see if they have opted in to shared data for research
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        if (!prefs.getBoolean("donate_data_query", false)) {
-
-            final NightscoutPreferences preferences = new AndroidPreferences(prefs);
-
+        final NightscoutPreferences preferences = new AndroidPreferences(prefs);
+        if (!preferences.isDataDonateEnabled()) {
             // Prompt user to ask to donate data to research
             AlertDialog.Builder dataDialog = new AlertDialog.Builder(this)
                     .setCancelable(false)
@@ -192,6 +185,10 @@ public class MainActivity extends Activity {
         if (prefs.getBoolean("cloud_storage_mongodb_enable", false)) {
             mTracker.send(new HitBuilders.EventBuilder("Upload", "Mongo").build());
         }
+        pebble = new Pebble(getApplicationContext());
+        pebble.setUnits(preferences.getPreferredUnits());
+        pebble.setPwdName(preferences.getPwdName());
+
     }
 
     @Override
@@ -211,9 +208,14 @@ public class MainActivity extends Activity {
         mWebView.resumeTimers();
 
         // Set and deal with mmol/L<->mg/dL conversions
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        NightscoutPreferences nsPrefs = new AndroidPreferences(prefs);
+
         Log.d(TAG,"display_options_units: "+prefs.getString("display_options_units", "0"));
         currentUnits = prefs.getString("display_options_units", "0").equals("0") ? 1 : Constants.MG_DL_TO_MMOL_L;
+        pebble.setUnits(nsPrefs.getPreferredUnits());
+        pebble.setPwdName(nsPrefs.getPwdName());
+        pebble.resendDownload();
         int sgv = (Integer) mTextSGV.getTag(R.string.display_sgv);
 
         int direction = (Integer) mTextSGV.getTag(R.string.display_trend);
@@ -303,6 +305,9 @@ public class MainActivity extends Activity {
 
             String responseSGVStr = getSGVStringByUnit(responseSGV,trend);
 
+            if (responseSGV != -1) {
+                pebble.sendDownload(responseSGV, trend, responseSGVTimestamp);
+            }
             // Reload d3 chart with new data
             if (json != null) {
                 mJSONData = json;
@@ -354,7 +359,7 @@ public class MainActivity extends Activity {
             // Start updating the timeago only if the screen is on
             PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
             if (pm.isScreenOn())
-                mHandler.postDelayed(updateTimeAgo,nextUploadTime/5);
+                mHandler.postDelayed(updateTimeAgo, nextUploadTime/5);
         }
     }
 

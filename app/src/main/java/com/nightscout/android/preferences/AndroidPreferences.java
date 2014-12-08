@@ -2,9 +2,9 @@ package com.nightscout.android.preferences;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.nightscout.core.download.GlucoseUnits;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
 import java.util.List;
@@ -85,7 +85,7 @@ public class AndroidPreferences implements NightscoutPreferences {
     @SuppressLint("CommitPrefEdits")
     @Override
     public void setRestApiEnabled(boolean restApiEnabled){
-        preferences.edit().putBoolean(PreferenceKeys.API_UPLOADER_ENABLED,restApiEnabled).commit();
+        preferences.edit().putBoolean(PreferenceKeys.API_UPLOADER_ENABLED, restApiEnabled).commit();
     }
 
     // Can't get Robolectric to read from resources
@@ -98,6 +98,31 @@ public class AndroidPreferences implements NightscoutPreferences {
     @Override
     public String getDefaultMongoDeviceStatusCollection() {
         return DEFAULT_MONGO_DEVICE_STATUS_COLLECTION;
+    }
+
+    @Override
+    public GlucoseUnits getPreferredUnits() {
+        return preferences.getString(PreferenceKeys.PREFERRED_UNITS, "0").equals("0")
+                ? GlucoseUnits.MGDL : GlucoseUnits.MMOL;
+    }
+
+    @Override
+    public void setPreferredUnits(GlucoseUnits units) {
+        String unitString = (units == GlucoseUnits.MGDL)?"0":"1";
+        preferences.edit().putString(PreferenceKeys.PREFERRED_UNITS, unitString).apply();
+    }
+
+    @Override
+    public String getPwdName() {
+        return preferences.getString(PreferenceKeys.PWD_NAME, "Not Set");
+    }
+
+    @Override
+    public void setPwdName(String pwdName) {
+        if (pwdName == null) {
+            return;
+        }
+        preferences.edit().putString(PreferenceKeys.PWD_NAME, pwdName);
     }
 
     @SuppressLint("CommitPrefEdits")

@@ -11,4 +11,6 @@ public final class PreferenceKeys {
     public static final String MONGO_COLLECTION = "cloud_storage_mongodb_collection";
     public static final String MONGO_DEVICE_STATUS_COLLECTION =
             "cloud_storage_mongodb_device_status_collection";
+    public static final String PREFERRED_UNITS = "display_options_units";
+    public static final String PWD_NAME = "pwd_name";
 }
