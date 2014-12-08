@@ -23,6 +23,7 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.preferences.AndroidPreferences;
+import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.android.wearables.Pebble;
 import com.nightscout.core.dexcom.Constants;
@@ -226,6 +227,10 @@ public class MainActivity extends Activity {
         mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) +  ")");
 
         mHandler.post(updateTimeAgo);
+        // FIXME: (klee) need to find a better way to do this. Too many things are hooking in here.
+        if (statusBarIcons != null) {
+            statusBarIcons.checkForRootOptionChanged();
+        }
     }
 
     private String getSGVStringByUnit(int sgv, TrendArrow trend){
@@ -459,21 +464,35 @@ public class MainActivity extends Activity {
         private ImageView mImageViewUpload;
         private ImageView mImageViewTimeIndicator;
         private ImageView mImageRcvrBattery;
+        private TextView mRcvrBatteryLabel;
         private boolean usbActive;
         private boolean uploadActive;
         private boolean displayTimeSync;
         private int batteryLevel;
 
-        StatusBarIcons(){
+        StatusBarIcons() {
             mImageViewUSB = (ImageView) findViewById(R.id.imageViewUSB);
             mImageViewUpload = (ImageView) findViewById(R.id.imageViewUploadStatus);
             mImageViewTimeIndicator = (ImageView) findViewById(R.id.imageViewTimeIndicator);
 
             mImageRcvrBattery = (ImageView) findViewById(R.id.imageViewRcvrBattery);
             mImageRcvrBattery.setImageResource(R.drawable.battery);
+            mRcvrBatteryLabel = (TextView) findViewById(R.id.rcvrBatteryLabel);
 
             setDefaults();
         }
+
+        public void checkForRootOptionChanged() {
+            if (!PreferenceManager.getDefaultSharedPreferences(
+                    getApplicationContext()).getBoolean(PreferenceKeys.ROOT_ENABLED, false)) {
+                mImageRcvrBattery.setVisibility(View.GONE);
+                mRcvrBatteryLabel.setVisibility(View.GONE);
+            } else {
+                mImageRcvrBattery.setVisibility(View.VISIBLE);
+                mRcvrBatteryLabel.setVisibility(View.VISIBLE);
+            }
+        }
+
 
         public void setDefaults() {
             setUSB(false);
