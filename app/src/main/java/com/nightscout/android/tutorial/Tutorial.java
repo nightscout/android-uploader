@@ -202,6 +202,12 @@ public class Tutorial {
                 @Override
                 public void onShowcaseViewShow(final ShowcaseView scv) {
                     scv.setButtonText(mActivity.getResources().getString(R.string.tutorial_next));
+                    int margin = (int) mActivity.getApplicationContext().getResources().getDimension(R.dimen.button_margin);
+                    RelativeLayout.LayoutParams lps = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    lps.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                    lps.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                    lps.setMargins(margin, margin, margin, margin);
+                    scv.setButtonPosition(lps);
                 }
 
                 @Override

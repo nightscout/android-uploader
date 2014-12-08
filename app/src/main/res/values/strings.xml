@@ -44,7 +44,7 @@
     <string name="tutorial_two_title">USB Status Icon</string>
     <string name="tutorial_two_summary">If red, then the receiver is not connected, if green then good to go!</string>
     <string name="tutorial_three_title">Current Sensor Value"</string>
-    <string name="tutorial_three_summary">Once the receiver is connected, the SG will show here.</string>
+    <string name="tutorial_three_summary">Once the receiver is connected, the sensor glucose values will show here.</string>
     <string name="tutorial_four_title">Time Ago</string>
     <string name="tutorial_four_summary">Right below the sensor value is the time it was downloaded.</string>
     <string name="tutorial_five_title">Chart</string>
