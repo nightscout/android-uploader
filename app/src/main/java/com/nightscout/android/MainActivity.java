@@ -25,6 +25,7 @@ import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.settings.SettingsActivity;
+import com.nightscout.android.tutorial.Tutorial;
 import com.nightscout.core.dexcom.Constants;
 import com.nightscout.core.dexcom.SpecialValue;
 import com.nightscout.core.dexcom.TrendArrow;
@@ -72,6 +73,8 @@ public class MainActivity extends Activity {
 
     // TODO: should try and avoid use static
     public static int batLevel = 0;
+
+    public static boolean notTesting = true;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -183,8 +186,14 @@ public class MainActivity extends Activity {
                 mTracker.send(new HitBuilders.EventBuilder("Upload", apiVersion).build());
             }
         }
+
         if (prefs.getBoolean("cloud_storage_mongodb_enable", false)) {
             mTracker.send(new HitBuilders.EventBuilder("Upload", "Mongo").build());
+        }
+
+        if (notTesting) {
+            Tutorial tutorial = new Tutorial(MainActivity.this);
+            tutorial.startTutorial();
         }
     }
 

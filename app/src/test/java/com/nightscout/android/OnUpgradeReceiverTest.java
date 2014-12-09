@@ -1,7 +1,9 @@
 package com.nightscout.android;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 
 import com.nightscout.android.test.RobolectricTestBase;
@@ -18,7 +20,10 @@ public class OnUpgradeReceiverTest extends RobolectricTestBase {
 
     @Before
     public void setUp() {
+        activity.notTesting = false;
         activity = Robolectric.buildActivity(MainActivity.class).create().get();
+//        SharedPreferences internal = activity.getApplicationContext().getSharedPreferences("showcase_internal", Context.MODE_PRIVATE);
+//        internal.edit().putBoolean("hasShot" + 1, true).apply();
     }
 
     @Test

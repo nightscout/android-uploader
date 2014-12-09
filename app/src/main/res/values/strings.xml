@@ -29,13 +29,36 @@
     <string name="UploadLabelText">Upload</string>
     <string name="DexBatteryLabelText">Dex Battery</string>
     <string name="TimeSyncLabelText">Time</string>
-    <string name="unknown_mongo_host">Error resolving Mongo host. Double check mongo url.</string>
-    <string name="illegal_rest_url">Could not create API uploader. Check your settings.</string>
 
     <string name="donate_dialog_title">Donate data?</string>
     <string name="donate_dialog_summary">Will you anonymously donate your CGM data for research in order to speed up diabetes innovation?</string>
     <string name="donate_dialog_yes">Yes</string>
     <string name="donate_dialog_no">No</string>
+
     <string name="auto_configure_title">Auto configure</string>
+    <string name="unknown_mongo_host">Error resolving Mongo host. Double check mongo url.</string>
+    <string name="illegal_rest_url">Could not create API uploader. Check your settings.</string>
+
+    <string name="tutorial_one_title">Welcome!</string>
+    <string name="tutorial_one_summary">Lets show you around...</string>
+    <string name="tutorial_two_title">USB Status Icon</string>
+    <string name="tutorial_two_summary">If red, then the receiver is not connected, if green then good to go!</string>
+    <string name="tutorial_three_title">Current Sensor Value"</string>
+    <string name="tutorial_three_summary">Once the receiver is connected, the sensor glucose values will show here.</string>
+    <string name="tutorial_four_title">Time Ago</string>
+    <string name="tutorial_four_summary">Right below the sensor value is the time it was downloaded.</string>
+    <string name="tutorial_five_title">Chart</string>
+    <string name="tutorial_five_summary">Once connected, the data will populate the chart.</string>
+    <string name="tutorial_six_title">Upload Status Icon</string>
+    <string name="tutorial_six_summary">If red, then not uploading to the cloud and you need to check you preferences, if green then good to go!</string>
+    <string name="tutorial_seven_title">Dex Battery Level Icon</string>
+    <string name="tutorial_seven_summary">Shows the Dex battery level.</string>
+    <string name="tutorial_eight_title">Time Status Icon</string>
+    <string name="tutorial_eight_summary">If red, then the receiver and Android have different times and you need to check the receivers time in its settings, if green then good to go!</string>
+    <string name="tutorial_nine_title">Now your ready!</string>
+    <string name="tutorial_nine_summary">Go to the preferences to get started.</string>
+    <string name="tutorial_next">Next</string>
+    <string name="tutorial_done">Done</string>
+
 
 </resources>
