@@ -1,37 +1,43 @@
 package com.nightscout.core.upload;
 
+import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
+import com.google.common.hash.HashCode;
 import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.records.DeviceStatus;
-import com.nightscout.core.utils.RestUriUtils;
+import com.squareup.okhttp.Request;
 
-import org.apache.http.message.AbstractHttpMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.URI;
+import java.net.URL;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
 public class RestV1Uploader extends AbstractRestUploader {
-    private final String secret;
+    private final String token;
 
-    public RestV1Uploader(NightscoutPreferences preferences, URI uri) {
-        super(preferences, RestUriUtils.removeToken(uri));
-        checkArgument(RestUriUtils.hasToken(uri), "Rest API v1 requires a token.");
-        secret = RestUriUtils.generateSecret(uri.getUserInfo());
+    public RestV1Uploader(NightscoutPreferences preferences, URL url, String secret) {
+        super(preferences, url);
+        checkArgument(!Strings.isNullOrEmpty(secret), "Rest API v1 requires a secret.");
+        token = generateToken(secret);
     }
 
-    protected String getSecret() {
-        return secret;
+    private String generateToken(String secret) {
+        return HashCode.fromBytes(secret.getBytes(Charsets.UTF_8)).toString();
+    }
+
+    protected String getToken() {
+        return token;
     }
 
     @Override
-    protected void setExtraHeaders(AbstractHttpMessage post) {
-        post.setHeader("api-secret", secret);
+    protected void setExtraHeaders(Request.Builder post) {
+        post.addHeader("api-secret", getToken());
     }
 
     private JSONObject toJSONObject(GlucoseDataSet record) throws JSONException {

@@ -1,26 +1,15 @@
 package com.nightscout.core.upload;
 
 import com.google.common.collect.Lists;
-import com.google.common.io.CharStreams;
 import com.nightscout.core.preferences.TestPreferences;
 import com.nightscout.core.records.DeviceStatus;
+import com.squareup.okhttp.mockwebserver.MockResponse;
+import com.squareup.okhttp.mockwebserver.MockWebServer;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.message.BasicStatusLine;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
 
 import static com.nightscout.core.test.MockFactory.mockCalRecord;
 import static com.nightscout.core.test.MockFactory.mockDeviceStatus;
@@ -31,35 +20,27 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 public class RestLegacyUploaderTest {
     RestLegacyUploader restUploader;
-    HttpClient mockHttpClient;
-    ArgumentCaptor<HttpUriRequest> captor;
+    MockWebServer server;
     private TestPreferences preferences;
 
     @Before
     public void setUp() throws Exception {
         preferences = new TestPreferences();
-        restUploader = new RestLegacyUploader(preferences, URI.create("http://test.com/"));
-        mockHttpClient = mock(HttpClient.class);
-        restUploader.setClient(mockHttpClient);
-        setUpExecuteCaptor();
+        server = new MockWebServer();
+        initializeMockServer();
+        restUploader = new RestLegacyUploader(preferences, server.getUrl("/"));
     }
 
-    public void setUpExecuteCaptor() throws IOException {
-        setUpExecuteCaptor(200);
+    public void initializeMockServer() throws Exception {
+        server.enqueue(new MockResponse().setResponseCode(200));
+        server.play();
     }
 
-    public void setUpExecuteCaptor(int status) throws IOException {
-        captor = ArgumentCaptor.forClass(HttpUriRequest.class);
-        HttpResponse response = new BasicHttpResponse(
-                new BasicStatusLine(new ProtocolVersion("mock", 1, 2), status, ""));
-        when(mockHttpClient.execute(captor.capture())).thenReturn(response);
+    public JSONObject getJSONBody() throws Exception {
+        return new JSONObject(server.takeRequest().getUtf8Body());
     }
 
     public static void verifyGlucoseDataSet(JSONObject jsonObject)
@@ -79,44 +60,38 @@ public class RestLegacyUploaderTest {
     @Test
     public void testGlucoseDataSet_Endpoint() throws Exception {
         restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
-        assertThat(captor.getValue().getURI().toString(), containsString("entries"));
+        assertThat(server.takeRequest().getPath(), containsString("entries"));
     }
 
     @Test
     public void testGlucoseDataSet_Entity() throws Exception {
         restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
-        HttpPost post = (HttpPost) captor.getValue();
-        String entity = CharStreams.toString(new InputStreamReader(post.getEntity().getContent()));
-        verifyGlucoseDataSet(new JSONObject(entity));
+        verifyGlucoseDataSet(getJSONBody());
     }
 
     @Test
     public void testMeterRecord_NoPost() throws Exception {
-        reset(mockHttpClient);
-        verifyNoMoreInteractions(mockHttpClient);
         restUploader.uploadMeterRecords(Lists.newArrayList(mockMeterRecord()));
+        assertThat(server.getRequestCount(), is(0));
     }
 
     @Test
     public void testCalRecord_NoPost() throws Exception {
         preferences.setCalibrationUploadEnabled(true);
-        reset(mockHttpClient);
-        verifyNoMoreInteractions(mockHttpClient);
         restUploader.uploadCalRecords(Lists.newArrayList(mockCalRecord()));
+        assertThat(server.getRequestCount(), is(0));
     }
 
     @Test
     public void testDeviceStatus_Endpoint() throws Exception {
         restUploader.uploadDeviceStatus(mockDeviceStatus());
-        assertThat(captor.getValue().getURI().toString(), containsString("devicestatus"));
+        assertThat(server.takeRequest().getPath(), containsString("devicestatus"));
     }
 
     @Test
     public void testDeviceStatus_Entity() throws Exception {
         DeviceStatus deviceStatus = mockDeviceStatus();
         restUploader.uploadDeviceStatus(deviceStatus);
-        HttpPost post = (HttpPost) captor.getValue();
-        String entity = CharStreams.toString(new InputStreamReader(post.getEntity().getContent()));
-        verifyDeviceStatus(new JSONObject(entity), deviceStatus);
+        verifyDeviceStatus(getJSONBody(), deviceStatus);
     }
 }

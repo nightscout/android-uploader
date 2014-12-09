@@ -2,56 +2,57 @@ package com.nightscout.core.upload;
 
 import com.google.common.base.Joiner;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.AbstractHttpMessage;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.URI;
+import java.net.URL;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractRestUploader extends BaseUploader {
-    private final URI uri;
-    private HttpClient client;
+    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private final URL url;
+    // TODO(trhodeos): dependency injection.
+    private OkHttpClient client;
 
-    public AbstractRestUploader(NightscoutPreferences preferences, URI baseUri) {
+    public AbstractRestUploader(NightscoutPreferences preferences, URL baseUrl) {
         super(preferences);
-        checkNotNull(baseUri);
-        this.uri = baseUri;
+        checkNotNull(baseUrl);
+        this.url = baseUrl;
     }
 
-    protected void setExtraHeaders(AbstractHttpMessage httpMessage) { }
+    protected void setExtraHeaders(Request.Builder builder) { }
 
-    public URI getUri() {
-        return uri;
-    }
-
-    public HttpClient getClient() {
+    public OkHttpClient getClient() {
         if (client != null) {
             return client;
         }
-        client = new DefaultHttpClient();
+        client = new OkHttpClient();
         return client;
     }
 
-    public void setClient(HttpClient client) {
-        this.client = client;
+    protected String getEndpointUrl(String endpoint) {
+        String output;
+        if (url.toString().endsWith("/")) {
+            output = url.toString() + endpoint;
+        } else {
+            output = Joiner.on('/').join(url.toString(), endpoint);
+        }
+        return output;
     }
 
     protected boolean doPost(String endpoint, JSONObject jsonObject) throws IOException {
-        HttpPost httpPost = new HttpPost(Joiner.on('/').join(uri.toString(), endpoint));
-        httpPost.addHeader("Content-Type", "application/json");
-        httpPost.addHeader("Accept", "application/json");
-        setExtraHeaders(httpPost);
-        httpPost.setEntity(new StringEntity(jsonObject.toString()));
-        HttpResponse response = getClient().execute(httpPost);
-        int statusCodeFamily = response.getStatusLine().getStatusCode() / 100;
-        return statusCodeFamily == 2;
+        Request.Builder builder = new Request.Builder()
+                .url(getEndpointUrl(endpoint))
+                .post(RequestBody.create(JSON, jsonObject.toString()))
+                .addHeader("Content-Type", JSON.toString())
+                .addHeader("Accept", JSON.toString());
+        setExtraHeaders(builder);
+        return getClient().newCall(builder.build()).execute().isSuccessful();
     }
 }

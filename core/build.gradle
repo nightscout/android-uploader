@@ -12,14 +12,15 @@ dependencies {
     // this is an old version of JSON, but it is the most compatible with the android version.
     // We exclude it in :app, because org.json is included in the adk.
     compile 'org.json:json:20090211'
-    // as with JSON, this httpclient version is old, but hopefully matches what is in android.
-    // We exclude it in :app
-    compile 'org.apache.httpcomponents:httpclient:4.3'
+
+    compile 'com.google.protobuf:protobuf-java:2.6.1'
+    compile 'com.squareup.okhttp:okhttp:2.1.0'
+
     testCompile 'org.slf4j:slf4j-simple:1.7.7'
     testCompile 'junit:junit:4.11'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
     testCompile 'org.mockito:mockito-core:1.9.5'
-    compile 'com.google.protobuf:protobuf-java:2.6.1'
+    testCompile 'com.squareup.okhttp:mockwebserver:2.1.0'
 }
 
 apply plugin: 'jacoco'

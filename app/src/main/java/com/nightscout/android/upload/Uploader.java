@@ -18,7 +18,8 @@ import com.nightscout.core.upload.MongoUploader;
 import com.nightscout.core.upload.RestLegacyUploader;
 import com.nightscout.core.upload.RestV1Uploader;
 
-import java.net.URI;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -60,25 +61,26 @@ public class Uploader {
     }
 
     private boolean initializeRestUploaders(Context context ,NightscoutPreferences preferences) {
-        List<String> baseUrisSetting = preferences.getRestApiBaseUris();
-        List<URI> baseUris = Lists.newArrayList();
+        List<String> baseUrlsFromSettings = preferences.getRestApiBaseUris();
+        List<URL> baseUrls = Lists.newArrayList();
         boolean allInitialized = true;
-        for (String baseURLSetting : baseUrisSetting) {
-            String baseUriString = baseURLSetting.trim();
+        for (String baseUrlString : baseUrlsFromSettings) {
+            String baseUriString = baseUrlString.trim();
             if (baseUriString.isEmpty()) continue;
             try {
-                baseUris.add(URI.create(baseUriString));
-            } catch (IllegalArgumentException e) {
+                baseUrls.add(new URL(baseUriString));
+            } catch (MalformedURLException e) {
                 Log.e(LOG_TAG, "Error creating rest uri from preferences.", e);
                 context.sendBroadcast(
                         ToastReceiver.createIntent(context, R.string.illegal_rest_url));
             }
         }
 
-        for (URI baseUri : baseUris) {
-            if (baseUri.getPath().contains("v1")) {
+        for (URL baseUrl : baseUrls) {
+            if (baseUrl.getPath().contains("v1")) {
                 try {
-                    uploaders.add(new RestV1Uploader(preferences, baseUri));
+
+                    uploaders.add(new RestV1Uploader(preferences, baseUrl, /* TODO */ null));
                 } catch (IllegalArgumentException e) {
                     Log.e(LOG_TAG, "Error initializing rest v1 uploader.", e);
                     allInitialized &= false;
@@ -86,7 +88,7 @@ public class Uploader {
                             ToastReceiver.createIntent(context, R.string.illegal_rest_url));
                 }
             } else {
-                uploaders.add(new RestLegacyUploader(preferences, baseUri));
+                uploaders.add(new RestLegacyUploader(preferences, baseUrl));
             }
         }
         return allInitialized;

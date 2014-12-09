@@ -8,12 +8,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.URI;
+import java.net.URL;
 
 public class RestLegacyUploader extends AbstractRestUploader {
 
-    public RestLegacyUploader(NightscoutPreferences preferences, URI uri) {
-        super(preferences, uri);
+    public RestLegacyUploader(NightscoutPreferences preferences, URL url) {
+        super(preferences, url);
     }
 
     private JSONObject toJSONObject(GlucoseDataSet record) throws JSONException {
