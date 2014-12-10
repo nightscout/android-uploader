@@ -240,7 +240,8 @@ public class MainActivity extends Activity {
         else
             sgvStr=String.valueOf(sgv);
         return (sgv!=-1)?
-                (SpecialValue.isSpecialValue(sgv))?SpecialValue.getEGVSpecialValue(sgv).toString():sgvStr+" "+trend.symbol():"---";
+                (SpecialValue.isSpecialValue(sgv))?
+                        SpecialValue.getEGVSpecialValue(sgv).toString():sgvStr+" "+trend.symbol():"---";
     }
 
     @Override

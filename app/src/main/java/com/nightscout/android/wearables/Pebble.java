@@ -75,15 +75,15 @@ public class Pebble {
         String bgStr = (units == GlucoseUnits.MGDL) ?
                 String.valueOf(bgMgdl) : String.format("%.1f", bgMgdl * Constants.MG_DL_TO_MMOL_L);
 
+        lastRecordTime = recordTime;
+        lastBgInMgdl = bgMgdl;
+        lastTrend = trend;
         recordTime = DateTimeZone.getDefault().convertUTCToLocal(recordTime);
         PebbleDictionary dictionary = buildDictionary(trend, bgStr, (int) (recordTime/1000),
                 (int) (DateTimeZone.getDefault().convertUTCToLocal(new DateTime().getMillis())/1000), deltaStr,
                 String.valueOf(MainActivity.batLevel), pwdName);
-        sendDownload(dictionary);
         currentReading = dictionary;
-        lastBgInMgdl = bgMgdl;
-        lastTrend = trend;
-        lastRecordTime = recordTime;
+        sendDownload(dictionary);
     }
 
     public void resendDownload(){
