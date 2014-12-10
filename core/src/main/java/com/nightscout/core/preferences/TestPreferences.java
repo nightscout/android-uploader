@@ -14,6 +14,8 @@ public class TestPreferences implements NightscoutPreferences {
     private String mongoCollection = null;
     private String mongoDeviceStatusCollection = null;
     private boolean dataDonateEnabled;
+    public static final String DEFAULT_MONGO_COLLECTION = "entries";
+    public static final String DEFAULT_MONGO_DEVICE_STATUS_COLLECTION = "devicestatus";
 
     public boolean isRestApiEnabled() {
         return restApiEnabled;

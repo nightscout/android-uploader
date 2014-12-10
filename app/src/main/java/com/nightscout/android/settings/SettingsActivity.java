@@ -380,7 +380,7 @@ public class SettingsActivity extends PreferenceActivity {
     // Specific to the barcode scanner
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-        NightscoutPreferences prefs = new AndroidPreferences(PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()));
+        NightscoutPreferences prefs = new AndroidPreferences(getApplicationContext());
         if (scanResult != null && scanResult.getContents() != null) {
             NSBarcodeConfig barcode=new NSBarcodeConfig(scanResult.getContents(), prefs);
             if (barcode.hasMongoConfig()) {

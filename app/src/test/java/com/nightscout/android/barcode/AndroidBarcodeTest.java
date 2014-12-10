@@ -6,10 +6,10 @@ import android.content.SharedPreferences;
 import com.google.common.collect.Lists;
 import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.integration.android.IntentIntegrator;
+import com.nightscout.android.R;
 import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.android.test.RobolectricTestBase;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,37 +37,37 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
     }
 
     private void setValidMongoOnlyWithIntentResult(){
-        jsonConfig = "{\"mongo\":{\"uri\":\"mongodb://user:pass@test.com/cgm_data\"}}";
+        jsonConfig = "{'mongo':{'uri':'mongodb://user:pass@test.com/cgm_data'}}";
         fakeActivityResult();
     }
 
     private void setSingleValidApiOnlyWithIntentResult(){
-        jsonConfig = "{\"rest\":{\"endpoint\":[\"http://abc@test.com/v1\"]}}";
+        jsonConfig = "{'rest':{'endpoint':['http://abc@test.com/v1']}}";
         fakeActivityResult();
     }
 
     private void setSingleValidApiAndMongoWithIntentResult(){
-        jsonConfig = "{\"mongo\":{\"uri\":\"mongodb://user:pass@test.com/cgm_data\"}, \"rest\":{\"endpoint\":[\"http://abc@test.com/\"]}}";
+        jsonConfig = "{'mongo':{'uri':'mongodb://user:pass@test.com/cgm_data'}, 'rest':{'endpoint':['http://abc@test.com/']}}";
         fakeActivityResult();
     }
 
     private void setMultipleValidApiOnlyWithIntentResult(){
-        jsonConfig = "{\"rest\":{\"endpoint\":[\"http://abc@test.com/v1\", \"http://test.com/\"]}}";
+        jsonConfig = "{'rest':{'endpoint':['http://abc@test.com/v1', 'http://test.com/']}}";
         fakeActivityResult();
     }
 
     private void setEmptyValidApiOnlyWithIntentResult(){
-        jsonConfig = "{\"rest\":{\"endpoint\":[]}}";
+        jsonConfig = "{'rest':{'endpoint':[]}}";
         fakeActivityResult();
     }
 
     private void setEmptyValidMongoOnlyWithIntentResult(){
-        jsonConfig = "{\"mongo\":{}";
+        jsonConfig = "{'mongo':{}}";
         fakeActivityResult();
     }
 
     private void setInvalidConfigWithValidJson(){
-        jsonConfig = "{\"some\":{\"random\":[\"values\"]}}";
+        jsonConfig = "{'some':{'random':['values']}}";
         fakeActivityResult();
     }
 
@@ -137,7 +137,7 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
 
     @Test
     public void multipleValidApiUriConfigShouldSetApiUriPrefsOnScanResult() throws Exception {
-        List<String> uris=Lists.newArrayList("http://abc@test.com/v1", "http://test.com/");
+        List<String> uris = Lists.newArrayList("http://abc@test.com/v1", "http://test.com/");
         setMultipleValidApiOnlyWithIntentResult();
         assertThat(Lists.newArrayList(sharedPrefs.getString(PreferenceKeys.API_URIS, null).split(" ")),is(uris));
     }
@@ -178,13 +178,16 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
     @Test
     public void validMongoOnlyShouldSetDefaultSgCollectionForOnlyMongoUriSet(){
         setValidMongoOnlyWithIntentResult();
-        assertThat(sharedPrefs.getString(PreferenceKeys.MONGO_COLLECTION,""), is("cgm_data"));
+        assertThat(sharedPrefs.getString(PreferenceKeys.MONGO_COLLECTION, ""),
+                is(getShadowApplication().getApplicationContext().getString(R.string.pref_default_mongodb_collection)));
     }
 
     @Test
     public void validMongoOnlyShouldSetDefaultDeviceStatusCollectionForOnlyMongoUriSet(){
         setValidMongoOnlyWithIntentResult();
-        assertThat(sharedPrefs.getString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION,""), is("devicestatus"));
+        assertThat(sharedPrefs.getString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION, ""),
+                is(getShadowApplication().getApplicationContext()
+                        .getString(R.string.pref_default_mongodb_device_status_collection)));
     }
 
     @Test
@@ -243,10 +246,5 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
         intent.putExtra("SCAN_RESULT_ORIENTATION", Integer.MIN_VALUE);
         intent.putExtra("SCAN_RESULT_ERROR_CORRECTION_LEVEL", "");
         return intent;
-    }
-
-    @After
-    public void tearDown(){
-        sharedPrefs = null;
     }
 }

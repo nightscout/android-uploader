@@ -1,19 +1,22 @@
 package com.nightscout.android.preferences;
 
-import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.SharedPreferences;
-
+import android.preference.PreferenceManager;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.nightscout.android.R;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
 import java.util.List;
 
 public class AndroidPreferences implements NightscoutPreferences {
     private final SharedPreferences preferences;
+    private Context context;
 
-    public AndroidPreferences(SharedPreferences preferences) {
-        this.preferences = preferences;
+    public AndroidPreferences(Context context){
+        this.context = context;
+        this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     @Override
@@ -76,51 +79,45 @@ public class AndroidPreferences implements NightscoutPreferences {
      *
      * @param mongoUploadEnabled whether or not to upload directly to mongo
      */
-    @SuppressLint("CommitPrefEdits")
     @Override
     public void setMongoUploadEnabled(boolean mongoUploadEnabled){
-        preferences.edit().putBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED,mongoUploadEnabled).commit();
+        preferences.edit().putBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED, mongoUploadEnabled).apply();
     }
 
-    @SuppressLint("CommitPrefEdits")
     @Override
     public void setRestApiEnabled(boolean restApiEnabled){
-        preferences.edit().putBoolean(PreferenceKeys.API_UPLOADER_ENABLED,restApiEnabled).commit();
+        preferences.edit().putBoolean(PreferenceKeys.API_UPLOADER_ENABLED, restApiEnabled).apply();
     }
 
     // Can't get Robolectric to read from resources
     @Override
     public String getDefaultMongoCollection() {
-        return DEFAULT_MONGO_COLLECTION;
+        return context.getString(R.string.pref_default_mongodb_collection);
     }
 
     // Can't get Robolectric to read from resources
     @Override
     public String getDefaultMongoDeviceStatusCollection() {
-        return DEFAULT_MONGO_DEVICE_STATUS_COLLECTION;
+        return context.getString(R.string.pref_default_mongodb_device_status_collection);
     }
 
-    @SuppressLint("CommitPrefEdits")
     @Override
     public void setMongoClientUri(String mongoClientUri) {
-        preferences.edit().putString(PreferenceKeys.MONGO_URI, mongoClientUri).commit();
+        preferences.edit().putString(PreferenceKeys.MONGO_URI, mongoClientUri).apply();
     }
 
-    @SuppressLint("CommitPrefEdits")
     @Override
     public void setRestApiBaseUris(List<String> restApis) {
-        preferences.edit().putString(PreferenceKeys.API_URIS, Joiner.on(' ').join(restApis)).commit();
+        preferences.edit().putString(PreferenceKeys.API_URIS, Joiner.on(' ').join(restApis)).apply();
     }
 
-    @SuppressLint("CommitPrefEdits")
     @Override
     public void setMongoDeviceStatusCollection(String deviceStatusCollection) {
-        preferences.edit().putString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION,deviceStatusCollection).commit();
+        preferences.edit().putString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION, deviceStatusCollection).apply();
     }
 
-    @SuppressLint("CommitPrefEdits")
     @Override
     public void setMongoCollection(String sgvCollection) {
-        preferences.edit().putString(PreferenceKeys.MONGO_COLLECTION,sgvCollection).commit();
+        preferences.edit().putString(PreferenceKeys.MONGO_COLLECTION, sgvCollection).apply();
     }
 }
