@@ -1,11 +1,10 @@
 package com.nightscout.android.preferences;
 
-import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.utils.RestUriUtils;
 
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class AndroidPreferences implements NightscoutPreferences {
 
     @Override
     public List<String> getRestApiBaseUris() {
-        return Lists.newArrayList(preferences.getString(PreferenceKeys.API_URIS, "").split(" "));
+        return RestUriUtils.splitIntoMultipleUris(preferences.getString(PreferenceKeys.API_URIS, ""));
     }
 
     @Override
@@ -32,8 +31,18 @@ public class AndroidPreferences implements NightscoutPreferences {
     }
 
     @Override
+    public void setCalibrationUploadEnabled(boolean calibrationUploadEnabled) {
+        preferences.edit().putBoolean(PreferenceKeys.CAL_UPLOAD_ENABLED, calibrationUploadEnabled).apply();
+    }
+
+    @Override
     public boolean isSensorUploadEnabled() {
         return preferences.getBoolean(PreferenceKeys.SENSOR_UPLOAD_ENABLED, false);
+    }
+
+    @Override
+    public void setSensorUploadEnabled(boolean sensorUploadEnabled) {
+        preferences.edit().putBoolean(PreferenceKeys.SENSOR_UPLOAD_ENABLED, sensorUploadEnabled).apply();
     }
 
     @Override
@@ -61,31 +70,19 @@ public class AndroidPreferences implements NightscoutPreferences {
         return preferences.getString(PreferenceKeys.MONGO_COLLECTION, getDefaultMongoCollection());
     }
 
-    /**
-     * Getter method to return the mongo device status collection
-     *
-     * @return MongoDB device status collection name
-     */
     @Override
     public String getMongoDeviceStatusCollection() {
         return preferences.getString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION, getDefaultMongoDeviceStatusCollection());
     }
 
-    /**
-     * Enable mongo upload in shared preferences
-     *
-     * @param mongoUploadEnabled whether or not to upload directly to mongo
-     */
-    @SuppressLint("CommitPrefEdits")
     @Override
     public void setMongoUploadEnabled(boolean mongoUploadEnabled){
-        preferences.edit().putBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED,mongoUploadEnabled).commit();
+        preferences.edit().putBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED,mongoUploadEnabled).apply();
     }
 
-    @SuppressLint("CommitPrefEdits")
     @Override
     public void setRestApiEnabled(boolean restApiEnabled){
-        preferences.edit().putBoolean(PreferenceKeys.API_UPLOADER_ENABLED,restApiEnabled).commit();
+        preferences.edit().putBoolean(PreferenceKeys.API_UPLOADER_ENABLED,restApiEnabled).apply();
     }
 
     // Can't get Robolectric to read from resources
@@ -100,27 +97,33 @@ public class AndroidPreferences implements NightscoutPreferences {
         return DEFAULT_MONGO_DEVICE_STATUS_COLLECTION;
     }
 
-    @SuppressLint("CommitPrefEdits")
     @Override
     public void setMongoClientUri(String mongoClientUri) {
-        preferences.edit().putString(PreferenceKeys.MONGO_URI, mongoClientUri).commit();
+        preferences.edit().putString(PreferenceKeys.MONGO_URI, mongoClientUri).apply();
     }
 
-    @SuppressLint("CommitPrefEdits")
-    @Override
-    public void setRestApiBaseUris(List<String> restApis) {
-        preferences.edit().putString(PreferenceKeys.API_URIS, Joiner.on(' ').join(restApis)).commit();
-    }
-
-    @SuppressLint("CommitPrefEdits")
     @Override
     public void setMongoDeviceStatusCollection(String deviceStatusCollection) {
-        preferences.edit().putString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION,deviceStatusCollection).commit();
+        preferences.edit().putString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION, deviceStatusCollection).apply();
     }
 
-    @SuppressLint("CommitPrefEdits")
     @Override
     public void setMongoCollection(String sgvCollection) {
-        preferences.edit().putString(PreferenceKeys.MONGO_COLLECTION,sgvCollection).commit();
+        preferences.edit().putString(PreferenceKeys.MONGO_COLLECTION, sgvCollection).apply();
+    }
+
+    @Override
+    public boolean getIUnderstand() {
+        return preferences.getBoolean(PreferenceKeys.I_UNDERSTAND, false);
+    }
+
+    @Override
+    public void setIUnderstand(boolean bool) {
+        preferences.edit().putBoolean(PreferenceKeys.I_UNDERSTAND, bool).apply();
+    }
+
+    @Override
+    public void setRestApiBaseUris(List<String> uris) {
+        preferences.edit().putString(PreferenceKeys.API_URIS, Joiner.on(' ').join(uris)).apply();
     }
 }

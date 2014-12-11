@@ -12,4 +12,5 @@ public final class PreferenceKeys {
     public static final String MONGO_DEVICE_STATUS_COLLECTION =
             "cloud_storage_mongodb_device_status_collection";
     public static final String ROOT_ENABLED = "root_support_enabled";
+    public static final String I_UNDERSTAND = "i_understand";
 }

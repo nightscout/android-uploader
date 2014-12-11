@@ -28,12 +28,15 @@ import com.google.common.collect.Lists;
 import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.preferences.PreferenceKeys;
+import com.nightscout.android.preferences.PreferencesValidator;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.core.dexcom.Constants;
 import com.nightscout.core.dexcom.SpecialValue;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.utils.RestUriUtils;
+
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.acra.ACRAConfigurationException;
@@ -41,6 +44,7 @@ import org.acra.ReportingInteractionMode;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -86,17 +90,17 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         Log.d(TAG,"OnCreate called.");
 
+        preferences = new AndroidPreferences(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
+        migrateToNewStyleRestUris();
+        ensureSavedUrisAreValid();
+        ensureIUnderstandDialogDisplayed();
+
         // Add timezone ID to ACRA report
         ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
 
         mTracker = ((Nightscout) getApplicationContext()).getTracker();
 
         mContext = getApplicationContext();
-
-        preferences = new AndroidPreferences(PreferenceManager.getDefaultSharedPreferences(
-                getApplicationContext()));
-
-        migrateToNewStyleRestUris();
 
         // Register USB attached/detached and battery changes intents
         IntentFilter deviceStatusFilter = new IntentFilter();
@@ -188,7 +192,7 @@ public class MainActivity extends Activity {
                 if (baseURL.isEmpty()) continue;
                 baseURIs.add(baseURL + (baseURL.endsWith("/") ? "" : "/"));
                 String apiVersion;
-                apiVersion=(baseURL.endsWith("/v1/"))?"WebAPIv1":"Legacy WebAPI";
+                apiVersion = (RestUriUtils.isV1Uri(URI.create(baseURL))) ? "WebAPIv1" : "Legacy WebAPI";
                 mTracker.send(new HitBuilders.EventBuilder("Upload", apiVersion).build());
             }
         }
@@ -211,6 +215,44 @@ public class MainActivity extends Activity {
             }
         }
         preferences.setRestApiBaseUris(newUris);
+    }
+
+    private void ensureSavedUrisAreValid() {
+        if (PreferencesValidator.validateMongoUriSyntax(getApplicationContext(),
+                preferences.getMongoClientUri()).isPresent()) {
+            preferences.setMongoClientUri(null);
+        }
+        List<String> filteredRestUris = Lists.newArrayList();
+        for (String uri : preferences.getRestApiBaseUris()) {
+            if (!PreferencesValidator.validateRestApiUriSyntax(getApplicationContext(), uri).isPresent()) {
+                filteredRestUris.add(uri);
+            }
+        }
+        preferences.setRestApiBaseUris(filteredRestUris);
+    }
+
+    private void ensureIUnderstandDialogDisplayed() {
+        if (!preferences.getIUnderstand()) {
+            final Activity activity = this;
+            // Prompt user to ask to donate data to research
+            AlertDialog.Builder dataDialog = new AlertDialog.Builder(this)
+                    .setCancelable(false)
+                    .setTitle(R.string.pref_title_i_understand)
+                    .setMessage(R.string.pref_summary_i_understand)
+                    .setPositiveButton(R.string.donate_dialog_yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            preferences.setIUnderstand(true);
+                        }
+                    })
+                    .setNegativeButton(R.string.donate_dialog_no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            android.os.Process.killProcess(android.os.Process.myPid());
+                            System.exit(1);
+                        }
+                    })
+                    .setIcon(R.drawable.ic_launcher);
+            dataDialog.show();
+        }
     }
 
     @Override

@@ -39,4 +39,11 @@
     <string name="auto_configure_title">Auto configure</string>
 
     <string name="TimeChangeDetected">Time change detected</string>
+    <string name="illegal_mongo_uri">Mongo uri has invalid syntax. Please double check.</string>
+    <string name="unknown_rest_host">Cannot connect to %s, please check that you are connected to the internet, and that the url is correct.</string>
+    <string name="invalid_rest_uri">Invalid rest url %s, please double check formatting.</string>
+    <string name="rest_uri_missing_token">Missing token for rest uri %s.</string>
+    <string name="invalid_input_title">Invalid Input</string>
+    <string name="ok">Ok</string>
+    <string name="version_unknown">Unknown version</string>
 </resources>
