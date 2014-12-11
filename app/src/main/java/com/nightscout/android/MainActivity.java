@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.google.android.gms.analytics.GoogleAnalytics;
@@ -135,6 +136,21 @@ public class MainActivity extends Activity {
         mWebView.setHorizontalScrollBarEnabled(false);
         mWebView.setBackgroundColor(0);
         mWebView.loadUrl("file:///android_asset/index.html");
+        
+        mWebView.setWebViewClient(new WebViewClient() {  
+            @Override  
+            public void onPageFinished(WebView view, String url)  
+            {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+                currentUnits = prefs.getString("display_options_units", "0").equals("0") ? 1 : Constants.MG_DL_TO_MMOL_L;
+                boolean isLogarithmic = prefs.getString("display_verticle_axis", "0").equals("0") ? true : false;
+                mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) +"," + 
+                        Boolean.toString(isLogarithmic) + ","+ 
+                        prefs.getString("display_low_range", "80") + "," +
+                        prefs.getString("display_high_range", "180") + ")");
+            }  
+        });  
+        
         statusBarIcons = new StatusBarIcons();
 
         // If app started due to android.hardware.usb.action.USB_DEVICE_ATTACHED intent, start syncing
@@ -233,6 +249,7 @@ public class MainActivity extends Activity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         Log.d(TAG, "display_options_units: " + prefs.getString("display_options_units", "0"));
         currentUnits = prefs.getString("display_options_units", "0").equals("0") ? 1 : Constants.MG_DL_TO_MMOL_L;
+        boolean isLogarithmic = prefs.getString("display_verticle_axis", "0").equals("0") ? true : false;
         int sgv = (Integer) mTextSGV.getTag(R.string.display_sgv);
 
         int direction = (Integer) mTextSGV.getTag(R.string.display_trend);
@@ -240,7 +257,10 @@ public class MainActivity extends Activity {
             mTextSGV.setText(getSGVStringByUnit(sgv, TrendArrow.values()[direction]));
         }
 
-        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) +  ")");
+        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) +"," + 
+                                                     Boolean.toString(isLogarithmic) + ","+ 
+                                                     prefs.getString("display_low_range", "80") + "," +
+                                                     prefs.getString("display_high_range", "180") + ")");
 
         mHandler.post(updateTimeAgo);
         // FIXME: (klee) need to find a better way to do this. Too many things are hooking in here.
