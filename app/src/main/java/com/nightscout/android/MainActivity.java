@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.*;
 import android.hardware.usb.UsbManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -21,6 +22,9 @@ import android.widget.TextView;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.preferences.PreferenceKeys;
@@ -39,6 +43,7 @@ import org.joda.time.Minutes;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 import static org.joda.time.Duration.standardMinutes;
@@ -57,6 +62,8 @@ public class MainActivity extends Activity {
     private String mJSONData;
     private long lastRecordTime = -1;
     private long receiverOffsetFromUploader = 0;
+
+    private NightscoutPreferences preferences;
 
     // Analytics mTracker
     private Tracker mTracker;
@@ -85,6 +92,11 @@ public class MainActivity extends Activity {
         mTracker = ((Nightscout) getApplicationContext()).getTracker();
 
         mContext = getApplicationContext();
+
+        preferences = new AndroidPreferences(PreferenceManager.getDefaultSharedPreferences(
+                getApplicationContext()));
+
+        migrateToNewStyleRestUris();
 
         // Register USB attached/detached and battery changes intents
         IntentFilter deviceStatusFilter = new IntentFilter();
@@ -140,9 +152,6 @@ public class MainActivity extends Activity {
         // Check (only once) to see if they have opted in to shared data for research
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         if (!prefs.getBoolean("donate_data_query", false)) {
-
-            final NightscoutPreferences preferences = new AndroidPreferences(prefs);
-
             // Prompt user to ask to donate data to research
             AlertDialog.Builder dataDialog = new AlertDialog.Builder(this)
                     .setCancelable(false)
@@ -186,6 +195,22 @@ public class MainActivity extends Activity {
         if (prefs.getBoolean("cloud_storage_mongodb_enable", false)) {
             mTracker.send(new HitBuilders.EventBuilder("Upload", "Mongo").build());
         }
+    }
+
+    private void migrateToNewStyleRestUris() {
+        List<String> newUris = Lists.newArrayList();
+        for (String uriString : preferences.getRestApiBaseUris()) {
+            if (uriString.contains("@http")) {
+                List<String> splitUri = Splitter.on('@').splitToList(uriString);
+                Uri oldUri = Uri.parse(splitUri.get(1));
+                String newAuthority = Joiner.on('@').join(splitUri.get(0), oldUri.getEncodedAuthority());
+                Uri newUri = oldUri.buildUpon().encodedAuthority(newAuthority).build();
+                newUris.add(newUri.toString());
+            } else {
+                newUris.add(uriString);
+            }
+        }
+        preferences.setRestApiBaseUris(newUris);
     }
 
     @Override
