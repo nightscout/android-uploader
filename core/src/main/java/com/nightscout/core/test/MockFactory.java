@@ -174,9 +174,7 @@ public class MockFactory {
         return record;
     }
 
-    public static CalRecord[] mockCalPage() throws ParseException {
-        DateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
-        format.setTimeZone(TimeZone.getDefault());
+    public static CalRecord[] mockCal505Page() throws ParseException {
         CalRecord[] record = new CalRecord[2];
         CalSubrecord[] subrecord0 = new CalSubrecord[2];
         subrecord0[0] = new CalSubrecord(121, 70130, 186705605, 186705180);
@@ -186,6 +184,19 @@ public class MockFactory {
         subrecord1[1] = new CalSubrecord(83, 74480, 186782402, 186782153);
         record[0] = new CalRecord(17791.61320896296, 512.6837392183724, 0.9, 0.5, 186959093, 186980695, subrecord0);
         record[1] = new CalRecord(17791.61320896296, 512.6837392183724, 0.9, 0.5, 186959393, 186980995, subrecord1);
+        return record;
+    }
+
+    public static CalRecord[] mockCalPre505Page() throws ParseException {
+        CalSubrecord[] subrec = new CalSubrecord[6];
+        subrec[0] = new CalSubrecord(102, 109056, 180243725, 180243367);
+        subrec[1] = new CalSubrecord(45, 82816, 180294423, 180294101);
+        subrec[2] = new CalSubrecord(52, 85056, 180328322, 180328043);
+        subrec[3] = new CalSubrecord(80, 101136, 180370320, 180369852);
+        subrec[4] = new CalSubrecord(80, 117408, 180455817, 180455393);
+        subrec[5] = new CalSubrecord(106, 156704, 180549714, 180549424);
+        CalRecord[] record = new CalRecord[1];
+        record[0] = new CalRecord(38809.93262015008, 901.7557081270957, 0.9, 0.0, 187193265, 180549714, subrec);
         return record;
     }
 
