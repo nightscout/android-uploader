@@ -19,6 +19,12 @@ public class AndroidPreferences implements NightscoutPreferences {
         this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
+    public AndroidPreferences(Context context, SharedPreferences prefs){
+        this.context = context;
+        this.preferences = prefs;
+    }
+
+
     @Override
     public boolean isRestApiEnabled() {
         return preferences.getBoolean(PreferenceKeys.API_UPLOADER_ENABLED, false);
