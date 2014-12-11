@@ -38,4 +38,5 @@
     <string name="donate_dialog_no">No</string>
     <string name="auto_configure_title">Auto configure</string>
 
+    <string name="TimeChangeDetected">Time change detected</string>
 </resources>
