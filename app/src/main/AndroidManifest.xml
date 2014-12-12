@@ -31,7 +31,6 @@
             android:resource="@xml/analytics_global_config" />
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="portrait"
             android:launchMode="singleTask">
 
             <intent-filter>

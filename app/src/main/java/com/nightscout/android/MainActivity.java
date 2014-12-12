@@ -139,6 +139,9 @@ public class MainActivity extends Activity {
         mWebView.setHorizontalScrollBarEnabled(false);
         mWebView.setBackgroundColor(0);
         mWebView.loadUrl("file:///android_asset/index.html");
+        // Issue w/ devices that don't allow hardware acceleration in webviews.
+        // If acceleration is enabled, but not allowed on the device, it crashes the app.
+        mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         statusBarIcons = new StatusBarIcons();
 
         // If app started due to android.hardware.usb.action.USB_DEVICE_ATTACHED intent, start syncing
@@ -340,7 +343,7 @@ public class MainActivity extends Activity {
         super.onRestoreInstanceState(savedInstanceState);
         // Restore the state of the WebView
         mWebView.restoreState(savedInstanceState);
-        mJSONData = savedInstanceState.getString("mJSONData");
+        mJSONData = savedInstanceState.getString("saveJSONData");
         mTextSGV.setText(savedInstanceState.getString("saveTextSGV"));
         mTextTimestamp.setText(savedInstanceState.getString("saveTextTimestamp"));
         statusBarIcons.setUSB(savedInstanceState.getBoolean("saveImageViewUSB"));
