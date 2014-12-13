@@ -7,6 +7,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.nightscout.android.R;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.utils.RestUriUtils;
 
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class AndroidPreferences implements NightscoutPreferences {
 
     @Override
     public List<String> getRestApiBaseUris() {
-        return Lists.newArrayList(preferences.getString(PreferenceKeys.API_URIS, "").split(" "));
+        return RestUriUtils.splitIntoMultipleUris(preferences.getString(PreferenceKeys.API_URIS, ""));
     }
 
     @Override
@@ -41,8 +42,18 @@ public class AndroidPreferences implements NightscoutPreferences {
     }
 
     @Override
+    public void setCalibrationUploadEnabled(boolean calibrationUploadEnabled) {
+        preferences.edit().putBoolean(PreferenceKeys.CAL_UPLOAD_ENABLED, calibrationUploadEnabled).apply();
+    }
+
+    @Override
     public boolean isSensorUploadEnabled() {
         return preferences.getBoolean(PreferenceKeys.SENSOR_UPLOAD_ENABLED, false);
+    }
+
+    @Override
+    public void setSensorUploadEnabled(boolean sensorUploadEnabled) {
+        preferences.edit().putBoolean(PreferenceKeys.SENSOR_UPLOAD_ENABLED, sensorUploadEnabled).apply();
     }
 
     @Override
@@ -70,11 +81,6 @@ public class AndroidPreferences implements NightscoutPreferences {
         return preferences.getString(PreferenceKeys.MONGO_COLLECTION, getDefaultMongoCollection());
     }
 
-    /**
-     * Getter method to return the mongo device status collection
-     *
-     * @return MongoDB device status collection name
-     */
     @Override
     public String getMongoDeviceStatusCollection() {
         return preferences.getString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION, getDefaultMongoDeviceStatusCollection());
@@ -125,5 +131,17 @@ public class AndroidPreferences implements NightscoutPreferences {
     @Override
     public void setMongoCollection(String sgvCollection) {
         preferences.edit().putString(PreferenceKeys.MONGO_COLLECTION, sgvCollection).apply();
+    public boolean getIUnderstand() {
+        return preferences.getBoolean(PreferenceKeys.I_UNDERSTAND, false);
+    }
+
+    @Override
+    public void setIUnderstand(boolean bool) {
+        preferences.edit().putBoolean(PreferenceKeys.I_UNDERSTAND, bool).apply();
+    }
+
+    @Override
+    public void setRestApiBaseUris(List<String> uris) {
+        preferences.edit().putString(PreferenceKeys.API_URIS, Joiner.on(' ').join(uris)).apply();
     }
 }
