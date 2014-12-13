@@ -2,12 +2,14 @@ package com.nightscout.android.wearables;
 
 import android.content.Context;
 import android.util.Log;
+
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 import com.nightscout.android.MainActivity;
 import com.nightscout.core.dexcom.Constants;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.download.GlucoseUnits;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -23,9 +25,6 @@ public class Pebble {
     //    CGM_DLTA_KEY = 0x4,		// TUPLE_CSTRING, MAX 5 BYTES (BG DELTA, -100 or -10.0)
     //    CGM_UBAT_KEY = 0x5,		// TUPLE_CSTRING, MAX 3 BYTES (UPLOADER BATTERY, 100)
     //    CGM_NAME_KEY = 0x6		// TUPLE_CSTRING, MAX 9 BYTES (Christine)
-    // Standard pebble UUID
-    // public static final UUID PEBBLEAPP_UUID = UUID.fromString("4bfa0b46-b9fa-4e1a-b2ba-a2ba7168f897");
-
     public static final UUID PEBBLEAPP_UUID = UUID.fromString("2c3f5ab3-7506-44e7-b8d0-2c63de32e1ec");
     public final int ICON_KEY=0;
     public static final int BG_KEY=1;

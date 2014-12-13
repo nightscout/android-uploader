@@ -3,10 +3,10 @@ package com.nightscout.android.preferences;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.nightscout.core.download.GlucoseUnits;
 import com.nightscout.android.R;
+import com.nightscout.core.download.GlucoseUnits;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.RestUriUtils;
 
@@ -128,7 +128,7 @@ public class AndroidPreferences implements NightscoutPreferences {
 
     @Override
     public String getPwdName() {
-        return preferences.getString(PreferenceKeys.PWD_NAME, "Not Set");
+        return preferences.getString(PreferenceKeys.PWD_NAME, context.getString(R.string.default_pwd_name));
     }
 
     @Override
@@ -136,7 +136,7 @@ public class AndroidPreferences implements NightscoutPreferences {
         if (pwdName == null) {
             return;
         }
-        preferences.edit().putString(PreferenceKeys.PWD_NAME, pwdName);
+        preferences.edit().putString(PreferenceKeys.PWD_NAME, pwdName).apply();
     }
 
     @Override
