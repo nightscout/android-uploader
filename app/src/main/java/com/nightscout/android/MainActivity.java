@@ -36,7 +36,6 @@ import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.RestUriUtils;
-
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.acra.ACRAConfigurationException;
@@ -90,7 +89,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         Log.d(TAG,"OnCreate called.");
 
-        preferences = new AndroidPreferences(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
+        preferences = new AndroidPreferences(getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
         migrateToNewStyleRestUris();
         ensureSavedUrisAreValid();
         ensureIUnderstandDialogDisplayed();

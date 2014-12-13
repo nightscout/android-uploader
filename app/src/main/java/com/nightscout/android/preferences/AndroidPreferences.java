@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import com.nightscout.android.R;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.RestUriUtils;
@@ -119,11 +118,6 @@ public class AndroidPreferences implements NightscoutPreferences {
     }
 
     @Override
-    public void setRestApiBaseUris(List<String> restApis) {
-        preferences.edit().putString(PreferenceKeys.API_URIS, Joiner.on(' ').join(restApis)).apply();
-    }
-
-    @Override
     public void setMongoDeviceStatusCollection(String deviceStatusCollection) {
         preferences.edit().putString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION, deviceStatusCollection).apply();
     }
@@ -131,6 +125,8 @@ public class AndroidPreferences implements NightscoutPreferences {
     @Override
     public void setMongoCollection(String sgvCollection) {
         preferences.edit().putString(PreferenceKeys.MONGO_COLLECTION, sgvCollection).apply();
+    }
+
     public boolean getIUnderstand() {
         return preferences.getBoolean(PreferenceKeys.I_UNDERSTAND, false);
     }

@@ -29,8 +29,6 @@ public interface NightscoutPreferences {
 
     String getMongoDeviceStatusCollection();
     void setMongoDeviceStatusCollection(String deviceStatusCollection);
-    void setMongoUploadEnabled(boolean mongoUploadEnabled);
-    void setRestApiEnabled(boolean restApiEnabled);
 
     boolean getIUnderstand();
     void setIUnderstand(boolean bool);

@@ -3,8 +3,6 @@ package com.nightscout.android.barcode;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v4.app.FragmentActivity;
-
 import com.google.common.collect.Lists;
 import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -20,7 +18,6 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowPreferenceManager;
-import org.robolectric.util.FragmentTestUtil;
 
 import java.util.List;
 
@@ -34,14 +31,12 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
     SharedPreferences sharedPrefs;
     String jsonConfig = null;
     NightscoutPreferences prefs;
-    private SettingsActivity.MainPreferenceFragment mainPreferenceFragment;
 
     @Before
     public void setUp() {
         activity = Robolectric.buildActivity(SettingsActivity.class).create().get();
         sharedPrefs = ShadowPreferenceManager.getDefaultSharedPreferences(Robolectric.application.getApplicationContext());
         prefs = new AndroidPreferences(activity.getApplicationContext(), sharedPrefs);
-        FragmentTestUtil.startFragment(mainPreferenceFragment, SettingsActivity.class);
     }
 
     private void setValidMongoOnlyWithIntentResult(){
