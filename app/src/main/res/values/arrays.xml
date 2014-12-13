@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="perf_verticle_axis_values">
+    <string-array name="perf_verticle_axis_values" translatable="false">
         <item>0</item>
         <item>1</item>
     </string-array>
     
     <!-- Low range setting (60-120)-->
-    <string name="pref_title_low_range">Low Range</string>
-    <string-array name="perf_low_range_entries">
+    <string name="pref_title_low_range" translatable="false">Low Range</string>
+    <string-array name="perf_low_range_entries" translatable="false">
         <item>60</item>
         <item>65</item>
         <item>70</item>
@@ -24,8 +24,8 @@
     </string-array>
 
     <!-- High range setting (160-250)-->
-    <string name="pref_title_high_range">High Range</string>
-    <string-array name="perf_high_range_entries">
+    <string name="pref_title_high_range" translatable="false">High Range</string>
+    <string-array name="perf_high_range_entries" translatable="false">
         <item>160</item>
         <item>170</item>
         <item>180</item>
@@ -39,7 +39,7 @@
     </string-array>
 
     <!-- Low range setting mmol(3.4-6.8)-->
-    <string-array name="perf_low_range_entries_mmol">
+    <string-array name="perf_low_range_entries_mmol" translatable="false">
         <item>3.4</item>
         <item>3.6</item>
         <item>3.8</item>
@@ -61,7 +61,7 @@
         </string-array>
 
     <!-- High range setting mmol (9.0-14)-->
-    <string-array name="perf_high_range_entries_mmol">
+    <string-array name="perf_high_range_entries_mmol" translatable="false">
         <item>9.0</item>
         <item>9.5</item>
         <item>10.0</item>
