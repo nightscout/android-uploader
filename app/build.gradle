@@ -13,7 +13,7 @@ apply plugin: 'robolectric'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion '21.1.1'
+    buildToolsVersion '21.1.2'
 
     defaultConfig {
         applicationId "com.nightscout.android"
@@ -24,6 +24,7 @@ android {
     lintOptions {
         quiet false
         checkAllWarnings true
+        warningsAsErrors false
         abortOnError true
         textReport true
         textOutput 'stdout'

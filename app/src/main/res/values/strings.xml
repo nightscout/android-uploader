@@ -44,6 +44,7 @@
     <string name="invalid_rest_uri">Invalid rest url %s, please double check formatting.</string>
     <string name="rest_uri_missing_token">Missing token for rest uri %s.</string>
     <string name="invalid_input_title">Invalid Input</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="version_unknown">Unknown version</string>
+    <string name="default_pwd_name">Camping</string>
 </resources>

@@ -31,9 +31,6 @@ public interface NightscoutPreferences {
 
     String getMongoDeviceStatusCollection();
 
-    void setMongoClientUri(String mongoClientUri);
-    void setRestApiBaseUris(List<String> restApis);
-    void setMongoCollection(String sgvCollection);
     void setMongoDeviceStatusCollection(String deviceStatusCollection);
 
     boolean getIUnderstand();

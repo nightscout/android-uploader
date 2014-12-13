@@ -5,7 +5,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.nightscout.android.MainActivity">
+    tools:context="com.nightscout.android.MainActivity"
+    android:background="#ff000000">
 
     <TextView
         android:layout_width="fill_parent"
@@ -14,10 +15,12 @@
         android:text="@string/unknown_values"
         android:id="@+id/sgValue"
         android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
         android:textSize="@android:dimen/notification_large_icon_width"
         android:singleLine="true"
         android:gravity="center|center_vertical|center_horizontal"
         android:layout_alignParentRight="false"
+        android:layout_alignParentEnd="false"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -28,6 +31,7 @@
         android:id="@+id/timeAgo"
         android:layout_alignParentTop="false"
         android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
         android:gravity="center|center_vertical|center_horizontal"
         android:singleLine="true"
         android:layout_alignTop="@+id/sgValue"
@@ -39,9 +43,12 @@
         android:layout_height="match_parent"
         android:id="@+id/webView"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/timeAgo"
         android:layout_alignRight="@+id/timeAgo"
+        android:layout_alignEnd="@+id/timeAgo"
         android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="false"
         android:layout_marginBottom="45dp" />
 
