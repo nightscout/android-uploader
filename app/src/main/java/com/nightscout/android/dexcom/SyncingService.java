@@ -157,7 +157,7 @@ public class SyncingService extends IntentService {
                 JSONArray array = new JSONArray();
                 for (int i = 0; i < recentRecords.length; i++) array.put(recentRecords[i].toJSON());
 
-                NightscoutPreferences preferences = new AndroidPreferences(prefs);
+                NightscoutPreferences preferences = new AndroidPreferences(getApplicationContext());
                 Uploader uploader = new Uploader(mContext, preferences);
                 // TODO: This should be cleaned up, 5 should be a constant, maybe handle in uploader,
                 // and maybe might not have to read 5 pages (that was only done for single sync for UI

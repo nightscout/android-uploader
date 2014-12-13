@@ -104,7 +104,7 @@ public class NSBarcodeConfigTest {
     @Test
     public void testMongoDefaultCollectionSetWithMongoConfig() {
         setValidMongoOnlyNoCollections();
-        assertThat(barcode.getMongoCollection().get(), is("cgm_data"));
+        assertThat(barcode.getMongoCollection().get(), is("entries"));
     }
 
     @Test

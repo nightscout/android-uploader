@@ -4,9 +4,9 @@ import android.content.Context;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 
-public class OpenSourceDialog extends DialogPreference {
+public class SimpleDialogPreference extends DialogPreference {
 
-    public OpenSourceDialog(Context context, AttributeSet attrs) {
+    public SimpleDialogPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 }

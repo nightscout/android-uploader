@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.*;
 import android.hardware.usb.UsbManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -21,9 +22,13 @@ import android.widget.TextView;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.preferences.PreferenceKeys;
+import com.nightscout.android.preferences.PreferencesValidator;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.android.wearables.Pebble;
 import com.nightscout.core.dexcom.Constants;
@@ -31,6 +36,7 @@ import com.nightscout.core.dexcom.SpecialValue;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.utils.RestUriUtils;
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.acra.ACRAConfigurationException;
@@ -38,8 +44,10 @@ import org.acra.ReportingInteractionMode;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 import static org.joda.time.Duration.standardMinutes;
@@ -58,6 +66,8 @@ public class MainActivity extends Activity {
     private String mJSONData;
     private long lastRecordTime = -1;
     private long receiverOffsetFromUploader = 0;
+
+    private NightscoutPreferences preferences;
 
     // Analytics mTracker
     private Tracker mTracker;
@@ -80,6 +90,11 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG,"OnCreate called.");
+
+        preferences = new AndroidPreferences(getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
+        migrateToNewStyleRestUris();
+        ensureSavedUrisAreValid();
+        ensureIUnderstandDialogDisplayed();
 
         // Add timezone ID to ACRA report
         ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
@@ -141,8 +156,10 @@ public class MainActivity extends Activity {
 
         // Check (only once) to see if they have opted in to shared data for research
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        final NightscoutPreferences preferences = new AndroidPreferences(prefs);
-        if (!preferences.isDataDonateEnabled()) {
+        if (!prefs.getBoolean("donate_data_query", false)) {
+
+            final NightscoutPreferences preferences = new AndroidPreferences(getApplicationContext());
+
             // Prompt user to ask to donate data to research
             AlertDialog.Builder dataDialog = new AlertDialog.Builder(this)
                     .setCancelable(false)
@@ -179,7 +196,7 @@ public class MainActivity extends Activity {
                 if (baseURL.isEmpty()) continue;
                 baseURIs.add(baseURL + (baseURL.endsWith("/") ? "" : "/"));
                 String apiVersion;
-                apiVersion=(baseURL.endsWith("/v1/"))?"WebAPIv1":"Legacy WebAPI";
+                apiVersion = (RestUriUtils.isV1Uri(URI.create(baseURL))) ? "WebAPIv1" : "Legacy WebAPI";
                 mTracker.send(new HitBuilders.EventBuilder("Upload", apiVersion).build());
             }
         }
@@ -190,6 +207,60 @@ public class MainActivity extends Activity {
         pebble.setUnits(preferences.getPreferredUnits());
         pebble.setPwdName(preferences.getPwdName());
 
+    }
+
+    private void migrateToNewStyleRestUris() {
+        List<String> newUris = Lists.newArrayList();
+        for (String uriString : preferences.getRestApiBaseUris()) {
+            if (uriString.contains("@http")) {
+                List<String> splitUri = Splitter.on('@').splitToList(uriString);
+                Uri oldUri = Uri.parse(splitUri.get(1));
+                String newAuthority = Joiner.on('@').join(splitUri.get(0), oldUri.getEncodedAuthority());
+                Uri newUri = oldUri.buildUpon().encodedAuthority(newAuthority).build();
+                newUris.add(newUri.toString());
+            } else {
+                newUris.add(uriString);
+            }
+        }
+        preferences.setRestApiBaseUris(newUris);
+    }
+
+    private void ensureSavedUrisAreValid() {
+        if (PreferencesValidator.validateMongoUriSyntax(getApplicationContext(),
+                preferences.getMongoClientUri()).isPresent()) {
+            preferences.setMongoClientUri(null);
+        }
+        List<String> filteredRestUris = Lists.newArrayList();
+        for (String uri : preferences.getRestApiBaseUris()) {
+            if (!PreferencesValidator.validateRestApiUriSyntax(getApplicationContext(), uri).isPresent()) {
+                filteredRestUris.add(uri);
+            }
+        }
+        preferences.setRestApiBaseUris(filteredRestUris);
+    }
+
+    private void ensureIUnderstandDialogDisplayed() {
+        if (!preferences.getIUnderstand()) {
+            final Activity activity = this;
+            // Prompt user to ask to donate data to research
+            AlertDialog.Builder dataDialog = new AlertDialog.Builder(this)
+                    .setCancelable(false)
+                    .setTitle(R.string.pref_title_i_understand)
+                    .setMessage(R.string.pref_summary_i_understand)
+                    .setPositiveButton(R.string.donate_dialog_yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            preferences.setIUnderstand(true);
+                        }
+                    })
+                    .setNegativeButton(R.string.donate_dialog_no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            android.os.Process.killProcess(android.os.Process.myPid());
+                            System.exit(1);
+                        }
+                    })
+                    .setIcon(R.drawable.ic_launcher);
+            dataDialog.show();
+        }
     }
 
     @Override
@@ -224,7 +295,7 @@ public class MainActivity extends Activity {
             mTextSGV.setText(getSGVStringByUnit(sgv, TrendArrow.values()[direction]));
         }
 
-        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) +  ")");
+        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) + ")");
 
         mHandler.post(updateTimeAgo);
         // FIXME: (klee) need to find a better way to do this. Too many things are hooking in here.
@@ -409,7 +480,7 @@ public class MainActivity extends Activity {
                 timeAgoStr = "---";
             }
             else if (delta < 0) {
-                timeAgoStr = "Time change detected";
+                timeAgoStr = getString(R.string.TimeChangeDetected);
             }
             else {
                 timeAgoStr = Utils.getTimeString(delta);
