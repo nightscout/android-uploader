@@ -3,20 +3,14 @@ package com.nightscout.android.barcode;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v4.app.FragmentActivity;
-
 import com.google.common.collect.Lists;
+import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.integration.android.IntentIntegrator;
+import com.nightscout.android.R;
 import com.nightscout.android.preferences.AndroidPreferences;
-import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.android.test.RobolectricTestBase;
-import com.nightscout.core.barcode.NSBarcodeConfig;
-import com.nightscout.core.barcode.NSBarcodeConfigKeys;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.junit.After;
+import com.nightscout.core.preferences.NightscoutPreferences;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +18,6 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowPreferenceManager;
-import org.robolectric.util.FragmentTestUtil;
 
 import java.util.List;
 
@@ -36,140 +29,225 @@ import static org.junit.Assert.assertThat;
 public class AndroidBarcodeTest extends RobolectricTestBase {
     Activity activity;
     SharedPreferences sharedPrefs;
-    private SettingsActivity.MainPreferenceFragment mainPreferenceFragment;
+    String jsonConfig = null;
+    NightscoutPreferences prefs;
 
     @Before
     public void setUp() {
         activity = Robolectric.buildActivity(SettingsActivity.class).create().get();
         sharedPrefs = ShadowPreferenceManager.getDefaultSharedPreferences(Robolectric.application.getApplicationContext());
-        mainPreferenceFragment = new SettingsActivity.MainPreferenceFragment();
-        FragmentTestUtil.startFragment(mainPreferenceFragment, SettingsActivity.class);
+        prefs = new AndroidPreferences(activity.getApplicationContext(), sharedPrefs);
+    }
+
+    private void setValidMongoOnlyWithIntentResult(){
+        jsonConfig = "{'mongo':{'uri':'mongodb://user:pass@test.com/cgm_data'}}";
+        fakeActivityResult();
+    }
+
+    private void setSingleValidApiOnlyWithIntentResult(){
+        jsonConfig = "{'rest':{'endpoint':['http://abc@test.com/v1']}}";
+        fakeActivityResult();
+    }
+
+    private void setSingleValidApiAndMongoWithIntentResult(){
+        jsonConfig = "{'mongo':{'uri':'mongodb://user:pass@test.com/cgm_data'}, 'rest':{'endpoint':['http://abc@test.com/']}}";
+        fakeActivityResult();
+    }
+
+    private void setMultipleValidApiOnlyWithIntentResult(){
+        jsonConfig = "{'rest':{'endpoint':['http://abc@test.com/v1', 'http://test.com/']}}";
+        fakeActivityResult();
+    }
+
+    private void setEmptyValidApiOnlyWithIntentResult(){
+        jsonConfig = "{'rest':{'endpoint':[]}}";
+        fakeActivityResult();
+    }
+
+    private void setEmptyValidMongoOnlyWithIntentResult(){
+        jsonConfig = "{'mongo':{}}";
+        fakeActivityResult();
+    }
+
+    private void setInvalidConfigWithValidJson(){
+        jsonConfig = "{'some':{'random':['values']}}";
+        fakeActivityResult();
+    }
+
+    private void setInvalidJsonWithIntentResult(){
+        jsonConfig = "{foo bar";
+        fakeActivityResult();
+    }
+
+    private void fakeActivityResult(){
+        Intent intent = createFakeScanIntent(jsonConfig);
+        new SettingsActivity().onActivityResult(IntentIntegrator.REQUEST_CODE, Activity.RESULT_OK, intent);
     }
 
     @Test
-    public void shouldSetMongoPrefsOnScanResult() throws Exception {
-        String mongoUri = "mongodb://user:pass@test.com/cgm_data";
-        String mongoCollection = "cgm_data";
-        String deviceStatusCollection = "devicestatus";
-        JSONObject json = new JSONObject();
-        JSONObject child = new JSONObject();
-        child.put(NSBarcodeConfigKeys.MONGO_URI, mongoUri);
-        child.put(NSBarcodeConfigKeys.MONGO_COLLECTION, mongoCollection);
-        child.put(NSBarcodeConfigKeys.MONGO_DEVICE_STATUS_COLLECTION, deviceStatusCollection);
-        json.put(NSBarcodeConfigKeys.MONGO_CONFIG,child);
-        System.out.println(json.toString());
-        Intent intent = createFakeScanIntent(json.toString());
-        mainPreferenceFragment.onActivityResult(IntentIntegrator.REQUEST_CODE, Activity.RESULT_OK, intent);
-        assertThat(sharedPrefs.getBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED, false), is(true));
-        assertThat(sharedPrefs.getString(PreferenceKeys.MONGO_URI, null), is(mongoUri));
-        assertThat(sharedPrefs.getString(PreferenceKeys.MONGO_COLLECTION, null), is(mongoCollection));
-        assertThat(sharedPrefs.getString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION, null), is(deviceStatusCollection));
-
-        assertThat(sharedPrefs.getBoolean(PreferenceKeys.API_UPLOADER_ENABLED, true), is(false));
+    public void mongoConfigShouldMongoEnablePrefsOnScanResult() throws Exception {
+        setValidMongoOnlyWithIntentResult();
+        assertThat(prefs.isMongoUploadEnabled(), is(true));
     }
 
     @Test
-    public void shouldSetApiPrefsOnScanResult() throws Exception{
-        String apiUri="http://abc@test.com/v1";
-        JSONObject json = new JSONObject();
-        JSONObject child = new JSONObject();
-        child.put(NSBarcodeConfigKeys.API_URI,apiUri);
-        JSONArray jsonArray = new JSONArray();
-        jsonArray.put(0,child);
-        json.put(NSBarcodeConfigKeys.API_CONFIG,jsonArray);
-
-        Intent intent = createFakeScanIntent(json.toString());
-        mainPreferenceFragment.onActivityResult(IntentIntegrator.REQUEST_CODE, Activity.RESULT_OK, intent);
-        assertThat(sharedPrefs.getBoolean(PreferenceKeys.API_UPLOADER_ENABLED,false),is(true));
-        assertThat(sharedPrefs.getString(PreferenceKeys.API_URIS,null),is(apiUri));
-
-        // Check to make sure that the mongo uploader was not enabled
-        assertThat(sharedPrefs.getBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED,true),is(false));
+    public void mongoConfigShouldSetMongoUriPrefsOnScanResult() throws Exception {
+        setValidMongoOnlyWithIntentResult();
+        assertThat(prefs.getMongoClientUri(), is("mongodb://user:pass@test.com/cgm_data"));
     }
 
     @Test
-    public void shouldSetMultipleApiPrefsOnScanResult() throws Exception {
-        List<String> uris=Lists.newArrayList();
-        uris.add("http://abc@test.com/v1");
-        uris.add("http://test.com/");
-        JSONObject json = new JSONObject();
-        JSONObject child = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
-        child.put(NSBarcodeConfigKeys.API_URI,uris.get(0));
-        jsonArray.put(0,child);
-        child = new JSONObject();
-        child.put(NSBarcodeConfigKeys.API_URI,uris.get(1));
-        jsonArray.put(1,child);
-        json.put(NSBarcodeConfigKeys.API_CONFIG,jsonArray);
-
-        Intent intent = createFakeScanIntent(json.toString());
-        mainPreferenceFragment.onActivityResult(IntentIntegrator.REQUEST_CODE, Activity.RESULT_OK, intent);
-        assertThat(sharedPrefs.getBoolean(PreferenceKeys.API_UPLOADER_ENABLED,false),is(true));
-        // May not be good - lists don't have a guaranteed order?
-        assertThat(Lists.newArrayList(sharedPrefs.getString(PreferenceKeys.API_URIS,null).split(" ")),is(uris));
-
-        // Check to make sure that the mongo uploader was not enabled
-        assertThat(sharedPrefs.getBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED,true),is(false));
+    public void mongoConfigShouldNotEnableApiPrefsOnScanResult() throws Exception {
+        setValidMongoOnlyWithIntentResult();
+        assertThat(prefs.isRestApiEnabled(), is(false));
     }
 
     @Test
-    public void shouldSetMongoAndApiPrefsOnScanResult() throws Exception {
-        String apiUri="http://abc@test.com/";
-        String mongoUri = "mongodb://user:pass@test.com/cgm_data";
-        String mongoCollection = "cgm_data";
-        String deviceStatusCollection = "devicestatus";
-        JSONObject json = new JSONObject();
-        JSONObject child = new JSONObject();
-        child.put(NSBarcodeConfigKeys.MONGO_URI, mongoUri);
-        child.put(NSBarcodeConfigKeys.MONGO_COLLECTION, mongoCollection);
-        child.put(NSBarcodeConfigKeys.MONGO_DEVICE_STATUS_COLLECTION, deviceStatusCollection);
-        json.put(NSBarcodeConfigKeys.MONGO_CONFIG, child);
-        child.put(NSBarcodeConfigKeys.API_URI, apiUri);
-        JSONArray jsonArray = new JSONArray();
-        jsonArray.put(0, child);
-        json.put(NSBarcodeConfigKeys.API_CONFIG, jsonArray);
-        json.put(NSBarcodeConfigKeys.MONGO_CONFIG, child);
-
-        Intent intent = createFakeScanIntent(json.toString());
-        mainPreferenceFragment.onActivityResult(IntentIntegrator.REQUEST_CODE, Activity.RESULT_OK, intent);
-        assertThat(sharedPrefs.getBoolean(PreferenceKeys.API_UPLOADER_ENABLED,false), is(true));
-        assertThat(sharedPrefs.getString(PreferenceKeys.API_URIS,null), is(apiUri));
-
-        // Check to make sure that the mongo uploader was not enabled
-        assertThat(sharedPrefs.getBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED,false),is(true));
+    public void apiConfigShouldEnableApiPrefsOnScanResult() throws Exception{
+        setSingleValidApiOnlyWithIntentResult();
+        assertThat(prefs.isRestApiEnabled(), is(true));
     }
+
+    @Test
+    public void apiConfigShouldSetApiPrefsOnScanResult() throws Exception{
+        setSingleValidApiOnlyWithIntentResult();
+        List<String> uris = Lists.newArrayList("http://abc@test.com/v1");
+        assertThat(prefs.getRestApiBaseUris(), is(uris));
+    }
+
+    @Test
+    public void apiConfigShouldNotSetMongoPrefsOnScanResult() throws Exception{
+        setSingleValidApiOnlyWithIntentResult();
+        assertThat(prefs.isMongoUploadEnabled(), is(false));
+    }
+
+    @Test
+    public void multipleApiUriConfigShouldEnableApiPrefsOnScanResult() throws Exception {
+        setMultipleValidApiOnlyWithIntentResult();
+        assertThat(prefs.isRestApiEnabled(), is(true));
+    }
+
+    @Test
+    public void multipleApiUriConfigShouldNotEnableMongoPrefsOnScanResult() throws Exception {
+        setMultipleValidApiOnlyWithIntentResult();
+        assertThat(prefs.isMongoUploadEnabled(), is(false));
+    }
+
+    @Test
+    public void multipleValidApiUriConfigShouldEnableApiUriPrefsOnScanResult() throws Exception {
+        setMultipleValidApiOnlyWithIntentResult();
+        assertThat(prefs.isRestApiEnabled(), is(true));
+    }
+
+    @Test
+    public void multipleValidApiUriConfigShouldSetApiUriPrefsOnScanResult() throws Exception {
+        List<String> uris = Lists.newArrayList("http://abc@test.com/v1", "http://test.com/");
+        setMultipleValidApiOnlyWithIntentResult();
+        assertThat(prefs.getRestApiBaseUris(), is(uris));
+    }
+
+    @Test
+    public void mongoAndApiConfigShouldEnableApiPrefsOnScanResult() throws Exception {
+        setSingleValidApiAndMongoWithIntentResult();
+        assertThat(prefs.isRestApiEnabled(), is(true));
+    }
+
+    @Test
+    public void mongoAndApiConfigShouldEnableMongoPrefsOnScanResult() throws Exception {
+        setSingleValidApiAndMongoWithIntentResult();
+        assertThat(prefs.isMongoUploadEnabled(), is(true));
+    }
+
+    @Test
+    public void mongoAndApiConfigShouldSetMongoPrefsOnScanResult() throws Exception {
+        setSingleValidApiAndMongoWithIntentResult();
+        assertThat(prefs.getMongoClientUri(), is("mongodb://user:pass@test.com/cgm_data"));
+    }
+
+    @Test
+    public void mongoAndApiConfigShouldSetApiPrefsOnScanResult() throws Exception {
+        setSingleValidApiAndMongoWithIntentResult();
+        List<String> uris = Lists.newArrayList("http://abc@test.com/");
+        assertThat(prefs.getRestApiBaseUris(), is(uris));
+    }
+
 
     @Test
     public void shouldStartScanActivity(){
         AndroidBarcode barcode = new AndroidBarcode(activity);
         barcode.scan();
         Intent intent = getShadowApplication().getNextStartedActivity();
-        assertThat(intent.getComponent().getClassName(), is(com.google.zxing.client.android.CaptureActivity.class.getName()));
+        assertThat(intent.getComponent().getClassName(), is(CaptureActivity.class.getName()));
     }
 
     @Test
-    public void shouldSetDefaultCollectionsForOnlyMongoUriSet(){
-        String jsonConfig = "{\""+NSBarcodeConfigKeys.MONGO_CONFIG+"\":{\""+NSBarcodeConfigKeys.MONGO_URI+"\":\"mongodb://user:pass@test.com/cgm_data\"}}";
-        AndroidPreferences androidPreferences = new AndroidPreferences(sharedPrefs);
-        NSBarcodeConfig barcode = new NSBarcodeConfig(jsonConfig, androidPreferences);
-        assertThat(barcode.getMongoCollection().isPresent(),is(true));
-        assertThat(barcode.getMongoDeviceStatusCollection().isPresent(),is(true));
-        assertThat(barcode.getMongoCollection().get(), is(androidPreferences.getDefaultMongoCollection()));
-        assertThat(barcode.getMongoDeviceStatusCollection().get(), is(androidPreferences.getDefaultMongoDeviceStatusCollection()));
+    public void validMongoOnlyShouldSetDefaultSgCollectionForOnlyMongoUriSet(){
+        setValidMongoOnlyWithIntentResult();
+        assertThat(prefs.getMongoCollection(), is(getShadowApplication().getApplicationContext().getString(R.string.pref_default_mongodb_collection)));
+    }
+
+    @Test
+    public void validMongoOnlyShouldSetDefaultDeviceStatusCollectionForOnlyMongoUriSet(){
+        setValidMongoOnlyWithIntentResult();
+        assertThat(prefs.getMongoDeviceStatusCollection(), is(getShadowApplication().getApplicationContext()
+                        .getString(R.string.pref_default_mongodb_device_status_collection)));
+    }
+
+    @Test
+    public void invalidJsonShouldNotEnableMongo(){
+        setInvalidJsonWithIntentResult();
+        assertThat(prefs.isMongoUploadEnabled(), is(false));
+    }
+
+    @Test
+    public void invalidJsonShouldNotEnableApi(){
+        setInvalidJsonWithIntentResult();
+        assertThat(prefs.isRestApiEnabled(), is(false));
+    }
+
+    @Test
+    public void setEmptyApiConfigShouldNotEnableApi(){
+        setEmptyValidApiOnlyWithIntentResult();
+        assertThat(prefs.isRestApiEnabled(), is(false));
+    }
+
+    @Test
+    public void setEmptyApiConfigShouldNotEnableMongo(){
+        setEmptyValidApiOnlyWithIntentResult();
+        assertThat(prefs.isMongoUploadEnabled(), is(false));
+    }
+
+    @Test
+    public void setEmptyMongoConfigShouldNotEnableApi(){
+        setEmptyValidMongoOnlyWithIntentResult();
+        assertThat(prefs.isRestApiEnabled(), is(false));
+    }
+
+    @Test
+    public void setEmptyMongoConfigShouldNotEnableMongo(){
+        setEmptyValidMongoOnlyWithIntentResult();
+        assertThat(prefs.isMongoUploadEnabled(), is(false));
+    }
+
+    @Test
+    public void invalidConfigShouldNotEnableMongo(){
+        setInvalidConfigWithValidJson();
+        assertThat(prefs.isMongoUploadEnabled(), is(false));
+    }
+
+    @Test
+    public void invalidConfigShouldNotEnableApi(){
+        setInvalidConfigWithValidJson();
+        assertThat(prefs.isRestApiEnabled(), is(false));
     }
 
     private Intent createFakeScanIntent(String jsonString){
         Intent intent = new Intent(AndroidBarcode.SCAN_INTENT);
-        intent.putExtra("SCAN_RESULT",jsonString);
+        intent.putExtra("SCAN_RESULT", jsonString);
         intent.putExtra("SCAN_RESULT_FORMAT", "");
         intent.putExtra("SCAN_RESULT_BYTES", new byte[0]);
         intent.putExtra("SCAN_RESULT_ORIENTATION", Integer.MIN_VALUE);
         intent.putExtra("SCAN_RESULT_ERROR_CORRECTION_LEVEL", "");
         return intent;
-    }
-
-    @After
-    public void tearDown(){
-        sharedPrefs = null;
     }
 }

@@ -36,7 +36,6 @@ import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.RestUriUtils;
-
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.acra.ACRAConfigurationException;
@@ -90,7 +89,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         Log.d(TAG,"OnCreate called.");
 
-        preferences = new AndroidPreferences(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
+        preferences = new AndroidPreferences(getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
         migrateToNewStyleRestUris();
         ensureSavedUrisAreValid();
         ensureIUnderstandDialogDisplayed();
@@ -156,6 +155,9 @@ public class MainActivity extends Activity {
         // Check (only once) to see if they have opted in to shared data for research
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         if (!prefs.getBoolean("donate_data_query", false)) {
+
+            final NightscoutPreferences preferences = new AndroidPreferences(getApplicationContext());
+
             // Prompt user to ask to donate data to research
             AlertDialog.Builder dataDialog = new AlertDialog.Builder(this)
                     .setCancelable(false)
@@ -282,7 +284,7 @@ public class MainActivity extends Activity {
             mTextSGV.setText(getSGVStringByUnit(sgv, TrendArrow.values()[direction]));
         }
 
-        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) +  ")");
+        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) + ")");
 
         mHandler.post(updateTimeAgo);
         // FIXME: (klee) need to find a better way to do this. Too many things are hooking in here.

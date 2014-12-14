@@ -1,8 +1,10 @@
 package com.nightscout.android.preferences;
 
+import android.content.Context;
 import android.content.SharedPreferences;
-
+import android.preference.PreferenceManager;
 import com.google.common.base.Joiner;
+import com.nightscout.android.R;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.RestUriUtils;
 
@@ -10,10 +12,18 @@ import java.util.List;
 
 public class AndroidPreferences implements NightscoutPreferences {
     private final SharedPreferences preferences;
+    private Context context;
 
-    public AndroidPreferences(SharedPreferences preferences) {
-        this.preferences = preferences;
+    public AndroidPreferences(Context context){
+        this.context = context;
+        this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
+
+    public AndroidPreferences(Context context, SharedPreferences prefs){
+        this.context = context;
+        this.preferences = prefs;
+    }
+
 
     @Override
     public boolean isRestApiEnabled() {
@@ -75,26 +85,31 @@ public class AndroidPreferences implements NightscoutPreferences {
         return preferences.getString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION, getDefaultMongoDeviceStatusCollection());
     }
 
+    /**
+     * Enable mongo upload in shared preferences
+     *
+     * @param mongoUploadEnabled whether or not to upload directly to mongo
+     */
     @Override
     public void setMongoUploadEnabled(boolean mongoUploadEnabled){
-        preferences.edit().putBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED,mongoUploadEnabled).apply();
+        preferences.edit().putBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED, mongoUploadEnabled).apply();
     }
 
     @Override
     public void setRestApiEnabled(boolean restApiEnabled){
-        preferences.edit().putBoolean(PreferenceKeys.API_UPLOADER_ENABLED,restApiEnabled).apply();
+        preferences.edit().putBoolean(PreferenceKeys.API_UPLOADER_ENABLED, restApiEnabled).apply();
     }
 
     // Can't get Robolectric to read from resources
     @Override
     public String getDefaultMongoCollection() {
-        return DEFAULT_MONGO_COLLECTION;
+        return context.getString(R.string.pref_default_mongodb_collection);
     }
 
     // Can't get Robolectric to read from resources
     @Override
     public String getDefaultMongoDeviceStatusCollection() {
-        return DEFAULT_MONGO_DEVICE_STATUS_COLLECTION;
+        return context.getString(R.string.pref_default_mongodb_device_status_collection);
     }
 
     @Override
@@ -112,7 +127,6 @@ public class AndroidPreferences implements NightscoutPreferences {
         preferences.edit().putString(PreferenceKeys.MONGO_COLLECTION, sgvCollection).apply();
     }
 
-    @Override
     public boolean getIUnderstand() {
         return preferences.getBoolean(PreferenceKeys.I_UNDERSTAND, false);
     }

@@ -33,11 +33,6 @@ public interface NightscoutPreferences {
     boolean getIUnderstand();
     void setIUnderstand(boolean bool);
 
-    // Unable to load values from res files for Robolectric tests
-    public static final String DEFAULT_MONGO_COLLECTION = "cgm_data";
-    public static final String DEFAULT_MONGO_DEVICE_STATUS_COLLECTION = "devicestatus";
-
-
     String getDefaultMongoCollection();
     String getDefaultMongoDeviceStatusCollection();
 
