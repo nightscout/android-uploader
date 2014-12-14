@@ -3,6 +3,7 @@ package com.nightscout.android.preferences;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+
 import com.google.common.base.Joiner;
 import com.nightscout.android.R;
 import com.nightscout.core.preferences.NightscoutPreferences;
@@ -14,12 +15,11 @@ public class AndroidPreferences implements NightscoutPreferences {
     private final SharedPreferences preferences;
     private Context context;
 
-    public AndroidPreferences(Context context){
-        this.context = context;
-        this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
+    public AndroidPreferences(Context context) {
+        this(context, PreferenceManager.getDefaultSharedPreferences(context));
     }
 
-    public AndroidPreferences(Context context, SharedPreferences prefs){
+    public AndroidPreferences(Context context, SharedPreferences prefs) {
         this.context = context;
         this.preferences = prefs;
     }
@@ -91,24 +91,20 @@ public class AndroidPreferences implements NightscoutPreferences {
      * @param mongoUploadEnabled whether or not to upload directly to mongo
      */
     @Override
-    public void setMongoUploadEnabled(boolean mongoUploadEnabled){
+    public void setMongoUploadEnabled(boolean mongoUploadEnabled) {
         preferences.edit().putBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED, mongoUploadEnabled).apply();
     }
 
     @Override
-    public void setRestApiEnabled(boolean restApiEnabled){
+    public void setRestApiEnabled(boolean restApiEnabled) {
         preferences.edit().putBoolean(PreferenceKeys.API_UPLOADER_ENABLED, restApiEnabled).apply();
     }
 
-    // Can't get Robolectric to read from resources
-    @Override
-    public String getDefaultMongoCollection() {
+    private String getDefaultMongoCollection() {
         return context.getString(R.string.pref_default_mongodb_collection);
     }
 
-    // Can't get Robolectric to read from resources
-    @Override
-    public String getDefaultMongoDeviceStatusCollection() {
+    private String getDefaultMongoDeviceStatusCollection() {
         return context.getString(R.string.pref_default_mongodb_device_status_collection);
     }
 
@@ -127,6 +123,7 @@ public class AndroidPreferences implements NightscoutPreferences {
         preferences.edit().putString(PreferenceKeys.MONGO_COLLECTION, sgvCollection).apply();
     }
 
+    @Override
     public boolean getIUnderstand() {
         return preferences.getBoolean(PreferenceKeys.I_UNDERSTAND, false);
     }

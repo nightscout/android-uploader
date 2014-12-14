@@ -3,7 +3,12 @@ package com.nightscout.android;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.hardware.usb.UsbManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +24,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -36,6 +42,7 @@ import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.RestUriUtils;
+
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.acra.ACRAConfigurationException;
@@ -155,9 +162,6 @@ public class MainActivity extends Activity {
         // Check (only once) to see if they have opted in to shared data for research
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         if (!prefs.getBoolean("donate_data_query", false)) {
-
-            final NightscoutPreferences preferences = new AndroidPreferences(getApplicationContext());
-
             // Prompt user to ask to donate data to research
             AlertDialog.Builder dataDialog = new AlertDialog.Builder(this)
                     .setCancelable(false)
