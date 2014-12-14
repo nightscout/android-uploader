@@ -3,6 +3,7 @@ package com.nightscout.core.barcode;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.nightscout.core.preferences.NightscoutPreferences;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,14 +58,14 @@ public class NSBarcodeConfig {
                 jsonArray = config.getJSONObject(NSBarcodeConfigKeys.API_CONFIG)
                         .getJSONArray(NSBarcodeConfigKeys.API_URI);
             } catch (JSONException e) {
-                log.error("Invalid json array: "+ config.toString());
+                log.error("Invalid json array: " + config.toString());
                 return apiUris;
             }
             for (int index = 0; index < jsonArray.length(); index++) {
                 try {
                     apiUris.add(jsonArray.getString(index));
                 } catch (JSONException e) {
-                    log.error("Invalid child json object: "+ config.toString());
+                    log.error("Invalid child json object: " + config.toString());
                 }
             }
         }
@@ -75,7 +76,7 @@ public class NSBarcodeConfig {
         if (! hasMongoConfig()) {
             return Optional.absent();
         }
-        String mongoCollection = prefs.getDefaultMongoCollection();
+        String mongoCollection = null;
         try {
             if (config.getJSONObject(NSBarcodeConfigKeys.MONGO_CONFIG).has(NSBarcodeConfigKeys.MONGO_COLLECTION)) {
                 mongoCollection = config.getJSONObject(NSBarcodeConfigKeys.MONGO_CONFIG)
@@ -85,14 +86,14 @@ public class NSBarcodeConfig {
             // Should not see this
             log.warn("JSON exception: ", e);
         }
-        return Optional.of(mongoCollection);
+        return Optional.fromNullable(mongoCollection);
     }
 
     public Optional<String> getMongoDeviceStatusCollection(){
         if (! config.has(NSBarcodeConfigKeys.MONGO_CONFIG)) {
             return Optional.absent();
         }
-        String deviceStatusCollection = prefs.getDefaultMongoDeviceStatusCollection();
+        String deviceStatusCollection = null;
         try {
             if (config.has(NSBarcodeConfigKeys.MONGO_CONFIG) &&
                     config.getJSONObject(NSBarcodeConfigKeys.MONGO_CONFIG).has(NSBarcodeConfigKeys.MONGO_COLLECTION)) {
@@ -101,9 +102,9 @@ public class NSBarcodeConfig {
             }
         } catch (JSONException e) {
             // Should not see this
-            log.warn("JSON exception: ",e);
+            log.warn("JSON exception: ", e);
         }
-        return Optional.of(deviceStatusCollection);
+        return Optional.fromNullable(deviceStatusCollection);
     }
 
     public boolean hasMongoConfig(){

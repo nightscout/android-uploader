@@ -3,6 +3,7 @@ package com.nightscout.core.barcode;
 
 import com.google.common.collect.Lists;
 import com.nightscout.core.preferences.TestPreferences;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,61 +26,61 @@ public class NSBarcodeConfigTest {
         prefs = new TestPreferences();
     }
 
-    private void setBarcode(){
+    private void setBarcode() {
         barcode = new NSBarcodeConfig(jsonConfig, prefs);
     }
 
-    private void setValidMongoOnlyNoCollections(){
-        jsonConfig = "{\"mongo\":{\"uri\":\"mongodb://user:pass@test.com/cgm_data\"}}";
+    private void setValidMongoOnlyNoCollections() {
+        jsonConfig = "{'mongo':{'uri':'mongodb://user:pass@test.com/cgm_data'}}";
         setBarcode();
     }
 
-    private void setSingleValidApiOnly(){
-        jsonConfig = "{\"rest\":{\"endpoint\":[\"http://abc@test.com/v1\"]}}";
+    private void setSingleValidApiOnly() {
+        jsonConfig = "{'rest':{'endpoint':['http://abc@test.com/v1']}}";
         setBarcode();
     }
 
-    private void setSingleValidApiAndMongo(){
-        jsonConfig = "{\"mongo\":{\"uri\":\"mongodb://user:pass@test.com/cgm_data\"}, \"rest\":{\"endpoint\":[\"http://abc@test.com/v1\"]}}";
+    private void setSingleValidApiAndMongo() {
+        jsonConfig = "{'mongo':{'uri':'mongodb://user:pass@test.com/cgm_data'}, 'rest':{'endpoint':['http://abc@test.com/v1']}}";
         setBarcode();
     }
 
-    private void setMultipleValidApiOnly(){
-        jsonConfig = "{\"rest\":{\"endpoint\":[\"http://abc@test.com/v1\", \"http://test.com/\"]}}";
+    private void setMultipleValidApiOnly() {
+        jsonConfig = "{'rest':{'endpoint':['http://abc@test.com/v1', 'http://test.com/']}}";
         setBarcode();
     }
 
-    private void setEmptyValidApiOnly(){
-        jsonConfig = "{\"rest\":{\"endpoint\":[]}}";
+    private void setEmptyValidApiOnly() {
+        jsonConfig = "{'rest':{'endpoint':[]}}";
         setBarcode();
     }
 
-    private void setEmptyValidMongoOnly(){
-        jsonConfig = "{\"mongo\":{}";
+    private void setEmptyValidMongoOnly() {
+        jsonConfig = "{'mongo':{}";
         setBarcode();
     }
 
-    private void setInvalidConfigWithValidJson(){
-        jsonConfig = "{\"some\":{\"random\":[\"values\"]}}";
+    private void setInvalidConfigWithValidJson() {
+        jsonConfig = "{'some':{'random':['values']}}";
         setBarcode();
     }
 
-    private void setInvalidJson(){
+    private void setInvalidJson() {
         jsonConfig = "{foo bar";
         setBarcode();
     }
 
-    private void verifySingleApiUri(){
+    private void verifySingleApiUri() {
         List<String> uris = Lists.newArrayList("http://abc@test.com/v1");
         assertThat(barcode.getApiUris(), is(uris));
     }
 
-    private void verifyMultipleApiUri(){
+    private void verifyMultipleApiUri() {
         List<String> uris = Lists.newArrayList("http://abc@test.com/v1", "http://test.com/");
         assertThat(barcode.getApiUris(), is(uris));
     }
 
-    private void verifyMongoUri(){
+    private void verifyMongoUri() {
         assertThat(barcode.getMongoUri().get(), is("mongodb://user:pass@test.com/cgm_data"));
     }
 
@@ -96,133 +97,121 @@ public class NSBarcodeConfigTest {
     }
 
     @Test
-    public void testMongoUriSetWithMongoConfig(){
+    public void testMongoUriSetWithMongoConfig() {
         setValidMongoOnlyNoCollections();
         verifyMongoUri();
     }
 
     @Test
-    public void testMongoDefaultCollectionSetWithMongoConfig() {
-        setValidMongoOnlyNoCollections();
-        assertThat(barcode.getMongoCollection().get(), is("entries"));
-    }
-
-    @Test
-    public void testMongoDefaultDeviceStatusCollectionSetWithMongoConfig() {
-        setValidMongoOnlyNoCollections();
-        assertThat(barcode.getMongoDeviceStatusCollection().get(), is("devicestatus"));
-    }
-
-    @Test
-    public void testApiEnabledWithApiConfig(){
+    public void testApiEnabledWithApiConfig() {
         setSingleValidApiOnly();
         assertThat(barcode.hasApiConfig(), is(true));
     }
 
     @Test
-    public void testMongoIsNotEnabledWithApiConfig(){
+    public void testMongoIsNotEnabledWithApiConfig() {
         setSingleValidApiOnly();
         assertThat(barcode.hasMongoConfig(), is(false));
     }
 
     @Test
-    public void testApiUriIsSetWithApiConfig(){
+    public void testApiUriIsSetWithApiConfig() {
         setSingleValidApiOnly();
         verifySingleApiUri();
     }
 
     @Test
-    public void testSingleApiUriAndMongoEnablesMongoWithApiAndMongoConfig(){
+    public void testSingleApiUriAndMongoEnablesMongoWithApiAndMongoConfig() {
         setSingleValidApiAndMongo();
         assertThat(barcode.hasMongoConfig(), is(true));
     }
 
     @Test
-    public void testSingleApiUriAndMongoEnablesApiWithApiAndMongoConfig(){
+    public void testSingleApiUriAndMongoEnablesApiWithApiAndMongoConfig() {
         setSingleValidApiAndMongo();
         assertThat(barcode.hasApiConfig(), is(true));
     }
 
     @Test
-    public void testSingleApiUriAndMongoSetsApiWithApiAndMongoConfig(){
+    public void testSingleApiUriAndMongoSetsApiWithApiAndMongoConfig() {
         setSingleValidApiAndMongo();
         verifySingleApiUri();
     }
 
     @Test
-    public void testSingleApiUriAndMongoSetsMongoWithApiAndMongoConfig(){
+    public void testSingleApiUriAndMongoSetsMongoWithApiAndMongoConfig() {
         setSingleValidApiAndMongo();
         verifyMongoUri();
     }
 
     @Test
-    public void testMultipleValidApiUriEnablesApiWithApiConfig(){
+    public void testMultipleValidApiUriEnablesApiWithApiConfig() {
         setMultipleValidApiOnly();
         assertThat(barcode.hasApiConfig(), is(true));
     }
 
     @Test
-    public void testMultipleValidApiUriDoesNotEnableMongoWithApiConfig(){
+    public void testMultipleValidApiUriDoesNotEnableMongoWithApiConfig() {
         setMultipleValidApiOnly();
         assertThat(barcode.hasMongoConfig(), is(false));
     }
 
     @Test
-    public void testMultipleValidApiUriSetsApiWithApiConfig(){
+    public void testMultipleValidApiUriSetsApiWithApiConfig() {
         setMultipleValidApiOnly();
         verifyMultipleApiUri();
     }
 
     @Test
-    public void testEmptyValidApiDoesNotEnableApiWithApiConfig(){
+    public void testEmptyValidApiDoesNotEnableApiWithApiConfig() {
         setEmptyValidApiOnly();
         assertThat(barcode.hasApiConfig(), is(false));
     }
 
     @Test
-    public void testEmptyValidApiDoesNotEnableMongoWithApiConfig(){
+    public void testEmptyValidApiDoesNotEnableMongoWithApiConfig() {
         setEmptyValidApiOnly();
         assertThat(barcode.hasMongoConfig(), is(false));
     }
 
     @Test
-    public void testEmptyValidMongoDoesNotEnableApiWithApiConfig(){
+    public void testEmptyValidMongoDoesNotEnableApiWithApiConfig() {
         setEmptyValidMongoOnly();
         assertThat(barcode.hasApiConfig(), is(false));
     }
 
     @Test
-    public void testEmptyValidMongoDoesNotEnableMongoWithApiConfig(){
+    public void testEmptyValidMongoDoesNotEnableMongoWithApiConfig() {
         setEmptyValidMongoOnly();
         assertThat(barcode.hasMongoConfig(), is(false));
     }
 
     @Test
-    public void testInvalidConfigWithValidJsonDoesNotEnableMongo(){
+    public void testInvalidConfigWithValidJsonDoesNotEnableMongo() {
         setInvalidConfigWithValidJson();
         assertThat(barcode.hasMongoConfig(), is(false));
     }
 
     @Test
-    public void testInvalidConfigWithValidJsonDoesNotEnableApi(){
+    public void testInvalidConfigWithValidJsonDoesNotEnableApi() {
         setInvalidConfigWithValidJson();
         assertThat(barcode.hasApiConfig(), is(false));
     }
 
     @Test
-    public void testInvalidJsonDoesNotEnableMongo(){
+    public void testInvalidJsonDoesNotEnableMongo() {
         setInvalidJson();
         assertThat(barcode.hasMongoConfig(), is(false));
     }
 
     @Test
-    public void testInvalidJsonDoesNotEnableApi(){
+    public void testInvalidJsonDoesNotEnableApi() {
         setInvalidJson();
         assertThat(barcode.hasApiConfig(), is(false));
     }
 
     @After
-    public void tearDown(){
+    public void tearDown() {
         prefs = null;
         jsonConfig = "";
         barcode = null;

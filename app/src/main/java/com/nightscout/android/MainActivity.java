@@ -164,9 +164,6 @@ public class MainActivity extends Activity {
         // Check (only once) to see if they have opted in to shared data for research
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         if (!prefs.getBoolean("donate_data_query", false)) {
-
-            final NightscoutPreferences preferences = new AndroidPreferences(getApplicationContext());
-
             // Prompt user to ask to donate data to research
             AlertDialog.Builder dataDialog = new AlertDialog.Builder(this)
                     .setCancelable(false)

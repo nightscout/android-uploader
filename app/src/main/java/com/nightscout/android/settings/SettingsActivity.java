@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+
 import com.google.common.base.Optional;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -71,12 +72,10 @@ public class SettingsActivity extends FragmentActivity {
                 prefs.setMongoUploadEnabled(true);
                 if (barcode.getMongoUri().isPresent()) {
                     prefs.setMongoClientUri(barcode.getMongoUri().get());
-                    if (barcode.getMongoCollection().isPresent()) {
-                        prefs.setMongoCollection(barcode.getMongoCollection().get());
-                    }
-                    if (barcode.getMongoDeviceStatusCollection().isPresent()) {
-                        prefs.setMongoDeviceStatusCollection(barcode.getMongoDeviceStatusCollection().get());
-                    }
+                    prefs.setMongoCollection(
+                            barcode.getMongoCollection().or(getApplicationContext().getString(R.string.pref_default_mongodb_collection)));
+                    prefs.setMongoDeviceStatusCollection(
+                            barcode.getMongoDeviceStatusCollection().or(getApplicationContext().getString(R.string.pref_default_mongodb_device_status_collection)));
                 }
             } else {
                 prefs.setMongoUploadEnabled(false);
