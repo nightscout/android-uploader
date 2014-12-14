@@ -11,10 +11,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.google.common.base.Optional;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -63,6 +60,33 @@ public class SettingsActivity extends FragmentActivity {
         builder.setMessage(message);
         builder.setPositiveButton(R.string.ok, null);
         builder.show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        NightscoutPreferences prefs = new AndroidPreferences(getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
+        if (scanResult != null && scanResult.getContents() != null) {
+            NSBarcodeConfig barcode=new NSBarcodeConfig(scanResult.getContents(), prefs);
+            if (barcode.hasMongoConfig()) {
+                prefs.setMongoUploadEnabled(true);
+                if (barcode.getMongoUri().isPresent()) {
+                    prefs.setMongoClientUri(barcode.getMongoUri().get());
+                    prefs.setMongoCollection(
+                            barcode.getMongoCollection().or(getApplicationContext().getString(R.string.pref_default_mongodb_collection)));
+                    prefs.setMongoDeviceStatusCollection(
+                            barcode.getMongoDeviceStatusCollection().or(getApplicationContext().getString(R.string.pref_default_mongodb_device_status_collection)));
+                }
+            } else {
+                prefs.setMongoUploadEnabled(false);
+            }
+            if (barcode.hasApiConfig()) {
+                prefs.setRestApiEnabled(true);
+                prefs.setRestApiBaseUris(barcode.getApiUris());
+            } else {
+                prefs.setRestApiEnabled(false);
+            }
+        }
     }
 
     public static class MainPreferenceFragment extends PreferenceFragment {
@@ -130,33 +154,6 @@ public class SettingsActivity extends FragmentActivity {
                     });
         }
 
-        @Override
-        public void onActivityResult(int requestCode, int resultCode, Intent data) {
-            IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-            NightscoutPreferences prefs = new AndroidPreferences(PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()));
-            if (scanResult != null && scanResult.getContents() != null) {
-                NSBarcodeConfig barcode=new NSBarcodeConfig(scanResult.getContents(),prefs);
-                if (barcode.hasMongoConfig()) {
-                    prefs.setMongoUploadEnabled(true);
-                    if (barcode.getMongoUri().isPresent()) {
-                        prefs.setMongoClientUri(barcode.getMongoUri().get());
-                        if (barcode.getMongoCollection().isPresent()) {
-                            prefs.setMongoCollection(barcode.getMongoCollection().get());
-                        }
-                        if (barcode.getMongoDeviceStatusCollection().isPresent()) {
-                            prefs.setMongoDeviceStatusCollection(barcode.getMongoDeviceStatusCollection().get());
-                        }
-                    }
-                } else {
-                    prefs.setMongoUploadEnabled(false);
-                }
-                if (barcode.hasApiConfig()) {
-                    prefs.setRestApiEnabled(true);
-                    prefs.setRestApiBaseUris(barcode.getApiUris());
-                } else {
-                    prefs.setRestApiEnabled(false);
-                }
-            }
-        }
+
     }
 }

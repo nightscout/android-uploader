@@ -3,7 +3,12 @@ package com.nightscout.android;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.hardware.usb.UsbManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +24,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -90,7 +96,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         Log.d(TAG,"OnCreate called.");
 
-        preferences = new AndroidPreferences(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
+        preferences = new AndroidPreferences(getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
         migrateToNewStyleRestUris();
         ensureSavedUrisAreValid();
         ensureIUnderstandDialogDisplayed();
@@ -282,7 +288,7 @@ public class MainActivity extends Activity {
             mTextSGV.setText(getSGVStringByUnit(sgv, TrendArrow.values()[direction]));
         }
 
-        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) +  ")");
+        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) + ")");
 
         mHandler.post(updateTimeAgo);
         // FIXME: (klee) need to find a better way to do this. Too many things are hooking in here.

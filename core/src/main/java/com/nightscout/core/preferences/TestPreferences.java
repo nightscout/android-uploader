@@ -27,16 +27,6 @@ public class TestPreferences implements NightscoutPreferences {
     }
 
     @Override
-    public String getDefaultMongoCollection() {
-        return DEFAULT_MONGO_COLLECTION;
-    }
-
-    @Override
-    public String getDefaultMongoDeviceStatusCollection() {
-        return TestPreferences.DEFAULT_MONGO_DEVICE_STATUS_COLLECTION;
-    }
-
-    @Override
     public List<String> getRestApiBaseUris() {
         return restApiBaseUris;
     }
