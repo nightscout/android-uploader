@@ -114,8 +114,8 @@ public class RestV1UploaderTest {
     public void testInitialize_GenerateToken() {
         RestV1Uploader uploader = new RestV1Uploader(preferences,
                 URI.create("http://123@test.com/v1"));
-        assertThat(uploader.getToken(), is(not(nullValue())));
-        assertThat(uploader.getToken(), is("313233"));
+        assertThat(uploader.getSecret(), is(not(nullValue())));
+        assertThat(uploader.getSecret(), is("313233"));
     }
 
     @Test
@@ -124,7 +124,7 @@ public class RestV1UploaderTest {
             new RestV1Uploader(preferences, URI.create("http://test.com"));
             fail("Should not be a valid uploader.");
         } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), containsString("secret token"));
+            assertThat(e.getMessage(), containsString("token"));
         }
     }
 

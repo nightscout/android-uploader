@@ -22,7 +22,7 @@ public class RobolectricTestBase {
     private final boolean[] intentSeen = {false};
 
     @Before
-    public void setUpBase() {
+    public final void setUpBase() {
         // NPEs happen when using Robolectric + GA for some reason. Disable them for now.
         // https://github.com/robolectric/robolectric/issues/1075
         getShadowApplication().declareActionUnbindable("com.google.android.gms.analytics.service.START");

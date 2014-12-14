@@ -127,6 +127,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/rcvrBatteryLabel"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="@string/DexBatteryLabelText"
                 android:textSize="12sp"

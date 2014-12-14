@@ -1,13 +1,11 @@
 package com.nightscout.core.upload;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Strings;
-import com.google.common.hash.HashCode;
 import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.records.DeviceStatus;
+import com.nightscout.core.utils.RestUriUtils;
 
 import org.apache.http.message.AbstractHttpMessage;
 import org.json.JSONException;
@@ -19,35 +17,21 @@ import java.net.URI;
 import static com.google.common.base.Preconditions.checkArgument;
 
 public class RestV1Uploader extends AbstractRestUploader {
-    private final String token;
+    private final String secret;
 
     public RestV1Uploader(NightscoutPreferences preferences, URI uri) {
-        super(preferences, removeToken(uri));
-        checkValidUri(uri);
-        token = generateToken(uri.getUserInfo());
+        super(preferences, RestUriUtils.removeToken(uri));
+        checkArgument(RestUriUtils.hasToken(uri), "Rest API v1 requires a token.");
+        secret = RestUriUtils.generateSecret(uri.getUserInfo());
     }
 
-    private static URI removeToken(URI uri) {
-        // This is gross, but I don't know a better way to do it.
-        return URI.create(uri.toString().replaceFirst("//[^@]+@", "//"));
-    }
-
-    private String generateToken(String secret) {
-        return HashCode.fromBytes(secret.getBytes(Charsets.UTF_8)).toString();
-    }
-
-    protected String getToken() {
-        return token;
-    }
-
-    private void checkValidUri(URI uri) {
-        String userInfo = uri.getUserInfo();
-        checkArgument(!Strings.isNullOrEmpty(userInfo), "Rest API v1 requires a secret token.");
+    protected String getSecret() {
+        return secret;
     }
 
     @Override
     protected void setExtraHeaders(AbstractHttpMessage post) {
-        post.setHeader("api-secret", token);
+        post.setHeader("api-secret", secret);
     }
 
     private JSONObject toJSONObject(GlucoseDataSet record) throws JSONException {
