@@ -8,13 +8,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.hardware.usb.UsbManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Menu;
@@ -33,15 +31,14 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.preferences.AndroidPreferences;
-import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.preferences.PreferencesValidator;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.android.wearables.Pebble;
-import com.nightscout.core.dexcom.Constants;
-import com.nightscout.core.dexcom.SpecialValue;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
+import com.nightscout.core.download.GlucoseUnits;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.utils.GlucoseReading;
 import com.nightscout.core.utils.RestUriUtils;
 
 import org.acra.ACRA;
@@ -52,11 +49,12 @@ import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import static com.nightscout.core.dexcom.SpecialValue.getEGVSpecialValue;
+import static com.nightscout.core.dexcom.SpecialValue.isSpecialValue;
 import static org.joda.time.Duration.standardMinutes;
 
 public class MainActivity extends Activity {
@@ -83,11 +81,8 @@ public class MainActivity extends Activity {
     private WebView mWebView;
     private TextView mTextSGV;
     private TextView mTextTimestamp;
-    StatusBarIcons statusBarIcons;
-    Pebble pebble;
-
-    // Display options
-    private float currentUnits = 1;
+    private StatusBarIcons statusBarIcons;
+    private Pebble pebble;
 
     // TODO: should try and avoid use static
     public static int batLevel = 0;
@@ -96,9 +91,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG,"OnCreate called.");
+        Log.d(TAG, "OnCreate called.");
 
-        preferences = new AndroidPreferences(getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
+        preferences = new AndroidPreferences(getApplicationContext());
         migrateToNewStyleRestUris();
         ensureSavedUrisAreValid();
         ensureIUnderstandDialogDisplayed();
@@ -162,8 +157,7 @@ public class MainActivity extends Activity {
         }
 
         // Check (only once) to see if they have opted in to shared data for research
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        if (!prefs.getBoolean("donate_data_query", false)) {
+        if (!preferences.hasAskedForData()) {
             // Prompt user to ask to donate data to research
             AlertDialog.Builder dataDialog = new AlertDialog.Builder(this)
                     .setCancelable(false)
@@ -185,32 +179,27 @@ public class MainActivity extends Activity {
 
             dataDialog.show();
 
-            SharedPreferences.Editor editor =
-                    PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
-            editor.putBoolean("donate_data_query", true);
-            editor.apply();
+            preferences.setAskedForData(true);
         }
 
         // Report API vs mongo stats once per session
-        if (prefs.getBoolean("cloud_storage_api_enable", false)) {
-            String baseURLSettings = prefs.getString("cloud_storage_api_base", "");
-            ArrayList<String> baseURIs = new ArrayList<String>();
-            for (String baseURLSetting : baseURLSettings.split(" ")) {
-                String baseURL = baseURLSetting.trim();
-                if (baseURL.isEmpty()) continue;
-                baseURIs.add(baseURL + (baseURL.endsWith("/") ? "" : "/"));
-                String apiVersion;
-                apiVersion = (RestUriUtils.isV1Uri(URI.create(baseURL))) ? "WebAPIv1" : "Legacy WebAPI";
-                mTracker.send(new HitBuilders.EventBuilder("Upload", apiVersion).build());
-            }
-        }
-        if (prefs.getBoolean("cloud_storage_mongodb_enable", false)) {
-            mTracker.send(new HitBuilders.EventBuilder("Upload", "Mongo").build());
-        }
+        reportUploadMethods(mTracker);
         pebble = new Pebble(getApplicationContext());
         pebble.setUnits(preferences.getPreferredUnits());
         pebble.setPwdName(preferences.getPwdName());
 
+    }
+
+    public void reportUploadMethods(Tracker tracker) {
+        if (preferences.isRestApiEnabled()) {
+            for (String url : preferences.getRestApiBaseUris()) {
+                String apiVersion = (RestUriUtils.isV1Uri(URI.create(url))) ? "WebAPIv1" : "Legacy WebAPI";
+                tracker.send(new HitBuilders.EventBuilder("Upload", apiVersion).build());
+            }
+        }
+        if (preferences.isMongoUploadEnabled()) {
+            tracker.send(new HitBuilders.EventBuilder("Upload", "Mongo").build());
+        }
     }
 
     private void migrateToNewStyleRestUris() {
@@ -276,6 +265,10 @@ public class MainActivity extends Activity {
         mHandler.removeCallbacks(updateTimeAgo);
     }
 
+    public void setPebble(Pebble pebble) {
+        this.pebble = pebble;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -284,22 +277,17 @@ public class MainActivity extends Activity {
         mWebView.resumeTimers();
 
         // Set and deal with mmol/L<->mg/dL conversions
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        NightscoutPreferences nsPrefs = new AndroidPreferences(getApplicationContext());
-
-        Log.d(TAG,"display_options_units: "+prefs.getString("display_options_units", "0"));
-        currentUnits = prefs.getString("display_options_units", "0").equals("0") ? 1 : Constants.MG_DL_TO_MMOL_L;
-        pebble.setUnits(nsPrefs.getPreferredUnits());
-        pebble.setPwdName(nsPrefs.getPwdName());
-        pebble.resendDownload();
+        Log.d(TAG, "display_options_units: " + preferences.getPreferredUnits().name());
+        pebble.config(preferences.getPwdName(), preferences.getPreferredUnits());
         int sgv = (Integer) mTextSGV.getTag(R.string.display_sgv);
 
         int direction = (Integer) mTextSGV.getTag(R.string.display_trend);
         if (sgv != -1) {
-            mTextSGV.setText(getSGVStringByUnit(sgv, TrendArrow.values()[direction]));
+            GlucoseReading sgvReading = new GlucoseReading(sgv, GlucoseUnits.MGDL);
+            mTextSGV.setText(getSGVStringByUnit(sgvReading, TrendArrow.values()[direction]));
         }
 
-        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) + ")");
+        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(preferences.getPreferredUnits() == GlucoseUnits.MMOL) + ")");
 
         mHandler.post(updateTimeAgo);
         // FIXME: (klee) need to find a better way to do this. Too many things are hooking in here.
@@ -308,15 +296,11 @@ public class MainActivity extends Activity {
         }
     }
 
-    private String getSGVStringByUnit(int sgv, TrendArrow trend){
-        String sgvStr;
-        if (currentUnits!=1)
-            sgvStr=String.format("%.1f",sgv * currentUnits);
-        else
-            sgvStr=String.valueOf(sgv);
-        return (sgv!=-1)?
-                (SpecialValue.isSpecialValue(sgv))?
-                        SpecialValue.getEGVSpecialValue(sgv).toString():sgvStr+" "+trend.symbol():"---";
+    private String getSGVStringByUnit(GlucoseReading sgv, TrendArrow trend) {
+        String sgvStr = sgv.asStr(preferences.getPreferredUnits());
+        return (sgv.asMgdl() != -1) ?
+                (isSpecialValue(sgv)) ?
+                        getEGVSpecialValue(sgv).get().toString() : sgvStr + " " + trend.symbol() : "---";
     }
 
     @Override
@@ -374,20 +358,19 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             // Get response messages from broadcast
             int responseSGV = intent.getIntExtra(SyncingService.RESPONSE_SGV, -1);
-            TrendArrow trend = TrendArrow.values()[intent.getIntExtra(SyncingService.RESPONSE_TREND,0)];
-            long responseSGVTimestamp = intent.getLongExtra(SyncingService.RESPONSE_TIMESTAMP,-1L);
+            GlucoseReading reading = new GlucoseReading(responseSGV, GlucoseUnits.MGDL);
+            TrendArrow trend = TrendArrow.values()[intent.getIntExtra(SyncingService.RESPONSE_TREND, 0)];
+            long responseSGVTimestamp = intent.getLongExtra(SyncingService.RESPONSE_TIMESTAMP, -1L);
             boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
             long responseNextUploadTime = intent.getLongExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
             long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME, new Date().getTime());
             lastRecordTime = responseSGVTimestamp;
-            receiverOffsetFromUploader = new Date().getTime()-responseDisplayTime;
+            receiverOffsetFromUploader = new Date().getTime() - responseDisplayTime;
             int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT, -1);
             String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
 
-            String responseSGVStr = getSGVStringByUnit(responseSGV,trend);
-
             if (responseSGV != -1) {
-                pebble.sendDownload(responseSGV, trend, responseSGVTimestamp);
+                pebble.sendDownload(reading, trend, responseSGVTimestamp);
             }
             // Reload d3 chart with new data
             if (json != null) {
@@ -399,12 +382,13 @@ public class MainActivity extends Activity {
             statusBarIcons.setUpload(responseUploadStatus);
 
             // Update UI with latest record information
-            mTextSGV.setText(responseSGVStr);
-            mTextSGV.setTag(R.string.display_sgv, responseSGV);
+            mTextSGV.setText(getSGVStringByUnit(reading, trend));
+            mTextSGV.setTag(R.string.display_sgv, reading.asMgdl());
             mTextSGV.setTag(R.string.display_trend, trend.getID());
+
             String timeAgoStr = "---";
-            Log.d(TAG,"Date: " + new Date().getTime());
-            Log.d(TAG,"Response SGV Timestamp: " + responseSGVTimestamp);
+            Log.d(TAG, "Date: " + new Date().getTime());
+            Log.d(TAG, "Response SGV Timestamp: " + responseSGVTimestamp);
             if (responseSGVTimestamp > 0) {
                 timeAgoStr = Utils.getTimeString(new Date().getTime() - responseSGVTimestamp);
             }
@@ -440,7 +424,7 @@ public class MainActivity extends Activity {
             // Start updating the timeago only if the screen is on
             PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
             if (pm.isScreenOn())
-                mHandler.postDelayed(updateTimeAgo, nextUploadTime/5);
+                mHandler.postDelayed(updateTimeAgo, nextUploadTime / 5);
         }
     }
 
@@ -477,16 +461,12 @@ public class MainActivity extends Activity {
         public void run() {
             long delta = new Date().getTime() - lastRecordTime + receiverOffsetFromUploader;
             if (lastRecordTime == 0) delta = 0;
-
-            String timeAgoStr= "";
-
-            if (lastRecordTime==-1) {
+            String timeAgoStr = "";
+            if (lastRecordTime == -1) {
                 timeAgoStr = "---";
-            }
-            else if (delta < 0) {
+            } else if (delta < 0) {
                 timeAgoStr = getString(R.string.TimeChangeDetected);
-            }
-            else {
+            } else {
                 timeAgoStr = Utils.getTimeString(delta);
             }
             mTextTimestamp.setText(timeAgoStr);
@@ -559,8 +539,7 @@ public class MainActivity extends Activity {
         }
 
         public void checkForRootOptionChanged() {
-            if (!PreferenceManager.getDefaultSharedPreferences(
-                    getApplicationContext()).getBoolean(PreferenceKeys.ROOT_ENABLED, false)) {
+            if (((AndroidPreferences) preferences).isRootEnabled()) {
                 mImageRcvrBattery.setVisibility(View.GONE);
                 mRcvrBatteryLabel.setVisibility(View.GONE);
             } else {

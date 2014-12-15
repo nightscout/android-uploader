@@ -128,10 +128,17 @@ public class AndroidPreferences implements NightscoutPreferences {
 
     @Override
     public void setPwdName(String pwdName) {
-        if (pwdName == null) {
-            return;
-        }
         preferences.edit().putString(PreferenceKeys.PWD_NAME, pwdName).apply();
+    }
+
+    @Override
+    public boolean hasAskedForData() {
+        return preferences.getBoolean(PreferenceKeys.DONATE_DATA_QUERY, false);
+    }
+
+    @Override
+    public void setAskedForData(boolean askedForData) {
+        preferences.edit().putBoolean(PreferenceKeys.DONATE_DATA_QUERY, askedForData).apply();
     }
 
     @Override
@@ -162,5 +169,13 @@ public class AndroidPreferences implements NightscoutPreferences {
     @Override
     public void setRestApiBaseUris(List<String> uris) {
         preferences.edit().putString(PreferenceKeys.API_URIS, Joiner.on(' ').join(uris)).apply();
+    }
+
+    public boolean isRootEnabled() {
+        return preferences.getBoolean(PreferenceKeys.ROOT_ENABLED, false);
+    }
+
+    public void setRootEnabled(boolean enabled) {
+        preferences.edit().putBoolean(PreferenceKeys.ROOT_ENABLED, enabled).apply();
     }
 }

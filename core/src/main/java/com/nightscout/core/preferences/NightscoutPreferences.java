@@ -50,4 +50,8 @@ public interface NightscoutPreferences {
 
     String getPwdName();
     void setPwdName(String pwdName);
+
+    boolean hasAskedForData();
+
+    void setAskedForData(boolean askedForData);
 }

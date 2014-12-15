@@ -18,6 +18,7 @@ public class TestPreferences implements NightscoutPreferences {
     private GlucoseUnits units;
     private String pwdName;
     private boolean understand;
+    private boolean askedForData;
 
     @Override
     public boolean isRestApiEnabled() {
@@ -132,6 +133,16 @@ public class TestPreferences implements NightscoutPreferences {
     @Override
     public void setPwdName(String pwdName) {
         this.pwdName = pwdName;
+    }
+
+    @Override
+    public boolean hasAskedForData() {
+        return askedForData;
+    }
+
+    @Override
+    public void setAskedForData(boolean askedForData) {
+        this.askedForData = askedForData;
     }
 
     @Override

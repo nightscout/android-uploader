@@ -6,9 +6,9 @@ import android.util.Log;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 import com.nightscout.android.MainActivity;
-import com.nightscout.core.dexcom.Constants;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.download.GlucoseUnits;
+import com.nightscout.core.utils.GlucoseReading;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -16,8 +16,6 @@ import org.joda.time.DateTimeZone;
 import java.util.UUID;
 
 public class Pebble {
-    private static final String TAG = Pebble.class.getSimpleName();
-
     //    CGM_ICON_KEY = 0x0,		// TUPLE_CSTRING, MAX 2 BYTES (10)
     //    CGM_BG_KEY = 0x1,		// TUPLE_CSTRING, MAX 4 BYTES (253 OR 22.2)
     //    CGM_TCGM_KEY = 0x2,		// TUPLE_INT, 4 BYTES (CGM TIME)
@@ -26,29 +24,31 @@ public class Pebble {
     //    CGM_UBAT_KEY = 0x5,		// TUPLE_CSTRING, MAX 3 BYTES (UPLOADER BATTERY, 100)
     //    CGM_NAME_KEY = 0x6		// TUPLE_CSTRING, MAX 9 BYTES (Christine)
     public static final UUID PEBBLEAPP_UUID = UUID.fromString("2c3f5ab3-7506-44e7-b8d0-2c63de32e1ec");
-    public final int ICON_KEY=0;
-    public static final int BG_KEY=1;
-    public static final int RECORD_TIME_KEY =2;
-    public static final int PHONE_TIME_KEY=3;
-    public static final int BG_DELTA_KEY=4;
-    public static final int UPLOADER_BATTERY_KEY=5;
-    public static final int NAME_KEY=6;
+    public static final int ICON_KEY = 0;
+    public static final int BG_KEY = 1;
+    public static final int RECORD_TIME_KEY = 2;
+    public static final int PHONE_TIME_KEY = 3;
+    public static final int BG_DELTA_KEY = 4;
+    public static final int UPLOADER_BATTERY_KEY = 5;
+    public static final int NAME_KEY = 6;
+    private static final String TAG = Pebble.class.getSimpleName();
     private Context context;
     private PebbleDictionary currentReading;
     private GlucoseUnits units = GlucoseUnits.MGDL;
     private String pwdName = "";
-    private int lastBgInMgdl = 0;
+    private GlucoseReading lastReading;
+    private GlucoseReading lastDelta;
     private TrendArrow lastTrend = TrendArrow.NONE;
     private long lastRecordTime = 0;
 
-    public Pebble(Context context){
+    public Pebble(Context context) {
         this.context = context;
         currentReading = null;
         init();
     }
 
     public PebbleDictionary buildDictionary(TrendArrow trend, String bgValue, int recordTime, int uploaderTimeSec,
-                                            String delta, String uploaderBattery, String name){
+                                            String delta, String uploaderBattery, String name) {
         PebbleDictionary dictionary = new PebbleDictionary();
         dictionary.addString(ICON_KEY, String.valueOf(trend.getID()));
         dictionary.addString(BG_KEY, bgValue);
@@ -61,38 +61,47 @@ public class Pebble {
         return dictionary;
     }
 
-    public void sendDownload(int bgMgdl, TrendArrow trend, long recordTime){
-        int delta = 0;
-        if (currentReading != null){
-            delta = (bgMgdl - lastBgInMgdl);
+    public void sendDownload(GlucoseReading reading, TrendArrow trend, long recordTime) {
+        sendDownload(reading, trend, recordTime, false);
+    }
+
+    public void sendDownload(GlucoseReading reading, TrendArrow trend, long recordTime, boolean resend) {
+        GlucoseReading delta = new GlucoseReading(0, GlucoseUnits.MGDL);
+
+        if (currentReading != null) {
+            delta = reading.subtract(lastReading);
+        }
+
+        if (resend) {
+            delta = lastDelta;
         }
         String deltaStr = "";
-        if (delta>0){
-            deltaStr+="+";
+        if (delta.asMgdl() > 0) {
+            deltaStr += "+";
         }
-        deltaStr+= (units == GlucoseUnits.MGDL) ? delta : String.format("%.1f",delta * Constants.MG_DL_TO_MMOL_L);
-        String bgStr = (units == GlucoseUnits.MGDL) ?
-                String.valueOf(bgMgdl) : String.format("%.1f", bgMgdl * Constants.MG_DL_TO_MMOL_L);
+        deltaStr += delta.asStr(units);
+        String bgStr = reading.asStr(units);
 
         lastRecordTime = recordTime;
-        lastBgInMgdl = bgMgdl;
+        lastReading = reading;
         lastTrend = trend;
+        lastDelta = delta;
         recordTime = DateTimeZone.getDefault().convertUTCToLocal(recordTime);
-        PebbleDictionary dictionary = buildDictionary(trend, bgStr, (int) (recordTime/1000),
-                (int) (DateTimeZone.getDefault().convertUTCToLocal(new DateTime().getMillis())/1000), deltaStr,
+        PebbleDictionary dictionary = buildDictionary(trend, bgStr, (int) (recordTime / 1000),
+                (int) (DateTimeZone.getDefault().convertUTCToLocal(new DateTime().getMillis()) / 1000), deltaStr,
                 String.valueOf(MainActivity.batLevel), pwdName);
         currentReading = dictionary;
         sendDownload(dictionary);
     }
 
-    public void resendDownload(){
+    public void resendDownload() {
         if (currentReading != null) {
-            sendDownload(lastBgInMgdl, lastTrend, lastRecordTime);
+            sendDownload(lastReading, lastTrend, lastRecordTime, true);
         }
     }
 
     public void sendDownload(PebbleDictionary dictionary) {
-        if (PebbleKit.isWatchConnected(context)){
+        if (PebbleKit.isWatchConnected(context)) {
             if (dictionary != null && context != null) {
                 Log.d(TAG, "Sending data to pebble");
                 PebbleKit.sendDataToPebble(context, PEBBLEAPP_UUID, dictionary);
@@ -100,40 +109,31 @@ public class Pebble {
         }
     }
 
-    private void init(){
+    private void init() {
         PebbleKit.registerReceivedDataHandler(context, new PebbleKit.PebbleDataReceiver(PEBBLEAPP_UUID) {
             @Override
             public void receiveData(final Context mContext, final int transactionId, final PebbleDictionary data) {
-                Log.d(TAG, "Received query. data: "+data.size());
+                Log.d(TAG, "Received query. data: " + data.size());
                 PebbleKit.sendAckToPebble(mContext, transactionId);
                 sendDownload(currentReading);
             }
         });
     }
 
-    public void setPwdName(String pwdName, boolean resend){
-        if (!this.pwdName.equals(pwdName)) {
-            this.pwdName = pwdName;
-            if (resend) {
-                resendDownload();
-            }
+    public void config(String pwdName, GlucoseUnits units) {
+        boolean changed = !this.pwdName.equals(pwdName) || this.units != units;
+        if (changed) {
+            setPwdName(pwdName);
+            setUnits(units);
+            resendDownload();
         }
     }
 
     public void setPwdName(String pwdName) {
-        setPwdName(pwdName, false);
-    }
-
-    public void setUnits(GlucoseUnits units, boolean resend){
-        if (this.units != units) {
-            this.units = units;
-            if (resend) {
-                resendDownload();
-            }
-        }
+        this.pwdName = pwdName;
     }
 
     public void setUnits(GlucoseUnits units) {
-        setUnits(units, false);
+        this.units = units;
     }
 }
