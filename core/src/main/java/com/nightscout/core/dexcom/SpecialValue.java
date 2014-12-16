@@ -1,5 +1,8 @@
 package com.nightscout.core.dexcom;
 
+import com.google.common.base.Optional;
+import com.nightscout.core.utils.GlucoseReading;
+
 public enum SpecialValue {
     NONE("??0", 0),
     SENSORNOTACTIVE("?SN", 1),
@@ -14,30 +17,39 @@ public enum SpecialValue {
 
     private String name;
     private int val;
-    SpecialValue(String s, int i){
-        name=s;
-        val=i;
+
+    SpecialValue(String s, int i) {
+        name = s;
+        val = i;
     }
 
-    public int getValue(){
+    public int getValue() {
         return val;
     }
 
-    public String toString(){
+    public String toString() {
         return name;
     }
 
-    public static SpecialValue getEGVSpecialValue(int val){
-        for (SpecialValue e: values()){
-            if (e.getValue()==val)
-                return e;
+    public static Optional<SpecialValue> getEGVSpecialValue(int val) {
+        for (SpecialValue e : values()) {
+            if (e.getValue() == val)
+                return Optional.of(e);
         }
-        return null;
+        return Optional.absent();
     }
 
-    public static boolean isSpecialValue(int val){
-        for (SpecialValue e: values()){
-            if (e.getValue()==val)
+    public static Optional<SpecialValue> getEGVSpecialValue(GlucoseReading reading) {
+        return getEGVSpecialValue(reading.asMgdl());
+    }
+
+    public static boolean isSpecialValue(GlucoseReading reading) {
+        return isSpecialValue(reading.asMgdl());
+    }
+
+    public static boolean isSpecialValue(int val) {
+        for (SpecialValue e : values()) {
+            if (e.getValue() == val)
                 return true;
         }
         return false;

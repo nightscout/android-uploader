@@ -1,6 +1,7 @@
 package com.nightscout.core.preferences;
 
 import com.google.common.collect.Lists;
+import com.nightscout.core.download.GlucoseUnits;
 
 import java.util.List;
 
@@ -14,7 +15,10 @@ public class TestPreferences implements NightscoutPreferences {
     private String mongoCollection = null;
     private String mongoDeviceStatusCollection = null;
     private boolean dataDonateEnabled;
+    private GlucoseUnits units;
+    private String pwdName;
     private boolean understand;
+    private boolean askedForData;
 
     @Override
     public boolean isRestApiEnabled() {
@@ -24,6 +28,16 @@ public class TestPreferences implements NightscoutPreferences {
     @Override
     public void setRestApiEnabled(boolean restApiEnabled) {
         this.restApiEnabled = restApiEnabled;
+    }
+
+    @Override
+    public GlucoseUnits getPreferredUnits() {
+        return units;
+    }
+
+    @Override
+    public void setPreferredUnits(GlucoseUnits units) {
+        this.units = units;
     }
 
     @Override
@@ -114,5 +128,25 @@ public class TestPreferences implements NightscoutPreferences {
     @Override
     public void setMongoDeviceStatusCollection(String mongoDeviceStatusCollection) {
         this.mongoDeviceStatusCollection = mongoDeviceStatusCollection;
+    }
+
+    @Override
+    public void setPwdName(String pwdName) {
+        this.pwdName = pwdName;
+    }
+
+    @Override
+    public boolean hasAskedForData() {
+        return askedForData;
+    }
+
+    @Override
+    public void setAskedForData(boolean askedForData) {
+        this.askedForData = askedForData;
+    }
+
+    @Override
+    public String getPwdName() {
+        return pwdName;
     }
 }

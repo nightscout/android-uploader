@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 
 import com.google.common.base.Joiner;
 import com.nightscout.android.R;
+import com.nightscout.core.download.GlucoseUnits;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.RestUriUtils;
 
@@ -109,6 +110,38 @@ public class AndroidPreferences implements NightscoutPreferences {
     }
 
     @Override
+    public GlucoseUnits getPreferredUnits() {
+        return preferences.getString(PreferenceKeys.PREFERRED_UNITS, "0").equals("0")
+                ? GlucoseUnits.MGDL : GlucoseUnits.MMOL;
+    }
+
+    @Override
+    public void setPreferredUnits(GlucoseUnits units) {
+        String unitString = (units == GlucoseUnits.MGDL)?"0":"1";
+        preferences.edit().putString(PreferenceKeys.PREFERRED_UNITS, unitString).apply();
+    }
+
+    @Override
+    public String getPwdName() {
+        return preferences.getString(PreferenceKeys.PWD_NAME, context.getString(R.string.default_pwd_name));
+    }
+
+    @Override
+    public void setPwdName(String pwdName) {
+        preferences.edit().putString(PreferenceKeys.PWD_NAME, pwdName).apply();
+    }
+
+    @Override
+    public boolean hasAskedForData() {
+        return preferences.getBoolean(PreferenceKeys.DONATE_DATA_QUERY, false);
+    }
+
+    @Override
+    public void setAskedForData(boolean askedForData) {
+        preferences.edit().putBoolean(PreferenceKeys.DONATE_DATA_QUERY, askedForData).apply();
+    }
+
+    @Override
     public void setMongoClientUri(String mongoClientUri) {
         preferences.edit().putString(PreferenceKeys.MONGO_URI, mongoClientUri).apply();
     }
@@ -136,5 +169,13 @@ public class AndroidPreferences implements NightscoutPreferences {
     @Override
     public void setRestApiBaseUris(List<String> uris) {
         preferences.edit().putString(PreferenceKeys.API_URIS, Joiner.on(' ').join(uris)).apply();
+    }
+
+    public boolean isRootEnabled() {
+        return preferences.getBoolean(PreferenceKeys.ROOT_ENABLED, false);
+    }
+
+    public void setRootEnabled(boolean enabled) {
+        preferences.edit().putBoolean(PreferenceKeys.ROOT_ENABLED, enabled).apply();
     }
 }

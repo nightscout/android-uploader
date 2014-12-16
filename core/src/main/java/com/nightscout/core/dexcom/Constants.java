@@ -9,4 +9,5 @@ public class Constants {
     public final static int EGV_NOISE_MASK = 112;
     public final static float MG_DL_TO_MMOL_L = 0.05556f;
     public final static int CRC_LEN = 2;
+    public static final float MMOL_L_TO_MG_DL = 18.0182f;
 }

@@ -1,5 +1,7 @@
 package com.nightscout.core.preferences;
 
+import com.nightscout.core.download.GlucoseUnits;
+
 import java.util.List;
 
 public interface NightscoutPreferences {
@@ -42,4 +44,14 @@ public interface NightscoutPreferences {
     boolean getIUnderstand();
 
     void setIUnderstand(boolean bool);
+
+    GlucoseUnits getPreferredUnits();
+    void setPreferredUnits(GlucoseUnits units);
+
+    String getPwdName();
+    void setPwdName(String pwdName);
+
+    boolean hasAskedForData();
+
+    void setAskedForData(boolean askedForData);
 }

@@ -13,4 +13,7 @@ public final class PreferenceKeys {
             "cloud_storage_mongodb_device_status_collection";
     public static final String ROOT_ENABLED = "root_support_enabled";
     public static final String I_UNDERSTAND = "i_understand";
+    public static final String PREFERRED_UNITS = "display_options_units";
+    public static final String PWD_NAME = "pwd_name";
+    public static final String DONATE_DATA_QUERY = "donate_data_query";
 }

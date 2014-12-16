@@ -24,6 +24,7 @@ android {
     lintOptions {
         quiet false
         checkAllWarnings true
+        warningsAsErrors false
         abortOnError true
         textReport true
         textOutput 'stdout'
@@ -55,9 +56,8 @@ robolectric {
 }
 
 repositories {
-    maven {
-        url "https://raw.github.com/embarkmobile/zxing-android-minimal/mvn-repo/maven-repository/"
-    }
+    maven { url "https://raw.github.com/embarkmobile/zxing-android-minimal/mvn-repo/maven-repository/" }
+    maven { url "https://oss.sonatype.org/content/groups/public/" }
 }
 
 dependencies {
@@ -80,6 +80,8 @@ dependencies {
     compile 'com.embarkmobile:zxing-android-legacy:2.0.0@aar'
     compile 'com.embarkmobile:zxing-android-integration:2.0.0@aar'
     compile 'com.google.zxing:core:3.0.1'
+
+    compile 'com.getpebble:pebblekit:2.6.0@aar'
 
     androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
     androidTestCompile 'org.mockito:mockito-core:1.9.5'
