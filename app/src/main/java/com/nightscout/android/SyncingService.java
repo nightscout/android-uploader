@@ -316,7 +316,7 @@ public class SyncingService extends IntentService {
             broadcastIntent.putExtra(RESPONSE_PROTO, proto);
         }
         if (json != null)
-            broadcastIntent.putExtra(RESPONSE_JSON, json.toString());
+          broadcastIntent.putExtra(RESPONSE_JSON, json.toString());
         broadcastIntent.putExtra(RESPONSE_BAT, batLvl);
         sendBroadcast(broadcastIntent);
     }

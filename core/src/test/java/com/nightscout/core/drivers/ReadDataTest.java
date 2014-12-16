@@ -1,7 +1,5 @@
-package com.nightscout.android.drivers;
+package com.nightscout.core.drivers;
 
-import com.nightscout.android.drivers.USB.CdcAcmSerialDriver;
-import com.nightscout.android.drivers.USB.UsbSerialDriver;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.EGVRecord;
@@ -27,11 +25,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ReadDataTest {
-    private UsbSerialDriver usbDevice;
+    private DeviceTransport usbDevice;
 
     @Before
     public void setUp() {
-        usbDevice = mock(CdcAcmSerialDriver.class);
+        usbDevice = mock(DeviceTransport.class);
     }
 
     @Test
