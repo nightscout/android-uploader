@@ -18,6 +18,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
 
+    <uses-permission android:name="android.permission.READ_SMS"/>
+    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
+    <uses-permission android:name="android.permission.WRITE_SMS"/>
+    <uses-permission android:name="android.permission.SEND_SMS"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
     <application
         android:name=".Nightscout"
@@ -72,6 +77,13 @@
                 android:value="com.nightscout.android.MainActivity" />
         </activity>
 
+        <receiver
+            android:name="com.nightscout.android.sms.SMSReceiver">
+            <intent-filter>
+                <action android:name=
+                    "android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -20,6 +20,7 @@ import com.nightscout.android.R;
 import com.nightscout.android.dexcom.USB.USBPower;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.dexcom.USB.UsbSerialProber;
+import com.nightscout.android.sms.SMSSender;
 import com.nightscout.android.upload.Uploader;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.Constants;
@@ -156,6 +157,8 @@ public class SyncingService extends IntentService {
 //                int batLevel = readData.readBatteryLevel();
                 int batLevel = 100;
 
+                SMSSender sender = new SMSSender(mContext);
+                sender.processForSMS(glucoseDataSetsList);
                 // convert into json for d3 plot
                 JSONArray array = new JSONArray();
                 for (int i = 0; i < recentRecords.length; i++) array.put(recentRecords[i].toJSON());
@@ -240,6 +243,7 @@ public class SyncingService extends IntentService {
                 return true;
             } catch (IOException e) {
                 Log.e(TAG, "Unable to open USB. ", e);
+                SMSSender.reset();
                 Tracker tracker;
                 tracker = ((Nightscout) getApplicationContext()).getTracker();
                 tracker.send(new HitBuilders.ExceptionBuilder()
