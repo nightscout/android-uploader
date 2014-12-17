@@ -56,7 +56,9 @@ robolectric {
 }
 
 repositories {
-    maven { url "https://raw.github.com/embarkmobile/zxing-android-minimal/mvn-repo/maven-repository/" }
+    maven {
+        url "https://raw.github.com/embarkmobile/zxing-android-minimal/mvn-repo/maven-repository/"
+    }
     maven { url "https://oss.sonatype.org/content/groups/public/" }
 }
 
@@ -138,7 +140,7 @@ def coverageSourceDirs = [
         '../app/src/main/java'
 ]
 
-task jacocoTestReport(type:JacocoReport, dependsOn: "testDebug") {
+task jacocoTestReport(type: JacocoReport, dependsOn: "testDebug") {
     group = "Reporting"
 
     description = "Generate Jacoco app coverage reports"

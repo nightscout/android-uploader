@@ -1,157 +1,157 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.nightscout.android.MainActivity"
-    android:background="#ff000000">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                tools:context="com.nightscout.android.MainActivity"
+                android:background="#ff000000">
 
     <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/unknown_values"
-        android:id="@+id/sgValue"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentStart="false"
-        android:textSize="@android:dimen/notification_large_icon_width"
-        android:singleLine="true"
-        android:gravity="center|center_vertical|center_horizontal"
-        android:layout_alignParentRight="false"
-        android:layout_alignParentEnd="false"
-        tools:ignore="ContentDescription" />
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/unknown_values"
+            android:id="@+id/sgValue"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentStart="false"
+            android:textSize="@android:dimen/notification_large_icon_width"
+            android:singleLine="true"
+            android:gravity="center|center_vertical|center_horizontal"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentEnd="false"
+            tools:ignore="ContentDescription"/>
 
     <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/unknown_values"
-        android:id="@+id/timeAgo"
-        android:layout_alignParentTop="false"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentStart="false"
-        android:gravity="center|center_vertical|center_horizontal"
-        android:singleLine="true"
-        android:layout_alignTop="@+id/sgValue"
-        android:layout_marginTop="70sp"
-        tools:ignore="ContentDescription" />
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/unknown_values"
+            android:id="@+id/timeAgo"
+            android:layout_alignParentTop="false"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentStart="false"
+            android:gravity="center|center_vertical|center_horizontal"
+            android:singleLine="true"
+            android:layout_alignTop="@+id/sgValue"
+            android:layout_marginTop="70sp"
+            tools:ignore="ContentDescription"/>
 
     <WebView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:id="@+id/webView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/timeAgo"
-        android:layout_alignRight="@+id/timeAgo"
-        android:layout_alignEnd="@+id/timeAgo"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="false"
-        android:layout_marginBottom="45dp" />
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/webView"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/timeAgo"
+            android:layout_alignRight="@+id/timeAgo"
+            android:layout_alignEnd="@+id/timeAgo"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="false"
+            android:layout_marginBottom="45dp"/>
 
     <TableLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="#ff006578">
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="#ff006578">
 
         <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/imageViewUSB"
-                android:src="@drawable/ic_usb_disconnected"
-                android:layout_column="1"
-                android:layout_weight="1"
-                android:layout_marginTop="5dp"
-                tools:ignore="ContentDescription" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/imageViewUSB"
+                    android:src="@drawable/ic_usb_disconnected"
+                    android:layout_column="1"
+                    android:layout_weight="1"
+                    android:layout_marginTop="5dp"
+                    tools:ignore="ContentDescription"/>
 
             <ImageView
-                android:id="@+id/imageViewUploadStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_upload_fail"
-                android:layout_column="2"
-                android:layout_weight="1"
-                android:layout_marginTop="5dp"
-                tools:ignore="ContentDescription" />
+                    android:id="@+id/imageViewUploadStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_upload_fail"
+                    android:layout_column="2"
+                    android:layout_weight="1"
+                    android:layout_marginTop="5dp"
+                    tools:ignore="ContentDescription"/>
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/imageViewRcvrBattery"
-                android:layout_column="3"
-                android:layout_weight="1"
-                android:src="@drawable/battery"
-                android:layout_marginTop="5dp"
-                tools:ignore="ContentDescription" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/imageViewRcvrBattery"
+                    android:layout_column="3"
+                    android:layout_weight="1"
+                    android:src="@drawable/battery"
+                    android:layout_marginTop="5dp"
+                    tools:ignore="ContentDescription"/>
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/imageViewTimeIndicator"
-                android:layout_column="4"
-                android:layout_weight="1"
-                android:src="@drawable/ic_clock_bad"
-                android:layout_marginTop="5dp"
-                tools:ignore="ContentDescription" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/imageViewTimeIndicator"
+                    android:layout_column="4"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_clock_bad"
+                    android:layout_marginTop="5dp"
+                    tools:ignore="ContentDescription"/>
         </TableRow>
 
         <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/USBLabelText"
-                android:textSize="12sp"
-                android:layout_column="1"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:layout_marginBottom="5dp" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@string/USBLabelText"
+                    android:textSize="12sp"
+                    android:layout_column="1"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:layout_marginBottom="5dp"/>
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/UploadLabelText"
-                android:minLines="1"
-                android:textSize="12sp"
-                android:layout_column="2"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:layout_marginBottom="5dp" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@string/UploadLabelText"
+                    android:minLines="1"
+                    android:textSize="12sp"
+                    android:layout_column="2"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:layout_marginBottom="5dp"/>
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/rcvrBatteryLabel"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/DexBatteryLabelText"
-                android:textSize="12sp"
-                android:layout_column="3"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:layout_marginBottom="5dp" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/rcvrBatteryLabel"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@string/DexBatteryLabelText"
+                    android:textSize="12sp"
+                    android:layout_column="3"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:layout_marginBottom="5dp"/>
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/TimeSyncLabelText"
-                android:textSize="12sp"
-                android:layout_column="4"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:layout_marginBottom="5dp" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@string/TimeSyncLabelText"
+                    android:textSize="12sp"
+                    android:layout_column="4"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:layout_marginBottom="5dp"/>
         </TableRow>
     </TableLayout>
 

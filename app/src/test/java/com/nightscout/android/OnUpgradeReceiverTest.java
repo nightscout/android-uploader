@@ -14,29 +14,30 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 public class OnUpgradeReceiverTest extends RobolectricTestBase {
-    MainActivity activity;
 
-    @Before
-    public void setUp() {
-        activity = Robolectric.buildActivity(MainActivity.class).create().get();
-    }
+  MainActivity activity;
 
-    @Test
-    public void testOnCreate_ShouldHaveUpgradeReceiver() {
-        Intent intent = new Intent(Intent.ACTION_PACKAGE_REPLACED);
-        assertThat(getShadowApplication().hasReceiverForIntent(intent), is(true));
-    }
+  @Before
+  public void setUp() {
+    activity = Robolectric.buildActivity(MainActivity.class).create().get();
+  }
 
-    @Test
-    public void testOnUpgradeReceiverRestartsMainActivity() {
-        Intent intent = new Intent(Intent.ACTION_PACKAGE_REPLACED);
-        Uri dataUri = Uri.parse("package:com.nightscout.android");
-        intent.setData(dataUri);
-        OnUpgradeReceiver onUpgradeReceiver = new OnUpgradeReceiver();
-        onUpgradeReceiver.onReceive(activity.getApplicationContext(),intent);
-        Intent anIntent = getShadowApplication().getNextStartedActivity();
-        assertThat(anIntent.getComponent().getClassName(), is(MainActivity.class.getName()));
-    }
+  @Test
+  public void testOnCreate_ShouldHaveUpgradeReceiver() {
+    Intent intent = new Intent(Intent.ACTION_PACKAGE_REPLACED);
+    assertThat(getShadowApplication().hasReceiverForIntent(intent), is(true));
+  }
 
-    //TODO: need a test to make sure that activity is not started if another package is replaced
+  @Test
+  public void testOnUpgradeReceiverRestartsMainActivity() {
+    Intent intent = new Intent(Intent.ACTION_PACKAGE_REPLACED);
+    Uri dataUri = Uri.parse("package:com.nightscout.android");
+    intent.setData(dataUri);
+    OnUpgradeReceiver onUpgradeReceiver = new OnUpgradeReceiver();
+    onUpgradeReceiver.onReceive(activity.getApplicationContext(), intent);
+    Intent anIntent = getShadowApplication().getNextStartedActivity();
+    assertThat(anIntent.getComponent().getClassName(), is(MainActivity.class.getName()));
+  }
+
+  //TODO: need a test to make sure that activity is not started if another package is replaced
 }

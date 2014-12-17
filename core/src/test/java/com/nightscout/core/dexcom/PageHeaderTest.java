@@ -62,46 +62,145 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class PageHeaderTest {
-    // Page: 0a 14 00 00 26 00 00 00 04 02 87 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 aa c1 62 60 1b 0b ff 0b 1b 0b 71 00 14 05 a9 8e 61 1b 0b 2b 0d 1b 0b 71 00 14 c5 5f ba 62 1b 0b 57 0e 1b 0b 6d 00 14 e2 6e e6 63 1b 0b 83 0f 1b 0b 69 00 14 4e fa 12 65 1b 0b af 10 1b 0b 66 00 14 a5 25 3e 66 1b 0b db 11 1b 0b 62 00 14 1e 11 6a 67 1b 0b 07 13 1b 0b 5f 00 14 45 21 96 68 1b 0b 33 14 1b 0b 5c 00 14 5f bf c2 69 1b 0b 5f 15 1b 0b 5a 00 14 c4 86 ee 6a 1b 0b 8b 16 1b 0b 58 00 14 90 4e 1a 6c 1b 0b b7 17 1b 0b 57 00 14 27 3c 46 6d 1b 0b e3 18 1b 0b 57 00 14 11 5f 72 6e 1b 0b 0f 1a 1b 0b 57 00 14 16 81 9e 6f 1b 0b 3b 1b 1b 0b 56 00 14 44 90 ca 70 1b 0b 67 1c 1b 0b 58 00 14 70 79 f6 71 1b 0b 93 1d 1b 0b 58 00 14 45 b1 22 73 1b 0b bf 1e 1b 0b 56 00 14 b6 4f 4e 74 1b 0b eb 1f 1b 0b 55 00 14 8b 79 7a 75 1b 0b 17 21 1b 0b 55 00 14 12 6a a6 76 1b 0b 43 22 1b 0b 55 00 14 e7 55 d2 77 1b 0b 6f 23 1b 0b 55 00 14 4a a9 fe 78 1b 0b 9b 24 1b 0b 55 00 14 57 80 2a 7a 1b 0b c7 25 1b 0b 57 00 14 e4 04 55 7b 1b 0b f3 26 1b 0b 57 00 14 ab 0d 82 7c 1b 0b 1f 28 1b 0b 58 00 14 b4 46 ae 7d 1b 0b 4b 29 1b 0b 5e 00 14 13 ac d9 7e 1b 0b 77 2a 1b 0b 6a 00 13 77 23 05 80 1b 0b a2 2b 1b 0b 78 00 12 f6 0a 31 81 1b 0b ce 2c 1b 0b 86 00 12 d0 1a 5d 82 1b 0b fa 2d 1b 0b 94 00 11 f2 76 89 83 1b 0b 26 2f 1b 0b a0 00 11 92 51 b6 84 1b 0b 53 30 1b 0b aa 00 12 ff ec 0e 87 1b 0b ab 32 1b 0b bf 00 12 b5 16 39 88 1b 0b d7 33 1b 0b c8 00 12 cc 58 66 89 1b 0b 03 35 1b 0b cf 00 12 8b 25 91 8a 1b 0b 2e 36 1b 0b d3 00 13 fe e3 bd 8b 1b 0b 5a 37 1b 0b d4 00 14 78 20 e9 8c 1b 0b 86 38 1b 0b d7 00 14 7b f3 ff ff ff ff ff ff
-    // First record: 5130
-    // Number of records: 38
-    // RecordType: 4
-    // Revision: 2
-    // Page number: 135
-    // Reserved 2: 0
-    // Reserved 3: 0
-    // Reserved 4: 0
-    private byte[] pageHeader = new byte[]{(byte) 0x0a, (byte) 0x14, (byte) 0x00, (byte) 0x00, (byte) 0x26, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x02, (byte) 0x87, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xaa, (byte) 0xc1, (byte) 0x62, (byte) 0x60, (byte) 0x1b, (byte) 0x0b, (byte) 0xff, (byte) 0x0b, (byte) 0x1b, (byte) 0x0b, (byte) 0x71, (byte) 0x00, (byte) 0x14, (byte) 0x05, (byte) 0xa9, (byte) 0x8e, (byte) 0x61, (byte) 0x1b, (byte) 0x0b, (byte) 0x2b, (byte) 0x0d, (byte) 0x1b, (byte) 0x0b, (byte) 0x71, (byte) 0x00, (byte) 0x14, (byte) 0xc5, (byte) 0x5f, (byte) 0xba, (byte) 0x62, (byte) 0x1b, (byte) 0x0b, (byte) 0x57, (byte) 0x0e, (byte) 0x1b, (byte) 0x0b, (byte) 0x6d, (byte) 0x00, (byte) 0x14, (byte) 0xe2, (byte) 0x6e, (byte) 0xe6, (byte) 0x63, (byte) 0x1b, (byte) 0x0b, (byte) 0x83, (byte) 0x0f, (byte) 0x1b, (byte) 0x0b, (byte) 0x69, (byte) 0x00, (byte) 0x14, (byte) 0x4e, (byte) 0xfa, (byte) 0x12, (byte) 0x65, (byte) 0x1b, (byte) 0x0b, (byte) 0xaf, (byte) 0x10, (byte) 0x1b, (byte) 0x0b, (byte) 0x66, (byte) 0x00, (byte) 0x14, (byte) 0xa5, (byte) 0x25, (byte) 0x3e, (byte) 0x66, (byte) 0x1b, (byte) 0x0b, (byte) 0xdb, (byte) 0x11, (byte) 0x1b, (byte) 0x0b, (byte) 0x62, (byte) 0x00, (byte) 0x14, (byte) 0x1e, (byte) 0x11, (byte) 0x6a, (byte) 0x67, (byte) 0x1b, (byte) 0x0b, (byte) 0x07, (byte) 0x13, (byte) 0x1b, (byte) 0x0b, (byte) 0x5f, (byte) 0x00, (byte) 0x14, (byte) 0x45, (byte) 0x21, (byte) 0x96, (byte) 0x68, (byte) 0x1b, (byte) 0x0b, (byte) 0x33, (byte) 0x14, (byte) 0x1b, (byte) 0x0b, (byte) 0x5c, (byte) 0x00, (byte) 0x14, (byte) 0x5f, (byte) 0xbf, (byte) 0xc2, (byte) 0x69, (byte) 0x1b, (byte) 0x0b, (byte) 0x5f, (byte) 0x15, (byte) 0x1b, (byte) 0x0b, (byte) 0x5a, (byte) 0x00, (byte) 0x14, (byte) 0xc4, (byte) 0x86, (byte) 0xee, (byte) 0x6a, (byte) 0x1b, (byte) 0x0b, (byte) 0x8b, (byte) 0x16, (byte) 0x1b, (byte) 0x0b, (byte) 0x58, (byte) 0x00, (byte) 0x14, (byte) 0x90, (byte) 0x4e, (byte) 0x1a, (byte) 0x6c, (byte) 0x1b, (byte) 0x0b, (byte) 0xb7, (byte) 0x17, (byte) 0x1b, (byte) 0x0b, (byte) 0x57, (byte) 0x00, (byte) 0x14, (byte) 0x27, (byte) 0x3c, (byte) 0x46, (byte) 0x6d, (byte) 0x1b, (byte) 0x0b, (byte) 0xe3, (byte) 0x18, (byte) 0x1b, (byte) 0x0b, (byte) 0x57, (byte) 0x00, (byte) 0x14, (byte) 0x11, (byte) 0x5f, (byte) 0x72, (byte) 0x6e, (byte) 0x1b, (byte) 0x0b, (byte) 0x0f, (byte) 0x1a, (byte) 0x1b, (byte) 0x0b, (byte) 0x57, (byte) 0x00, (byte) 0x14, (byte) 0x16, (byte) 0x81, (byte) 0x9e, (byte) 0x6f, (byte) 0x1b, (byte) 0x0b, (byte) 0x3b, (byte) 0x1b, (byte) 0x1b, (byte) 0x0b, (byte) 0x56, (byte) 0x00, (byte) 0x14, (byte) 0x44, (byte) 0x90, (byte) 0xca, (byte) 0x70, (byte) 0x1b, (byte) 0x0b, (byte) 0x67, (byte) 0x1c, (byte) 0x1b, (byte) 0x0b, (byte) 0x58, (byte) 0x00, (byte) 0x14, (byte) 0x70, (byte) 0x79, (byte) 0xf6, (byte) 0x71, (byte) 0x1b, (byte) 0x0b, (byte) 0x93, (byte) 0x1d, (byte) 0x1b, (byte) 0x0b, (byte) 0x58, (byte) 0x00, (byte) 0x14, (byte) 0x45, (byte) 0xb1, (byte) 0x22, (byte) 0x73, (byte) 0x1b, (byte) 0x0b, (byte) 0xbf, (byte) 0x1e, (byte) 0x1b, (byte) 0x0b, (byte) 0x56, (byte) 0x00, (byte) 0x14, (byte) 0xb6, (byte) 0x4f, (byte) 0x4e, (byte) 0x74, (byte) 0x1b, (byte) 0x0b, (byte) 0xeb, (byte) 0x1f, (byte) 0x1b, (byte) 0x0b, (byte) 0x55, (byte) 0x00, (byte) 0x14, (byte) 0x8b, (byte) 0x79, (byte) 0x7a, (byte) 0x75, (byte) 0x1b, (byte) 0x0b, (byte) 0x17, (byte) 0x21, (byte) 0x1b, (byte) 0x0b, (byte) 0x55, (byte) 0x00, (byte) 0x14, (byte) 0x12, (byte) 0x6a, (byte) 0xa6, (byte) 0x76, (byte) 0x1b, (byte) 0x0b, (byte) 0x43, (byte) 0x22, (byte) 0x1b, (byte) 0x0b, (byte) 0x55, (byte) 0x00, (byte) 0x14, (byte) 0xe7, (byte) 0x55, (byte) 0xd2, (byte) 0x77, (byte) 0x1b, (byte) 0x0b, (byte) 0x6f, (byte) 0x23, (byte) 0x1b, (byte) 0x0b, (byte) 0x55, (byte) 0x00, (byte) 0x14, (byte) 0x4a, (byte) 0xa9, (byte) 0xfe, (byte) 0x78, (byte) 0x1b, (byte) 0x0b, (byte) 0x9b, (byte) 0x24, (byte) 0x1b, (byte) 0x0b, (byte) 0x55, (byte) 0x00, (byte) 0x14, (byte) 0x57, (byte) 0x80, (byte) 0x2a, (byte) 0x7a, (byte) 0x1b, (byte) 0x0b, (byte) 0xc7, (byte) 0x25, (byte) 0x1b, (byte) 0x0b, (byte) 0x57, (byte) 0x00, (byte) 0x14, (byte) 0xe4, (byte) 0x04, (byte) 0x55, (byte) 0x7b, (byte) 0x1b, (byte) 0x0b, (byte) 0xf3, (byte) 0x26, (byte) 0x1b, (byte) 0x0b, (byte) 0x57, (byte) 0x00, (byte) 0x14, (byte) 0xab, (byte) 0x0d, (byte) 0x82, (byte) 0x7c, (byte) 0x1b, (byte) 0x0b, (byte) 0x1f, (byte) 0x28, (byte) 0x1b, (byte) 0x0b, (byte) 0x58, (byte) 0x00, (byte) 0x14, (byte) 0xb4, (byte) 0x46, (byte) 0xae, (byte) 0x7d, (byte) 0x1b, (byte) 0x0b, (byte) 0x4b, (byte) 0x29, (byte) 0x1b, (byte) 0x0b, (byte) 0x5e, (byte) 0x00, (byte) 0x14, (byte) 0x13, (byte) 0xac, (byte) 0xd9, (byte) 0x7e, (byte) 0x1b, (byte) 0x0b, (byte) 0x77, (byte) 0x2a, (byte) 0x1b, (byte) 0x0b, (byte) 0x6a, (byte) 0x00, (byte) 0x13, (byte) 0x77, (byte) 0x23, (byte) 0x05, (byte) 0x80, (byte) 0x1b, (byte) 0x0b, (byte) 0xa2, (byte) 0x2b, (byte) 0x1b, (byte) 0x0b, (byte) 0x78, (byte) 0x00, (byte) 0x12, (byte) 0xf6, (byte) 0x0a, (byte) 0x31, (byte) 0x81, (byte) 0x1b, (byte) 0x0b, (byte) 0xce, (byte) 0x2c, (byte) 0x1b, (byte) 0x0b, (byte) 0x86, (byte) 0x00, (byte) 0x12, (byte) 0xd0, (byte) 0x1a, (byte) 0x5d, (byte) 0x82, (byte) 0x1b, (byte) 0x0b, (byte) 0xfa, (byte) 0x2d, (byte) 0x1b, (byte) 0x0b, (byte) 0x94, (byte) 0x00, (byte) 0x11, (byte) 0xf2, (byte) 0x76, (byte) 0x89, (byte) 0x83, (byte) 0x1b, (byte) 0x0b, (byte) 0x26, (byte) 0x2f, (byte) 0x1b, (byte) 0x0b, (byte) 0xa0, (byte) 0x00, (byte) 0x11, (byte) 0x92, (byte) 0x51, (byte) 0xb6, (byte) 0x84, (byte) 0x1b, (byte) 0x0b, (byte) 0x53, (byte) 0x30, (byte) 0x1b, (byte) 0x0b, (byte) 0xaa, (byte) 0x00, (byte) 0x12, (byte) 0xff, (byte) 0xec, (byte) 0x0e, (byte) 0x87, (byte) 0x1b, (byte) 0x0b, (byte) 0xab, (byte) 0x32, (byte) 0x1b, (byte) 0x0b, (byte) 0xbf, (byte) 0x00, (byte) 0x12, (byte) 0xb5, (byte) 0x16, (byte) 0x39, (byte) 0x88, (byte) 0x1b, (byte) 0x0b, (byte) 0xd7, (byte) 0x33, (byte) 0x1b, (byte) 0x0b, (byte) 0xc8, (byte) 0x00, (byte) 0x12, (byte) 0xcc, (byte) 0x58, (byte) 0x66, (byte) 0x89, (byte) 0x1b, (byte) 0x0b, (byte) 0x03, (byte) 0x35, (byte) 0x1b, (byte) 0x0b, (byte) 0xcf, (byte) 0x00, (byte) 0x12, (byte) 0x8b, (byte) 0x25, (byte) 0x91, (byte) 0x8a, (byte) 0x1b, (byte) 0x0b, (byte) 0x2e, (byte) 0x36, (byte) 0x1b, (byte) 0x0b, (byte) 0xd3, (byte) 0x00, (byte) 0x13, (byte) 0xfe, (byte) 0xe3, (byte) 0xbd, (byte) 0x8b, (byte) 0x1b, (byte) 0x0b, (byte) 0x5a, (byte) 0x37, (byte) 0x1b, (byte) 0x0b, (byte) 0xd4, (byte) 0x00, (byte) 0x14, (byte) 0x78, (byte) 0x20, (byte) 0xe9, (byte) 0x8c, (byte) 0x1b, (byte) 0x0b, (byte) 0x86, (byte) 0x38, (byte) 0x1b, (byte) 0x0b, (byte) 0xd7, (byte) 0x00, (byte) 0x14, (byte) 0x7b, (byte) 0xf3, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff};
-    private byte[] pageHeaderSmall = new byte[]{(byte) 0x0a, (byte) 0x14, (byte) 0x00, (byte) 0x00,
-            (byte) 0x26, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x02,
-            (byte) 0x87, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-            (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-            (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xaa};
-    private byte[] pageHeaderBadCrc = new byte[]{(byte) 0x0a, (byte) 0x14, (byte) 0x00, (byte) 0x00,
-            (byte) 0x26, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x02,
-            (byte) 0x87, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-            (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-            (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xaa, (byte) 0xc0};
-    @Test
-    public void testPageHeaderParse() throws Exception {
-        PageHeader header = new PageHeader(pageHeader);
-        assertThat(header.getFirstRecordIndex(), is(5130));
-        assertThat(header.getNumOfRecords(), is(38));
-        assertThat(header.getRecordType().ordinal(), is(4));
-        assertThat(header.getRevision(), is((byte) 2));
-        assertThat(header.getPageNumber(), is(135));
-        assertThat(header.getReserved2(), is(0));
-        assertThat(header.getReserved3(), is(0));
-        assertThat(header.getReserved4(), is(0));
-    }
 
-    @Test(expected = InvalidRecordLengthException.class)
-    public void testSmallPageHeaderParse() throws Exception {
-        PageHeader header = new PageHeader(pageHeaderSmall);
-    }
+  // Page: 0a 14 00 00 26 00 00 00 04 02 87 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 aa c1 62 60 1b 0b ff 0b 1b 0b 71 00 14 05 a9 8e 61 1b 0b 2b 0d 1b 0b 71 00 14 c5 5f ba 62 1b 0b 57 0e 1b 0b 6d 00 14 e2 6e e6 63 1b 0b 83 0f 1b 0b 69 00 14 4e fa 12 65 1b 0b af 10 1b 0b 66 00 14 a5 25 3e 66 1b 0b db 11 1b 0b 62 00 14 1e 11 6a 67 1b 0b 07 13 1b 0b 5f 00 14 45 21 96 68 1b 0b 33 14 1b 0b 5c 00 14 5f bf c2 69 1b 0b 5f 15 1b 0b 5a 00 14 c4 86 ee 6a 1b 0b 8b 16 1b 0b 58 00 14 90 4e 1a 6c 1b 0b b7 17 1b 0b 57 00 14 27 3c 46 6d 1b 0b e3 18 1b 0b 57 00 14 11 5f 72 6e 1b 0b 0f 1a 1b 0b 57 00 14 16 81 9e 6f 1b 0b 3b 1b 1b 0b 56 00 14 44 90 ca 70 1b 0b 67 1c 1b 0b 58 00 14 70 79 f6 71 1b 0b 93 1d 1b 0b 58 00 14 45 b1 22 73 1b 0b bf 1e 1b 0b 56 00 14 b6 4f 4e 74 1b 0b eb 1f 1b 0b 55 00 14 8b 79 7a 75 1b 0b 17 21 1b 0b 55 00 14 12 6a a6 76 1b 0b 43 22 1b 0b 55 00 14 e7 55 d2 77 1b 0b 6f 23 1b 0b 55 00 14 4a a9 fe 78 1b 0b 9b 24 1b 0b 55 00 14 57 80 2a 7a 1b 0b c7 25 1b 0b 57 00 14 e4 04 55 7b 1b 0b f3 26 1b 0b 57 00 14 ab 0d 82 7c 1b 0b 1f 28 1b 0b 58 00 14 b4 46 ae 7d 1b 0b 4b 29 1b 0b 5e 00 14 13 ac d9 7e 1b 0b 77 2a 1b 0b 6a 00 13 77 23 05 80 1b 0b a2 2b 1b 0b 78 00 12 f6 0a 31 81 1b 0b ce 2c 1b 0b 86 00 12 d0 1a 5d 82 1b 0b fa 2d 1b 0b 94 00 11 f2 76 89 83 1b 0b 26 2f 1b 0b a0 00 11 92 51 b6 84 1b 0b 53 30 1b 0b aa 00 12 ff ec 0e 87 1b 0b ab 32 1b 0b bf 00 12 b5 16 39 88 1b 0b d7 33 1b 0b c8 00 12 cc 58 66 89 1b 0b 03 35 1b 0b cf 00 12 8b 25 91 8a 1b 0b 2e 36 1b 0b d3 00 13 fe e3 bd 8b 1b 0b 5a 37 1b 0b d4 00 14 78 20 e9 8c 1b 0b 86 38 1b 0b d7 00 14 7b f3 ff ff ff ff ff ff
+  // First record: 5130
+  // Number of records: 38
+  // RecordType: 4
+  // Revision: 2
+  // Page number: 135
+  // Reserved 2: 0
+  // Reserved 3: 0
+  // Reserved 4: 0
+  private byte[]
+      pageHeader =
+      new byte[]{(byte) 0x0a, (byte) 0x14, (byte) 0x00, (byte) 0x00, (byte) 0x26, (byte) 0x00,
+                 (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x02, (byte) 0x87, (byte) 0x00,
+                 (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                 (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                 (byte) 0x00, (byte) 0x00, (byte) 0xaa, (byte) 0xc1, (byte) 0x62, (byte) 0x60,
+                 (byte) 0x1b, (byte) 0x0b, (byte) 0xff, (byte) 0x0b, (byte) 0x1b, (byte) 0x0b,
+                 (byte) 0x71, (byte) 0x00, (byte) 0x14, (byte) 0x05, (byte) 0xa9, (byte) 0x8e,
+                 (byte) 0x61, (byte) 0x1b, (byte) 0x0b, (byte) 0x2b, (byte) 0x0d, (byte) 0x1b,
+                 (byte) 0x0b, (byte) 0x71, (byte) 0x00, (byte) 0x14, (byte) 0xc5, (byte) 0x5f,
+                 (byte) 0xba, (byte) 0x62, (byte) 0x1b, (byte) 0x0b, (byte) 0x57, (byte) 0x0e,
+                 (byte) 0x1b, (byte) 0x0b, (byte) 0x6d, (byte) 0x00, (byte) 0x14, (byte) 0xe2,
+                 (byte) 0x6e, (byte) 0xe6, (byte) 0x63, (byte) 0x1b, (byte) 0x0b, (byte) 0x83,
+                 (byte) 0x0f, (byte) 0x1b, (byte) 0x0b, (byte) 0x69, (byte) 0x00, (byte) 0x14,
+                 (byte) 0x4e, (byte) 0xfa, (byte) 0x12, (byte) 0x65, (byte) 0x1b, (byte) 0x0b,
+                 (byte) 0xaf, (byte) 0x10, (byte) 0x1b, (byte) 0x0b, (byte) 0x66, (byte) 0x00,
+                 (byte) 0x14, (byte) 0xa5, (byte) 0x25, (byte) 0x3e, (byte) 0x66, (byte) 0x1b,
+                 (byte) 0x0b, (byte) 0xdb, (byte) 0x11, (byte) 0x1b, (byte) 0x0b, (byte) 0x62,
+                 (byte) 0x00, (byte) 0x14, (byte) 0x1e, (byte) 0x11, (byte) 0x6a, (byte) 0x67,
+                 (byte) 0x1b, (byte) 0x0b, (byte) 0x07, (byte) 0x13, (byte) 0x1b, (byte) 0x0b,
+                 (byte) 0x5f, (byte) 0x00, (byte) 0x14, (byte) 0x45, (byte) 0x21, (byte) 0x96,
+                 (byte) 0x68, (byte) 0x1b, (byte) 0x0b, (byte) 0x33, (byte) 0x14, (byte) 0x1b,
+                 (byte) 0x0b, (byte) 0x5c, (byte) 0x00, (byte) 0x14, (byte) 0x5f, (byte) 0xbf,
+                 (byte) 0xc2, (byte) 0x69, (byte) 0x1b, (byte) 0x0b, (byte) 0x5f, (byte) 0x15,
+                 (byte) 0x1b, (byte) 0x0b, (byte) 0x5a, (byte) 0x00, (byte) 0x14, (byte) 0xc4,
+                 (byte) 0x86, (byte) 0xee, (byte) 0x6a, (byte) 0x1b, (byte) 0x0b, (byte) 0x8b,
+                 (byte) 0x16, (byte) 0x1b, (byte) 0x0b, (byte) 0x58, (byte) 0x00, (byte) 0x14,
+                 (byte) 0x90, (byte) 0x4e, (byte) 0x1a, (byte) 0x6c, (byte) 0x1b, (byte) 0x0b,
+                 (byte) 0xb7, (byte) 0x17, (byte) 0x1b, (byte) 0x0b, (byte) 0x57, (byte) 0x00,
+                 (byte) 0x14, (byte) 0x27, (byte) 0x3c, (byte) 0x46, (byte) 0x6d, (byte) 0x1b,
+                 (byte) 0x0b, (byte) 0xe3, (byte) 0x18, (byte) 0x1b, (byte) 0x0b, (byte) 0x57,
+                 (byte) 0x00, (byte) 0x14, (byte) 0x11, (byte) 0x5f, (byte) 0x72, (byte) 0x6e,
+                 (byte) 0x1b, (byte) 0x0b, (byte) 0x0f, (byte) 0x1a, (byte) 0x1b, (byte) 0x0b,
+                 (byte) 0x57, (byte) 0x00, (byte) 0x14, (byte) 0x16, (byte) 0x81, (byte) 0x9e,
+                 (byte) 0x6f, (byte) 0x1b, (byte) 0x0b, (byte) 0x3b, (byte) 0x1b, (byte) 0x1b,
+                 (byte) 0x0b, (byte) 0x56, (byte) 0x00, (byte) 0x14, (byte) 0x44, (byte) 0x90,
+                 (byte) 0xca, (byte) 0x70, (byte) 0x1b, (byte) 0x0b, (byte) 0x67, (byte) 0x1c,
+                 (byte) 0x1b, (byte) 0x0b, (byte) 0x58, (byte) 0x00, (byte) 0x14, (byte) 0x70,
+                 (byte) 0x79, (byte) 0xf6, (byte) 0x71, (byte) 0x1b, (byte) 0x0b, (byte) 0x93,
+                 (byte) 0x1d, (byte) 0x1b, (byte) 0x0b, (byte) 0x58, (byte) 0x00, (byte) 0x14,
+                 (byte) 0x45, (byte) 0xb1, (byte) 0x22, (byte) 0x73, (byte) 0x1b, (byte) 0x0b,
+                 (byte) 0xbf, (byte) 0x1e, (byte) 0x1b, (byte) 0x0b, (byte) 0x56, (byte) 0x00,
+                 (byte) 0x14, (byte) 0xb6, (byte) 0x4f, (byte) 0x4e, (byte) 0x74, (byte) 0x1b,
+                 (byte) 0x0b, (byte) 0xeb, (byte) 0x1f, (byte) 0x1b, (byte) 0x0b, (byte) 0x55,
+                 (byte) 0x00, (byte) 0x14, (byte) 0x8b, (byte) 0x79, (byte) 0x7a, (byte) 0x75,
+                 (byte) 0x1b, (byte) 0x0b, (byte) 0x17, (byte) 0x21, (byte) 0x1b, (byte) 0x0b,
+                 (byte) 0x55, (byte) 0x00, (byte) 0x14, (byte) 0x12, (byte) 0x6a, (byte) 0xa6,
+                 (byte) 0x76, (byte) 0x1b, (byte) 0x0b, (byte) 0x43, (byte) 0x22, (byte) 0x1b,
+                 (byte) 0x0b, (byte) 0x55, (byte) 0x00, (byte) 0x14, (byte) 0xe7, (byte) 0x55,
+                 (byte) 0xd2, (byte) 0x77, (byte) 0x1b, (byte) 0x0b, (byte) 0x6f, (byte) 0x23,
+                 (byte) 0x1b, (byte) 0x0b, (byte) 0x55, (byte) 0x00, (byte) 0x14, (byte) 0x4a,
+                 (byte) 0xa9, (byte) 0xfe, (byte) 0x78, (byte) 0x1b, (byte) 0x0b, (byte) 0x9b,
+                 (byte) 0x24, (byte) 0x1b, (byte) 0x0b, (byte) 0x55, (byte) 0x00, (byte) 0x14,
+                 (byte) 0x57, (byte) 0x80, (byte) 0x2a, (byte) 0x7a, (byte) 0x1b, (byte) 0x0b,
+                 (byte) 0xc7, (byte) 0x25, (byte) 0x1b, (byte) 0x0b, (byte) 0x57, (byte) 0x00,
+                 (byte) 0x14, (byte) 0xe4, (byte) 0x04, (byte) 0x55, (byte) 0x7b, (byte) 0x1b,
+                 (byte) 0x0b, (byte) 0xf3, (byte) 0x26, (byte) 0x1b, (byte) 0x0b, (byte) 0x57,
+                 (byte) 0x00, (byte) 0x14, (byte) 0xab, (byte) 0x0d, (byte) 0x82, (byte) 0x7c,
+                 (byte) 0x1b, (byte) 0x0b, (byte) 0x1f, (byte) 0x28, (byte) 0x1b, (byte) 0x0b,
+                 (byte) 0x58, (byte) 0x00, (byte) 0x14, (byte) 0xb4, (byte) 0x46, (byte) 0xae,
+                 (byte) 0x7d, (byte) 0x1b, (byte) 0x0b, (byte) 0x4b, (byte) 0x29, (byte) 0x1b,
+                 (byte) 0x0b, (byte) 0x5e, (byte) 0x00, (byte) 0x14, (byte) 0x13, (byte) 0xac,
+                 (byte) 0xd9, (byte) 0x7e, (byte) 0x1b, (byte) 0x0b, (byte) 0x77, (byte) 0x2a,
+                 (byte) 0x1b, (byte) 0x0b, (byte) 0x6a, (byte) 0x00, (byte) 0x13, (byte) 0x77,
+                 (byte) 0x23, (byte) 0x05, (byte) 0x80, (byte) 0x1b, (byte) 0x0b, (byte) 0xa2,
+                 (byte) 0x2b, (byte) 0x1b, (byte) 0x0b, (byte) 0x78, (byte) 0x00, (byte) 0x12,
+                 (byte) 0xf6, (byte) 0x0a, (byte) 0x31, (byte) 0x81, (byte) 0x1b, (byte) 0x0b,
+                 (byte) 0xce, (byte) 0x2c, (byte) 0x1b, (byte) 0x0b, (byte) 0x86, (byte) 0x00,
+                 (byte) 0x12, (byte) 0xd0, (byte) 0x1a, (byte) 0x5d, (byte) 0x82, (byte) 0x1b,
+                 (byte) 0x0b, (byte) 0xfa, (byte) 0x2d, (byte) 0x1b, (byte) 0x0b, (byte) 0x94,
+                 (byte) 0x00, (byte) 0x11, (byte) 0xf2, (byte) 0x76, (byte) 0x89, (byte) 0x83,
+                 (byte) 0x1b, (byte) 0x0b, (byte) 0x26, (byte) 0x2f, (byte) 0x1b, (byte) 0x0b,
+                 (byte) 0xa0, (byte) 0x00, (byte) 0x11, (byte) 0x92, (byte) 0x51, (byte) 0xb6,
+                 (byte) 0x84, (byte) 0x1b, (byte) 0x0b, (byte) 0x53, (byte) 0x30, (byte) 0x1b,
+                 (byte) 0x0b, (byte) 0xaa, (byte) 0x00, (byte) 0x12, (byte) 0xff, (byte) 0xec,
+                 (byte) 0x0e, (byte) 0x87, (byte) 0x1b, (byte) 0x0b, (byte) 0xab, (byte) 0x32,
+                 (byte) 0x1b, (byte) 0x0b, (byte) 0xbf, (byte) 0x00, (byte) 0x12, (byte) 0xb5,
+                 (byte) 0x16, (byte) 0x39, (byte) 0x88, (byte) 0x1b, (byte) 0x0b, (byte) 0xd7,
+                 (byte) 0x33, (byte) 0x1b, (byte) 0x0b, (byte) 0xc8, (byte) 0x00, (byte) 0x12,
+                 (byte) 0xcc, (byte) 0x58, (byte) 0x66, (byte) 0x89, (byte) 0x1b, (byte) 0x0b,
+                 (byte) 0x03, (byte) 0x35, (byte) 0x1b, (byte) 0x0b, (byte) 0xcf, (byte) 0x00,
+                 (byte) 0x12, (byte) 0x8b, (byte) 0x25, (byte) 0x91, (byte) 0x8a, (byte) 0x1b,
+                 (byte) 0x0b, (byte) 0x2e, (byte) 0x36, (byte) 0x1b, (byte) 0x0b, (byte) 0xd3,
+                 (byte) 0x00, (byte) 0x13, (byte) 0xfe, (byte) 0xe3, (byte) 0xbd, (byte) 0x8b,
+                 (byte) 0x1b, (byte) 0x0b, (byte) 0x5a, (byte) 0x37, (byte) 0x1b, (byte) 0x0b,
+                 (byte) 0xd4, (byte) 0x00, (byte) 0x14, (byte) 0x78, (byte) 0x20, (byte) 0xe9,
+                 (byte) 0x8c, (byte) 0x1b, (byte) 0x0b, (byte) 0x86, (byte) 0x38, (byte) 0x1b,
+                 (byte) 0x0b, (byte) 0xd7, (byte) 0x00, (byte) 0x14, (byte) 0x7b, (byte) 0xf3,
+                 (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff};
+  private byte[] pageHeaderSmall = new byte[]{(byte) 0x0a, (byte) 0x14, (byte) 0x00, (byte) 0x00,
+                                              (byte) 0x26, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                                              (byte) 0x04, (byte) 0x02,
+                                              (byte) 0x87, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                                              (byte) 0x00, (byte) 0x00,
+                                              (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                                              (byte) 0x00, (byte) 0x00,
+                                              (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                                              (byte) 0xaa};
+  private byte[] pageHeaderBadCrc = new byte[]{(byte) 0x0a, (byte) 0x14, (byte) 0x00, (byte) 0x00,
+                                               (byte) 0x26, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                                               (byte) 0x04, (byte) 0x02,
+                                               (byte) 0x87, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                                               (byte) 0x00, (byte) 0x00,
+                                               (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                                               (byte) 0x00, (byte) 0x00,
+                                               (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                                               (byte) 0xaa, (byte) 0xc0};
 
-    @Test(expected = CRCFailError.class)
-    public void testPageHeaderParseBadCrc() throws Exception {
-        PageHeader header = new PageHeader(pageHeaderBadCrc);
-    }
+  @Test
+  public void testPageHeaderParse() throws Exception {
+    PageHeader header = new PageHeader(pageHeader);
+    assertThat(header.getFirstRecordIndex(), is(5130));
+    assertThat(header.getNumOfRecords(), is(38));
+    assertThat(header.getRecordType().ordinal(), is(4));
+    assertThat(header.getRevision(), is((byte) 2));
+    assertThat(header.getPageNumber(), is(135));
+    assertThat(header.getReserved2(), is(0));
+    assertThat(header.getReserved3(), is(0));
+    assertThat(header.getReserved4(), is(0));
+  }
+
+  @Test(expected = InvalidRecordLengthException.class)
+  public void testSmallPageHeaderParse() throws Exception {
+    PageHeader header = new PageHeader(pageHeaderSmall);
+  }
+
+  @Test(expected = CRCFailError.class)
+  public void testPageHeaderParseBadCrc() throws Exception {
+    PageHeader header = new PageHeader(pageHeaderBadCrc);
+  }
 }
