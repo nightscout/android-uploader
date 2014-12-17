@@ -1,13 +1,12 @@
 package com.nightscout.core.upload;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
-import com.google.common.hash.HashCode;
 import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.records.DeviceStatus;
+import com.nightscout.core.utils.RestUrlUtils;
 import com.squareup.okhttp.Request;
 
 import org.json.JSONException;
@@ -24,11 +23,8 @@ public class RestV1Uploader extends AbstractRestUploader {
     public RestV1Uploader(NightscoutPreferences preferences, URL url, String secret) {
         super(preferences, url);
         checkArgument(!Strings.isNullOrEmpty(secret), "Rest API v1 requires a secret.");
-        token = generateToken(secret);
-    }
-
-    private String generateToken(String secret) {
-        return HashCode.fromBytes(secret.getBytes(Charsets.UTF_8)).toString();
+        checkArgument(RestUrlUtils.isV1Url(url), "Url should end in /v1");
+        token = RestUrlUtils.generateToken(secret);
     }
 
     protected String getToken() {
@@ -37,6 +33,7 @@ public class RestV1Uploader extends AbstractRestUploader {
 
     @Override
     protected void setExtraHeaders(Request.Builder post) {
+        log.error("Adding secret {}", getToken());
         post.addHeader("api-secret", getToken());
     }
 

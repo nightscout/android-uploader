@@ -40,7 +40,7 @@ public class RobolectricTestBase {
     }
 
     public void assertIntentSeen() {
-        assertThat(intentSeen[0], is(true));
+        assertThat("Intent not seen.", intentSeen[0], is(true));
     }
 
     public Context getContext() {

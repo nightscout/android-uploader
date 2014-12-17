@@ -11,10 +11,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.google.common.base.Optional;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -26,7 +23,7 @@ import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.preferences.PreferencesValidator;
 import com.nightscout.core.barcode.NSBarcodeConfig;
 import com.nightscout.core.preferences.NightscoutPreferences;
-import com.nightscout.core.utils.RestUriUtils;
+import com.nightscout.core.utils.RestUrlUtils;
 
 import java.util.List;
 
@@ -102,7 +99,7 @@ public class SettingsActivity extends FragmentActivity {
                         @Override
                         public boolean onPreferenceChange(Preference preference, Object newValue) {
                             String combinedUris = (String) newValue;
-                            List<String> splitUris = RestUriUtils.splitIntoMultipleUris(combinedUris);
+                            List<String> splitUris = RestUrlUtils.splitIntoMultipleUris(combinedUris);
                             for (String uri : splitUris) {
                                 Optional<String> error = PreferencesValidator.validateRestApiUriSyntax(
                                         getActivity(), uri);

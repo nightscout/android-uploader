@@ -3,7 +3,12 @@ package com.nightscout.android;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.hardware.usb.UsbManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +24,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -35,7 +41,7 @@ import com.nightscout.core.dexcom.SpecialValue;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.preferences.NightscoutPreferences;
-import com.nightscout.core.utils.RestUriUtils;
+import com.nightscout.core.utils.RestUrlUtils;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -44,7 +50,8 @@ import org.acra.ReportingInteractionMode;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 
-import java.net.URI;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -192,8 +199,12 @@ public class MainActivity extends Activity {
                 if (baseURL.isEmpty()) continue;
                 baseURIs.add(baseURL + (baseURL.endsWith("/") ? "" : "/"));
                 String apiVersion;
-                apiVersion = (RestUriUtils.isV1Uri(URI.create(baseURL))) ? "WebAPIv1" : "Legacy WebAPI";
-                mTracker.send(new HitBuilders.EventBuilder("Upload", apiVersion).build());
+                try {
+                    apiVersion = (RestUrlUtils.isV1Url(new URL(baseURL))) ? "WebAPIv1" : "Legacy WebAPI";
+                    mTracker.send(new HitBuilders.EventBuilder("Upload", apiVersion).build());
+                } catch (MalformedURLException e) {
+                    Log.e("Malformed url exception when parsing " + baseURL, "exception", e);
+                }
             }
         }
         if (prefs.getBoolean("cloud_storage_mongodb_enable", false)) {
@@ -366,7 +377,7 @@ public class MainActivity extends Activity {
             int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT, -1);
             String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
 
-            String responseSGVStr = getSGVStringByUnit(responseSGV,trend);
+            String responseSGVStr = getSGVStringByUnit(responseSGV, trend);
 
             // Reload d3 chart with new data
             if (json != null) {
@@ -382,8 +393,8 @@ public class MainActivity extends Activity {
             mTextSGV.setTag(R.string.display_sgv, responseSGV);
             mTextSGV.setTag(R.string.display_trend, trend.getID());
             String timeAgoStr = "---";
-            Log.d(TAG,"Date: " + new Date().getTime());
-            Log.d(TAG,"Response SGV Timestamp: " + responseSGVTimestamp);
+            Log.d(TAG, "Date: " + new Date().getTime());
+            Log.d(TAG, "Response SGV Timestamp: " + responseSGVTimestamp);
             if (responseSGVTimestamp > 0) {
                 timeAgoStr = Utils.getTimeString(new Date().getTime() - responseSGVTimestamp);
             }

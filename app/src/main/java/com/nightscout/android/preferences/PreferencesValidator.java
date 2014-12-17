@@ -6,9 +6,10 @@ import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.mongodb.MongoClientURI;
 import com.nightscout.android.R;
-import com.nightscout.core.utils.RestUriUtils;
+import com.nightscout.core.utils.RestUrlUtils;
 
-import java.net.URI;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class PreferencesValidator {
     /**
@@ -34,16 +35,16 @@ public class PreferencesValidator {
         if (Strings.isNullOrEmpty(restApiUri)) {
             return Optional.of(context.getString(R.string.invalid_rest_uri, restApiUri));
         }
-        URI uri;
+        URL url;
         try {
-            uri = URI.create(restApiUri);
+            url = new URL(restApiUri);
         } catch (NullPointerException e) {
             return Optional.of(context.getString(R.string.invalid_rest_uri, restApiUri));
-        } catch (IllegalArgumentException e) {
+        } catch (MalformedURLException e) {
             return Optional.of(context.getString(R.string.invalid_rest_uri, restApiUri));
         }
-        if (RestUriUtils.isV1Uri(uri)) {
-            if (!RestUriUtils.hasToken(uri)) {
+        if (RestUrlUtils.isV1Url(url)) {
+            if (!RestUrlUtils.hasToken(url)) {
                 return Optional.of(context.getString(R.string.rest_uri_missing_token, restApiUri));
             }
         }

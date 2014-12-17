@@ -93,16 +93,16 @@ public class RestV1UploaderTest {
         RestV1Uploader uploader = new RestV1Uploader(preferences,
                 new URL("http://test.com/v1"), "123");
         assertThat(uploader.getToken(), is(not(nullValue())));
-        assertThat(uploader.getToken(), is("313233"));
+        assertThat(uploader.getToken(), is("40bd001563085fc35165329ea1ff5c5ecbdbbeef"));
     }
 
     @Test
     public void testInitalize_NoToken() throws Exception {
         try {
-            new RestV1Uploader(preferences, new URL("http://test.com"), "");
+            new RestV1Uploader(preferences, new URL("http://test.com/v1"), "");
             fail("Should not be a valid uploader.");
         } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), containsString("token"));
+            assertThat(e.getMessage(), containsString("secret"));
         }
     }
 

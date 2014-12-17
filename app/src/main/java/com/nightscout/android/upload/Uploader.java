@@ -17,6 +17,7 @@ import com.nightscout.core.upload.BaseUploader;
 import com.nightscout.core.upload.MongoUploader;
 import com.nightscout.core.upload.RestLegacyUploader;
 import com.nightscout.core.upload.RestV1Uploader;
+import com.nightscout.core.utils.RestUrlUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -79,8 +80,7 @@ public class Uploader {
         for (URL baseUrl : baseUrls) {
             if (baseUrl.getPath().contains("v1")) {
                 try {
-
-                    uploaders.add(new RestV1Uploader(preferences, baseUrl, /* TODO */ null));
+                    uploaders.add(new RestV1Uploader(preferences, baseUrl, RestUrlUtils.getSecret(baseUrl)));
                 } catch (IllegalArgumentException e) {
                     Log.e(LOG_TAG, "Error initializing rest v1 uploader.", e);
                     allInitialized &= false;

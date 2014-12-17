@@ -54,7 +54,7 @@ public class SettingsActivityTest extends RobolectricTestBase {
                 SettingsActivity.MainPreferenceFragment.class)
                 .findPreference(PreferenceKeys.API_URIS);
         assertThat(editTextPreference.getOnPreferenceChangeListener()
-                        .onPreferenceChange(editTextPreference, "http://example.com validUri.com"),
+                        .onPreferenceChange(editTextPreference, "http://example.com https://validUri.com"),
                 is(true));
     }
 

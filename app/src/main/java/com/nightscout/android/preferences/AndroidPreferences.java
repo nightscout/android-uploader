@@ -4,7 +4,7 @@ import android.content.SharedPreferences;
 
 import com.google.common.base.Joiner;
 import com.nightscout.core.preferences.NightscoutPreferences;
-import com.nightscout.core.utils.RestUriUtils;
+import com.nightscout.core.utils.RestUrlUtils;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class AndroidPreferences implements NightscoutPreferences {
 
     @Override
     public List<String> getRestApiBaseUris() {
-        return RestUriUtils.splitIntoMultipleUris(preferences.getString(PreferenceKeys.API_URIS, ""));
+        return RestUrlUtils.splitIntoMultipleUris(preferences.getString(PreferenceKeys.API_URIS, ""));
     }
 
     @Override

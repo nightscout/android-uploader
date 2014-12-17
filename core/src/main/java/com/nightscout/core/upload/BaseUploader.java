@@ -51,7 +51,7 @@ public abstract class BaseUploader {
             try {
                 output &= doUpload(glucoseDataSet);
             } catch (IOException e) {
-                log.error("Error uploading glucose data set.", e);
+                log.error("Error uploading glucose data set. {}\n{}", e.getMessage(), e.getStackTrace());
                 output = false;
             }
         }
