@@ -18,37 +18,43 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class SensorRecordTest {
-    
-    @Test
-    public void shouldParseSensorRecord() throws Exception {
-        byte[] record = new byte[]{(byte) 0x56, (byte) 0x30, (byte) 0x1B, (byte) 0x0B, (byte) 0xF3,
-                (byte) 0xDB, (byte) 0x1A, (byte) 0x0B, (byte) 0xC0, (byte) 0x3B, (byte) 0x02,
-                (byte) 0x00, (byte) 0x50, (byte) 0xFD, (byte) 0x01, (byte) 0x00, (byte) 0xA6,
-                (byte) 0x00, (byte) 0xC7};
-        SensorRecord sensorRecord = new SensorRecord(record);
-        assertThat(sensorRecord.getUnfiltered(), is(146368L));
-        assertThat(sensorRecord.getFiltered(), is(130384L));
-        assertThat(sensorRecord.getRssi(), is(166));
-        assertThat(sensorRecord.getRawDisplayTimeSeconds(), is(186309619L));
-        assertThat(sensorRecord.getRawSystemTimeSeconds(), is(186331222));
-    }
 
-    @Test(expected = InvalidRecordLengthException.class)
-    public void shouldNotParseSmallSensorRecord() throws Exception {
-        byte[] record = new byte[]{(byte) 0x56, (byte) 0x30, (byte) 0x1B, (byte) 0x0B, (byte) 0xF3,
-                (byte) 0xDB, (byte) 0x1A, (byte) 0x0B, (byte) 0xC0, (byte) 0x3B, (byte) 0x02,
-                (byte) 0x00, (byte) 0x50, (byte) 0xFD, (byte) 0x01, (byte) 0x00, (byte) 0xA6,
-                (byte) 0x00};
-        SensorRecord sensorRecord = new SensorRecord(record);
-    }
+  @Test
+  public void shouldParseSensorRecord() throws Exception {
+    byte[] record = new byte[]{(byte) 0x56, (byte) 0x30, (byte) 0x1B, (byte) 0x0B, (byte) 0xF3,
+                               (byte) 0xDB, (byte) 0x1A, (byte) 0x0B, (byte) 0xC0, (byte) 0x3B,
+                               (byte) 0x02,
+                               (byte) 0x00, (byte) 0x50, (byte) 0xFD, (byte) 0x01, (byte) 0x00,
+                               (byte) 0xA6,
+                               (byte) 0x00, (byte) 0xC7};
+    SensorRecord sensorRecord = new SensorRecord(record);
+    assertThat(sensorRecord.getUnfiltered(), is(146368L));
+    assertThat(sensorRecord.getFiltered(), is(130384L));
+    assertThat(sensorRecord.getRssi(), is(166));
+    assertThat(sensorRecord.getRawDisplayTimeSeconds(), is(186309619L));
+    assertThat(sensorRecord.getRawSystemTimeSeconds(), is(186331222));
+  }
 
-    @Test(expected = InvalidRecordLengthException.class)
-    public void shouldNotParseLargeSensorRecord() throws Exception {
-        byte[] record = new byte[]{(byte) 0x56, (byte) 0x30, (byte) 0x1B, (byte) 0x0B, (byte) 0xF3,
-                (byte) 0xDB, (byte) 0x1A, (byte) 0x0B, (byte) 0xC0, (byte) 0x3B, (byte) 0x02,
-                (byte) 0x00, (byte) 0x50, (byte) 0xFD, (byte) 0x01, (byte) 0x00, (byte) 0xA6,
-                (byte) 0x00, (byte) 0xC7, (byte) 0x00};
-        SensorRecord sensorRecord = new SensorRecord(record);
-    }
+  @Test(expected = InvalidRecordLengthException.class)
+  public void shouldNotParseSmallSensorRecord() throws Exception {
+    byte[] record = new byte[]{(byte) 0x56, (byte) 0x30, (byte) 0x1B, (byte) 0x0B, (byte) 0xF3,
+                               (byte) 0xDB, (byte) 0x1A, (byte) 0x0B, (byte) 0xC0, (byte) 0x3B,
+                               (byte) 0x02,
+                               (byte) 0x00, (byte) 0x50, (byte) 0xFD, (byte) 0x01, (byte) 0x00,
+                               (byte) 0xA6,
+                               (byte) 0x00};
+    SensorRecord sensorRecord = new SensorRecord(record);
+  }
+
+  @Test(expected = InvalidRecordLengthException.class)
+  public void shouldNotParseLargeSensorRecord() throws Exception {
+    byte[] record = new byte[]{(byte) 0x56, (byte) 0x30, (byte) 0x1B, (byte) 0x0B, (byte) 0xF3,
+                               (byte) 0xDB, (byte) 0x1A, (byte) 0x0B, (byte) 0xC0, (byte) 0x3B,
+                               (byte) 0x02,
+                               (byte) 0x00, (byte) 0x50, (byte) 0xFD, (byte) 0x01, (byte) 0x00,
+                               (byte) 0xA6,
+                               (byte) 0x00, (byte) 0xC7, (byte) 0x00};
+    SensorRecord sensorRecord = new SensorRecord(record);
+  }
 
 }

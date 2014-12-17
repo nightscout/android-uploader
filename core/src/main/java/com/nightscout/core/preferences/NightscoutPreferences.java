@@ -5,53 +5,56 @@ import com.nightscout.core.download.GlucoseUnits;
 import java.util.List;
 
 public interface NightscoutPreferences {
-    boolean isRestApiEnabled();
 
-    void setRestApiEnabled(boolean restApiEnabled);
+  boolean isRestApiEnabled();
 
-    List<String> getRestApiBaseUris();
+  void setRestApiEnabled(boolean restApiEnabled);
 
-    void setRestApiBaseUris(List<String> restApis);
+  List<String> getRestApiBaseUris();
 
-    boolean isCalibrationUploadEnabled();
+  void setRestApiBaseUris(List<String> restApis);
 
-    void setCalibrationUploadEnabled(boolean calibrationUploadEnabled);
+  boolean isCalibrationUploadEnabled();
 
-    boolean isSensorUploadEnabled();
+  void setCalibrationUploadEnabled(boolean calibrationUploadEnabled);
 
-    void setSensorUploadEnabled(boolean sensorUploadEnabled);
+  boolean isSensorUploadEnabled();
 
-    boolean isMongoUploadEnabled();
+  void setSensorUploadEnabled(boolean sensorUploadEnabled);
 
-    void setMongoUploadEnabled(boolean mongoUploadEnabled);
+  boolean isMongoUploadEnabled();
 
-    boolean isDataDonateEnabled();
+  void setMongoUploadEnabled(boolean mongoUploadEnabled);
 
-    void setDataDonateEnabled(boolean toDonate);
+  boolean isDataDonateEnabled();
 
-    String getMongoClientUri();
+  void setDataDonateEnabled(boolean toDonate);
 
-    void setMongoClientUri(String client);
+  String getMongoClientUri();
 
-    String getMongoCollection();
+  void setMongoClientUri(String client);
 
-    void setMongoCollection(String mongoCollection);
+  String getMongoCollection();
 
-    String getMongoDeviceStatusCollection();
+  void setMongoCollection(String mongoCollection);
 
-    void setMongoDeviceStatusCollection(String deviceStatusCollection);
+  String getMongoDeviceStatusCollection();
 
-    boolean getIUnderstand();
+  void setMongoDeviceStatusCollection(String deviceStatusCollection);
 
-    void setIUnderstand(boolean bool);
+  boolean getIUnderstand();
 
-    GlucoseUnits getPreferredUnits();
-    void setPreferredUnits(GlucoseUnits units);
+  void setIUnderstand(boolean bool);
 
-    String getPwdName();
-    void setPwdName(String pwdName);
+  GlucoseUnits getPreferredUnits();
 
-    boolean hasAskedForData();
+  void setPreferredUnits(GlucoseUnits units);
 
-    void setAskedForData(boolean askedForData);
+  String getPwdName();
+
+  void setPwdName(String pwdName);
+
+  boolean hasAskedForData();
+
+  void setAskedForData(boolean askedForData);
 }

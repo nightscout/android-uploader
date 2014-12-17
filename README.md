@@ -7,8 +7,12 @@ android-uploader
 <a href="https://play.google.com/store/apps/details?id=com.nightscout.android"><img alt="Android app on Google Play" src="https://developer.android.com/images/brand/en_app_rgb_wo_45.png" />
 </a>
 
-Android Uploader for the Nightscout Project.
+Android Uploader for the Nightscout Project. This project requires Android Studio 1.0 or greater. 
 
+## Contributing
+The entire project is formatted using Google's [java style](https://google-styleguide.googlecode.com/svn/trunk/intellij-java-google-style.xml). In order to 'import' this file into Android Studio, you must copy the file into the `codestyles` directory for Android Studio. For OS X, it is located in `~/Library/Preferences/AndroidStudio/codestyles`. After you copy it into the correct directory, you must restart AndroidStudio, and select `GoogleStyle` in the File -> Preferences -> Code Style preference panel.
+
+Pull requests for features and bugs require tests.
 
 ## [License - GPL V3](gpl-v3)
 [gpl-3]: http://www.gnu.org/licenses/gpl-3.0.txt

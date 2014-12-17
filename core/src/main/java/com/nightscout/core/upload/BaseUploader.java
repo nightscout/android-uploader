@@ -15,114 +15,112 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class BaseUploader {
-    protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private final NightscoutPreferences preferences;
+  protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    protected abstract boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException;
+  private final NightscoutPreferences preferences;
 
-    protected boolean doUpload(MeterRecord meterRecord) throws IOException {
-        log.info("Meter record upload not supported.");
-        return true;
+  public BaseUploader(NightscoutPreferences preferences) {
+    checkNotNull(preferences);
+    this.preferences = preferences;
+  }
+
+  protected abstract boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException;
+
+  protected boolean doUpload(MeterRecord meterRecord) throws IOException {
+    log.info("Meter record upload not supported.");
+    return true;
+  }
+
+  protected boolean doUpload(CalRecord calRecord) throws IOException {
+    log.info("Cal record upload not supported.");
+    return true;
+  }
+
+  protected boolean doUpload(DeviceStatus deviceStatus) throws IOException {
+    log.info("Device status upload not supported.");
+    return true;
+  }
+
+  // TODO(trhodeos): implement some sort of retry logic in all of these public functions.
+  public final boolean uploadGlucoseDataSets(List<GlucoseDataSet> glucoseDataSets) {
+    if (glucoseDataSets == null) {
+      return true;
     }
-
-    protected boolean doUpload(CalRecord calRecord) throws IOException {
-        log.info("Cal record upload not supported.");
-        return true;
+    boolean output = true;
+    for (GlucoseDataSet glucoseDataSet : glucoseDataSets) {
+      try {
+        output &= doUpload(glucoseDataSet);
+      } catch (IOException e) {
+        log.error("Error uploading glucose data set.", e);
+        output = false;
+      }
     }
+    return output;
+  }
 
-    protected boolean doUpload(DeviceStatus deviceStatus) throws IOException {
-        log.info("Device status upload not supported.");
-        return true;
+  /**
+   * Uploads the meter records
+   *
+   * @return True if the upload was successful, false if the upload was unsuccessful
+   */
+  public final boolean uploadMeterRecords(List<MeterRecord> meterRecords) {
+    if (meterRecords == null) {
+      return true;
     }
-
-    public BaseUploader(NightscoutPreferences preferences) {
-        checkNotNull(preferences);
-        this.preferences = preferences;
+    boolean output = true;
+    for (MeterRecord meterRecord : meterRecords) {
+      try {
+        output &= doUpload(meterRecord);
+      } catch (IOException e) {
+        log.error("Error uploading meter record.", e);
+        output = false;
+      }
     }
+    return output;
+  }
 
-    // TODO(trhodeos): implement some sort of retry logic in all of these public functions.
-    public final boolean uploadGlucoseDataSets(List<GlucoseDataSet> glucoseDataSets) {
-        if (glucoseDataSets == null) {
-            return true;
-        }
-        boolean output = true;
-        for (GlucoseDataSet glucoseDataSet : glucoseDataSets) {
-            try {
-                output &= doUpload(glucoseDataSet);
-            } catch (IOException e) {
-                log.error("Error uploading glucose data set.", e);
-                output = false;
-            }
-        }
-        return output;
+  /**
+   * Uploads the calibration records
+   *
+   * @return True if the upload was successful, false if the upload was unsuccessful
+   */
+  public final boolean uploadCalRecords(List<CalRecord> calRecords) {
+    if (calRecords == null) {
+      return true;
     }
-
-    /**
-     * Uploads the meter records
-     *
-     * @param meterRecords
-     * @return True if the upload was successful, false if the upload was unsuccessful
-     */
-    public final boolean uploadMeterRecords(List<MeterRecord> meterRecords) {
-        if (meterRecords == null) {
-            return true;
-        }
-        boolean output = true;
-        for (MeterRecord meterRecord : meterRecords) {
-            try {
-                output &= doUpload(meterRecord);
-            } catch (IOException e) {
-                log.error("Error uploading meter record.", e);
-                output = false;
-            }
-        }
-        return output;
-    }
-
-    /**
-     * Uploads the calibration records
-     *
-     * @param calRecords
-     * @return True if the upload was successful, false if the upload was unsuccessful
-     */
-    public final boolean uploadCalRecords(List<CalRecord> calRecords) {
-        if (calRecords == null) {
-            return true;
-        }
-        boolean output = true;
-        if (getPreferences().isCalibrationUploadEnabled()) {
-            for (CalRecord calRecord : calRecords) {
-                try {
-                    output &= doUpload(calRecord);
-                } catch (IOException e) {
-                    log.error("Error uploading calibration record.", e);
-                    output = false;
-                }
-            }
-        }
-        return output;
-    }
-
-    /**
-     * Uploads the device status
-     *
-     * @param deviceStatus
-     * @return True if the upload was successful or False if the upload was unsuccessful
-     */
-    public final boolean uploadDeviceStatus(DeviceStatus deviceStatus) {
-        if (deviceStatus == null) {
-            return true;
-        }
+    boolean output = true;
+    if (getPreferences().isCalibrationUploadEnabled()) {
+      for (CalRecord calRecord : calRecords) {
         try {
-            return doUpload(deviceStatus);
+          output &= doUpload(calRecord);
         } catch (IOException e) {
-            log.error("Error uploading device status", e);
-            return false;
+          log.error("Error uploading calibration record.", e);
+          output = false;
         }
+      }
     }
+    return output;
+  }
 
-    protected NightscoutPreferences getPreferences() {
-        return this.preferences;
+  /**
+   * Uploads the device status
+   *
+   * @return True if the upload was successful or False if the upload was unsuccessful
+   */
+  public final boolean uploadDeviceStatus(DeviceStatus deviceStatus) {
+    if (deviceStatus == null) {
+      return true;
     }
+    try {
+      return doUpload(deviceStatus);
+    } catch (IOException e) {
+      log.error("Error uploading device status", e);
+      return false;
+    }
+  }
+
+  protected NightscoutPreferences getPreferences() {
+    return this.preferences;
+  }
 }

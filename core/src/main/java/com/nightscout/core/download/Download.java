@@ -10,41 +10,42 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Download object that maintains the state of a download from a device
  */
 abstract public class Download {
-    protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    protected DateTime downloadTimestamp;
-    protected DownloadStatus status = DownloadStatus.NONE;
-    protected int uploaderBattery;
+  protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public Download(DateTime downloadTimestamp, DownloadStatus status, int uploaderBattery){
-        this.downloadTimestamp=checkNotNull(downloadTimestamp);
-        this.status=checkNotNull(status);
-        this.uploaderBattery=checkNotNull(uploaderBattery);
-    }
+  protected DateTime downloadTimestamp;
+  protected DownloadStatus status = DownloadStatus.NONE;
+  protected int uploaderBattery;
 
-    public DateTime getDownloadTimestamp() {
-        return downloadTimestamp;
-    }
+  public Download(DateTime downloadTimestamp, DownloadStatus status, int uploaderBattery) {
+    this.downloadTimestamp = checkNotNull(downloadTimestamp);
+    this.status = checkNotNull(status);
+    this.uploaderBattery = checkNotNull(uploaderBattery);
+  }
 
-    public void setDownloadTimestamp(DateTime downloadTimestamp) {
-        this.downloadTimestamp = downloadTimestamp;
-    }
+  public DateTime getDownloadTimestamp() {
+    return downloadTimestamp;
+  }
 
-    public DownloadStatus getStatus() {
-        return status;
-    }
+  public void setDownloadTimestamp(DateTime downloadTimestamp) {
+    this.downloadTimestamp = downloadTimestamp;
+  }
 
-    public void setStatus(DownloadStatus status) {
-        this.status = status;
-    }
+  public DownloadStatus getStatus() {
+    return status;
+  }
 
-    public int getUploaderBattery() {
-        return uploaderBattery;
-    }
+  public void setStatus(DownloadStatus status) {
+    this.status = status;
+  }
 
-    public void setUploaderBattery(int uploaderBattery) {
-        this.uploaderBattery = uploaderBattery;
-    }
+  public int getUploaderBattery() {
+    return uploaderBattery;
+  }
 
-    abstract public byte[] toProtobufByteArray();
+  public void setUploaderBattery(int uploaderBattery) {
+    this.uploaderBattery = uploaderBattery;
+  }
+
+  abstract public byte[] toProtobufByteArray();
 }

@@ -32,7 +32,7 @@ jacoco {
 jacocoTestReport {
     additionalSourceDirs = files(sourceSets.main.allSource.srcDirs)
     sourceDirectories = files(sourceSets.main.allSource.srcDirs)
-    classDirectories =  files(sourceSets.main.output)
+    classDirectories = files(sourceSets.main.output)
     reports {
         html.enabled = true
         xml.enabled = true

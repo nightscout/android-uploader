@@ -4,13 +4,145 @@
 package com.nightscout.core.download;
 
 public final class SGV {
-  private SGV() {}
+
+  private static final com.google.protobuf.Descriptors.Descriptor
+      internal_static_CookieMonsterG4Download_descriptor;
+  private static final com.google.protobuf.Descriptors.Descriptor
+      internal_static_CookieMonsterG4EGV_descriptor;
+  private static final com.google.protobuf.Descriptors.Descriptor
+      internal_static_CookieMonsterG4Meter_descriptor;
+  private static final com.google.protobuf.Descriptors.Descriptor
+      internal_static_CookieMonsterG4Sensor_descriptor;
+  private static final com.google.protobuf.Descriptors.Descriptor
+      internal_static_CookieMonsterG4Cal_descriptor;
+  private static final com.google.protobuf.Descriptors.Descriptor
+      internal_static_CookieMonsterReceiverStatus_descriptor;
+  private static
+  com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_CookieMonsterG4Download_fieldAccessorTable;
+  private static
+  com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_CookieMonsterG4EGV_fieldAccessorTable;
+  private static
+  com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_CookieMonsterG4Meter_fieldAccessorTable;
+  private static
+  com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_CookieMonsterG4Sensor_fieldAccessorTable;
+  private static
+  com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_CookieMonsterG4Cal_fieldAccessorTable;
+  private static
+  com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_CookieMonsterReceiverStatus_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.FileDescriptor
+      descriptor;
+
+  static {
+    java.lang.String[] descriptorData = {
+        "\n\tSGV.proto\"\277\004\n\027CookieMonsterG4Download\022" +
+        " \n\003sgv\030\001 \003(\0132\023.CookieMonsterG4EGV\022,\n\005uni" +
+        "ts\030\002 \001(\0162\035.CookieMonsterG4Download.Unit\022" +
+        "\032\n\022download_timestamp\030\003 \002(\t\022\034\n\024receiver_" +
+        "system_time\030\004 \001(\004\022F\n\017download_status\030\005 \001" +
+        "(\0162\'.CookieMonsterG4Download.DownloadSta" +
+        "tus:\004NONE\022\030\n\020receiver_battery\030\006 \001(\r\022\030\n\020u" +
+        "ploader_battery\030\007 \001(\r\022$\n\005meter\030\010 \003(\0132\025.C" +
+        "ookieMonsterG4Meter\022&\n\006sensor\030\t \003(\0132\026.Co" +
+        "okieMonsterG4Sensor\022 \n\003cal\030\n \003(\0132\023.Cooki",
+        "eMonsterG4Cal\022\024\n\014patient_name\030\013 \001(\t\"\032\n\004U" +
+        "nit\022\010\n\004MGDL\020\000\022\010\n\004MMOL\020\001\"|\n\016DownloadStatu" +
+        "s\022\013\n\007SUCCESS\020\000\022\013\n\007NO_DATA\020\001\022\024\n\020DEVICE_NO" +
+        "T_FOUND\020\002\022\014\n\010IO_ERROR\020\003\022\025\n\021APPLICATION_E" +
+        "RROR\020\004\022\010\n\004NONE\020\006\022\013\n\007UNKNOWN\020\007\"\233\002\n\022Cookie"
+        +
+        "MonsterG4EGV\022\013\n\003sgv\030\001 \002(\r\022\021\n\ttimestamp\030\002" +
+        " \001(\004\0220\n\tdirection\030\003 \001(\0162\035.CookieMonsterG" +
+        "4EGV.Direction\"\262\001\n\tDirection\022\010\n\004NONE\020\000\022\r" +
+        "\n\tDOUBLE_UP\020\001\022\r\n\tSINGLE_UP\020\002\022\021\n\rFORTY_FI" +
+        "VE_UP\020\003\022\010\n\004FLAT\020\004\022\023\n\017FORTY_FIVE_DOWN\020\005\022\017",
+        "\n\013SINGLE_DOWN\020\006\022\017\n\013DOUBLE_DOWN\020\007\022\022\n\016NOT_" +
+        "COMPUTABLE\020\010\022\025\n\021RATE_OUT_OF_RANGE\020\t\"O\n\024C" +
+        "ookieMonsterG4Meter\022\020\n\010meter_bg\030\001 \002(\r\022\022\n" +
+        "\nmeter_time\030\002 \001(\r\022\021\n\ttimestamp\030\003 \001(\004\"^\n\025" +
+        "CookieMonsterG4Sensor\022\020\n\010filtered\030\001 \002(\004\022" +
+        "\022\n\nunfiltered\030\002 \001(\004\022\014\n\004rssi\030\003 \001(\r\022\021\n\ttim" +
+        "estamp\030\004 \001(\004\"X\n\022CookieMonsterG4Cal\022\r\n\005sl" +
+        "ope\030\001 \002(\001\022\021\n\tintercept\030\002 \001(\001\022\r\n\005scale\030\003 " +
+        "\001(\001\022\021\n\ttimestamp\030\004 \001(\004\"\257\001\n\033CookieMonster" +
+        "ReceiverStatus\022\021\n\ttimestamp\030\001 \002(\004\022:\n\005eve",
+        "nt\030\002 \003(\0162+.CookieMonsterReceiverStatus.R" +
+        "eceiverStatus\"A\n\016ReceiverStatus\022\025\n\021RECEI" +
+        "VERCONNECTED\020\000\022\030\n\024RECEIVERDISCONNECTED\020\001" +
+        "B#\n\034com.nightscout.core.downloadB\003SGV"
+    };
+    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
+        new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
+    com.google.protobuf.Descriptors.FileDescriptor
+        .internalBuildGeneratedFileFrom(descriptorData,
+                                        new com.google.protobuf.Descriptors.FileDescriptor[]{
+                                        }, assigner);
+    internal_static_CookieMonsterG4Download_descriptor =
+        getDescriptor().getMessageTypes().get(0);
+    internal_static_CookieMonsterG4Download_fieldAccessorTable = new
+        com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_CookieMonsterG4Download_descriptor,
+        new java.lang.String[]{"Sgv", "Units", "DownloadTimestamp", "ReceiverSystemTime",
+                               "DownloadStatus", "ReceiverBattery", "UploaderBattery", "Meter",
+                               "Sensor", "Cal", "PatientName",});
+    internal_static_CookieMonsterG4EGV_descriptor =
+        getDescriptor().getMessageTypes().get(1);
+    internal_static_CookieMonsterG4EGV_fieldAccessorTable = new
+        com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_CookieMonsterG4EGV_descriptor,
+        new java.lang.String[]{"Sgv", "Timestamp", "Direction",});
+    internal_static_CookieMonsterG4Meter_descriptor =
+        getDescriptor().getMessageTypes().get(2);
+    internal_static_CookieMonsterG4Meter_fieldAccessorTable = new
+        com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_CookieMonsterG4Meter_descriptor,
+        new java.lang.String[]{"MeterBg", "MeterTime", "Timestamp",});
+    internal_static_CookieMonsterG4Sensor_descriptor =
+        getDescriptor().getMessageTypes().get(3);
+    internal_static_CookieMonsterG4Sensor_fieldAccessorTable = new
+        com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_CookieMonsterG4Sensor_descriptor,
+        new java.lang.String[]{"Filtered", "Unfiltered", "Rssi", "Timestamp",});
+    internal_static_CookieMonsterG4Cal_descriptor =
+        getDescriptor().getMessageTypes().get(4);
+    internal_static_CookieMonsterG4Cal_fieldAccessorTable = new
+        com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_CookieMonsterG4Cal_descriptor,
+        new java.lang.String[]{"Slope", "Intercept", "Scale", "Timestamp",});
+    internal_static_CookieMonsterReceiverStatus_descriptor =
+        getDescriptor().getMessageTypes().get(5);
+    internal_static_CookieMonsterReceiverStatus_fieldAccessorTable = new
+        com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_CookieMonsterReceiverStatus_descriptor,
+        new java.lang.String[]{"Timestamp", "Event",});
+  }
+
+  private SGV() {
+  }
+
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
+
+  public static com.google.protobuf.Descriptors.FileDescriptor
+  getDescriptor() {
+    return descriptor;
+  }
+
   public interface CookieMonsterG4DownloadOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:CookieMonsterG4Download)
-      com.google.protobuf.MessageOrBuilder {
+                                                    // @@protoc_insertion_point(interface_extends:CookieMonsterG4Download)
+                                                        com.google.protobuf.MessageOrBuilder {
 
     /**
      * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
@@ -19,8 +151,9 @@ public final class SGV {
      * Glucose records as reported by the G4
      * </pre>
      */
-    java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4EGV> 
-        getSgvList();
+    java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4EGV>
+    getSgvList();
+
     /**
      * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
      *
@@ -29,6 +162,7 @@ public final class SGV {
      * </pre>
      */
     com.nightscout.core.download.SGV.CookieMonsterG4EGV getSgv(int index);
+
     /**
      * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
      *
@@ -37,6 +171,7 @@ public final class SGV {
      * </pre>
      */
     int getSgvCount();
+
     /**
      * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
      *
@@ -44,8 +179,9 @@ public final class SGV {
      * Glucose records as reported by the G4
      * </pre>
      */
-    java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4EGVOrBuilder> 
-        getSgvOrBuilderList();
+    java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4EGVOrBuilder>
+    getSgvOrBuilderList();
+
     /**
      * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
      *
@@ -64,6 +200,7 @@ public final class SGV {
      * </pre>
      */
     boolean hasUnits();
+
     /**
      * <code>optional .CookieMonsterG4Download.Unit units = 2;</code>
      *
@@ -81,6 +218,7 @@ public final class SGV {
      * </pre>
      */
     boolean hasDownloadTimestamp();
+
     /**
      * <code>required string download_timestamp = 3;</code>
      *
@@ -89,6 +227,7 @@ public final class SGV {
      * </pre>
      */
     java.lang.String getDownloadTimestamp();
+
     /**
      * <code>required string download_timestamp = 3;</code>
      *
@@ -97,7 +236,7 @@ public final class SGV {
      * </pre>
      */
     com.google.protobuf.ByteString
-        getDownloadTimestampBytes();
+    getDownloadTimestampBytes();
 
     /**
      * <code>optional uint64 receiver_system_time = 4;</code>
@@ -107,6 +246,7 @@ public final class SGV {
      * </pre>
      */
     boolean hasReceiverSystemTime();
+
     /**
      * <code>optional uint64 receiver_system_time = 4;</code>
      *
@@ -117,15 +257,18 @@ public final class SGV {
     long getReceiverSystemTime();
 
     /**
-     * <code>optional .CookieMonsterG4Download.DownloadStatus download_status = 5 [default = NONE];</code>
+     * <code>optional .CookieMonsterG4Download.DownloadStatus download_status = 5 [default =
+     * NONE];</code>
      *
      * <pre>
      * Status of the download
      * </pre>
      */
     boolean hasDownloadStatus();
+
     /**
-     * <code>optional .CookieMonsterG4Download.DownloadStatus download_status = 5 [default = NONE];</code>
+     * <code>optional .CookieMonsterG4Download.DownloadStatus download_status = 5 [default =
+     * NONE];</code>
      *
      * <pre>
      * Status of the download
@@ -141,6 +284,7 @@ public final class SGV {
      * </pre>
      */
     boolean hasReceiverBattery();
+
     /**
      * <code>optional uint32 receiver_battery = 6;</code>
      *
@@ -158,6 +302,7 @@ public final class SGV {
      * </pre>
      */
     boolean hasUploaderBattery();
+
     /**
      * <code>optional uint32 uploader_battery = 7;</code>
      *
@@ -170,21 +315,25 @@ public final class SGV {
     /**
      * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
      */
-    java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Meter> 
-        getMeterList();
+    java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Meter>
+    getMeterList();
+
     /**
      * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
      */
     com.nightscout.core.download.SGV.CookieMonsterG4Meter getMeter(int index);
+
     /**
      * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
      */
     int getMeterCount();
+
     /**
      * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
      */
-    java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4MeterOrBuilder> 
-        getMeterOrBuilderList();
+    java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4MeterOrBuilder>
+    getMeterOrBuilderList();
+
     /**
      * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
      */
@@ -194,21 +343,25 @@ public final class SGV {
     /**
      * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
      */
-    java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Sensor> 
-        getSensorList();
+    java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Sensor>
+    getSensorList();
+
     /**
      * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
      */
     com.nightscout.core.download.SGV.CookieMonsterG4Sensor getSensor(int index);
+
     /**
      * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
      */
     int getSensorCount();
+
     /**
      * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
      */
-    java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4SensorOrBuilder> 
-        getSensorOrBuilderList();
+    java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4SensorOrBuilder>
+    getSensorOrBuilderList();
+
     /**
      * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
      */
@@ -218,21 +371,25 @@ public final class SGV {
     /**
      * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
      */
-    java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Cal> 
-        getCalList();
+    java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Cal>
+    getCalList();
+
     /**
      * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
      */
     com.nightscout.core.download.SGV.CookieMonsterG4Cal getCal(int index);
+
     /**
      * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
      */
     int getCalCount();
+
     /**
      * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
      */
-    java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4CalOrBuilder> 
-        getCalOrBuilderList();
+    java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4CalOrBuilder>
+    getCalOrBuilderList();
+
     /**
      * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
      */
@@ -243,45 +400,289 @@ public final class SGV {
      * <code>optional string patient_name = 11;</code>
      */
     boolean hasPatientName();
+
     /**
      * <code>optional string patient_name = 11;</code>
      */
     java.lang.String getPatientName();
+
     /**
      * <code>optional string patient_name = 11;</code>
      */
     com.google.protobuf.ByteString
-        getPatientNameBytes();
+    getPatientNameBytes();
   }
+
+  public interface CookieMonsterG4EGVOrBuilder extends
+                                               // @@protoc_insertion_point(interface_extends:CookieMonsterG4EGV)
+                                                   com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>required uint32 sgv = 1;</code>
+     *
+     * <pre>
+     * Glucose value
+     * </pre>
+     */
+    boolean hasSgv();
+
+    /**
+     * <code>required uint32 sgv = 1;</code>
+     *
+     * <pre>
+     * Glucose value
+     * </pre>
+     */
+    int getSgv();
+
+    /**
+     * <code>optional uint64 timestamp = 2;</code>
+     *
+     * <pre>
+     * timestamp of the record
+     * </pre>
+     */
+    boolean hasTimestamp();
+
+    /**
+     * <code>optional uint64 timestamp = 2;</code>
+     *
+     * <pre>
+     * timestamp of the record
+     * </pre>
+     */
+    long getTimestamp();
+
+    /**
+     * <code>optional .CookieMonsterG4EGV.Direction direction = 3;</code>
+     *
+     * <pre>
+     * Trend arrow
+     * </pre>
+     */
+    boolean hasDirection();
+
+    /**
+     * <code>optional .CookieMonsterG4EGV.Direction direction = 3;</code>
+     *
+     * <pre>
+     * Trend arrow
+     * </pre>
+     */
+    com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction getDirection();
+  }
+
+  public interface CookieMonsterG4MeterOrBuilder extends
+                                                 // @@protoc_insertion_point(interface_extends:CookieMonsterG4Meter)
+                                                     com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>required uint32 meter_bg = 1;</code>
+     */
+    boolean hasMeterBg();
+
+    /**
+     * <code>required uint32 meter_bg = 1;</code>
+     */
+    int getMeterBg();
+
+    /**
+     * <code>optional uint32 meter_time = 2;</code>
+     */
+    boolean hasMeterTime();
+
+    /**
+     * <code>optional uint32 meter_time = 2;</code>
+     */
+    int getMeterTime();
+
+    /**
+     * <code>optional uint64 timestamp = 3;</code>
+     */
+    boolean hasTimestamp();
+
+    /**
+     * <code>optional uint64 timestamp = 3;</code>
+     */
+    long getTimestamp();
+  }
+
+  public interface CookieMonsterG4SensorOrBuilder extends
+                                                  // @@protoc_insertion_point(interface_extends:CookieMonsterG4Sensor)
+                                                      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>required uint64 filtered = 1;</code>
+     */
+    boolean hasFiltered();
+
+    /**
+     * <code>required uint64 filtered = 1;</code>
+     */
+    long getFiltered();
+
+    /**
+     * <code>optional uint64 unfiltered = 2;</code>
+     */
+    boolean hasUnfiltered();
+
+    /**
+     * <code>optional uint64 unfiltered = 2;</code>
+     */
+    long getUnfiltered();
+
+    /**
+     * <code>optional uint32 rssi = 3;</code>
+     */
+    boolean hasRssi();
+
+    /**
+     * <code>optional uint32 rssi = 3;</code>
+     */
+    int getRssi();
+
+    /**
+     * <code>optional uint64 timestamp = 4;</code>
+     */
+    boolean hasTimestamp();
+
+    /**
+     * <code>optional uint64 timestamp = 4;</code>
+     */
+    long getTimestamp();
+  }
+
+  public interface CookieMonsterG4CalOrBuilder extends
+                                               // @@protoc_insertion_point(interface_extends:CookieMonsterG4Cal)
+                                                   com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>required double slope = 1;</code>
+     */
+    boolean hasSlope();
+
+    /**
+     * <code>required double slope = 1;</code>
+     */
+    double getSlope();
+
+    /**
+     * <code>optional double intercept = 2;</code>
+     */
+    boolean hasIntercept();
+
+    /**
+     * <code>optional double intercept = 2;</code>
+     */
+    double getIntercept();
+
+    /**
+     * <code>optional double scale = 3;</code>
+     */
+    boolean hasScale();
+
+    /**
+     * <code>optional double scale = 3;</code>
+     */
+    double getScale();
+
+    /**
+     * <code>optional uint64 timestamp = 4;</code>
+     */
+    boolean hasTimestamp();
+
+    /**
+     * <code>optional uint64 timestamp = 4;</code>
+     */
+    long getTimestamp();
+  }
+
+  public interface CookieMonsterReceiverStatusOrBuilder extends
+                                                        // @@protoc_insertion_point(interface_extends:CookieMonsterReceiverStatus)
+                                                            com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>required uint64 timestamp = 1;</code>
+     */
+    boolean hasTimestamp();
+
+    /**
+     * <code>required uint64 timestamp = 1;</code>
+     */
+    long getTimestamp();
+
+    /**
+     * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
+     */
+    java.util.List<com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus> getEventList();
+
+    /**
+     * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
+     */
+    int getEventCount();
+
+    /**
+     * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
+     */
+    com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus getEvent(int index);
+  }
+
   /**
    * Protobuf type {@code CookieMonsterG4Download}
    */
   public static final class CookieMonsterG4Download extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:CookieMonsterG4Download)
-      CookieMonsterG4DownloadOrBuilder {
+                                                    com.google.protobuf.GeneratedMessage implements
+                                                                                         // @@protoc_insertion_point(message_implements:CookieMonsterG4Download)
+                                                                                             CookieMonsterG4DownloadOrBuilder {
+
+    public static final int SGV_FIELD_NUMBER = 1;
+    public static final int UNITS_FIELD_NUMBER = 2;
+    public static final int DOWNLOAD_TIMESTAMP_FIELD_NUMBER = 3;
+    public static final int RECEIVER_SYSTEM_TIME_FIELD_NUMBER = 4;
+    public static final int DOWNLOAD_STATUS_FIELD_NUMBER = 5;
+    public static final int RECEIVER_BATTERY_FIELD_NUMBER = 6;
+    public static final int UPLOADER_BATTERY_FIELD_NUMBER = 7;
+    public static final int METER_FIELD_NUMBER = 8;
+    public static final int SENSOR_FIELD_NUMBER = 9;
+    public static final int CAL_FIELD_NUMBER = 10;
+    public static final int PATIENT_NAME_FIELD_NUMBER = 11;
+    private static final CookieMonsterG4Download defaultInstance;
+    private static final long serialVersionUID = 0L;
+    public static com.google.protobuf.Parser<CookieMonsterG4Download> PARSER =
+        new com.google.protobuf.AbstractParser<CookieMonsterG4Download>() {
+          public CookieMonsterG4Download parsePartialFrom(
+              com.google.protobuf.CodedInputStream input,
+              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+              throws com.google.protobuf.InvalidProtocolBufferException {
+            return new CookieMonsterG4Download(input, extensionRegistry);
+          }
+        };
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    private int bitField0_;
+    private java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4EGV> sgv_;
+    private com.nightscout.core.download.SGV.CookieMonsterG4Download.Unit units_;
+    private java.lang.Object downloadTimestamp_;
+    private long receiverSystemTime_;
+    private com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus downloadStatus_;
+    private int receiverBattery_;
+    private int uploaderBattery_;
+    private java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Meter> meter_;
+    private java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Sensor> sensor_;
+    private java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Cal> cal_;
+    private java.lang.Object patientName_;
+    private byte memoizedIsInitialized = -1;
+    private int memoizedSerializedSize = -1;
+
     // Use CookieMonsterG4Download.newBuilder() to construct.
     private CookieMonsterG4Download(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
     }
-    private CookieMonsterG4Download(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
 
-    private static final CookieMonsterG4Download defaultInstance;
-    public static CookieMonsterG4Download getDefaultInstance() {
-      return defaultInstance;
+    private CookieMonsterG4Download(boolean noInit) {
+      this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance();
     }
 
-    public CookieMonsterG4Download getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
-      return this.unknownFields;
-    }
     private CookieMonsterG4Download(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -307,15 +708,19 @@ public final class SGV {
             }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-                sgv_ = new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterG4EGV>();
+                sgv_ =
+                    new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterG4EGV>();
                 mutable_bitField0_ |= 0x00000001;
               }
-              sgv_.add(input.readMessage(com.nightscout.core.download.SGV.CookieMonsterG4EGV.PARSER, extensionRegistry));
+              sgv_.add(input.readMessage(com.nightscout.core.download.SGV.CookieMonsterG4EGV.PARSER,
+                                         extensionRegistry));
               break;
             }
             case 16: {
               int rawValue = input.readEnum();
-              com.nightscout.core.download.SGV.CookieMonsterG4Download.Unit value = com.nightscout.core.download.SGV.CookieMonsterG4Download.Unit.valueOf(rawValue);
+              com.nightscout.core.download.SGV.CookieMonsterG4Download.Unit
+                  value =
+                  com.nightscout.core.download.SGV.CookieMonsterG4Download.Unit.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(2, rawValue);
               } else {
@@ -337,7 +742,10 @@ public final class SGV {
             }
             case 40: {
               int rawValue = input.readEnum();
-              com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus value = com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus.valueOf(rawValue);
+              com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus
+                  value =
+                  com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus
+                      .valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(5, rawValue);
               } else {
@@ -358,26 +766,33 @@ public final class SGV {
             }
             case 66: {
               if (!((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
-                meter_ = new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterG4Meter>();
+                meter_ =
+                    new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterG4Meter>();
                 mutable_bitField0_ |= 0x00000080;
               }
-              meter_.add(input.readMessage(com.nightscout.core.download.SGV.CookieMonsterG4Meter.PARSER, extensionRegistry));
+              meter_.add(input.readMessage(
+                  com.nightscout.core.download.SGV.CookieMonsterG4Meter.PARSER, extensionRegistry));
               break;
             }
             case 74: {
               if (!((mutable_bitField0_ & 0x00000100) == 0x00000100)) {
-                sensor_ = new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterG4Sensor>();
+                sensor_ =
+                    new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterG4Sensor>();
                 mutable_bitField0_ |= 0x00000100;
               }
-              sensor_.add(input.readMessage(com.nightscout.core.download.SGV.CookieMonsterG4Sensor.PARSER, extensionRegistry));
+              sensor_.add(input.readMessage(
+                  com.nightscout.core.download.SGV.CookieMonsterG4Sensor.PARSER,
+                  extensionRegistry));
               break;
             }
             case 82: {
               if (!((mutable_bitField0_ & 0x00000200) == 0x00000200)) {
-                cal_ = new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterG4Cal>();
+                cal_ =
+                    new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterG4Cal>();
                 mutable_bitField0_ |= 0x00000200;
               }
-              cal_.add(input.readMessage(com.nightscout.core.download.SGV.CookieMonsterG4Cal.PARSER, extensionRegistry));
+              cal_.add(input.readMessage(com.nightscout.core.download.SGV.CookieMonsterG4Cal.PARSER,
+                                         extensionRegistry));
               break;
             }
             case 90: {
@@ -410,245 +825,112 @@ public final class SGV {
         makeExtensionsImmutable();
       }
     }
+
+    public static CookieMonsterG4Download getDefaultInstance() {
+      return defaultInstance;
+    }
+
     public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
+    getDescriptor() {
       return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Download_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Download_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              com.nightscout.core.download.SGV.CookieMonsterG4Download.class, com.nightscout.core.download.SGV.CookieMonsterG4Download.Builder.class);
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
     }
 
-    public static com.google.protobuf.Parser<CookieMonsterG4Download> PARSER =
-        new com.google.protobuf.AbstractParser<CookieMonsterG4Download>() {
-      public CookieMonsterG4Download parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new CookieMonsterG4Download(input, extensionRegistry);
-      }
-    };
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseFrom(
+        java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseDelimitedFrom(
+        java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() {
+      return Builder.create();
+    }
+
+    public static Builder newBuilder(
+        com.nightscout.core.download.SGV.CookieMonsterG4Download prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+
+    public CookieMonsterG4Download getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    internalGetFieldAccessorTable() {
+      return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Download_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.nightscout.core.download.SGV.CookieMonsterG4Download.class,
+              com.nightscout.core.download.SGV.CookieMonsterG4Download.Builder.class);
+    }
 
     @java.lang.Override
     public com.google.protobuf.Parser<CookieMonsterG4Download> getParserForType() {
       return PARSER;
     }
 
-    /**
-     * Protobuf enum {@code CookieMonsterG4Download.Unit}
-     */
-    public enum Unit
-        implements com.google.protobuf.ProtocolMessageEnum {
-      /**
-       * <code>MGDL = 0;</code>
-       */
-      MGDL(0, 0),
-      /**
-       * <code>MMOL = 1;</code>
-       */
-      MMOL(1, 1),
-      ;
-
-      /**
-       * <code>MGDL = 0;</code>
-       */
-      public static final int MGDL_VALUE = 0;
-      /**
-       * <code>MMOL = 1;</code>
-       */
-      public static final int MMOL_VALUE = 1;
-
-
-      public final int getNumber() { return value; }
-
-      public static Unit valueOf(int value) {
-        switch (value) {
-          case 0: return MGDL;
-          case 1: return MMOL;
-          default: return null;
-        }
-      }
-
-      public static com.google.protobuf.Internal.EnumLiteMap<Unit>
-          internalGetValueMap() {
-        return internalValueMap;
-      }
-      private static com.google.protobuf.Internal.EnumLiteMap<Unit>
-          internalValueMap =
-            new com.google.protobuf.Internal.EnumLiteMap<Unit>() {
-              public Unit findValueByNumber(int number) {
-                return Unit.valueOf(number);
-              }
-            };
-
-      public final com.google.protobuf.Descriptors.EnumValueDescriptor
-          getValueDescriptor() {
-        return getDescriptor().getValues().get(index);
-      }
-      public final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptorForType() {
-        return getDescriptor();
-      }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptor() {
-        return com.nightscout.core.download.SGV.CookieMonsterG4Download.getDescriptor().getEnumTypes().get(0);
-      }
-
-      private static final Unit[] VALUES = values();
-
-      public static Unit valueOf(
-          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-        if (desc.getType() != getDescriptor()) {
-          throw new java.lang.IllegalArgumentException(
-            "EnumValueDescriptor is not for this type.");
-        }
-        return VALUES[desc.getIndex()];
-      }
-
-      private final int index;
-      private final int value;
-
-      private Unit(int index, int value) {
-        this.index = index;
-        this.value = value;
-      }
-
-      // @@protoc_insertion_point(enum_scope:CookieMonsterG4Download.Unit)
-    }
-
-    /**
-     * Protobuf enum {@code CookieMonsterG4Download.DownloadStatus}
-     */
-    public enum DownloadStatus
-        implements com.google.protobuf.ProtocolMessageEnum {
-      /**
-       * <code>SUCCESS = 0;</code>
-       */
-      SUCCESS(0, 0),
-      /**
-       * <code>NO_DATA = 1;</code>
-       */
-      NO_DATA(1, 1),
-      /**
-       * <code>DEVICE_NOT_FOUND = 2;</code>
-       */
-      DEVICE_NOT_FOUND(2, 2),
-      /**
-       * <code>IO_ERROR = 3;</code>
-       */
-      IO_ERROR(3, 3),
-      /**
-       * <code>APPLICATION_ERROR = 4;</code>
-       */
-      APPLICATION_ERROR(4, 4),
-      /**
-       * <code>NONE = 6;</code>
-       */
-      NONE(5, 6),
-      /**
-       * <code>UNKNOWN = 7;</code>
-       */
-      UNKNOWN(6, 7),
-      ;
-
-      /**
-       * <code>SUCCESS = 0;</code>
-       */
-      public static final int SUCCESS_VALUE = 0;
-      /**
-       * <code>NO_DATA = 1;</code>
-       */
-      public static final int NO_DATA_VALUE = 1;
-      /**
-       * <code>DEVICE_NOT_FOUND = 2;</code>
-       */
-      public static final int DEVICE_NOT_FOUND_VALUE = 2;
-      /**
-       * <code>IO_ERROR = 3;</code>
-       */
-      public static final int IO_ERROR_VALUE = 3;
-      /**
-       * <code>APPLICATION_ERROR = 4;</code>
-       */
-      public static final int APPLICATION_ERROR_VALUE = 4;
-      /**
-       * <code>NONE = 6;</code>
-       */
-      public static final int NONE_VALUE = 6;
-      /**
-       * <code>UNKNOWN = 7;</code>
-       */
-      public static final int UNKNOWN_VALUE = 7;
-
-
-      public final int getNumber() { return value; }
-
-      public static DownloadStatus valueOf(int value) {
-        switch (value) {
-          case 0: return SUCCESS;
-          case 1: return NO_DATA;
-          case 2: return DEVICE_NOT_FOUND;
-          case 3: return IO_ERROR;
-          case 4: return APPLICATION_ERROR;
-          case 6: return NONE;
-          case 7: return UNKNOWN;
-          default: return null;
-        }
-      }
-
-      public static com.google.protobuf.Internal.EnumLiteMap<DownloadStatus>
-          internalGetValueMap() {
-        return internalValueMap;
-      }
-      private static com.google.protobuf.Internal.EnumLiteMap<DownloadStatus>
-          internalValueMap =
-            new com.google.protobuf.Internal.EnumLiteMap<DownloadStatus>() {
-              public DownloadStatus findValueByNumber(int number) {
-                return DownloadStatus.valueOf(number);
-              }
-            };
-
-      public final com.google.protobuf.Descriptors.EnumValueDescriptor
-          getValueDescriptor() {
-        return getDescriptor().getValues().get(index);
-      }
-      public final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptorForType() {
-        return getDescriptor();
-      }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptor() {
-        return com.nightscout.core.download.SGV.CookieMonsterG4Download.getDescriptor().getEnumTypes().get(1);
-      }
-
-      private static final DownloadStatus[] VALUES = values();
-
-      public static DownloadStatus valueOf(
-          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-        if (desc.getType() != getDescriptor()) {
-          throw new java.lang.IllegalArgumentException(
-            "EnumValueDescriptor is not for this type.");
-        }
-        return VALUES[desc.getIndex()];
-      }
-
-      private final int index;
-      private final int value;
-
-      private DownloadStatus(int index, int value) {
-        this.index = index;
-        this.value = value;
-      }
-
-      // @@protoc_insertion_point(enum_scope:CookieMonsterG4Download.DownloadStatus)
-    }
-
-    private int bitField0_;
-    public static final int SGV_FIELD_NUMBER = 1;
-    private java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4EGV> sgv_;
     /**
      * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
      *
@@ -659,6 +941,7 @@ public final class SGV {
     public java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4EGV> getSgvList() {
       return sgv_;
     }
+
     /**
      * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
      *
@@ -666,10 +949,11 @@ public final class SGV {
      * Glucose records as reported by the G4
      * </pre>
      */
-    public java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4EGVOrBuilder> 
-        getSgvOrBuilderList() {
+    public java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4EGVOrBuilder>
+    getSgvOrBuilderList() {
       return sgv_;
     }
+
     /**
      * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
      *
@@ -680,6 +964,7 @@ public final class SGV {
     public int getSgvCount() {
       return sgv_.size();
     }
+
     /**
      * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
      *
@@ -690,6 +975,7 @@ public final class SGV {
     public com.nightscout.core.download.SGV.CookieMonsterG4EGV getSgv(int index) {
       return sgv_.get(index);
     }
+
     /**
      * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
      *
@@ -702,8 +988,6 @@ public final class SGV {
       return sgv_.get(index);
     }
 
-    public static final int UNITS_FIELD_NUMBER = 2;
-    private com.nightscout.core.download.SGV.CookieMonsterG4Download.Unit units_;
     /**
      * <code>optional .CookieMonsterG4Download.Unit units = 2;</code>
      *
@@ -714,6 +998,7 @@ public final class SGV {
     public boolean hasUnits() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
+
     /**
      * <code>optional .CookieMonsterG4Download.Unit units = 2;</code>
      *
@@ -725,8 +1010,6 @@ public final class SGV {
       return units_;
     }
 
-    public static final int DOWNLOAD_TIMESTAMP_FIELD_NUMBER = 3;
-    private java.lang.Object downloadTimestamp_;
     /**
      * <code>required string download_timestamp = 3;</code>
      *
@@ -737,6 +1020,7 @@ public final class SGV {
     public boolean hasDownloadTimestamp() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
+
     /**
      * <code>required string download_timestamp = 3;</code>
      *
@@ -749,7 +1033,7 @@ public final class SGV {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -758,6 +1042,7 @@ public final class SGV {
         return s;
       }
     }
+
     /**
      * <code>required string download_timestamp = 3;</code>
      *
@@ -766,10 +1051,10 @@ public final class SGV {
      * </pre>
      */
     public com.google.protobuf.ByteString
-        getDownloadTimestampBytes() {
+    getDownloadTimestampBytes() {
       java.lang.Object ref = downloadTimestamp_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         downloadTimestamp_ = b;
@@ -779,8 +1064,6 @@ public final class SGV {
       }
     }
 
-    public static final int RECEIVER_SYSTEM_TIME_FIELD_NUMBER = 4;
-    private long receiverSystemTime_;
     /**
      * <code>optional uint64 receiver_system_time = 4;</code>
      *
@@ -791,6 +1074,7 @@ public final class SGV {
     public boolean hasReceiverSystemTime() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
+
     /**
      * <code>optional uint64 receiver_system_time = 4;</code>
      *
@@ -802,10 +1086,9 @@ public final class SGV {
       return receiverSystemTime_;
     }
 
-    public static final int DOWNLOAD_STATUS_FIELD_NUMBER = 5;
-    private com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus downloadStatus_;
     /**
-     * <code>optional .CookieMonsterG4Download.DownloadStatus download_status = 5 [default = NONE];</code>
+     * <code>optional .CookieMonsterG4Download.DownloadStatus download_status = 5 [default =
+     * NONE];</code>
      *
      * <pre>
      * Status of the download
@@ -814,8 +1097,10 @@ public final class SGV {
     public boolean hasDownloadStatus() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
+
     /**
-     * <code>optional .CookieMonsterG4Download.DownloadStatus download_status = 5 [default = NONE];</code>
+     * <code>optional .CookieMonsterG4Download.DownloadStatus download_status = 5 [default =
+     * NONE];</code>
      *
      * <pre>
      * Status of the download
@@ -825,8 +1110,6 @@ public final class SGV {
       return downloadStatus_;
     }
 
-    public static final int RECEIVER_BATTERY_FIELD_NUMBER = 6;
-    private int receiverBattery_;
     /**
      * <code>optional uint32 receiver_battery = 6;</code>
      *
@@ -837,6 +1120,7 @@ public final class SGV {
     public boolean hasReceiverBattery() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
+
     /**
      * <code>optional uint32 receiver_battery = 6;</code>
      *
@@ -848,8 +1132,6 @@ public final class SGV {
       return receiverBattery_;
     }
 
-    public static final int UPLOADER_BATTERY_FIELD_NUMBER = 7;
-    private int uploaderBattery_;
     /**
      * <code>optional uint32 uploader_battery = 7;</code>
      *
@@ -860,6 +1142,7 @@ public final class SGV {
     public boolean hasUploaderBattery() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
+
     /**
      * <code>optional uint32 uploader_battery = 7;</code>
      *
@@ -871,33 +1154,35 @@ public final class SGV {
       return uploaderBattery_;
     }
 
-    public static final int METER_FIELD_NUMBER = 8;
-    private java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Meter> meter_;
     /**
      * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
      */
     public java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Meter> getMeterList() {
       return meter_;
     }
+
     /**
      * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
      */
-    public java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4MeterOrBuilder> 
-        getMeterOrBuilderList() {
+    public java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4MeterOrBuilder>
+    getMeterOrBuilderList() {
       return meter_;
     }
+
     /**
      * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
      */
     public int getMeterCount() {
       return meter_.size();
     }
+
     /**
      * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
      */
     public com.nightscout.core.download.SGV.CookieMonsterG4Meter getMeter(int index) {
       return meter_.get(index);
     }
+
     /**
      * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
      */
@@ -906,33 +1191,35 @@ public final class SGV {
       return meter_.get(index);
     }
 
-    public static final int SENSOR_FIELD_NUMBER = 9;
-    private java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Sensor> sensor_;
     /**
      * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
      */
     public java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Sensor> getSensorList() {
       return sensor_;
     }
+
     /**
      * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
      */
-    public java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4SensorOrBuilder> 
-        getSensorOrBuilderList() {
+    public java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4SensorOrBuilder>
+    getSensorOrBuilderList() {
       return sensor_;
     }
+
     /**
      * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
      */
     public int getSensorCount() {
       return sensor_.size();
     }
+
     /**
      * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
      */
     public com.nightscout.core.download.SGV.CookieMonsterG4Sensor getSensor(int index) {
       return sensor_.get(index);
     }
+
     /**
      * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
      */
@@ -941,33 +1228,35 @@ public final class SGV {
       return sensor_.get(index);
     }
 
-    public static final int CAL_FIELD_NUMBER = 10;
-    private java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Cal> cal_;
     /**
      * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
      */
     public java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Cal> getCalList() {
       return cal_;
     }
+
     /**
      * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
      */
-    public java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4CalOrBuilder> 
-        getCalOrBuilderList() {
+    public java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4CalOrBuilder>
+    getCalOrBuilderList() {
       return cal_;
     }
+
     /**
      * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
      */
     public int getCalCount() {
       return cal_.size();
     }
+
     /**
      * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
      */
     public com.nightscout.core.download.SGV.CookieMonsterG4Cal getCal(int index) {
       return cal_.get(index);
     }
+
     /**
      * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
      */
@@ -976,14 +1265,13 @@ public final class SGV {
       return cal_.get(index);
     }
 
-    public static final int PATIENT_NAME_FIELD_NUMBER = 11;
-    private java.lang.Object patientName_;
     /**
      * <code>optional string patient_name = 11;</code>
      */
     public boolean hasPatientName() {
       return ((bitField0_ & 0x00000040) == 0x00000040);
     }
+
     /**
      * <code>optional string patient_name = 11;</code>
      */
@@ -992,7 +1280,7 @@ public final class SGV {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
@@ -1001,14 +1289,15 @@ public final class SGV {
         return s;
       }
     }
+
     /**
      * <code>optional string patient_name = 11;</code>
      */
     public com.google.protobuf.ByteString
-        getPatientNameBytes() {
+    getPatientNameBytes() {
       java.lang.Object ref = patientName_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         patientName_ = b;
@@ -1023,7 +1312,8 @@ public final class SGV {
       units_ = com.nightscout.core.download.SGV.CookieMonsterG4Download.Unit.MGDL;
       downloadTimestamp_ = "";
       receiverSystemTime_ = 0L;
-      downloadStatus_ = com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus.NONE;
+      downloadStatus_ =
+          com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus.NONE;
       receiverBattery_ = 0;
       uploaderBattery_ = 0;
       meter_ = java.util.Collections.emptyList();
@@ -1031,11 +1321,15 @@ public final class SGV {
       cal_ = java.util.Collections.emptyList();
       patientName_ = "";
     }
-    private byte memoizedIsInitialized = -1;
+
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
+      if (isInitialized == 1) {
+        return true;
+      }
+      if (isInitialized == 0) {
+        return false;
+      }
 
       if (!hasDownloadTimestamp()) {
         memoizedIsInitialized = 0;
@@ -1070,7 +1364,7 @@ public final class SGV {
     }
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
+        throws java.io.IOException {
       getSerializedSize();
       for (int i = 0; i < sgv_.size(); i++) {
         output.writeMessage(1, sgv_.get(i));
@@ -1108,127 +1402,75 @@ public final class SGV {
       getUnknownFields().writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
-      if (size != -1) return size;
+      if (size != -1) {
+        return size;
+      }
 
       size = 0;
       for (int i = 0; i < sgv_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, sgv_.get(i));
+            .computeMessageSize(1, sgv_.get(i));
       }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(2, units_.getNumber());
+            .computeEnumSize(2, units_.getNumber());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, getDownloadTimestampBytes());
+            .computeBytesSize(3, getDownloadTimestampBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(4, receiverSystemTime_);
+            .computeUInt64Size(4, receiverSystemTime_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(5, downloadStatus_.getNumber());
+            .computeEnumSize(5, downloadStatus_.getNumber());
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(6, receiverBattery_);
+            .computeUInt32Size(6, receiverBattery_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(7, uploaderBattery_);
+            .computeUInt32Size(7, uploaderBattery_);
       }
       for (int i = 0; i < meter_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(8, meter_.get(i));
+            .computeMessageSize(8, meter_.get(i));
       }
       for (int i = 0; i < sensor_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(9, sensor_.get(i));
+            .computeMessageSize(9, sensor_.get(i));
       }
       for (int i = 0; i < cal_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(10, cal_.get(i));
+            .computeMessageSize(10, cal_.get(i));
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(11, getPatientNameBytes());
+            .computeBytesSize(11, getPatientNameBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     protected java.lang.Object writeReplace()
         throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Download parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+    public Builder newBuilderForType() {
+      return newBuilder();
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.nightscout.core.download.SGV.CookieMonsterG4Download prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public Builder toBuilder() {
+      return newBuilder(this);
     }
-    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -1236,24 +1478,270 @@ public final class SGV {
       Builder builder = new Builder(parent);
       return builder;
     }
+
+    /**
+     * Protobuf enum {@code CookieMonsterG4Download.Unit}
+     */
+    public enum Unit
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>MGDL = 0;</code>
+       */
+      MGDL(0, 0),
+      /**
+       * <code>MMOL = 1;</code>
+       */
+      MMOL(1, 1),;
+
+      /**
+       * <code>MGDL = 0;</code>
+       */
+      public static final int MGDL_VALUE = 0;
+      /**
+       * <code>MMOL = 1;</code>
+       */
+      public static final int MMOL_VALUE = 1;
+      private static final Unit[] VALUES = values();
+      private static com.google.protobuf.Internal.EnumLiteMap<Unit>
+          internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<Unit>() {
+            public Unit findValueByNumber(int number) {
+              return Unit.valueOf(number);
+            }
+          };
+      private final int index;
+      private final int value;
+
+      private Unit(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+
+      public static Unit valueOf(int value) {
+        switch (value) {
+          case 0:
+            return MGDL;
+          case 1:
+            return MMOL;
+          default:
+            return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<Unit>
+      internalGetValueMap() {
+        return internalValueMap;
+      }
+
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+      getDescriptor() {
+        return com.nightscout.core.download.SGV.CookieMonsterG4Download.getDescriptor()
+            .getEnumTypes().get(0);
+      }
+
+      public static Unit valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+              "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      public final int getNumber() {
+        return value;
+      }
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+      getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+      getDescriptorForType() {
+        return getDescriptor();
+      }
+
+      // @@protoc_insertion_point(enum_scope:CookieMonsterG4Download.Unit)
+    }
+
+    /**
+     * Protobuf enum {@code CookieMonsterG4Download.DownloadStatus}
+     */
+    public enum DownloadStatus
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>SUCCESS = 0;</code>
+       */
+      SUCCESS(0, 0),
+      /**
+       * <code>NO_DATA = 1;</code>
+       */
+      NO_DATA(1, 1),
+      /**
+       * <code>DEVICE_NOT_FOUND = 2;</code>
+       */
+      DEVICE_NOT_FOUND(2, 2),
+      /**
+       * <code>IO_ERROR = 3;</code>
+       */
+      IO_ERROR(3, 3),
+      /**
+       * <code>APPLICATION_ERROR = 4;</code>
+       */
+      APPLICATION_ERROR(4, 4),
+      /**
+       * <code>NONE = 6;</code>
+       */
+      NONE(5, 6),
+      /**
+       * <code>UNKNOWN = 7;</code>
+       */
+      UNKNOWN(6, 7),;
+
+      /**
+       * <code>SUCCESS = 0;</code>
+       */
+      public static final int SUCCESS_VALUE = 0;
+      /**
+       * <code>NO_DATA = 1;</code>
+       */
+      public static final int NO_DATA_VALUE = 1;
+      /**
+       * <code>DEVICE_NOT_FOUND = 2;</code>
+       */
+      public static final int DEVICE_NOT_FOUND_VALUE = 2;
+      /**
+       * <code>IO_ERROR = 3;</code>
+       */
+      public static final int IO_ERROR_VALUE = 3;
+      /**
+       * <code>APPLICATION_ERROR = 4;</code>
+       */
+      public static final int APPLICATION_ERROR_VALUE = 4;
+      /**
+       * <code>NONE = 6;</code>
+       */
+      public static final int NONE_VALUE = 6;
+      /**
+       * <code>UNKNOWN = 7;</code>
+       */
+      public static final int UNKNOWN_VALUE = 7;
+      private static final DownloadStatus[] VALUES = values();
+      private static com.google.protobuf.Internal.EnumLiteMap<DownloadStatus>
+          internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<DownloadStatus>() {
+            public DownloadStatus findValueByNumber(int number) {
+              return DownloadStatus.valueOf(number);
+            }
+          };
+      private final int index;
+      private final int value;
+
+      private DownloadStatus(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+
+      public static DownloadStatus valueOf(int value) {
+        switch (value) {
+          case 0:
+            return SUCCESS;
+          case 1:
+            return NO_DATA;
+          case 2:
+            return DEVICE_NOT_FOUND;
+          case 3:
+            return IO_ERROR;
+          case 4:
+            return APPLICATION_ERROR;
+          case 6:
+            return NONE;
+          case 7:
+            return UNKNOWN;
+          default:
+            return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<DownloadStatus>
+      internalGetValueMap() {
+        return internalValueMap;
+      }
+
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+      getDescriptor() {
+        return com.nightscout.core.download.SGV.CookieMonsterG4Download.getDescriptor()
+            .getEnumTypes().get(1);
+      }
+
+      public static DownloadStatus valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+              "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      public final int getNumber() {
+        return value;
+      }
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+      getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+      getDescriptorForType() {
+        return getDescriptor();
+      }
+
+      // @@protoc_insertion_point(enum_scope:CookieMonsterG4Download.DownloadStatus)
+    }
+
     /**
      * Protobuf type {@code CookieMonsterG4Download}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+                                      com.google.protobuf.GeneratedMessage.Builder<Builder>
+        implements
         // @@protoc_insertion_point(builder_implements:CookieMonsterG4Download)
-        com.nightscout.core.download.SGV.CookieMonsterG4DownloadOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Download_descriptor;
-      }
+            com.nightscout.core.download.SGV.CookieMonsterG4DownloadOrBuilder {
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Download_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                com.nightscout.core.download.SGV.CookieMonsterG4Download.class, com.nightscout.core.download.SGV.CookieMonsterG4Download.Builder.class);
-      }
+      private int bitField0_;
+      private java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4EGV> sgv_ =
+          java.util.Collections.emptyList();
+      private com.google.protobuf.RepeatedFieldBuilder<
+          com.nightscout.core.download.SGV.CookieMonsterG4EGV, com.nightscout.core.download.SGV.CookieMonsterG4EGV.Builder, com.nightscout.core.download.SGV.CookieMonsterG4EGVOrBuilder>
+          sgvBuilder_;
+      private com.nightscout.core.download.SGV.CookieMonsterG4Download.Unit
+          units_ =
+          com.nightscout.core.download.SGV.CookieMonsterG4Download.Unit.MGDL;
+      private java.lang.Object downloadTimestamp_ = "";
+      private long receiverSystemTime_;
+      private com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus
+          downloadStatus_ =
+          com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus.NONE;
+      private int receiverBattery_;
+      private int uploaderBattery_;
+      private java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Meter> meter_ =
+          java.util.Collections.emptyList();
+      private com.google.protobuf.RepeatedFieldBuilder<
+          com.nightscout.core.download.SGV.CookieMonsterG4Meter, com.nightscout.core.download.SGV.CookieMonsterG4Meter.Builder, com.nightscout.core.download.SGV.CookieMonsterG4MeterOrBuilder>
+          meterBuilder_;
+      private java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Sensor> sensor_ =
+          java.util.Collections.emptyList();
+      private com.google.protobuf.RepeatedFieldBuilder<
+          com.nightscout.core.download.SGV.CookieMonsterG4Sensor, com.nightscout.core.download.SGV.CookieMonsterG4Sensor.Builder, com.nightscout.core.download.SGV.CookieMonsterG4SensorOrBuilder>
+          sensorBuilder_;
+      private java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Cal> cal_ =
+          java.util.Collections.emptyList();
+      private com.google.protobuf.RepeatedFieldBuilder<
+          com.nightscout.core.download.SGV.CookieMonsterG4Cal, com.nightscout.core.download.SGV.CookieMonsterG4Cal.Builder, com.nightscout.core.download.SGV.CookieMonsterG4CalOrBuilder>
+          calBuilder_;
+      private java.lang.Object patientName_ = "";
 
       // Construct using com.nightscout.core.download.SGV.CookieMonsterG4Download.newBuilder()
       private Builder() {
@@ -1265,6 +1753,24 @@ public final class SGV {
         super(parent);
         maybeForceBuilderInitialization();
       }
+
+      public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Download_descriptor;
+      }
+
+      private static Builder create() {
+        return new Builder();
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internalGetFieldAccessorTable() {
+        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Download_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.nightscout.core.download.SGV.CookieMonsterG4Download.class,
+                com.nightscout.core.download.SGV.CookieMonsterG4Download.Builder.class);
+      }
+
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getSgvFieldBuilder();
@@ -1272,9 +1778,6 @@ public final class SGV {
           getSensorFieldBuilder();
           getCalFieldBuilder();
         }
-      }
-      private static Builder create() {
-        return new Builder();
       }
 
       public Builder clear() {
@@ -1291,7 +1794,8 @@ public final class SGV {
         bitField0_ = (bitField0_ & ~0x00000004);
         receiverSystemTime_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000008);
-        downloadStatus_ = com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus.NONE;
+        downloadStatus_ =
+            com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus.NONE;
         bitField0_ = (bitField0_ & ~0x00000010);
         receiverBattery_ = 0;
         bitField0_ = (bitField0_ & ~0x00000020);
@@ -1325,7 +1829,7 @@ public final class SGV {
       }
 
       public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
+      getDescriptorForType() {
         return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Download_descriptor;
       }
 
@@ -1342,7 +1846,9 @@ public final class SGV {
       }
 
       public com.nightscout.core.download.SGV.CookieMonsterG4Download buildPartial() {
-        com.nightscout.core.download.SGV.CookieMonsterG4Download result = new com.nightscout.core.download.SGV.CookieMonsterG4Download(this);
+        com.nightscout.core.download.SGV.CookieMonsterG4Download
+            result =
+            new com.nightscout.core.download.SGV.CookieMonsterG4Download(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (sgvBuilder_ == null) {
@@ -1416,7 +1922,7 @@ public final class SGV {
 
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof com.nightscout.core.download.SGV.CookieMonsterG4Download) {
-          return mergeFrom((com.nightscout.core.download.SGV.CookieMonsterG4Download)other);
+          return mergeFrom((com.nightscout.core.download.SGV.CookieMonsterG4Download) other);
         } else {
           super.mergeFrom(other);
           return this;
@@ -1424,7 +1930,10 @@ public final class SGV {
       }
 
       public Builder mergeFrom(com.nightscout.core.download.SGV.CookieMonsterG4Download other) {
-        if (other == com.nightscout.core.download.SGV.CookieMonsterG4Download.getDefaultInstance()) return this;
+        if (other == com.nightscout.core.download.SGV.CookieMonsterG4Download
+            .getDefaultInstance()) {
+          return this;
+        }
         if (sgvBuilder_ == null) {
           if (!other.sgv_.isEmpty()) {
             if (sgv_.isEmpty()) {
@@ -1443,9 +1952,9 @@ public final class SGV {
               sgvBuilder_ = null;
               sgv_ = other.sgv_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              sgvBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                   getSgvFieldBuilder() : null;
+              sgvBuilder_ =
+                  com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                  getSgvFieldBuilder() : null;
             } else {
               sgvBuilder_.addAllMessages(other.sgv_);
             }
@@ -1489,9 +1998,9 @@ public final class SGV {
               meterBuilder_ = null;
               meter_ = other.meter_;
               bitField0_ = (bitField0_ & ~0x00000080);
-              meterBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                   getMeterFieldBuilder() : null;
+              meterBuilder_ =
+                  com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                  getMeterFieldBuilder() : null;
             } else {
               meterBuilder_.addAllMessages(other.meter_);
             }
@@ -1515,9 +2024,9 @@ public final class SGV {
               sensorBuilder_ = null;
               sensor_ = other.sensor_;
               bitField0_ = (bitField0_ & ~0x00000100);
-              sensorBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                   getSensorFieldBuilder() : null;
+              sensorBuilder_ =
+                  com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                  getSensorFieldBuilder() : null;
             } else {
               sensorBuilder_.addAllMessages(other.sensor_);
             }
@@ -1541,9 +2050,9 @@ public final class SGV {
               calBuilder_ = null;
               cal_ = other.cal_;
               bitField0_ = (bitField0_ & ~0x00000200);
-              calBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                   getCalFieldBuilder() : null;
+              calBuilder_ =
+                  com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                  getCalFieldBuilder() : null;
             } else {
               calBuilder_.addAllMessages(other.cal_);
             }
@@ -1560,30 +2069,30 @@ public final class SGV {
 
       public final boolean isInitialized() {
         if (!hasDownloadTimestamp()) {
-          
+
           return false;
         }
         for (int i = 0; i < getSgvCount(); i++) {
           if (!getSgv(i).isInitialized()) {
-            
+
             return false;
           }
         }
         for (int i = 0; i < getMeterCount(); i++) {
           if (!getMeter(i).isInitialized()) {
-            
+
             return false;
           }
         }
         for (int i = 0; i < getSensorCount(); i++) {
           if (!getSensor(i).isInitialized()) {
-            
+
             return false;
           }
         }
         for (int i = 0; i < getCalCount(); i++) {
           if (!getCal(i).isInitialized()) {
-            
+
             return false;
           }
         }
@@ -1598,7 +2107,8 @@ public final class SGV {
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (com.nightscout.core.download.SGV.CookieMonsterG4Download) e.getUnfinishedMessage();
+          parsedMessage =
+              (com.nightscout.core.download.SGV.CookieMonsterG4Download) e.getUnfinishedMessage();
           throw e;
         } finally {
           if (parsedMessage != null) {
@@ -1607,19 +2117,13 @@ public final class SGV {
         }
         return this;
       }
-      private int bitField0_;
 
-      private java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4EGV> sgv_ =
-        java.util.Collections.emptyList();
       private void ensureSgvIsMutable() {
         if (!((bitField0_ & 0x00000001) == 0x00000001)) {
           sgv_ = new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterG4EGV>(sgv_);
           bitField0_ |= 0x00000001;
-         }
+        }
       }
-
-      private com.google.protobuf.RepeatedFieldBuilder<
-          com.nightscout.core.download.SGV.CookieMonsterG4EGV, com.nightscout.core.download.SGV.CookieMonsterG4EGV.Builder, com.nightscout.core.download.SGV.CookieMonsterG4EGVOrBuilder> sgvBuilder_;
 
       /**
        * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
@@ -1635,6 +2139,7 @@ public final class SGV {
           return sgvBuilder_.getMessageList();
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
        *
@@ -1649,6 +2154,7 @@ public final class SGV {
           return sgvBuilder_.getCount();
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
        *
@@ -1663,6 +2169,7 @@ public final class SGV {
           return sgvBuilder_.getMessage(index);
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
        *
@@ -1684,6 +2191,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
        *
@@ -1702,6 +2210,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
        *
@@ -1722,6 +2231,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
        *
@@ -1743,6 +2253,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
        *
@@ -1761,6 +2272,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
        *
@@ -1779,6 +2291,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
        *
@@ -1798,6 +2311,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
        *
@@ -1815,6 +2329,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
        *
@@ -1832,6 +2347,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
        *
@@ -1843,6 +2359,7 @@ public final class SGV {
           int index) {
         return getSgvFieldBuilder().getBuilder(index);
       }
+
       /**
        * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
        *
@@ -1853,10 +2370,12 @@ public final class SGV {
       public com.nightscout.core.download.SGV.CookieMonsterG4EGVOrBuilder getSgvOrBuilder(
           int index) {
         if (sgvBuilder_ == null) {
-          return sgv_.get(index);  } else {
+          return sgv_.get(index);
+        } else {
           return sgvBuilder_.getMessageOrBuilder(index);
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
        *
@@ -1864,14 +2383,15 @@ public final class SGV {
        * Glucose records as reported by the G4
        * </pre>
        */
-      public java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4EGVOrBuilder> 
-           getSgvOrBuilderList() {
+      public java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4EGVOrBuilder>
+      getSgvOrBuilderList() {
         if (sgvBuilder_ != null) {
           return sgvBuilder_.getMessageOrBuilderList();
         } else {
           return java.util.Collections.unmodifiableList(sgv_);
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
        *
@@ -1883,6 +2403,7 @@ public final class SGV {
         return getSgvFieldBuilder().addBuilder(
             com.nightscout.core.download.SGV.CookieMonsterG4EGV.getDefaultInstance());
       }
+
       /**
        * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
        *
@@ -1895,6 +2416,7 @@ public final class SGV {
         return getSgvFieldBuilder().addBuilder(
             index, com.nightscout.core.download.SGV.CookieMonsterG4EGV.getDefaultInstance());
       }
+
       /**
        * <code>repeated .CookieMonsterG4EGV sgv = 1;</code>
        *
@@ -1902,26 +2424,26 @@ public final class SGV {
        * Glucose records as reported by the G4
        * </pre>
        */
-      public java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4EGV.Builder> 
-           getSgvBuilderList() {
+      public java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4EGV.Builder>
+      getSgvBuilderList() {
         return getSgvFieldBuilder().getBuilderList();
       }
+
       private com.google.protobuf.RepeatedFieldBuilder<
-          com.nightscout.core.download.SGV.CookieMonsterG4EGV, com.nightscout.core.download.SGV.CookieMonsterG4EGV.Builder, com.nightscout.core.download.SGV.CookieMonsterG4EGVOrBuilder> 
-          getSgvFieldBuilder() {
+          com.nightscout.core.download.SGV.CookieMonsterG4EGV, com.nightscout.core.download.SGV.CookieMonsterG4EGV.Builder, com.nightscout.core.download.SGV.CookieMonsterG4EGVOrBuilder>
+      getSgvFieldBuilder() {
         if (sgvBuilder_ == null) {
           sgvBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
               com.nightscout.core.download.SGV.CookieMonsterG4EGV, com.nightscout.core.download.SGV.CookieMonsterG4EGV.Builder, com.nightscout.core.download.SGV.CookieMonsterG4EGVOrBuilder>(
-                  sgv_,
-                  ((bitField0_ & 0x00000001) == 0x00000001),
-                  getParentForChildren(),
-                  isClean());
+              sgv_,
+              ((bitField0_ & 0x00000001) == 0x00000001),
+              getParentForChildren(),
+              isClean());
           sgv_ = null;
         }
         return sgvBuilder_;
       }
 
-      private com.nightscout.core.download.SGV.CookieMonsterG4Download.Unit units_ = com.nightscout.core.download.SGV.CookieMonsterG4Download.Unit.MGDL;
       /**
        * <code>optional .CookieMonsterG4Download.Unit units = 2;</code>
        *
@@ -1932,6 +2454,7 @@ public final class SGV {
       public boolean hasUnits() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+
       /**
        * <code>optional .CookieMonsterG4Download.Unit units = 2;</code>
        *
@@ -1942,6 +2465,7 @@ public final class SGV {
       public com.nightscout.core.download.SGV.CookieMonsterG4Download.Unit getUnits() {
         return units_;
       }
+
       /**
        * <code>optional .CookieMonsterG4Download.Unit units = 2;</code>
        *
@@ -1958,6 +2482,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional .CookieMonsterG4Download.Unit units = 2;</code>
        *
@@ -1972,7 +2497,6 @@ public final class SGV {
         return this;
       }
 
-      private java.lang.Object downloadTimestamp_ = "";
       /**
        * <code>required string download_timestamp = 3;</code>
        *
@@ -1983,6 +2507,7 @@ public final class SGV {
       public boolean hasDownloadTimestamp() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
+
       /**
        * <code>required string download_timestamp = 3;</code>
        *
@@ -2004,26 +2529,7 @@ public final class SGV {
           return (java.lang.String) ref;
         }
       }
-      /**
-       * <code>required string download_timestamp = 3;</code>
-       *
-       * <pre>
-       * ISO8601 timestamp reported by uploader
-       * </pre>
-       */
-      public com.google.protobuf.ByteString
-          getDownloadTimestampBytes() {
-        java.lang.Object ref = downloadTimestamp_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          downloadTimestamp_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
+
       /**
        * <code>required string download_timestamp = 3;</code>
        *
@@ -2034,13 +2540,53 @@ public final class SGV {
       public Builder setDownloadTimestamp(
           java.lang.String value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000004;
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000004;
         downloadTimestamp_ = value;
         onChanged();
         return this;
       }
+
+      /**
+       * <code>required string download_timestamp = 3;</code>
+       *
+       * <pre>
+       * ISO8601 timestamp reported by uploader
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+      getDownloadTimestampBytes() {
+        java.lang.Object ref = downloadTimestamp_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b =
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          downloadTimestamp_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+
+      /**
+       * <code>required string download_timestamp = 3;</code>
+       *
+       * <pre>
+       * ISO8601 timestamp reported by uploader
+       * </pre>
+       */
+      public Builder setDownloadTimestampBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000004;
+        downloadTimestamp_ = value;
+        onChanged();
+        return this;
+      }
+
       /**
        * <code>required string download_timestamp = 3;</code>
        *
@@ -2054,25 +2600,7 @@ public final class SGV {
         onChanged();
         return this;
       }
-      /**
-       * <code>required string download_timestamp = 3;</code>
-       *
-       * <pre>
-       * ISO8601 timestamp reported by uploader
-       * </pre>
-       */
-      public Builder setDownloadTimestampBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000004;
-        downloadTimestamp_ = value;
-        onChanged();
-        return this;
-      }
 
-      private long receiverSystemTime_ ;
       /**
        * <code>optional uint64 receiver_system_time = 4;</code>
        *
@@ -2083,6 +2611,7 @@ public final class SGV {
       public boolean hasReceiverSystemTime() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
+
       /**
        * <code>optional uint64 receiver_system_time = 4;</code>
        *
@@ -2093,6 +2622,7 @@ public final class SGV {
       public long getReceiverSystemTime() {
         return receiverSystemTime_;
       }
+
       /**
        * <code>optional uint64 receiver_system_time = 4;</code>
        *
@@ -2106,6 +2636,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional uint64 receiver_system_time = 4;</code>
        *
@@ -2120,9 +2651,9 @@ public final class SGV {
         return this;
       }
 
-      private com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus downloadStatus_ = com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus.NONE;
       /**
-       * <code>optional .CookieMonsterG4Download.DownloadStatus download_status = 5 [default = NONE];</code>
+       * <code>optional .CookieMonsterG4Download.DownloadStatus download_status = 5 [default =
+       * NONE];</code>
        *
        * <pre>
        * Status of the download
@@ -2131,8 +2662,10 @@ public final class SGV {
       public boolean hasDownloadStatus() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
+
       /**
-       * <code>optional .CookieMonsterG4Download.DownloadStatus download_status = 5 [default = NONE];</code>
+       * <code>optional .CookieMonsterG4Download.DownloadStatus download_status = 5 [default =
+       * NONE];</code>
        *
        * <pre>
        * Status of the download
@@ -2141,14 +2674,17 @@ public final class SGV {
       public com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus getDownloadStatus() {
         return downloadStatus_;
       }
+
       /**
-       * <code>optional .CookieMonsterG4Download.DownloadStatus download_status = 5 [default = NONE];</code>
+       * <code>optional .CookieMonsterG4Download.DownloadStatus download_status = 5 [default =
+       * NONE];</code>
        *
        * <pre>
        * Status of the download
        * </pre>
        */
-      public Builder setDownloadStatus(com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus value) {
+      public Builder setDownloadStatus(
+          com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -2157,8 +2693,10 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
-       * <code>optional .CookieMonsterG4Download.DownloadStatus download_status = 5 [default = NONE];</code>
+       * <code>optional .CookieMonsterG4Download.DownloadStatus download_status = 5 [default =
+       * NONE];</code>
        *
        * <pre>
        * Status of the download
@@ -2166,12 +2704,12 @@ public final class SGV {
        */
       public Builder clearDownloadStatus() {
         bitField0_ = (bitField0_ & ~0x00000010);
-        downloadStatus_ = com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus.NONE;
+        downloadStatus_ =
+            com.nightscout.core.download.SGV.CookieMonsterG4Download.DownloadStatus.NONE;
         onChanged();
         return this;
       }
 
-      private int receiverBattery_ ;
       /**
        * <code>optional uint32 receiver_battery = 6;</code>
        *
@@ -2182,6 +2720,7 @@ public final class SGV {
       public boolean hasReceiverBattery() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
+
       /**
        * <code>optional uint32 receiver_battery = 6;</code>
        *
@@ -2192,6 +2731,7 @@ public final class SGV {
       public int getReceiverBattery() {
         return receiverBattery_;
       }
+
       /**
        * <code>optional uint32 receiver_battery = 6;</code>
        *
@@ -2205,6 +2745,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional uint32 receiver_battery = 6;</code>
        *
@@ -2219,7 +2760,6 @@ public final class SGV {
         return this;
       }
 
-      private int uploaderBattery_ ;
       /**
        * <code>optional uint32 uploader_battery = 7;</code>
        *
@@ -2230,6 +2770,7 @@ public final class SGV {
       public boolean hasUploaderBattery() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
+
       /**
        * <code>optional uint32 uploader_battery = 7;</code>
        *
@@ -2240,6 +2781,7 @@ public final class SGV {
       public int getUploaderBattery() {
         return uploaderBattery_;
       }
+
       /**
        * <code>optional uint32 uploader_battery = 7;</code>
        *
@@ -2253,6 +2795,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional uint32 uploader_battery = 7;</code>
        *
@@ -2267,17 +2810,14 @@ public final class SGV {
         return this;
       }
 
-      private java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Meter> meter_ =
-        java.util.Collections.emptyList();
       private void ensureMeterIsMutable() {
         if (!((bitField0_ & 0x00000080) == 0x00000080)) {
-          meter_ = new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterG4Meter>(meter_);
+          meter_ =
+              new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterG4Meter>(
+                  meter_);
           bitField0_ |= 0x00000080;
-         }
+        }
       }
-
-      private com.google.protobuf.RepeatedFieldBuilder<
-          com.nightscout.core.download.SGV.CookieMonsterG4Meter, com.nightscout.core.download.SGV.CookieMonsterG4Meter.Builder, com.nightscout.core.download.SGV.CookieMonsterG4MeterOrBuilder> meterBuilder_;
 
       /**
        * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
@@ -2289,6 +2829,7 @@ public final class SGV {
           return meterBuilder_.getMessageList();
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
        */
@@ -2299,6 +2840,7 @@ public final class SGV {
           return meterBuilder_.getCount();
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
        */
@@ -2309,6 +2851,7 @@ public final class SGV {
           return meterBuilder_.getMessage(index);
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
        */
@@ -2326,11 +2869,13 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
        */
       public Builder setMeter(
-          int index, com.nightscout.core.download.SGV.CookieMonsterG4Meter.Builder builderForValue) {
+          int index,
+          com.nightscout.core.download.SGV.CookieMonsterG4Meter.Builder builderForValue) {
         if (meterBuilder_ == null) {
           ensureMeterIsMutable();
           meter_.set(index, builderForValue.build());
@@ -2340,6 +2885,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
        */
@@ -2356,6 +2902,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
        */
@@ -2373,6 +2920,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
        */
@@ -2387,11 +2935,13 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
        */
       public Builder addMeter(
-          int index, com.nightscout.core.download.SGV.CookieMonsterG4Meter.Builder builderForValue) {
+          int index,
+          com.nightscout.core.download.SGV.CookieMonsterG4Meter.Builder builderForValue) {
         if (meterBuilder_ == null) {
           ensureMeterIsMutable();
           meter_.add(index, builderForValue.build());
@@ -2401,6 +2951,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
        */
@@ -2416,6 +2967,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
        */
@@ -2429,6 +2981,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
        */
@@ -2442,6 +2995,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
        */
@@ -2449,27 +3003,31 @@ public final class SGV {
           int index) {
         return getMeterFieldBuilder().getBuilder(index);
       }
+
       /**
        * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
        */
       public com.nightscout.core.download.SGV.CookieMonsterG4MeterOrBuilder getMeterOrBuilder(
           int index) {
         if (meterBuilder_ == null) {
-          return meter_.get(index);  } else {
+          return meter_.get(index);
+        } else {
           return meterBuilder_.getMessageOrBuilder(index);
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
        */
-      public java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4MeterOrBuilder> 
-           getMeterOrBuilderList() {
+      public java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4MeterOrBuilder>
+      getMeterOrBuilderList() {
         if (meterBuilder_ != null) {
           return meterBuilder_.getMessageOrBuilderList();
         } else {
           return java.util.Collections.unmodifiableList(meter_);
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
        */
@@ -2477,6 +3035,7 @@ public final class SGV {
         return getMeterFieldBuilder().addBuilder(
             com.nightscout.core.download.SGV.CookieMonsterG4Meter.getDefaultInstance());
       }
+
       /**
        * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
        */
@@ -2485,39 +3044,38 @@ public final class SGV {
         return getMeterFieldBuilder().addBuilder(
             index, com.nightscout.core.download.SGV.CookieMonsterG4Meter.getDefaultInstance());
       }
+
       /**
        * <code>repeated .CookieMonsterG4Meter meter = 8;</code>
        */
-      public java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Meter.Builder> 
-           getMeterBuilderList() {
+      public java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Meter.Builder>
+      getMeterBuilderList() {
         return getMeterFieldBuilder().getBuilderList();
       }
+
       private com.google.protobuf.RepeatedFieldBuilder<
-          com.nightscout.core.download.SGV.CookieMonsterG4Meter, com.nightscout.core.download.SGV.CookieMonsterG4Meter.Builder, com.nightscout.core.download.SGV.CookieMonsterG4MeterOrBuilder> 
-          getMeterFieldBuilder() {
+          com.nightscout.core.download.SGV.CookieMonsterG4Meter, com.nightscout.core.download.SGV.CookieMonsterG4Meter.Builder, com.nightscout.core.download.SGV.CookieMonsterG4MeterOrBuilder>
+      getMeterFieldBuilder() {
         if (meterBuilder_ == null) {
           meterBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
               com.nightscout.core.download.SGV.CookieMonsterG4Meter, com.nightscout.core.download.SGV.CookieMonsterG4Meter.Builder, com.nightscout.core.download.SGV.CookieMonsterG4MeterOrBuilder>(
-                  meter_,
-                  ((bitField0_ & 0x00000080) == 0x00000080),
-                  getParentForChildren(),
-                  isClean());
+              meter_,
+              ((bitField0_ & 0x00000080) == 0x00000080),
+              getParentForChildren(),
+              isClean());
           meter_ = null;
         }
         return meterBuilder_;
       }
 
-      private java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Sensor> sensor_ =
-        java.util.Collections.emptyList();
       private void ensureSensorIsMutable() {
         if (!((bitField0_ & 0x00000100) == 0x00000100)) {
-          sensor_ = new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterG4Sensor>(sensor_);
+          sensor_ =
+              new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterG4Sensor>(
+                  sensor_);
           bitField0_ |= 0x00000100;
-         }
+        }
       }
-
-      private com.google.protobuf.RepeatedFieldBuilder<
-          com.nightscout.core.download.SGV.CookieMonsterG4Sensor, com.nightscout.core.download.SGV.CookieMonsterG4Sensor.Builder, com.nightscout.core.download.SGV.CookieMonsterG4SensorOrBuilder> sensorBuilder_;
 
       /**
        * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
@@ -2529,6 +3087,7 @@ public final class SGV {
           return sensorBuilder_.getMessageList();
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
        */
@@ -2539,6 +3098,7 @@ public final class SGV {
           return sensorBuilder_.getCount();
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
        */
@@ -2549,6 +3109,7 @@ public final class SGV {
           return sensorBuilder_.getMessage(index);
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
        */
@@ -2566,11 +3127,13 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
        */
       public Builder setSensor(
-          int index, com.nightscout.core.download.SGV.CookieMonsterG4Sensor.Builder builderForValue) {
+          int index,
+          com.nightscout.core.download.SGV.CookieMonsterG4Sensor.Builder builderForValue) {
         if (sensorBuilder_ == null) {
           ensureSensorIsMutable();
           sensor_.set(index, builderForValue.build());
@@ -2580,6 +3143,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
        */
@@ -2596,6 +3160,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
        */
@@ -2613,6 +3178,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
        */
@@ -2627,11 +3193,13 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
        */
       public Builder addSensor(
-          int index, com.nightscout.core.download.SGV.CookieMonsterG4Sensor.Builder builderForValue) {
+          int index,
+          com.nightscout.core.download.SGV.CookieMonsterG4Sensor.Builder builderForValue) {
         if (sensorBuilder_ == null) {
           ensureSensorIsMutable();
           sensor_.add(index, builderForValue.build());
@@ -2641,6 +3209,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
        */
@@ -2656,6 +3225,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
        */
@@ -2669,6 +3239,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
        */
@@ -2682,6 +3253,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
        */
@@ -2689,27 +3261,31 @@ public final class SGV {
           int index) {
         return getSensorFieldBuilder().getBuilder(index);
       }
+
       /**
        * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
        */
       public com.nightscout.core.download.SGV.CookieMonsterG4SensorOrBuilder getSensorOrBuilder(
           int index) {
         if (sensorBuilder_ == null) {
-          return sensor_.get(index);  } else {
+          return sensor_.get(index);
+        } else {
           return sensorBuilder_.getMessageOrBuilder(index);
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
        */
-      public java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4SensorOrBuilder> 
-           getSensorOrBuilderList() {
+      public java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4SensorOrBuilder>
+      getSensorOrBuilderList() {
         if (sensorBuilder_ != null) {
           return sensorBuilder_.getMessageOrBuilderList();
         } else {
           return java.util.Collections.unmodifiableList(sensor_);
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
        */
@@ -2717,6 +3293,7 @@ public final class SGV {
         return getSensorFieldBuilder().addBuilder(
             com.nightscout.core.download.SGV.CookieMonsterG4Sensor.getDefaultInstance());
       }
+
       /**
        * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
        */
@@ -2725,39 +3302,36 @@ public final class SGV {
         return getSensorFieldBuilder().addBuilder(
             index, com.nightscout.core.download.SGV.CookieMonsterG4Sensor.getDefaultInstance());
       }
+
       /**
        * <code>repeated .CookieMonsterG4Sensor sensor = 9;</code>
        */
-      public java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Sensor.Builder> 
-           getSensorBuilderList() {
+      public java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Sensor.Builder>
+      getSensorBuilderList() {
         return getSensorFieldBuilder().getBuilderList();
       }
+
       private com.google.protobuf.RepeatedFieldBuilder<
-          com.nightscout.core.download.SGV.CookieMonsterG4Sensor, com.nightscout.core.download.SGV.CookieMonsterG4Sensor.Builder, com.nightscout.core.download.SGV.CookieMonsterG4SensorOrBuilder> 
-          getSensorFieldBuilder() {
+          com.nightscout.core.download.SGV.CookieMonsterG4Sensor, com.nightscout.core.download.SGV.CookieMonsterG4Sensor.Builder, com.nightscout.core.download.SGV.CookieMonsterG4SensorOrBuilder>
+      getSensorFieldBuilder() {
         if (sensorBuilder_ == null) {
           sensorBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
               com.nightscout.core.download.SGV.CookieMonsterG4Sensor, com.nightscout.core.download.SGV.CookieMonsterG4Sensor.Builder, com.nightscout.core.download.SGV.CookieMonsterG4SensorOrBuilder>(
-                  sensor_,
-                  ((bitField0_ & 0x00000100) == 0x00000100),
-                  getParentForChildren(),
-                  isClean());
+              sensor_,
+              ((bitField0_ & 0x00000100) == 0x00000100),
+              getParentForChildren(),
+              isClean());
           sensor_ = null;
         }
         return sensorBuilder_;
       }
 
-      private java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Cal> cal_ =
-        java.util.Collections.emptyList();
       private void ensureCalIsMutable() {
         if (!((bitField0_ & 0x00000200) == 0x00000200)) {
           cal_ = new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterG4Cal>(cal_);
           bitField0_ |= 0x00000200;
-         }
+        }
       }
-
-      private com.google.protobuf.RepeatedFieldBuilder<
-          com.nightscout.core.download.SGV.CookieMonsterG4Cal, com.nightscout.core.download.SGV.CookieMonsterG4Cal.Builder, com.nightscout.core.download.SGV.CookieMonsterG4CalOrBuilder> calBuilder_;
 
       /**
        * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
@@ -2769,6 +3343,7 @@ public final class SGV {
           return calBuilder_.getMessageList();
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
        */
@@ -2779,6 +3354,7 @@ public final class SGV {
           return calBuilder_.getCount();
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
        */
@@ -2789,6 +3365,7 @@ public final class SGV {
           return calBuilder_.getMessage(index);
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
        */
@@ -2806,6 +3383,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
        */
@@ -2820,6 +3398,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
        */
@@ -2836,6 +3415,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
        */
@@ -2853,6 +3433,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
        */
@@ -2867,6 +3448,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
        */
@@ -2881,6 +3463,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
        */
@@ -2896,6 +3479,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
        */
@@ -2909,6 +3493,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
        */
@@ -2922,6 +3507,7 @@ public final class SGV {
         }
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
        */
@@ -2929,27 +3515,31 @@ public final class SGV {
           int index) {
         return getCalFieldBuilder().getBuilder(index);
       }
+
       /**
        * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
        */
       public com.nightscout.core.download.SGV.CookieMonsterG4CalOrBuilder getCalOrBuilder(
           int index) {
         if (calBuilder_ == null) {
-          return cal_.get(index);  } else {
+          return cal_.get(index);
+        } else {
           return calBuilder_.getMessageOrBuilder(index);
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
        */
-      public java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4CalOrBuilder> 
-           getCalOrBuilderList() {
+      public java.util.List<? extends com.nightscout.core.download.SGV.CookieMonsterG4CalOrBuilder>
+      getCalOrBuilderList() {
         if (calBuilder_ != null) {
           return calBuilder_.getMessageOrBuilderList();
         } else {
           return java.util.Collections.unmodifiableList(cal_);
         }
       }
+
       /**
        * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
        */
@@ -2957,6 +3547,7 @@ public final class SGV {
         return getCalFieldBuilder().addBuilder(
             com.nightscout.core.download.SGV.CookieMonsterG4Cal.getDefaultInstance());
       }
+
       /**
        * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
        */
@@ -2965,35 +3556,37 @@ public final class SGV {
         return getCalFieldBuilder().addBuilder(
             index, com.nightscout.core.download.SGV.CookieMonsterG4Cal.getDefaultInstance());
       }
+
       /**
        * <code>repeated .CookieMonsterG4Cal cal = 10;</code>
        */
-      public java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Cal.Builder> 
-           getCalBuilderList() {
+      public java.util.List<com.nightscout.core.download.SGV.CookieMonsterG4Cal.Builder>
+      getCalBuilderList() {
         return getCalFieldBuilder().getBuilderList();
       }
+
       private com.google.protobuf.RepeatedFieldBuilder<
-          com.nightscout.core.download.SGV.CookieMonsterG4Cal, com.nightscout.core.download.SGV.CookieMonsterG4Cal.Builder, com.nightscout.core.download.SGV.CookieMonsterG4CalOrBuilder> 
-          getCalFieldBuilder() {
+          com.nightscout.core.download.SGV.CookieMonsterG4Cal, com.nightscout.core.download.SGV.CookieMonsterG4Cal.Builder, com.nightscout.core.download.SGV.CookieMonsterG4CalOrBuilder>
+      getCalFieldBuilder() {
         if (calBuilder_ == null) {
           calBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
               com.nightscout.core.download.SGV.CookieMonsterG4Cal, com.nightscout.core.download.SGV.CookieMonsterG4Cal.Builder, com.nightscout.core.download.SGV.CookieMonsterG4CalOrBuilder>(
-                  cal_,
-                  ((bitField0_ & 0x00000200) == 0x00000200),
-                  getParentForChildren(),
-                  isClean());
+              cal_,
+              ((bitField0_ & 0x00000200) == 0x00000200),
+              getParentForChildren(),
+              isClean());
           cal_ = null;
         }
         return calBuilder_;
       }
 
-      private java.lang.Object patientName_ = "";
       /**
        * <code>optional string patient_name = 11;</code>
        */
       public boolean hasPatientName() {
         return ((bitField0_ & 0x00000400) == 0x00000400);
       }
+
       /**
        * <code>optional string patient_name = 11;</code>
        */
@@ -3011,14 +3604,29 @@ public final class SGV {
           return (java.lang.String) ref;
         }
       }
+
+      /**
+       * <code>optional string patient_name = 11;</code>
+       */
+      public Builder setPatientName(
+          java.lang.String value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000400;
+        patientName_ = value;
+        onChanged();
+        return this;
+      }
+
       /**
        * <code>optional string patient_name = 11;</code>
        */
       public com.google.protobuf.ByteString
-          getPatientNameBytes() {
+      getPatientNameBytes() {
         java.lang.Object ref = patientName_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           patientName_ = b;
@@ -3027,38 +3635,27 @@ public final class SGV {
           return (com.google.protobuf.ByteString) ref;
         }
       }
-      /**
-       * <code>optional string patient_name = 11;</code>
-       */
-      public Builder setPatientName(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000400;
-        patientName_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string patient_name = 11;</code>
-       */
-      public Builder clearPatientName() {
-        bitField0_ = (bitField0_ & ~0x00000400);
-        patientName_ = getDefaultInstance().getPatientName();
-        onChanged();
-        return this;
-      }
+
       /**
        * <code>optional string patient_name = 11;</code>
        */
       public Builder setPatientNameBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000400;
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000400;
         patientName_ = value;
+        onChanged();
+        return this;
+      }
+
+      /**
+       * <code>optional string patient_name = 11;</code>
+       */
+      public Builder clearPatientName() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        patientName_ = getDefaultInstance().getPatientName();
         onChanged();
         return this;
       }
@@ -3074,90 +3671,46 @@ public final class SGV {
     // @@protoc_insertion_point(class_scope:CookieMonsterG4Download)
   }
 
-  public interface CookieMonsterG4EGVOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:CookieMonsterG4EGV)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>required uint32 sgv = 1;</code>
-     *
-     * <pre>
-     * Glucose value
-     * </pre>
-     */
-    boolean hasSgv();
-    /**
-     * <code>required uint32 sgv = 1;</code>
-     *
-     * <pre>
-     * Glucose value
-     * </pre>
-     */
-    int getSgv();
-
-    /**
-     * <code>optional uint64 timestamp = 2;</code>
-     *
-     * <pre>
-     * timestamp of the record
-     * </pre>
-     */
-    boolean hasTimestamp();
-    /**
-     * <code>optional uint64 timestamp = 2;</code>
-     *
-     * <pre>
-     * timestamp of the record
-     * </pre>
-     */
-    long getTimestamp();
-
-    /**
-     * <code>optional .CookieMonsterG4EGV.Direction direction = 3;</code>
-     *
-     * <pre>
-     * Trend arrow
-     * </pre>
-     */
-    boolean hasDirection();
-    /**
-     * <code>optional .CookieMonsterG4EGV.Direction direction = 3;</code>
-     *
-     * <pre>
-     * Trend arrow
-     * </pre>
-     */
-    com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction getDirection();
-  }
   /**
    * Protobuf type {@code CookieMonsterG4EGV}
    */
   public static final class CookieMonsterG4EGV extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:CookieMonsterG4EGV)
-      CookieMonsterG4EGVOrBuilder {
+                                               com.google.protobuf.GeneratedMessage implements
+                                                                                    // @@protoc_insertion_point(message_implements:CookieMonsterG4EGV)
+                                                                                        CookieMonsterG4EGVOrBuilder {
+
+    public static final int SGV_FIELD_NUMBER = 1;
+    public static final int TIMESTAMP_FIELD_NUMBER = 2;
+    public static final int DIRECTION_FIELD_NUMBER = 3;
+    private static final CookieMonsterG4EGV defaultInstance;
+    private static final long serialVersionUID = 0L;
+    public static com.google.protobuf.Parser<CookieMonsterG4EGV> PARSER =
+        new com.google.protobuf.AbstractParser<CookieMonsterG4EGV>() {
+          public CookieMonsterG4EGV parsePartialFrom(
+              com.google.protobuf.CodedInputStream input,
+              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+              throws com.google.protobuf.InvalidProtocolBufferException {
+            return new CookieMonsterG4EGV(input, extensionRegistry);
+          }
+        };
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    private int bitField0_;
+    private int sgv_;
+    private long timestamp_;
+    private com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction direction_;
+    private byte memoizedIsInitialized = -1;
+    private int memoizedSerializedSize = -1;
+
     // Use CookieMonsterG4EGV.newBuilder() to construct.
     private CookieMonsterG4EGV(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
     }
-    private CookieMonsterG4EGV(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
 
-    private static final CookieMonsterG4EGV defaultInstance;
-    public static CookieMonsterG4EGV getDefaultInstance() {
-      return defaultInstance;
+    private CookieMonsterG4EGV(boolean noInit) {
+      this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance();
     }
 
-    public CookieMonsterG4EGV getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
-      return this.unknownFields;
-    }
     private CookieMonsterG4EGV(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3193,7 +3746,9 @@ public final class SGV {
             }
             case 24: {
               int rawValue = input.readEnum();
-              com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction value = com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction.valueOf(rawValue);
+              com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction
+                  value =
+                  com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(3, rawValue);
               } else {
@@ -3214,31 +3769,259 @@ public final class SGV {
         makeExtensionsImmutable();
       }
     }
+
+    public static CookieMonsterG4EGV getDefaultInstance() {
+      return defaultInstance;
+    }
+
     public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
+    getDescriptor() {
       return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4EGV_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4EGV_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              com.nightscout.core.download.SGV.CookieMonsterG4EGV.class, com.nightscout.core.download.SGV.CookieMonsterG4EGV.Builder.class);
+    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
     }
 
-    public static com.google.protobuf.Parser<CookieMonsterG4EGV> PARSER =
-        new com.google.protobuf.AbstractParser<CookieMonsterG4EGV>() {
-      public CookieMonsterG4EGV parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new CookieMonsterG4EGV(input, extensionRegistry);
-      }
-    };
+    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseFrom(
+        java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseDelimitedFrom(
+        java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() {
+      return Builder.create();
+    }
+
+    public static Builder newBuilder(
+        com.nightscout.core.download.SGV.CookieMonsterG4EGV prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+
+    public CookieMonsterG4EGV getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    internalGetFieldAccessorTable() {
+      return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4EGV_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.nightscout.core.download.SGV.CookieMonsterG4EGV.class,
+              com.nightscout.core.download.SGV.CookieMonsterG4EGV.Builder.class);
+    }
 
     @java.lang.Override
     public com.google.protobuf.Parser<CookieMonsterG4EGV> getParserForType() {
       return PARSER;
+    }
+
+    /**
+     * <code>required uint32 sgv = 1;</code>
+     *
+     * <pre>
+     * Glucose value
+     * </pre>
+     */
+    public boolean hasSgv() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+
+    /**
+     * <code>required uint32 sgv = 1;</code>
+     *
+     * <pre>
+     * Glucose value
+     * </pre>
+     */
+    public int getSgv() {
+      return sgv_;
+    }
+
+    /**
+     * <code>optional uint64 timestamp = 2;</code>
+     *
+     * <pre>
+     * timestamp of the record
+     * </pre>
+     */
+    public boolean hasTimestamp() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+
+    /**
+     * <code>optional uint64 timestamp = 2;</code>
+     *
+     * <pre>
+     * timestamp of the record
+     * </pre>
+     */
+    public long getTimestamp() {
+      return timestamp_;
+    }
+
+    /**
+     * <code>optional .CookieMonsterG4EGV.Direction direction = 3;</code>
+     *
+     * <pre>
+     * Trend arrow
+     * </pre>
+     */
+    public boolean hasDirection() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+
+    /**
+     * <code>optional .CookieMonsterG4EGV.Direction direction = 3;</code>
+     *
+     * <pre>
+     * Trend arrow
+     * </pre>
+     */
+    public com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction getDirection() {
+      return direction_;
+    }
+
+    private void initFields() {
+      sgv_ = 0;
+      timestamp_ = 0L;
+      direction_ = com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction.NONE;
+    }
+
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) {
+        return true;
+      }
+      if (isInitialized == 0) {
+        return false;
+      }
+
+      if (!hasSgv()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeUInt32(1, sgv_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeUInt64(2, timestamp_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeEnum(3, direction_.getNumber());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) {
+        return size;
+      }
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeUInt32Size(1, sgv_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeUInt64Size(2, timestamp_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeEnumSize(3, direction_.getNumber());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public Builder newBuilderForType() {
+      return newBuilder();
+    }
+
+    public Builder toBuilder() {
+      return newBuilder(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
     }
 
     /**
@@ -3285,8 +4068,7 @@ public final class SGV {
       /**
        * <code>RATE_OUT_OF_RANGE = 9;</code>
        */
-      RATE_OUT_OF_RANGE(9, 9),
-      ;
+      RATE_OUT_OF_RANGE(9, 9),;
 
       /**
        * <code>NONE = 0;</code>
@@ -3328,62 +4110,14 @@ public final class SGV {
        * <code>RATE_OUT_OF_RANGE = 9;</code>
        */
       public static final int RATE_OUT_OF_RANGE_VALUE = 9;
-
-
-      public final int getNumber() { return value; }
-
-      public static Direction valueOf(int value) {
-        switch (value) {
-          case 0: return NONE;
-          case 1: return DOUBLE_UP;
-          case 2: return SINGLE_UP;
-          case 3: return FORTY_FIVE_UP;
-          case 4: return FLAT;
-          case 5: return FORTY_FIVE_DOWN;
-          case 6: return SINGLE_DOWN;
-          case 7: return DOUBLE_DOWN;
-          case 8: return NOT_COMPUTABLE;
-          case 9: return RATE_OUT_OF_RANGE;
-          default: return null;
-        }
-      }
-
-      public static com.google.protobuf.Internal.EnumLiteMap<Direction>
-          internalGetValueMap() {
-        return internalValueMap;
-      }
+      private static final Direction[] VALUES = values();
       private static com.google.protobuf.Internal.EnumLiteMap<Direction>
           internalValueMap =
-            new com.google.protobuf.Internal.EnumLiteMap<Direction>() {
-              public Direction findValueByNumber(int number) {
-                return Direction.valueOf(number);
-              }
-            };
-
-      public final com.google.protobuf.Descriptors.EnumValueDescriptor
-          getValueDescriptor() {
-        return getDescriptor().getValues().get(index);
-      }
-      public final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptorForType() {
-        return getDescriptor();
-      }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptor() {
-        return com.nightscout.core.download.SGV.CookieMonsterG4EGV.getDescriptor().getEnumTypes().get(0);
-      }
-
-      private static final Direction[] VALUES = values();
-
-      public static Direction valueOf(
-          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-        if (desc.getType() != getDescriptor()) {
-          throw new java.lang.IllegalArgumentException(
-            "EnumValueDescriptor is not for this type.");
-        }
-        return VALUES[desc.getIndex()];
-      }
-
+          new com.google.protobuf.Internal.EnumLiteMap<Direction>() {
+            public Direction findValueByNumber(int number) {
+              return Direction.valueOf(number);
+            }
+          };
       private final int index;
       private final int value;
 
@@ -3392,227 +4126,85 @@ public final class SGV {
         this.value = value;
       }
 
+      public static Direction valueOf(int value) {
+        switch (value) {
+          case 0:
+            return NONE;
+          case 1:
+            return DOUBLE_UP;
+          case 2:
+            return SINGLE_UP;
+          case 3:
+            return FORTY_FIVE_UP;
+          case 4:
+            return FLAT;
+          case 5:
+            return FORTY_FIVE_DOWN;
+          case 6:
+            return SINGLE_DOWN;
+          case 7:
+            return DOUBLE_DOWN;
+          case 8:
+            return NOT_COMPUTABLE;
+          case 9:
+            return RATE_OUT_OF_RANGE;
+          default:
+            return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<Direction>
+      internalGetValueMap() {
+        return internalValueMap;
+      }
+
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+      getDescriptor() {
+        return com.nightscout.core.download.SGV.CookieMonsterG4EGV.getDescriptor().getEnumTypes()
+            .get(0);
+      }
+
+      public static Direction valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+              "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      public final int getNumber() {
+        return value;
+      }
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+      getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+      getDescriptorForType() {
+        return getDescriptor();
+      }
+
       // @@protoc_insertion_point(enum_scope:CookieMonsterG4EGV.Direction)
     }
 
-    private int bitField0_;
-    public static final int SGV_FIELD_NUMBER = 1;
-    private int sgv_;
-    /**
-     * <code>required uint32 sgv = 1;</code>
-     *
-     * <pre>
-     * Glucose value
-     * </pre>
-     */
-    public boolean hasSgv() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    /**
-     * <code>required uint32 sgv = 1;</code>
-     *
-     * <pre>
-     * Glucose value
-     * </pre>
-     */
-    public int getSgv() {
-      return sgv_;
-    }
-
-    public static final int TIMESTAMP_FIELD_NUMBER = 2;
-    private long timestamp_;
-    /**
-     * <code>optional uint64 timestamp = 2;</code>
-     *
-     * <pre>
-     * timestamp of the record
-     * </pre>
-     */
-    public boolean hasTimestamp() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    /**
-     * <code>optional uint64 timestamp = 2;</code>
-     *
-     * <pre>
-     * timestamp of the record
-     * </pre>
-     */
-    public long getTimestamp() {
-      return timestamp_;
-    }
-
-    public static final int DIRECTION_FIELD_NUMBER = 3;
-    private com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction direction_;
-    /**
-     * <code>optional .CookieMonsterG4EGV.Direction direction = 3;</code>
-     *
-     * <pre>
-     * Trend arrow
-     * </pre>
-     */
-    public boolean hasDirection() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    /**
-     * <code>optional .CookieMonsterG4EGV.Direction direction = 3;</code>
-     *
-     * <pre>
-     * Trend arrow
-     * </pre>
-     */
-    public com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction getDirection() {
-      return direction_;
-    }
-
-    private void initFields() {
-      sgv_ = 0;
-      timestamp_ = 0L;
-      direction_ = com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction.NONE;
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      if (!hasSgv()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeUInt32(1, sgv_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeUInt64(2, timestamp_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeEnum(3, direction_.getNumber());
-      }
-      getUnknownFields().writeTo(output);
-    }
-
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(1, sgv_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(2, timestamp_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(3, direction_.getNumber());
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
-    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4EGV parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.nightscout.core.download.SGV.CookieMonsterG4EGV prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
     /**
      * Protobuf type {@code CookieMonsterG4EGV}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+                                      com.google.protobuf.GeneratedMessage.Builder<Builder>
+        implements
         // @@protoc_insertion_point(builder_implements:CookieMonsterG4EGV)
-        com.nightscout.core.download.SGV.CookieMonsterG4EGVOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4EGV_descriptor;
-      }
+            com.nightscout.core.download.SGV.CookieMonsterG4EGVOrBuilder {
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4EGV_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                com.nightscout.core.download.SGV.CookieMonsterG4EGV.class, com.nightscout.core.download.SGV.CookieMonsterG4EGV.Builder.class);
-      }
+      private int bitField0_;
+      private int sgv_;
+      private long timestamp_;
+      private com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction
+          direction_ =
+          com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction.NONE;
 
       // Construct using com.nightscout.core.download.SGV.CookieMonsterG4EGV.newBuilder()
       private Builder() {
@@ -3624,12 +4216,27 @@ public final class SGV {
         super(parent);
         maybeForceBuilderInitialization();
       }
+
+      public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4EGV_descriptor;
+      }
+
+      private static Builder create() {
+        return new Builder();
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internalGetFieldAccessorTable() {
+        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4EGV_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.nightscout.core.download.SGV.CookieMonsterG4EGV.class,
+                com.nightscout.core.download.SGV.CookieMonsterG4EGV.Builder.class);
+      }
+
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
-      }
-      private static Builder create() {
-        return new Builder();
       }
 
       public Builder clear() {
@@ -3648,7 +4255,7 @@ public final class SGV {
       }
 
       public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
+      getDescriptorForType() {
         return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4EGV_descriptor;
       }
 
@@ -3665,7 +4272,9 @@ public final class SGV {
       }
 
       public com.nightscout.core.download.SGV.CookieMonsterG4EGV buildPartial() {
-        com.nightscout.core.download.SGV.CookieMonsterG4EGV result = new com.nightscout.core.download.SGV.CookieMonsterG4EGV(this);
+        com.nightscout.core.download.SGV.CookieMonsterG4EGV
+            result =
+            new com.nightscout.core.download.SGV.CookieMonsterG4EGV(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
@@ -3687,7 +4296,7 @@ public final class SGV {
 
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof com.nightscout.core.download.SGV.CookieMonsterG4EGV) {
-          return mergeFrom((com.nightscout.core.download.SGV.CookieMonsterG4EGV)other);
+          return mergeFrom((com.nightscout.core.download.SGV.CookieMonsterG4EGV) other);
         } else {
           super.mergeFrom(other);
           return this;
@@ -3695,7 +4304,9 @@ public final class SGV {
       }
 
       public Builder mergeFrom(com.nightscout.core.download.SGV.CookieMonsterG4EGV other) {
-        if (other == com.nightscout.core.download.SGV.CookieMonsterG4EGV.getDefaultInstance()) return this;
+        if (other == com.nightscout.core.download.SGV.CookieMonsterG4EGV.getDefaultInstance()) {
+          return this;
+        }
         if (other.hasSgv()) {
           setSgv(other.getSgv());
         }
@@ -3711,7 +4322,7 @@ public final class SGV {
 
       public final boolean isInitialized() {
         if (!hasSgv()) {
-          
+
           return false;
         }
         return true;
@@ -3725,7 +4336,8 @@ public final class SGV {
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (com.nightscout.core.download.SGV.CookieMonsterG4EGV) e.getUnfinishedMessage();
+          parsedMessage =
+              (com.nightscout.core.download.SGV.CookieMonsterG4EGV) e.getUnfinishedMessage();
           throw e;
         } finally {
           if (parsedMessage != null) {
@@ -3734,9 +4346,7 @@ public final class SGV {
         }
         return this;
       }
-      private int bitField0_;
 
-      private int sgv_ ;
       /**
        * <code>required uint32 sgv = 1;</code>
        *
@@ -3747,6 +4357,7 @@ public final class SGV {
       public boolean hasSgv() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+
       /**
        * <code>required uint32 sgv = 1;</code>
        *
@@ -3757,6 +4368,7 @@ public final class SGV {
       public int getSgv() {
         return sgv_;
       }
+
       /**
        * <code>required uint32 sgv = 1;</code>
        *
@@ -3770,6 +4382,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>required uint32 sgv = 1;</code>
        *
@@ -3784,7 +4397,6 @@ public final class SGV {
         return this;
       }
 
-      private long timestamp_ ;
       /**
        * <code>optional uint64 timestamp = 2;</code>
        *
@@ -3795,6 +4407,7 @@ public final class SGV {
       public boolean hasTimestamp() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+
       /**
        * <code>optional uint64 timestamp = 2;</code>
        *
@@ -3805,6 +4418,7 @@ public final class SGV {
       public long getTimestamp() {
         return timestamp_;
       }
+
       /**
        * <code>optional uint64 timestamp = 2;</code>
        *
@@ -3818,6 +4432,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional uint64 timestamp = 2;</code>
        *
@@ -3832,7 +4447,6 @@ public final class SGV {
         return this;
       }
 
-      private com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction direction_ = com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction.NONE;
       /**
        * <code>optional .CookieMonsterG4EGV.Direction direction = 3;</code>
        *
@@ -3843,6 +4457,7 @@ public final class SGV {
       public boolean hasDirection() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
+
       /**
        * <code>optional .CookieMonsterG4EGV.Direction direction = 3;</code>
        *
@@ -3853,6 +4468,7 @@ public final class SGV {
       public com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction getDirection() {
         return direction_;
       }
+
       /**
        * <code>optional .CookieMonsterG4EGV.Direction direction = 3;</code>
        *
@@ -3860,7 +4476,8 @@ public final class SGV {
        * Trend arrow
        * </pre>
        */
-      public Builder setDirection(com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction value) {
+      public Builder setDirection(
+          com.nightscout.core.download.SGV.CookieMonsterG4EGV.Direction value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -3869,6 +4486,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional .CookieMonsterG4EGV.Direction direction = 3;</code>
        *
@@ -3894,66 +4512,46 @@ public final class SGV {
     // @@protoc_insertion_point(class_scope:CookieMonsterG4EGV)
   }
 
-  public interface CookieMonsterG4MeterOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:CookieMonsterG4Meter)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>required uint32 meter_bg = 1;</code>
-     */
-    boolean hasMeterBg();
-    /**
-     * <code>required uint32 meter_bg = 1;</code>
-     */
-    int getMeterBg();
-
-    /**
-     * <code>optional uint32 meter_time = 2;</code>
-     */
-    boolean hasMeterTime();
-    /**
-     * <code>optional uint32 meter_time = 2;</code>
-     */
-    int getMeterTime();
-
-    /**
-     * <code>optional uint64 timestamp = 3;</code>
-     */
-    boolean hasTimestamp();
-    /**
-     * <code>optional uint64 timestamp = 3;</code>
-     */
-    long getTimestamp();
-  }
   /**
    * Protobuf type {@code CookieMonsterG4Meter}
    */
   public static final class CookieMonsterG4Meter extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:CookieMonsterG4Meter)
-      CookieMonsterG4MeterOrBuilder {
+                                                 com.google.protobuf.GeneratedMessage implements
+                                                                                      // @@protoc_insertion_point(message_implements:CookieMonsterG4Meter)
+                                                                                          CookieMonsterG4MeterOrBuilder {
+
+    public static final int METER_BG_FIELD_NUMBER = 1;
+    public static final int METER_TIME_FIELD_NUMBER = 2;
+    public static final int TIMESTAMP_FIELD_NUMBER = 3;
+    private static final CookieMonsterG4Meter defaultInstance;
+    private static final long serialVersionUID = 0L;
+    public static com.google.protobuf.Parser<CookieMonsterG4Meter> PARSER =
+        new com.google.protobuf.AbstractParser<CookieMonsterG4Meter>() {
+          public CookieMonsterG4Meter parsePartialFrom(
+              com.google.protobuf.CodedInputStream input,
+              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+              throws com.google.protobuf.InvalidProtocolBufferException {
+            return new CookieMonsterG4Meter(input, extensionRegistry);
+          }
+        };
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    private int bitField0_;
+    private int meterBg_;
+    private int meterTime_;
+    private long timestamp_;
+    private byte memoizedIsInitialized = -1;
+    private int memoizedSerializedSize = -1;
+
     // Use CookieMonsterG4Meter.newBuilder() to construct.
     private CookieMonsterG4Meter(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
     }
-    private CookieMonsterG4Meter(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
 
-    private static final CookieMonsterG4Meter defaultInstance;
-    public static CookieMonsterG4Meter getDefaultInstance() {
-      return defaultInstance;
+    private CookieMonsterG4Meter(boolean noInit) {
+      this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance();
     }
 
-    public CookieMonsterG4Meter getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
-      return this.unknownFields;
-    }
     private CookieMonsterG4Meter(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4004,42 +4602,119 @@ public final class SGV {
         makeExtensionsImmutable();
       }
     }
+
+    public static CookieMonsterG4Meter getDefaultInstance() {
+      return defaultInstance;
+    }
+
     public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
+    getDescriptor() {
       return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Meter_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Meter_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              com.nightscout.core.download.SGV.CookieMonsterG4Meter.class, com.nightscout.core.download.SGV.CookieMonsterG4Meter.Builder.class);
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
     }
 
-    public static com.google.protobuf.Parser<CookieMonsterG4Meter> PARSER =
-        new com.google.protobuf.AbstractParser<CookieMonsterG4Meter>() {
-      public CookieMonsterG4Meter parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new CookieMonsterG4Meter(input, extensionRegistry);
-      }
-    };
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseFrom(
+        java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseDelimitedFrom(
+        java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() {
+      return Builder.create();
+    }
+
+    public static Builder newBuilder(
+        com.nightscout.core.download.SGV.CookieMonsterG4Meter prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+
+    public CookieMonsterG4Meter getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    internalGetFieldAccessorTable() {
+      return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Meter_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.nightscout.core.download.SGV.CookieMonsterG4Meter.class,
+              com.nightscout.core.download.SGV.CookieMonsterG4Meter.Builder.class);
+    }
 
     @java.lang.Override
     public com.google.protobuf.Parser<CookieMonsterG4Meter> getParserForType() {
       return PARSER;
     }
 
-    private int bitField0_;
-    public static final int METER_BG_FIELD_NUMBER = 1;
-    private int meterBg_;
     /**
      * <code>required uint32 meter_bg = 1;</code>
      */
     public boolean hasMeterBg() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
+
     /**
      * <code>required uint32 meter_bg = 1;</code>
      */
@@ -4047,14 +4722,13 @@ public final class SGV {
       return meterBg_;
     }
 
-    public static final int METER_TIME_FIELD_NUMBER = 2;
-    private int meterTime_;
     /**
      * <code>optional uint32 meter_time = 2;</code>
      */
     public boolean hasMeterTime() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
+
     /**
      * <code>optional uint32 meter_time = 2;</code>
      */
@@ -4062,14 +4736,13 @@ public final class SGV {
       return meterTime_;
     }
 
-    public static final int TIMESTAMP_FIELD_NUMBER = 3;
-    private long timestamp_;
     /**
      * <code>optional uint64 timestamp = 3;</code>
      */
     public boolean hasTimestamp() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
+
     /**
      * <code>optional uint64 timestamp = 3;</code>
      */
@@ -4082,11 +4755,15 @@ public final class SGV {
       meterTime_ = 0;
       timestamp_ = 0L;
     }
-    private byte memoizedIsInitialized = -1;
+
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
+      if (isInitialized == 1) {
+        return true;
+      }
+      if (isInitialized == 0) {
+        return false;
+      }
 
       if (!hasMeterBg()) {
         memoizedIsInitialized = 0;
@@ -4097,7 +4774,7 @@ public final class SGV {
     }
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
+        throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeUInt32(1, meterBg_);
@@ -4111,95 +4788,43 @@ public final class SGV {
       getUnknownFields().writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
-      if (size != -1) return size;
+      if (size != -1) {
+        return size;
+      }
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(1, meterBg_);
+            .computeUInt32Size(1, meterBg_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(2, meterTime_);
+            .computeUInt32Size(2, meterTime_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(3, timestamp_);
+            .computeUInt64Size(3, timestamp_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     protected java.lang.Object writeReplace()
         throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Meter parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+    public Builder newBuilderForType() {
+      return newBuilder();
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.nightscout.core.download.SGV.CookieMonsterG4Meter prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public Builder toBuilder() {
+      return newBuilder(this);
     }
-    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -4207,24 +4832,20 @@ public final class SGV {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /**
      * Protobuf type {@code CookieMonsterG4Meter}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+                                      com.google.protobuf.GeneratedMessage.Builder<Builder>
+        implements
         // @@protoc_insertion_point(builder_implements:CookieMonsterG4Meter)
-        com.nightscout.core.download.SGV.CookieMonsterG4MeterOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Meter_descriptor;
-      }
+            com.nightscout.core.download.SGV.CookieMonsterG4MeterOrBuilder {
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Meter_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                com.nightscout.core.download.SGV.CookieMonsterG4Meter.class, com.nightscout.core.download.SGV.CookieMonsterG4Meter.Builder.class);
-      }
+      private int bitField0_;
+      private int meterBg_;
+      private int meterTime_;
+      private long timestamp_;
 
       // Construct using com.nightscout.core.download.SGV.CookieMonsterG4Meter.newBuilder()
       private Builder() {
@@ -4236,12 +4857,27 @@ public final class SGV {
         super(parent);
         maybeForceBuilderInitialization();
       }
+
+      public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Meter_descriptor;
+      }
+
+      private static Builder create() {
+        return new Builder();
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internalGetFieldAccessorTable() {
+        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Meter_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.nightscout.core.download.SGV.CookieMonsterG4Meter.class,
+                com.nightscout.core.download.SGV.CookieMonsterG4Meter.Builder.class);
+      }
+
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
-      }
-      private static Builder create() {
-        return new Builder();
       }
 
       public Builder clear() {
@@ -4260,7 +4896,7 @@ public final class SGV {
       }
 
       public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
+      getDescriptorForType() {
         return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Meter_descriptor;
       }
 
@@ -4277,7 +4913,9 @@ public final class SGV {
       }
 
       public com.nightscout.core.download.SGV.CookieMonsterG4Meter buildPartial() {
-        com.nightscout.core.download.SGV.CookieMonsterG4Meter result = new com.nightscout.core.download.SGV.CookieMonsterG4Meter(this);
+        com.nightscout.core.download.SGV.CookieMonsterG4Meter
+            result =
+            new com.nightscout.core.download.SGV.CookieMonsterG4Meter(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
@@ -4299,7 +4937,7 @@ public final class SGV {
 
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof com.nightscout.core.download.SGV.CookieMonsterG4Meter) {
-          return mergeFrom((com.nightscout.core.download.SGV.CookieMonsterG4Meter)other);
+          return mergeFrom((com.nightscout.core.download.SGV.CookieMonsterG4Meter) other);
         } else {
           super.mergeFrom(other);
           return this;
@@ -4307,7 +4945,9 @@ public final class SGV {
       }
 
       public Builder mergeFrom(com.nightscout.core.download.SGV.CookieMonsterG4Meter other) {
-        if (other == com.nightscout.core.download.SGV.CookieMonsterG4Meter.getDefaultInstance()) return this;
+        if (other == com.nightscout.core.download.SGV.CookieMonsterG4Meter.getDefaultInstance()) {
+          return this;
+        }
         if (other.hasMeterBg()) {
           setMeterBg(other.getMeterBg());
         }
@@ -4323,7 +4963,7 @@ public final class SGV {
 
       public final boolean isInitialized() {
         if (!hasMeterBg()) {
-          
+
           return false;
         }
         return true;
@@ -4337,7 +4977,8 @@ public final class SGV {
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (com.nightscout.core.download.SGV.CookieMonsterG4Meter) e.getUnfinishedMessage();
+          parsedMessage =
+              (com.nightscout.core.download.SGV.CookieMonsterG4Meter) e.getUnfinishedMessage();
           throw e;
         } finally {
           if (parsedMessage != null) {
@@ -4346,21 +4987,21 @@ public final class SGV {
         }
         return this;
       }
-      private int bitField0_;
 
-      private int meterBg_ ;
       /**
        * <code>required uint32 meter_bg = 1;</code>
        */
       public boolean hasMeterBg() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+
       /**
        * <code>required uint32 meter_bg = 1;</code>
        */
       public int getMeterBg() {
         return meterBg_;
       }
+
       /**
        * <code>required uint32 meter_bg = 1;</code>
        */
@@ -4370,6 +5011,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>required uint32 meter_bg = 1;</code>
        */
@@ -4380,19 +5022,20 @@ public final class SGV {
         return this;
       }
 
-      private int meterTime_ ;
       /**
        * <code>optional uint32 meter_time = 2;</code>
        */
       public boolean hasMeterTime() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+
       /**
        * <code>optional uint32 meter_time = 2;</code>
        */
       public int getMeterTime() {
         return meterTime_;
       }
+
       /**
        * <code>optional uint32 meter_time = 2;</code>
        */
@@ -4402,6 +5045,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional uint32 meter_time = 2;</code>
        */
@@ -4412,19 +5056,20 @@ public final class SGV {
         return this;
       }
 
-      private long timestamp_ ;
       /**
        * <code>optional uint64 timestamp = 3;</code>
        */
       public boolean hasTimestamp() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
+
       /**
        * <code>optional uint64 timestamp = 3;</code>
        */
       public long getTimestamp() {
         return timestamp_;
       }
+
       /**
        * <code>optional uint64 timestamp = 3;</code>
        */
@@ -4434,6 +5079,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional uint64 timestamp = 3;</code>
        */
@@ -4455,75 +5101,48 @@ public final class SGV {
     // @@protoc_insertion_point(class_scope:CookieMonsterG4Meter)
   }
 
-  public interface CookieMonsterG4SensorOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:CookieMonsterG4Sensor)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>required uint64 filtered = 1;</code>
-     */
-    boolean hasFiltered();
-    /**
-     * <code>required uint64 filtered = 1;</code>
-     */
-    long getFiltered();
-
-    /**
-     * <code>optional uint64 unfiltered = 2;</code>
-     */
-    boolean hasUnfiltered();
-    /**
-     * <code>optional uint64 unfiltered = 2;</code>
-     */
-    long getUnfiltered();
-
-    /**
-     * <code>optional uint32 rssi = 3;</code>
-     */
-    boolean hasRssi();
-    /**
-     * <code>optional uint32 rssi = 3;</code>
-     */
-    int getRssi();
-
-    /**
-     * <code>optional uint64 timestamp = 4;</code>
-     */
-    boolean hasTimestamp();
-    /**
-     * <code>optional uint64 timestamp = 4;</code>
-     */
-    long getTimestamp();
-  }
   /**
    * Protobuf type {@code CookieMonsterG4Sensor}
    */
   public static final class CookieMonsterG4Sensor extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:CookieMonsterG4Sensor)
-      CookieMonsterG4SensorOrBuilder {
+                                                  com.google.protobuf.GeneratedMessage implements
+                                                                                       // @@protoc_insertion_point(message_implements:CookieMonsterG4Sensor)
+                                                                                           CookieMonsterG4SensorOrBuilder {
+
+    public static final int FILTERED_FIELD_NUMBER = 1;
+    public static final int UNFILTERED_FIELD_NUMBER = 2;
+    public static final int RSSI_FIELD_NUMBER = 3;
+    public static final int TIMESTAMP_FIELD_NUMBER = 4;
+    private static final CookieMonsterG4Sensor defaultInstance;
+    private static final long serialVersionUID = 0L;
+    public static com.google.protobuf.Parser<CookieMonsterG4Sensor> PARSER =
+        new com.google.protobuf.AbstractParser<CookieMonsterG4Sensor>() {
+          public CookieMonsterG4Sensor parsePartialFrom(
+              com.google.protobuf.CodedInputStream input,
+              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+              throws com.google.protobuf.InvalidProtocolBufferException {
+            return new CookieMonsterG4Sensor(input, extensionRegistry);
+          }
+        };
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    private int bitField0_;
+    private long filtered_;
+    private long unfiltered_;
+    private int rssi_;
+    private long timestamp_;
+    private byte memoizedIsInitialized = -1;
+    private int memoizedSerializedSize = -1;
+
     // Use CookieMonsterG4Sensor.newBuilder() to construct.
     private CookieMonsterG4Sensor(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
     }
-    private CookieMonsterG4Sensor(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
 
-    private static final CookieMonsterG4Sensor defaultInstance;
-    public static CookieMonsterG4Sensor getDefaultInstance() {
-      return defaultInstance;
+    private CookieMonsterG4Sensor(boolean noInit) {
+      this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance();
     }
 
-    public CookieMonsterG4Sensor getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
-      return this.unknownFields;
-    }
     private CookieMonsterG4Sensor(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4579,42 +5198,119 @@ public final class SGV {
         makeExtensionsImmutable();
       }
     }
+
+    public static CookieMonsterG4Sensor getDefaultInstance() {
+      return defaultInstance;
+    }
+
     public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
+    getDescriptor() {
       return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Sensor_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Sensor_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              com.nightscout.core.download.SGV.CookieMonsterG4Sensor.class, com.nightscout.core.download.SGV.CookieMonsterG4Sensor.Builder.class);
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
     }
 
-    public static com.google.protobuf.Parser<CookieMonsterG4Sensor> PARSER =
-        new com.google.protobuf.AbstractParser<CookieMonsterG4Sensor>() {
-      public CookieMonsterG4Sensor parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new CookieMonsterG4Sensor(input, extensionRegistry);
-      }
-    };
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseFrom(
+        java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseDelimitedFrom(
+        java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() {
+      return Builder.create();
+    }
+
+    public static Builder newBuilder(
+        com.nightscout.core.download.SGV.CookieMonsterG4Sensor prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+
+    public CookieMonsterG4Sensor getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    internalGetFieldAccessorTable() {
+      return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Sensor_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.nightscout.core.download.SGV.CookieMonsterG4Sensor.class,
+              com.nightscout.core.download.SGV.CookieMonsterG4Sensor.Builder.class);
+    }
 
     @java.lang.Override
     public com.google.protobuf.Parser<CookieMonsterG4Sensor> getParserForType() {
       return PARSER;
     }
 
-    private int bitField0_;
-    public static final int FILTERED_FIELD_NUMBER = 1;
-    private long filtered_;
     /**
      * <code>required uint64 filtered = 1;</code>
      */
     public boolean hasFiltered() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
+
     /**
      * <code>required uint64 filtered = 1;</code>
      */
@@ -4622,14 +5318,13 @@ public final class SGV {
       return filtered_;
     }
 
-    public static final int UNFILTERED_FIELD_NUMBER = 2;
-    private long unfiltered_;
     /**
      * <code>optional uint64 unfiltered = 2;</code>
      */
     public boolean hasUnfiltered() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
+
     /**
      * <code>optional uint64 unfiltered = 2;</code>
      */
@@ -4637,14 +5332,13 @@ public final class SGV {
       return unfiltered_;
     }
 
-    public static final int RSSI_FIELD_NUMBER = 3;
-    private int rssi_;
     /**
      * <code>optional uint32 rssi = 3;</code>
      */
     public boolean hasRssi() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
+
     /**
      * <code>optional uint32 rssi = 3;</code>
      */
@@ -4652,14 +5346,13 @@ public final class SGV {
       return rssi_;
     }
 
-    public static final int TIMESTAMP_FIELD_NUMBER = 4;
-    private long timestamp_;
     /**
      * <code>optional uint64 timestamp = 4;</code>
      */
     public boolean hasTimestamp() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
+
     /**
      * <code>optional uint64 timestamp = 4;</code>
      */
@@ -4673,11 +5366,15 @@ public final class SGV {
       rssi_ = 0;
       timestamp_ = 0L;
     }
-    private byte memoizedIsInitialized = -1;
+
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
+      if (isInitialized == 1) {
+        return true;
+      }
+      if (isInitialized == 0) {
+        return false;
+      }
 
       if (!hasFiltered()) {
         memoizedIsInitialized = 0;
@@ -4688,7 +5385,7 @@ public final class SGV {
     }
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
+        throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeUInt64(1, filtered_);
@@ -4705,99 +5402,47 @@ public final class SGV {
       getUnknownFields().writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
-      if (size != -1) return size;
+      if (size != -1) {
+        return size;
+      }
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(1, filtered_);
+            .computeUInt64Size(1, filtered_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(2, unfiltered_);
+            .computeUInt64Size(2, unfiltered_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(3, rssi_);
+            .computeUInt32Size(3, rssi_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(4, timestamp_);
+            .computeUInt64Size(4, timestamp_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     protected java.lang.Object writeReplace()
         throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Sensor parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+    public Builder newBuilderForType() {
+      return newBuilder();
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.nightscout.core.download.SGV.CookieMonsterG4Sensor prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public Builder toBuilder() {
+      return newBuilder(this);
     }
-    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -4805,24 +5450,21 @@ public final class SGV {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /**
      * Protobuf type {@code CookieMonsterG4Sensor}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+                                      com.google.protobuf.GeneratedMessage.Builder<Builder>
+        implements
         // @@protoc_insertion_point(builder_implements:CookieMonsterG4Sensor)
-        com.nightscout.core.download.SGV.CookieMonsterG4SensorOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Sensor_descriptor;
-      }
+            com.nightscout.core.download.SGV.CookieMonsterG4SensorOrBuilder {
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Sensor_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                com.nightscout.core.download.SGV.CookieMonsterG4Sensor.class, com.nightscout.core.download.SGV.CookieMonsterG4Sensor.Builder.class);
-      }
+      private int bitField0_;
+      private long filtered_;
+      private long unfiltered_;
+      private int rssi_;
+      private long timestamp_;
 
       // Construct using com.nightscout.core.download.SGV.CookieMonsterG4Sensor.newBuilder()
       private Builder() {
@@ -4834,12 +5476,27 @@ public final class SGV {
         super(parent);
         maybeForceBuilderInitialization();
       }
+
+      public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Sensor_descriptor;
+      }
+
+      private static Builder create() {
+        return new Builder();
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internalGetFieldAccessorTable() {
+        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Sensor_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.nightscout.core.download.SGV.CookieMonsterG4Sensor.class,
+                com.nightscout.core.download.SGV.CookieMonsterG4Sensor.Builder.class);
+      }
+
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
-      }
-      private static Builder create() {
-        return new Builder();
       }
 
       public Builder clear() {
@@ -4860,7 +5517,7 @@ public final class SGV {
       }
 
       public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
+      getDescriptorForType() {
         return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Sensor_descriptor;
       }
 
@@ -4877,7 +5534,9 @@ public final class SGV {
       }
 
       public com.nightscout.core.download.SGV.CookieMonsterG4Sensor buildPartial() {
-        com.nightscout.core.download.SGV.CookieMonsterG4Sensor result = new com.nightscout.core.download.SGV.CookieMonsterG4Sensor(this);
+        com.nightscout.core.download.SGV.CookieMonsterG4Sensor
+            result =
+            new com.nightscout.core.download.SGV.CookieMonsterG4Sensor(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
@@ -4903,7 +5562,7 @@ public final class SGV {
 
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof com.nightscout.core.download.SGV.CookieMonsterG4Sensor) {
-          return mergeFrom((com.nightscout.core.download.SGV.CookieMonsterG4Sensor)other);
+          return mergeFrom((com.nightscout.core.download.SGV.CookieMonsterG4Sensor) other);
         } else {
           super.mergeFrom(other);
           return this;
@@ -4911,7 +5570,9 @@ public final class SGV {
       }
 
       public Builder mergeFrom(com.nightscout.core.download.SGV.CookieMonsterG4Sensor other) {
-        if (other == com.nightscout.core.download.SGV.CookieMonsterG4Sensor.getDefaultInstance()) return this;
+        if (other == com.nightscout.core.download.SGV.CookieMonsterG4Sensor.getDefaultInstance()) {
+          return this;
+        }
         if (other.hasFiltered()) {
           setFiltered(other.getFiltered());
         }
@@ -4930,7 +5591,7 @@ public final class SGV {
 
       public final boolean isInitialized() {
         if (!hasFiltered()) {
-          
+
           return false;
         }
         return true;
@@ -4944,7 +5605,8 @@ public final class SGV {
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (com.nightscout.core.download.SGV.CookieMonsterG4Sensor) e.getUnfinishedMessage();
+          parsedMessage =
+              (com.nightscout.core.download.SGV.CookieMonsterG4Sensor) e.getUnfinishedMessage();
           throw e;
         } finally {
           if (parsedMessage != null) {
@@ -4953,21 +5615,21 @@ public final class SGV {
         }
         return this;
       }
-      private int bitField0_;
 
-      private long filtered_ ;
       /**
        * <code>required uint64 filtered = 1;</code>
        */
       public boolean hasFiltered() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+
       /**
        * <code>required uint64 filtered = 1;</code>
        */
       public long getFiltered() {
         return filtered_;
       }
+
       /**
        * <code>required uint64 filtered = 1;</code>
        */
@@ -4977,6 +5639,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>required uint64 filtered = 1;</code>
        */
@@ -4987,19 +5650,20 @@ public final class SGV {
         return this;
       }
 
-      private long unfiltered_ ;
       /**
        * <code>optional uint64 unfiltered = 2;</code>
        */
       public boolean hasUnfiltered() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+
       /**
        * <code>optional uint64 unfiltered = 2;</code>
        */
       public long getUnfiltered() {
         return unfiltered_;
       }
+
       /**
        * <code>optional uint64 unfiltered = 2;</code>
        */
@@ -5009,6 +5673,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional uint64 unfiltered = 2;</code>
        */
@@ -5019,19 +5684,20 @@ public final class SGV {
         return this;
       }
 
-      private int rssi_ ;
       /**
        * <code>optional uint32 rssi = 3;</code>
        */
       public boolean hasRssi() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
+
       /**
        * <code>optional uint32 rssi = 3;</code>
        */
       public int getRssi() {
         return rssi_;
       }
+
       /**
        * <code>optional uint32 rssi = 3;</code>
        */
@@ -5041,6 +5707,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional uint32 rssi = 3;</code>
        */
@@ -5051,19 +5718,20 @@ public final class SGV {
         return this;
       }
 
-      private long timestamp_ ;
       /**
        * <code>optional uint64 timestamp = 4;</code>
        */
       public boolean hasTimestamp() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
+
       /**
        * <code>optional uint64 timestamp = 4;</code>
        */
       public long getTimestamp() {
         return timestamp_;
       }
+
       /**
        * <code>optional uint64 timestamp = 4;</code>
        */
@@ -5073,6 +5741,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional uint64 timestamp = 4;</code>
        */
@@ -5094,75 +5763,48 @@ public final class SGV {
     // @@protoc_insertion_point(class_scope:CookieMonsterG4Sensor)
   }
 
-  public interface CookieMonsterG4CalOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:CookieMonsterG4Cal)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>required double slope = 1;</code>
-     */
-    boolean hasSlope();
-    /**
-     * <code>required double slope = 1;</code>
-     */
-    double getSlope();
-
-    /**
-     * <code>optional double intercept = 2;</code>
-     */
-    boolean hasIntercept();
-    /**
-     * <code>optional double intercept = 2;</code>
-     */
-    double getIntercept();
-
-    /**
-     * <code>optional double scale = 3;</code>
-     */
-    boolean hasScale();
-    /**
-     * <code>optional double scale = 3;</code>
-     */
-    double getScale();
-
-    /**
-     * <code>optional uint64 timestamp = 4;</code>
-     */
-    boolean hasTimestamp();
-    /**
-     * <code>optional uint64 timestamp = 4;</code>
-     */
-    long getTimestamp();
-  }
   /**
    * Protobuf type {@code CookieMonsterG4Cal}
    */
   public static final class CookieMonsterG4Cal extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:CookieMonsterG4Cal)
-      CookieMonsterG4CalOrBuilder {
+                                               com.google.protobuf.GeneratedMessage implements
+                                                                                    // @@protoc_insertion_point(message_implements:CookieMonsterG4Cal)
+                                                                                        CookieMonsterG4CalOrBuilder {
+
+    public static final int SLOPE_FIELD_NUMBER = 1;
+    public static final int INTERCEPT_FIELD_NUMBER = 2;
+    public static final int SCALE_FIELD_NUMBER = 3;
+    public static final int TIMESTAMP_FIELD_NUMBER = 4;
+    private static final CookieMonsterG4Cal defaultInstance;
+    private static final long serialVersionUID = 0L;
+    public static com.google.protobuf.Parser<CookieMonsterG4Cal> PARSER =
+        new com.google.protobuf.AbstractParser<CookieMonsterG4Cal>() {
+          public CookieMonsterG4Cal parsePartialFrom(
+              com.google.protobuf.CodedInputStream input,
+              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+              throws com.google.protobuf.InvalidProtocolBufferException {
+            return new CookieMonsterG4Cal(input, extensionRegistry);
+          }
+        };
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    private int bitField0_;
+    private double slope_;
+    private double intercept_;
+    private double scale_;
+    private long timestamp_;
+    private byte memoizedIsInitialized = -1;
+    private int memoizedSerializedSize = -1;
+
     // Use CookieMonsterG4Cal.newBuilder() to construct.
     private CookieMonsterG4Cal(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
     }
-    private CookieMonsterG4Cal(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
 
-    private static final CookieMonsterG4Cal defaultInstance;
-    public static CookieMonsterG4Cal getDefaultInstance() {
-      return defaultInstance;
+    private CookieMonsterG4Cal(boolean noInit) {
+      this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance();
     }
 
-    public CookieMonsterG4Cal getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
-      return this.unknownFields;
-    }
     private CookieMonsterG4Cal(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -5218,42 +5860,119 @@ public final class SGV {
         makeExtensionsImmutable();
       }
     }
+
+    public static CookieMonsterG4Cal getDefaultInstance() {
+      return defaultInstance;
+    }
+
     public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
+    getDescriptor() {
       return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Cal_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Cal_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              com.nightscout.core.download.SGV.CookieMonsterG4Cal.class, com.nightscout.core.download.SGV.CookieMonsterG4Cal.Builder.class);
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
     }
 
-    public static com.google.protobuf.Parser<CookieMonsterG4Cal> PARSER =
-        new com.google.protobuf.AbstractParser<CookieMonsterG4Cal>() {
-      public CookieMonsterG4Cal parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new CookieMonsterG4Cal(input, extensionRegistry);
-      }
-    };
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseFrom(
+        java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseDelimitedFrom(
+        java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() {
+      return Builder.create();
+    }
+
+    public static Builder newBuilder(
+        com.nightscout.core.download.SGV.CookieMonsterG4Cal prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+
+    public CookieMonsterG4Cal getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    internalGetFieldAccessorTable() {
+      return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Cal_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.nightscout.core.download.SGV.CookieMonsterG4Cal.class,
+              com.nightscout.core.download.SGV.CookieMonsterG4Cal.Builder.class);
+    }
 
     @java.lang.Override
     public com.google.protobuf.Parser<CookieMonsterG4Cal> getParserForType() {
       return PARSER;
     }
 
-    private int bitField0_;
-    public static final int SLOPE_FIELD_NUMBER = 1;
-    private double slope_;
     /**
      * <code>required double slope = 1;</code>
      */
     public boolean hasSlope() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
+
     /**
      * <code>required double slope = 1;</code>
      */
@@ -5261,14 +5980,13 @@ public final class SGV {
       return slope_;
     }
 
-    public static final int INTERCEPT_FIELD_NUMBER = 2;
-    private double intercept_;
     /**
      * <code>optional double intercept = 2;</code>
      */
     public boolean hasIntercept() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
+
     /**
      * <code>optional double intercept = 2;</code>
      */
@@ -5276,14 +5994,13 @@ public final class SGV {
       return intercept_;
     }
 
-    public static final int SCALE_FIELD_NUMBER = 3;
-    private double scale_;
     /**
      * <code>optional double scale = 3;</code>
      */
     public boolean hasScale() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
+
     /**
      * <code>optional double scale = 3;</code>
      */
@@ -5291,14 +6008,13 @@ public final class SGV {
       return scale_;
     }
 
-    public static final int TIMESTAMP_FIELD_NUMBER = 4;
-    private long timestamp_;
     /**
      * <code>optional uint64 timestamp = 4;</code>
      */
     public boolean hasTimestamp() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
+
     /**
      * <code>optional uint64 timestamp = 4;</code>
      */
@@ -5312,11 +6028,15 @@ public final class SGV {
       scale_ = 0D;
       timestamp_ = 0L;
     }
-    private byte memoizedIsInitialized = -1;
+
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
+      if (isInitialized == 1) {
+        return true;
+      }
+      if (isInitialized == 0) {
+        return false;
+      }
 
       if (!hasSlope()) {
         memoizedIsInitialized = 0;
@@ -5327,7 +6047,7 @@ public final class SGV {
     }
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
+        throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeDouble(1, slope_);
@@ -5344,99 +6064,47 @@ public final class SGV {
       getUnknownFields().writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
-      if (size != -1) return size;
+      if (size != -1) {
+        return size;
+      }
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(1, slope_);
+            .computeDoubleSize(1, slope_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(2, intercept_);
+            .computeDoubleSize(2, intercept_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(3, scale_);
+            .computeDoubleSize(3, scale_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(4, timestamp_);
+            .computeUInt64Size(4, timestamp_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     protected java.lang.Object writeReplace()
         throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterG4Cal parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+    public Builder newBuilderForType() {
+      return newBuilder();
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.nightscout.core.download.SGV.CookieMonsterG4Cal prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public Builder toBuilder() {
+      return newBuilder(this);
     }
-    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -5444,24 +6112,21 @@ public final class SGV {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /**
      * Protobuf type {@code CookieMonsterG4Cal}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+                                      com.google.protobuf.GeneratedMessage.Builder<Builder>
+        implements
         // @@protoc_insertion_point(builder_implements:CookieMonsterG4Cal)
-        com.nightscout.core.download.SGV.CookieMonsterG4CalOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Cal_descriptor;
-      }
+            com.nightscout.core.download.SGV.CookieMonsterG4CalOrBuilder {
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Cal_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                com.nightscout.core.download.SGV.CookieMonsterG4Cal.class, com.nightscout.core.download.SGV.CookieMonsterG4Cal.Builder.class);
-      }
+      private int bitField0_;
+      private double slope_;
+      private double intercept_;
+      private double scale_;
+      private long timestamp_;
 
       // Construct using com.nightscout.core.download.SGV.CookieMonsterG4Cal.newBuilder()
       private Builder() {
@@ -5473,12 +6138,27 @@ public final class SGV {
         super(parent);
         maybeForceBuilderInitialization();
       }
+
+      public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Cal_descriptor;
+      }
+
+      private static Builder create() {
+        return new Builder();
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internalGetFieldAccessorTable() {
+        return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Cal_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.nightscout.core.download.SGV.CookieMonsterG4Cal.class,
+                com.nightscout.core.download.SGV.CookieMonsterG4Cal.Builder.class);
+      }
+
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
-      }
-      private static Builder create() {
-        return new Builder();
       }
 
       public Builder clear() {
@@ -5499,7 +6179,7 @@ public final class SGV {
       }
 
       public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
+      getDescriptorForType() {
         return com.nightscout.core.download.SGV.internal_static_CookieMonsterG4Cal_descriptor;
       }
 
@@ -5516,7 +6196,9 @@ public final class SGV {
       }
 
       public com.nightscout.core.download.SGV.CookieMonsterG4Cal buildPartial() {
-        com.nightscout.core.download.SGV.CookieMonsterG4Cal result = new com.nightscout.core.download.SGV.CookieMonsterG4Cal(this);
+        com.nightscout.core.download.SGV.CookieMonsterG4Cal
+            result =
+            new com.nightscout.core.download.SGV.CookieMonsterG4Cal(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
@@ -5542,7 +6224,7 @@ public final class SGV {
 
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof com.nightscout.core.download.SGV.CookieMonsterG4Cal) {
-          return mergeFrom((com.nightscout.core.download.SGV.CookieMonsterG4Cal)other);
+          return mergeFrom((com.nightscout.core.download.SGV.CookieMonsterG4Cal) other);
         } else {
           super.mergeFrom(other);
           return this;
@@ -5550,7 +6232,9 @@ public final class SGV {
       }
 
       public Builder mergeFrom(com.nightscout.core.download.SGV.CookieMonsterG4Cal other) {
-        if (other == com.nightscout.core.download.SGV.CookieMonsterG4Cal.getDefaultInstance()) return this;
+        if (other == com.nightscout.core.download.SGV.CookieMonsterG4Cal.getDefaultInstance()) {
+          return this;
+        }
         if (other.hasSlope()) {
           setSlope(other.getSlope());
         }
@@ -5569,7 +6253,7 @@ public final class SGV {
 
       public final boolean isInitialized() {
         if (!hasSlope()) {
-          
+
           return false;
         }
         return true;
@@ -5583,7 +6267,8 @@ public final class SGV {
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (com.nightscout.core.download.SGV.CookieMonsterG4Cal) e.getUnfinishedMessage();
+          parsedMessage =
+              (com.nightscout.core.download.SGV.CookieMonsterG4Cal) e.getUnfinishedMessage();
           throw e;
         } finally {
           if (parsedMessage != null) {
@@ -5592,21 +6277,21 @@ public final class SGV {
         }
         return this;
       }
-      private int bitField0_;
 
-      private double slope_ ;
       /**
        * <code>required double slope = 1;</code>
        */
       public boolean hasSlope() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+
       /**
        * <code>required double slope = 1;</code>
        */
       public double getSlope() {
         return slope_;
       }
+
       /**
        * <code>required double slope = 1;</code>
        */
@@ -5616,6 +6301,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>required double slope = 1;</code>
        */
@@ -5626,19 +6312,20 @@ public final class SGV {
         return this;
       }
 
-      private double intercept_ ;
       /**
        * <code>optional double intercept = 2;</code>
        */
       public boolean hasIntercept() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+
       /**
        * <code>optional double intercept = 2;</code>
        */
       public double getIntercept() {
         return intercept_;
       }
+
       /**
        * <code>optional double intercept = 2;</code>
        */
@@ -5648,6 +6335,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional double intercept = 2;</code>
        */
@@ -5658,19 +6346,20 @@ public final class SGV {
         return this;
       }
 
-      private double scale_ ;
       /**
        * <code>optional double scale = 3;</code>
        */
       public boolean hasScale() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
+
       /**
        * <code>optional double scale = 3;</code>
        */
       public double getScale() {
         return scale_;
       }
+
       /**
        * <code>optional double scale = 3;</code>
        */
@@ -5680,6 +6369,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional double scale = 3;</code>
        */
@@ -5690,19 +6380,20 @@ public final class SGV {
         return this;
       }
 
-      private long timestamp_ ;
       /**
        * <code>optional uint64 timestamp = 4;</code>
        */
       public boolean hasTimestamp() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
+
       /**
        * <code>optional uint64 timestamp = 4;</code>
        */
       public long getTimestamp() {
         return timestamp_;
       }
+
       /**
        * <code>optional uint64 timestamp = 4;</code>
        */
@@ -5712,6 +6403,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional uint64 timestamp = 4;</code>
        */
@@ -5733,61 +6425,46 @@ public final class SGV {
     // @@protoc_insertion_point(class_scope:CookieMonsterG4Cal)
   }
 
-  public interface CookieMonsterReceiverStatusOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:CookieMonsterReceiverStatus)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>required uint64 timestamp = 1;</code>
-     */
-    boolean hasTimestamp();
-    /**
-     * <code>required uint64 timestamp = 1;</code>
-     */
-    long getTimestamp();
-
-    /**
-     * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
-     */
-    java.util.List<com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus> getEventList();
-    /**
-     * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
-     */
-    int getEventCount();
-    /**
-     * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
-     */
-    com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus getEvent(int index);
-  }
   /**
    * Protobuf type {@code CookieMonsterReceiverStatus}
    */
   public static final class CookieMonsterReceiverStatus extends
-      com.google.protobuf.GeneratedMessage implements
+                                                        com.google.protobuf.GeneratedMessage
+      implements
       // @@protoc_insertion_point(message_implements:CookieMonsterReceiverStatus)
-      CookieMonsterReceiverStatusOrBuilder {
+          CookieMonsterReceiverStatusOrBuilder {
+
+    public static final int TIMESTAMP_FIELD_NUMBER = 1;
+    public static final int EVENT_FIELD_NUMBER = 2;
+    private static final CookieMonsterReceiverStatus defaultInstance;
+    private static final long serialVersionUID = 0L;
+    public static com.google.protobuf.Parser<CookieMonsterReceiverStatus> PARSER =
+        new com.google.protobuf.AbstractParser<CookieMonsterReceiverStatus>() {
+          public CookieMonsterReceiverStatus parsePartialFrom(
+              com.google.protobuf.CodedInputStream input,
+              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+              throws com.google.protobuf.InvalidProtocolBufferException {
+            return new CookieMonsterReceiverStatus(input, extensionRegistry);
+          }
+        };
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    private int bitField0_;
+    private long timestamp_;
+    private java.util.List<com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus>
+        event_;
+    private byte memoizedIsInitialized = -1;
+    private int memoizedSerializedSize = -1;
+
     // Use CookieMonsterReceiverStatus.newBuilder() to construct.
     private CookieMonsterReceiverStatus(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
     }
-    private CookieMonsterReceiverStatus(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
 
-    private static final CookieMonsterReceiverStatus defaultInstance;
-    public static CookieMonsterReceiverStatus getDefaultInstance() {
-      return defaultInstance;
+    private CookieMonsterReceiverStatus(boolean noInit) {
+      this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance();
     }
 
-    public CookieMonsterReceiverStatus getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
-      return this.unknownFields;
-    }
     private CookieMonsterReceiverStatus(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -5818,12 +6495,16 @@ public final class SGV {
             }
             case 16: {
               int rawValue = input.readEnum();
-              com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus value = com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus.valueOf(rawValue);
+              com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus
+                  value =
+                  com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus
+                      .valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(2, rawValue);
-                } else {
+              } else {
                 if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-                  event_ = new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus>();
+                  event_ =
+                      new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus>();
                   mutable_bitField0_ |= 0x00000002;
                 }
                 event_.add(value);
@@ -5833,14 +6514,18 @@ public final class SGV {
             case 18: {
               int length = input.readRawVarint32();
               int oldLimit = input.pushLimit(length);
-              while(input.getBytesUntilLimit() > 0) {
+              while (input.getBytesUntilLimit() > 0) {
                 int rawValue = input.readEnum();
-                com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus value = com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus.valueOf(rawValue);
+                com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus
+                    value =
+                    com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus
+                        .valueOf(rawValue);
                 if (value == null) {
                   unknownFields.mergeVarintField(2, rawValue);
-                  } else {
+                } else {
                   if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-                    event_ = new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus>();
+                    event_ =
+                        new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus>();
                     mutable_bitField0_ |= 0x00000002;
                   }
                   event_.add(value);
@@ -5864,31 +6549,227 @@ public final class SGV {
         makeExtensionsImmutable();
       }
     }
+
+    public static CookieMonsterReceiverStatus getDefaultInstance() {
+      return defaultInstance;
+    }
+
     public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
+    getDescriptor() {
       return com.nightscout.core.download.SGV.internal_static_CookieMonsterReceiverStatus_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return com.nightscout.core.download.SGV.internal_static_CookieMonsterReceiverStatus_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.class, com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.Builder.class);
+    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
     }
 
-    public static com.google.protobuf.Parser<CookieMonsterReceiverStatus> PARSER =
-        new com.google.protobuf.AbstractParser<CookieMonsterReceiverStatus>() {
-      public CookieMonsterReceiverStatus parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new CookieMonsterReceiverStatus(input, extensionRegistry);
-      }
-    };
+    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseFrom(
+        byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseFrom(
+        java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseDelimitedFrom(
+        java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+
+    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() {
+      return Builder.create();
+    }
+
+    public static Builder newBuilder(
+        com.nightscout.core.download.SGV.CookieMonsterReceiverStatus prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+
+    public CookieMonsterReceiverStatus getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    internalGetFieldAccessorTable() {
+      return com.nightscout.core.download.SGV.internal_static_CookieMonsterReceiverStatus_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.class,
+              com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.Builder.class);
+    }
 
     @java.lang.Override
     public com.google.protobuf.Parser<CookieMonsterReceiverStatus> getParserForType() {
       return PARSER;
+    }
+
+    /**
+     * <code>required uint64 timestamp = 1;</code>
+     */
+    public boolean hasTimestamp() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+
+    /**
+     * <code>required uint64 timestamp = 1;</code>
+     */
+    public long getTimestamp() {
+      return timestamp_;
+    }
+
+    /**
+     * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
+     */
+    public java.util.List<com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus> getEventList() {
+      return event_;
+    }
+
+    /**
+     * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
+     */
+    public int getEventCount() {
+      return event_.size();
+    }
+
+    /**
+     * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
+     */
+    public com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus getEvent(
+        int index) {
+      return event_.get(index);
+    }
+
+    private void initFields() {
+      timestamp_ = 0L;
+      event_ = java.util.Collections.emptyList();
+    }
+
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) {
+        return true;
+      }
+      if (isInitialized == 0) {
+        return false;
+      }
+
+      if (!hasTimestamp()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeUInt64(1, timestamp_);
+      }
+      for (int i = 0; i < event_.size(); i++) {
+        output.writeEnum(2, event_.get(i).getNumber());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) {
+        return size;
+      }
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+            .computeUInt64Size(1, timestamp_);
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < event_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+              .computeEnumSizeNoTag(event_.get(i).getNumber());
+        }
+        size += dataSize;
+        size += 1 * event_.size();
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public Builder newBuilderForType() {
+      return newBuilder();
+    }
+
+    public Builder toBuilder() {
+      return newBuilder(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
     }
 
     /**
@@ -5903,8 +6784,7 @@ public final class SGV {
       /**
        * <code>RECEIVERDISCONNECTED = 1;</code>
        */
-      RECEIVERDISCONNECTED(1, 1),
-      ;
+      RECEIVERDISCONNECTED(1, 1),;
 
       /**
        * <code>RECEIVERCONNECTED = 0;</code>
@@ -5914,54 +6794,14 @@ public final class SGV {
        * <code>RECEIVERDISCONNECTED = 1;</code>
        */
       public static final int RECEIVERDISCONNECTED_VALUE = 1;
-
-
-      public final int getNumber() { return value; }
-
-      public static ReceiverStatus valueOf(int value) {
-        switch (value) {
-          case 0: return RECEIVERCONNECTED;
-          case 1: return RECEIVERDISCONNECTED;
-          default: return null;
-        }
-      }
-
-      public static com.google.protobuf.Internal.EnumLiteMap<ReceiverStatus>
-          internalGetValueMap() {
-        return internalValueMap;
-      }
+      private static final ReceiverStatus[] VALUES = values();
       private static com.google.protobuf.Internal.EnumLiteMap<ReceiverStatus>
           internalValueMap =
-            new com.google.protobuf.Internal.EnumLiteMap<ReceiverStatus>() {
-              public ReceiverStatus findValueByNumber(int number) {
-                return ReceiverStatus.valueOf(number);
-              }
-            };
-
-      public final com.google.protobuf.Descriptors.EnumValueDescriptor
-          getValueDescriptor() {
-        return getDescriptor().getValues().get(index);
-      }
-      public final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptorForType() {
-        return getDescriptor();
-      }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptor() {
-        return com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.getDescriptor().getEnumTypes().get(0);
-      }
-
-      private static final ReceiverStatus[] VALUES = values();
-
-      public static ReceiverStatus valueOf(
-          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-        if (desc.getType() != getDescriptor()) {
-          throw new java.lang.IllegalArgumentException(
-            "EnumValueDescriptor is not for this type.");
-        }
-        return VALUES[desc.getIndex()];
-      }
-
+          new com.google.protobuf.Internal.EnumLiteMap<ReceiverStatus>() {
+            public ReceiverStatus findValueByNumber(int number) {
+              return ReceiverStatus.valueOf(number);
+            }
+          };
       private final int index;
       private final int value;
 
@@ -5970,191 +6810,68 @@ public final class SGV {
         this.value = value;
       }
 
+      public static ReceiverStatus valueOf(int value) {
+        switch (value) {
+          case 0:
+            return RECEIVERCONNECTED;
+          case 1:
+            return RECEIVERDISCONNECTED;
+          default:
+            return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<ReceiverStatus>
+      internalGetValueMap() {
+        return internalValueMap;
+      }
+
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+      getDescriptor() {
+        return com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.getDescriptor()
+            .getEnumTypes().get(0);
+      }
+
+      public static ReceiverStatus valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+              "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      public final int getNumber() {
+        return value;
+      }
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+      getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+      getDescriptorForType() {
+        return getDescriptor();
+      }
+
       // @@protoc_insertion_point(enum_scope:CookieMonsterReceiverStatus.ReceiverStatus)
     }
 
-    private int bitField0_;
-    public static final int TIMESTAMP_FIELD_NUMBER = 1;
-    private long timestamp_;
-    /**
-     * <code>required uint64 timestamp = 1;</code>
-     */
-    public boolean hasTimestamp() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    /**
-     * <code>required uint64 timestamp = 1;</code>
-     */
-    public long getTimestamp() {
-      return timestamp_;
-    }
-
-    public static final int EVENT_FIELD_NUMBER = 2;
-    private java.util.List<com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus> event_;
-    /**
-     * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
-     */
-    public java.util.List<com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus> getEventList() {
-      return event_;
-    }
-    /**
-     * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
-     */
-    public int getEventCount() {
-      return event_.size();
-    }
-    /**
-     * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
-     */
-    public com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus getEvent(int index) {
-      return event_.get(index);
-    }
-
-    private void initFields() {
-      timestamp_ = 0L;
-      event_ = java.util.Collections.emptyList();
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      if (!hasTimestamp()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeUInt64(1, timestamp_);
-      }
-      for (int i = 0; i < event_.size(); i++) {
-        output.writeEnum(2, event_.get(i).getNumber());
-      }
-      getUnknownFields().writeTo(output);
-    }
-
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(1, timestamp_);
-      }
-      {
-        int dataSize = 0;
-        for (int i = 0; i < event_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeEnumSizeNoTag(event_.get(i).getNumber());
-        }
-        size += dataSize;
-        size += 1 * event_.size();
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
-    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static com.nightscout.core.download.SGV.CookieMonsterReceiverStatus parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.nightscout.core.download.SGV.CookieMonsterReceiverStatus prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
     /**
      * Protobuf type {@code CookieMonsterReceiverStatus}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+                                      com.google.protobuf.GeneratedMessage.Builder<Builder>
+        implements
         // @@protoc_insertion_point(builder_implements:CookieMonsterReceiverStatus)
-        com.nightscout.core.download.SGV.CookieMonsterReceiverStatusOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return com.nightscout.core.download.SGV.internal_static_CookieMonsterReceiverStatus_descriptor;
-      }
+            com.nightscout.core.download.SGV.CookieMonsterReceiverStatusOrBuilder {
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return com.nightscout.core.download.SGV.internal_static_CookieMonsterReceiverStatus_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.class, com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.Builder.class);
-      }
+      private int bitField0_;
+      private long timestamp_;
+      private java.util.List<com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus>
+          event_ =
+          java.util.Collections.emptyList();
 
       // Construct using com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.newBuilder()
       private Builder() {
@@ -6166,12 +6883,27 @@ public final class SGV {
         super(parent);
         maybeForceBuilderInitialization();
       }
+
+      public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
+        return com.nightscout.core.download.SGV.internal_static_CookieMonsterReceiverStatus_descriptor;
+      }
+
+      private static Builder create() {
+        return new Builder();
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internalGetFieldAccessorTable() {
+        return com.nightscout.core.download.SGV.internal_static_CookieMonsterReceiverStatus_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.class,
+                com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.Builder.class);
+      }
+
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
-      }
-      private static Builder create() {
-        return new Builder();
       }
 
       public Builder clear() {
@@ -6188,7 +6920,7 @@ public final class SGV {
       }
 
       public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
+      getDescriptorForType() {
         return com.nightscout.core.download.SGV.internal_static_CookieMonsterReceiverStatus_descriptor;
       }
 
@@ -6205,7 +6937,9 @@ public final class SGV {
       }
 
       public com.nightscout.core.download.SGV.CookieMonsterReceiverStatus buildPartial() {
-        com.nightscout.core.download.SGV.CookieMonsterReceiverStatus result = new com.nightscout.core.download.SGV.CookieMonsterReceiverStatus(this);
+        com.nightscout.core.download.SGV.CookieMonsterReceiverStatus
+            result =
+            new com.nightscout.core.download.SGV.CookieMonsterReceiverStatus(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
@@ -6224,7 +6958,7 @@ public final class SGV {
 
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof com.nightscout.core.download.SGV.CookieMonsterReceiverStatus) {
-          return mergeFrom((com.nightscout.core.download.SGV.CookieMonsterReceiverStatus)other);
+          return mergeFrom((com.nightscout.core.download.SGV.CookieMonsterReceiverStatus) other);
         } else {
           super.mergeFrom(other);
           return this;
@@ -6232,7 +6966,10 @@ public final class SGV {
       }
 
       public Builder mergeFrom(com.nightscout.core.download.SGV.CookieMonsterReceiverStatus other) {
-        if (other == com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.getDefaultInstance()) return this;
+        if (other == com.nightscout.core.download.SGV.CookieMonsterReceiverStatus
+            .getDefaultInstance()) {
+          return this;
+        }
         if (other.hasTimestamp()) {
           setTimestamp(other.getTimestamp());
         }
@@ -6252,7 +6989,7 @@ public final class SGV {
 
       public final boolean isInitialized() {
         if (!hasTimestamp()) {
-          
+
           return false;
         }
         return true;
@@ -6266,7 +7003,9 @@ public final class SGV {
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (com.nightscout.core.download.SGV.CookieMonsterReceiverStatus) e.getUnfinishedMessage();
+          parsedMessage =
+              (com.nightscout.core.download.SGV.CookieMonsterReceiverStatus) e
+                  .getUnfinishedMessage();
           throw e;
         } finally {
           if (parsedMessage != null) {
@@ -6275,21 +7014,21 @@ public final class SGV {
         }
         return this;
       }
-      private int bitField0_;
 
-      private long timestamp_ ;
       /**
        * <code>required uint64 timestamp = 1;</code>
        */
       public boolean hasTimestamp() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+
       /**
        * <code>required uint64 timestamp = 1;</code>
        */
       public long getTimestamp() {
         return timestamp_;
       }
+
       /**
        * <code>required uint64 timestamp = 1;</code>
        */
@@ -6299,6 +7038,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>required uint64 timestamp = 1;</code>
        */
@@ -6309,37 +7049,43 @@ public final class SGV {
         return this;
       }
 
-      private java.util.List<com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus> event_ =
-        java.util.Collections.emptyList();
       private void ensureEventIsMutable() {
         if (!((bitField0_ & 0x00000002) == 0x00000002)) {
-          event_ = new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus>(event_);
+          event_ =
+              new java.util.ArrayList<com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus>(
+                  event_);
           bitField0_ |= 0x00000002;
         }
       }
+
       /**
        * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
        */
       public java.util.List<com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus> getEventList() {
         return java.util.Collections.unmodifiableList(event_);
       }
+
       /**
        * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
        */
       public int getEventCount() {
         return event_.size();
       }
+
       /**
        * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
        */
-      public com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus getEvent(int index) {
+      public com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus getEvent(
+          int index) {
         return event_.get(index);
       }
+
       /**
        * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
        */
       public Builder setEvent(
-          int index, com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus value) {
+          int index,
+          com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -6348,10 +7094,12 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
        */
-      public Builder addEvent(com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus value) {
+      public Builder addEvent(
+          com.nightscout.core.download.SGV.CookieMonsterReceiverStatus.ReceiverStatus value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -6360,6 +7108,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
        */
@@ -6371,6 +7120,7 @@ public final class SGV {
         onChanged();
         return this;
       }
+
       /**
        * <code>repeated .CookieMonsterReceiverStatus.ReceiverStatus event = 2;</code>
        */
@@ -6390,130 +7140,6 @@ public final class SGV {
     }
 
     // @@protoc_insertion_point(class_scope:CookieMonsterReceiverStatus)
-  }
-
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_CookieMonsterG4Download_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_CookieMonsterG4Download_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_CookieMonsterG4EGV_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_CookieMonsterG4EGV_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_CookieMonsterG4Meter_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_CookieMonsterG4Meter_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_CookieMonsterG4Sensor_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_CookieMonsterG4Sensor_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_CookieMonsterG4Cal_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_CookieMonsterG4Cal_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_CookieMonsterReceiverStatus_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_CookieMonsterReceiverStatus_fieldAccessorTable;
-
-  public static com.google.protobuf.Descriptors.FileDescriptor
-      getDescriptor() {
-    return descriptor;
-  }
-  private static com.google.protobuf.Descriptors.FileDescriptor
-      descriptor;
-  static {
-    java.lang.String[] descriptorData = {
-      "\n\tSGV.proto\"\277\004\n\027CookieMonsterG4Download\022" +
-      " \n\003sgv\030\001 \003(\0132\023.CookieMonsterG4EGV\022,\n\005uni" +
-      "ts\030\002 \001(\0162\035.CookieMonsterG4Download.Unit\022" +
-      "\032\n\022download_timestamp\030\003 \002(\t\022\034\n\024receiver_" +
-      "system_time\030\004 \001(\004\022F\n\017download_status\030\005 \001" +
-      "(\0162\'.CookieMonsterG4Download.DownloadSta" +
-      "tus:\004NONE\022\030\n\020receiver_battery\030\006 \001(\r\022\030\n\020u" +
-      "ploader_battery\030\007 \001(\r\022$\n\005meter\030\010 \003(\0132\025.C" +
-      "ookieMonsterG4Meter\022&\n\006sensor\030\t \003(\0132\026.Co" +
-      "okieMonsterG4Sensor\022 \n\003cal\030\n \003(\0132\023.Cooki",
-      "eMonsterG4Cal\022\024\n\014patient_name\030\013 \001(\t\"\032\n\004U" +
-      "nit\022\010\n\004MGDL\020\000\022\010\n\004MMOL\020\001\"|\n\016DownloadStatu" +
-      "s\022\013\n\007SUCCESS\020\000\022\013\n\007NO_DATA\020\001\022\024\n\020DEVICE_NO" +
-      "T_FOUND\020\002\022\014\n\010IO_ERROR\020\003\022\025\n\021APPLICATION_E" +
-      "RROR\020\004\022\010\n\004NONE\020\006\022\013\n\007UNKNOWN\020\007\"\233\002\n\022Cookie" +
-      "MonsterG4EGV\022\013\n\003sgv\030\001 \002(\r\022\021\n\ttimestamp\030\002" +
-      " \001(\004\0220\n\tdirection\030\003 \001(\0162\035.CookieMonsterG" +
-      "4EGV.Direction\"\262\001\n\tDirection\022\010\n\004NONE\020\000\022\r" +
-      "\n\tDOUBLE_UP\020\001\022\r\n\tSINGLE_UP\020\002\022\021\n\rFORTY_FI" +
-      "VE_UP\020\003\022\010\n\004FLAT\020\004\022\023\n\017FORTY_FIVE_DOWN\020\005\022\017",
-      "\n\013SINGLE_DOWN\020\006\022\017\n\013DOUBLE_DOWN\020\007\022\022\n\016NOT_" +
-      "COMPUTABLE\020\010\022\025\n\021RATE_OUT_OF_RANGE\020\t\"O\n\024C" +
-      "ookieMonsterG4Meter\022\020\n\010meter_bg\030\001 \002(\r\022\022\n" +
-      "\nmeter_time\030\002 \001(\r\022\021\n\ttimestamp\030\003 \001(\004\"^\n\025" +
-      "CookieMonsterG4Sensor\022\020\n\010filtered\030\001 \002(\004\022" +
-      "\022\n\nunfiltered\030\002 \001(\004\022\014\n\004rssi\030\003 \001(\r\022\021\n\ttim" +
-      "estamp\030\004 \001(\004\"X\n\022CookieMonsterG4Cal\022\r\n\005sl" +
-      "ope\030\001 \002(\001\022\021\n\tintercept\030\002 \001(\001\022\r\n\005scale\030\003 " +
-      "\001(\001\022\021\n\ttimestamp\030\004 \001(\004\"\257\001\n\033CookieMonster" +
-      "ReceiverStatus\022\021\n\ttimestamp\030\001 \002(\004\022:\n\005eve",
-      "nt\030\002 \003(\0162+.CookieMonsterReceiverStatus.R" +
-      "eceiverStatus\"A\n\016ReceiverStatus\022\025\n\021RECEI" +
-      "VERCONNECTED\020\000\022\030\n\024RECEIVERDISCONNECTED\020\001" +
-      "B#\n\034com.nightscout.core.downloadB\003SGV"
-    };
-    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
-            descriptor = root;
-            return null;
-          }
-        };
-    com.google.protobuf.Descriptors.FileDescriptor
-      .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[] {
-        }, assigner);
-    internal_static_CookieMonsterG4Download_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_CookieMonsterG4Download_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_CookieMonsterG4Download_descriptor,
-        new java.lang.String[] { "Sgv", "Units", "DownloadTimestamp", "ReceiverSystemTime", "DownloadStatus", "ReceiverBattery", "UploaderBattery", "Meter", "Sensor", "Cal", "PatientName", });
-    internal_static_CookieMonsterG4EGV_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_CookieMonsterG4EGV_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_CookieMonsterG4EGV_descriptor,
-        new java.lang.String[] { "Sgv", "Timestamp", "Direction", });
-    internal_static_CookieMonsterG4Meter_descriptor =
-      getDescriptor().getMessageTypes().get(2);
-    internal_static_CookieMonsterG4Meter_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_CookieMonsterG4Meter_descriptor,
-        new java.lang.String[] { "MeterBg", "MeterTime", "Timestamp", });
-    internal_static_CookieMonsterG4Sensor_descriptor =
-      getDescriptor().getMessageTypes().get(3);
-    internal_static_CookieMonsterG4Sensor_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_CookieMonsterG4Sensor_descriptor,
-        new java.lang.String[] { "Filtered", "Unfiltered", "Rssi", "Timestamp", });
-    internal_static_CookieMonsterG4Cal_descriptor =
-      getDescriptor().getMessageTypes().get(4);
-    internal_static_CookieMonsterG4Cal_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_CookieMonsterG4Cal_descriptor,
-        new java.lang.String[] { "Slope", "Intercept", "Scale", "Timestamp", });
-    internal_static_CookieMonsterReceiverStatus_descriptor =
-      getDescriptor().getMessageTypes().get(5);
-    internal_static_CookieMonsterReceiverStatus_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_CookieMonsterReceiverStatus_descriptor,
-        new java.lang.String[] { "Timestamp", "Event", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

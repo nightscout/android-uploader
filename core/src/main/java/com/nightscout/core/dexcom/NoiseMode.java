@@ -1,29 +1,31 @@
 package com.nightscout.core.dexcom;
 
 public enum NoiseMode {
-    None(0),
-    Clean(1),
-    Light(2),
-    Medium(3),
-    Heavy(4),
-    NotComputed(5),
-    Max(6);
+  None(0),
+  Clean(1),
+  Light(2),
+  Medium(3),
+  Heavy(4),
+  NotComputed(5),
+  Max(6);
 
-    private int index;
-    private NoiseMode(int i){
-        index=i;
-    }
+  private int index;
 
-    public int getValue(){
-        return index;
-    }
+  private NoiseMode(int i) {
+    index = i;
+  }
 
-    public static NoiseMode getNoiseMode(int val){
-        for (NoiseMode e: values()){
-            if (e.getValue() == val)
-                return e;
-        }
-        return null;
+  public static NoiseMode getNoiseMode(int val) {
+    for (NoiseMode e : values()) {
+      if (e.getValue() == val) {
+        return e;
+      }
     }
+    return null;
+  }
+
+  public int getValue() {
+    return index;
+  }
 
 }

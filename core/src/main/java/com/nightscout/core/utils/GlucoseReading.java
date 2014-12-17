@@ -4,38 +4,39 @@ import com.nightscout.core.dexcom.Constants;
 import com.nightscout.core.download.GlucoseUnits;
 
 public class GlucoseReading {
-    private int valueMgdl;
 
-    public GlucoseReading(float value, GlucoseUnits units) {
-        this.valueMgdl = (units == GlucoseUnits.MGDL) ?
-                Math.round(value) : Math.round(value * Constants.MMOL_L_TO_MG_DL);
-    }
+  private int valueMgdl;
 
-    public float asMmol() {
-        return valueMgdl * Constants.MG_DL_TO_MMOL_L;
-    }
+  public GlucoseReading(float value, GlucoseUnits units) {
+    this.valueMgdl = (units == GlucoseUnits.MGDL) ?
+                     Math.round(value) : Math.round(value * Constants.MMOL_L_TO_MG_DL);
+  }
 
-    public String asMmolStr() {
-        return String.format("%.1f", asMmol());
-    }
+  public float asMmol() {
+    return valueMgdl * Constants.MG_DL_TO_MMOL_L;
+  }
 
-    public int asMgdl() {
-        return valueMgdl;
-    }
+  public String asMmolStr() {
+    return String.format("%.1f", asMmol());
+  }
 
-    public String asMgdlStr() {
-        return String.valueOf(valueMgdl);
-    }
+  public int asMgdl() {
+    return valueMgdl;
+  }
 
-    public float as(GlucoseUnits units) {
-        return (units == GlucoseUnits.MGDL) ? asMgdl() : asMmol();
-    }
+  public String asMgdlStr() {
+    return String.valueOf(valueMgdl);
+  }
 
-    public String asStr(GlucoseUnits units) {
-        return (units == GlucoseUnits.MGDL) ? asMgdlStr() : asMmolStr();
-    }
+  public float as(GlucoseUnits units) {
+    return (units == GlucoseUnits.MGDL) ? asMgdl() : asMmol();
+  }
 
-    public GlucoseReading subtract(GlucoseReading reading) {
-        return new GlucoseReading(valueMgdl - reading.asMgdl(), GlucoseUnits.MGDL);
-    }
+  public String asStr(GlucoseUnits units) {
+    return (units == GlucoseUnits.MGDL) ? asMgdlStr() : asMmolStr();
+  }
+
+  public GlucoseReading subtract(GlucoseReading reading) {
+    return new GlucoseReading(valueMgdl - reading.asMgdl(), GlucoseUnits.MGDL);
+  }
 }

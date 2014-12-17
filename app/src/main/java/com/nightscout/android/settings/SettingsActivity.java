@@ -1,5 +1,9 @@
 package com.nightscout.android.settings;
 
+import com.google.common.base.Optional;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -13,9 +17,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
-import com.google.common.base.Optional;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
 import com.nightscout.android.R;
 import com.nightscout.android.barcode.AndroidBarcode;
 import com.nightscout.android.preferences.AndroidPreferences;
@@ -28,132 +29,140 @@ import com.nightscout.core.utils.RestUriUtils;
 import java.util.List;
 
 public class SettingsActivity extends FragmentActivity {
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setupActionBar();
 
-        // Display the fragment as the main content.
-        getFragmentManager().beginTransaction().replace(android.R.id.content,
-                new MainPreferenceFragment()).commit();
+  protected static void showValidationError(final Context context, final String message) {
+    final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+    builder.setTitle(R.string.invalid_input_title);
+    builder.setMessage(message);
+    builder.setPositiveButton(R.string.ok, null);
+    builder.show();
+  }
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setupActionBar();
+
+    // Display the fragment as the main content.
+    getFragmentManager().beginTransaction().replace(android.R.id.content,
+                                                    new MainPreferenceFragment()).commit();
+  }
+
+  private void setupActionBar() {
+    if (getActionBar() != null) {
+      getActionBar().setDisplayHomeAsUpEnabled(true);
     }
+  }
 
-    private void setupActionBar() {
-        if (getActionBar() != null) {
-            getActionBar().setDisplayHomeAsUpEnabled(true);
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    int id = item.getItemId();
+    if (id == R.id.home) {
+      NavUtils.navigateUpFromSameTask(this);
+      return true;
+    }
+    return super.onOptionsItemSelected(item);
+  }
+
+  @Override
+  public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+    NightscoutPreferences
+        prefs =
+        new AndroidPreferences(getApplicationContext(), PreferenceManager
+            .getDefaultSharedPreferences(getApplicationContext()));
+    if (scanResult != null && scanResult.getContents() != null) {
+      NSBarcodeConfig barcode = new NSBarcodeConfig(scanResult.getContents(), prefs);
+      if (barcode.hasMongoConfig()) {
+        prefs.setMongoUploadEnabled(true);
+        if (barcode.getMongoUri().isPresent()) {
+          prefs.setMongoClientUri(barcode.getMongoUri().get());
+          prefs.setMongoCollection(
+              barcode.getMongoCollection()
+                  .or(getApplicationContext().getString(R.string.pref_default_mongodb_collection)));
+          prefs.setMongoDeviceStatusCollection(
+              barcode.getMongoDeviceStatusCollection().or(getApplicationContext().getString(
+                  R.string.pref_default_mongodb_device_status_collection)));
         }
+      } else {
+        prefs.setMongoUploadEnabled(false);
+      }
+      if (barcode.hasApiConfig()) {
+        prefs.setRestApiEnabled(true);
+        prefs.setRestApiBaseUris(barcode.getApiUris());
+      } else {
+        prefs.setRestApiEnabled(false);
+      }
     }
+  }
+
+  public static class MainPreferenceFragment extends PreferenceFragment {
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.home) {
-            NavUtils.navigateUpFromSameTask(this);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+    public void onCreate(Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
+      addPreferencesFromResource(R.xml.pref_main);
+      setupBarcodeScanner();
+      setupValidation();
+      setupVersionNumbers();
     }
 
-    protected static void showValidationError(final Context context, final String message) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(R.string.invalid_input_title);
-        builder.setMessage(message);
-        builder.setPositiveButton(R.string.ok, null);
-        builder.show();
+    private void setupVersionNumbers() {
+      try {
+        PackageInfo pInfo = null;
+        pInfo = getActivity().getPackageManager().getPackageInfo(
+            getActivity().getPackageName(), 0);
+        findPreference("about_version_number").setSummary(pInfo.versionName);
+      } catch (PackageManager.NameNotFoundException e) {
+        // nom
+      }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        NightscoutPreferences prefs = new AndroidPreferences(getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
-        if (scanResult != null && scanResult.getContents() != null) {
-            NSBarcodeConfig barcode=new NSBarcodeConfig(scanResult.getContents(), prefs);
-            if (barcode.hasMongoConfig()) {
-                prefs.setMongoUploadEnabled(true);
-                if (barcode.getMongoUri().isPresent()) {
-                    prefs.setMongoClientUri(barcode.getMongoUri().get());
-                    prefs.setMongoCollection(
-                            barcode.getMongoCollection().or(getApplicationContext().getString(R.string.pref_default_mongodb_collection)));
-                    prefs.setMongoDeviceStatusCollection(
-                            barcode.getMongoDeviceStatusCollection().or(getApplicationContext().getString(R.string.pref_default_mongodb_device_status_collection)));
+    private void setupBarcodeScanner() {
+      findPreference("auto_configure")
+          .setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+              new AndroidBarcode(getActivity()).scan();
+              return true;
+            }
+          });
+    }
+
+    private void setupValidation() {
+      findPreference(PreferenceKeys.API_URIS).setOnPreferenceChangeListener(
+          new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+              String combinedUris = (String) newValue;
+              List<String> splitUris = RestUriUtils.splitIntoMultipleUris(combinedUris);
+              for (String uri : splitUris) {
+                Optional<String> error = PreferencesValidator.validateRestApiUriSyntax(
+                    getActivity(), uri);
+                if (error.isPresent()) {
+                  showValidationError(getActivity(), error.get());
+                  return false;
                 }
-            } else {
-                prefs.setMongoUploadEnabled(false);
+              }
+              return true;
             }
-            if (barcode.hasApiConfig()) {
-                prefs.setRestApiEnabled(true);
-                prefs.setRestApiBaseUris(barcode.getApiUris());
-            } else {
-                prefs.setRestApiEnabled(false);
+          });
+      findPreference(PreferenceKeys.MONGO_URI).setOnPreferenceChangeListener(
+          new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+              String mongoUri = (String) newValue;
+              Optional<String> error = PreferencesValidator.validateMongoUriSyntax(
+                  getActivity(), mongoUri);
+              if (error.isPresent()) {
+                showValidationError(getActivity(), error.get());
+                return false;
+              }
+              return true;
             }
-        }
+          });
     }
 
-    public static class MainPreferenceFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_main);
-            setupBarcodeScanner();
-            setupValidation();
-            setupVersionNumbers();
-        }
 
-        private void setupVersionNumbers() {
-            try {
-                PackageInfo pInfo = null;
-                pInfo = getActivity().getPackageManager().getPackageInfo(
-                        getActivity().getPackageName(), 0);
-                findPreference("about_version_number").setSummary(pInfo.versionName);
-            } catch (PackageManager.NameNotFoundException e) {
-                // nom
-            }
-        }
-
-        private void setupBarcodeScanner() {
-            findPreference("auto_configure").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    new AndroidBarcode(getActivity()).scan();
-                    return true;
-                }
-            });
-        }
-
-        private void setupValidation() {
-            findPreference(PreferenceKeys.API_URIS).setOnPreferenceChangeListener(
-                    new Preference.OnPreferenceChangeListener() {
-                        @Override
-                        public boolean onPreferenceChange(Preference preference, Object newValue) {
-                            String combinedUris = (String) newValue;
-                            List<String> splitUris = RestUriUtils.splitIntoMultipleUris(combinedUris);
-                            for (String uri : splitUris) {
-                                Optional<String> error = PreferencesValidator.validateRestApiUriSyntax(
-                                        getActivity(), uri);
-                                if (error.isPresent()) {
-                                    showValidationError(getActivity(), error.get());
-                                    return false;
-                                }
-                            }
-                            return true;
-                        }
-                    });
-            findPreference(PreferenceKeys.MONGO_URI).setOnPreferenceChangeListener(
-                    new Preference.OnPreferenceChangeListener() {
-                        @Override
-                        public boolean onPreferenceChange(Preference preference, Object newValue) {
-                            String mongoUri = (String) newValue;
-                            Optional<String> error = PreferencesValidator.validateMongoUriSyntax(
-                                    getActivity(), mongoUri);
-                            if (error.isPresent()) {
-                                showValidationError(getActivity(), error.get());
-                                return false;
-                            }
-                            return true;
-                        }
-                    });
-        }
-
-
-    }
+  }
 }
