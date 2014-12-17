@@ -14,6 +14,10 @@ public class TestPreferences implements NightscoutPreferences {
     private String mongoCollection = null;
     private String mongoDeviceStatusCollection = null;
     private boolean dataDonateEnabled;
+    private String displayLowRange = "70";
+    private String displayHighRange = "180";
+    boolean Logarithmic = false;
+    boolean DisplayOptionsMgdl = false;    
 
     public boolean isRestApiEnabled() {
         return restApiEnabled;
@@ -64,6 +68,25 @@ public class TestPreferences implements NightscoutPreferences {
     @Override
     public boolean isDataDonateEnabled() {
         return dataDonateEnabled;
+    }
+    @Override
+    public String displayLowRange() {
+        return displayLowRange;
+    }
+    
+    @Override
+    public String displayHighRange() {
+        return displayHighRange();
+    }
+    
+    @Override
+    public boolean isLogarithmic() {
+        return Logarithmic;
+    }
+    
+    @Override
+    public boolean isDisplayOptionsMgdl() {
+        return DisplayOptionsMgdl;  
     }
 
     @Override

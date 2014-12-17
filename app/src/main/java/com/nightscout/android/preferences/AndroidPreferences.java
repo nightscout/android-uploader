@@ -42,6 +42,26 @@ public class AndroidPreferences implements NightscoutPreferences {
     }
 
     @Override
+    public String displayLowRange() {
+        return preferences.getString(PreferenceKeys.DISPLAY_LOW_RANGE, "80");
+    }
+    
+    @Override
+    public String displayHighRange() {
+        return preferences.getString(PreferenceKeys.DISPLAY_HIGH_RANGE, "180");
+    }
+    
+    @Override
+    public boolean isLogarithmic() {
+        return preferences.getBoolean(PreferenceKeys.DISPLAY_VERTICAL_AXIS, false);
+    }
+
+    @Override
+    public boolean isDisplayOptionsMgdl() {
+        return preferences.getBoolean(PreferenceKeys.DISPLAY_OPTIONS_UNITS, false);
+    }
+
+    @Override
     public boolean isMongoUploadEnabled() {
         return preferences.getBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED, false);
     }

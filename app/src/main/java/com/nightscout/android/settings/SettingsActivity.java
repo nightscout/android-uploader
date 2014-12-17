@@ -97,9 +97,8 @@ public class SettingsActivity extends PreferenceActivity {
         setupSimplePreferencesScreen();
     }
     private String [] convertToMgdl(String [] bg) {
-        int i;
         String [] new_bg = new String[bg.length];
-        for (i=0; i < bg.length; i++) {
+        for (int i = 0; i < bg.length; i++) {
                 new_bg[i] = Float.toString(18 * Float.parseFloat(bg[i]));
         }
         return new_bg;
@@ -151,8 +150,6 @@ public class SettingsActivity extends PreferenceActivity {
         fakeHeader.setTitle(R.string.pref_header_labs);
         getPreferenceScreen().addPreference(fakeHeader);
         addPreferencesFromResource(R.xml.pref_labs);
-
-        
         
         // Bind the summaries of EditText/List/Dialog/Ringtone preferences to
         // their values. When their values change, their summaries are updated
@@ -163,7 +160,7 @@ public class SettingsActivity extends PreferenceActivity {
         bindPreferenceSummaryToValue(findPreference("cloud_storage_api_base"));
         bindPreferenceSummaryToValue(findPreference("acra.user.email"));
         bindPreferenceSummaryToValue(findPreference("display_options_units"));
-        bindPreferenceSummaryToValue(findPreference("display_verticle_axis"));
+        bindPreferenceSummaryToValue(findPreference("display_vertical_axis"));
         bindPreferenceSummaryToValue(findPreference("display_low_range"));
         bindPreferenceSummaryToValue(findPreference("display_high_range"));
 

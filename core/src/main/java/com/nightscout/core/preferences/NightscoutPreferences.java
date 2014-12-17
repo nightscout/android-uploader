@@ -9,6 +9,10 @@ public interface NightscoutPreferences {
     boolean isSensorUploadEnabled();
     boolean isMongoUploadEnabled();
     boolean isDataDonateEnabled();
+    String displayLowRange();
+    String displayHighRange();
+    boolean isLogarithmic();
+    boolean isDisplayOptionsMgdl();
     void setDataDonateEnabled(boolean toDonate);
     String getMongoClientUri();
     String getMongoCollection();

@@ -12,4 +12,8 @@ public final class PreferenceKeys {
     public static final String MONGO_DEVICE_STATUS_COLLECTION =
             "cloud_storage_mongodb_device_status_collection";
     public static final String ROOT_ENABLED = "root_support_enabled";
+    public static final String DISPLAY_LOW_RANGE = "display_low_range";
+    public static final String DISPLAY_HIGH_RANGE = "display_high_range";
+    public static final String DISPLAY_VERTICAL_AXIS = "display_vertical_axis";
+    public static final String DISPLAY_OPTIONS_UNITS = "display_options_units";
 }

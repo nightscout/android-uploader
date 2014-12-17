@@ -92,7 +92,7 @@
 
     <!-- Y axis setting (Linear/logarithmic)-->
     <string name="pref_title_chart_y_axis">vertical axis</string>
-    <string-array name="perf_verticle_axis">
+    <string-array name="perf_vertical_axis">
         <item>Logarithmic</item>
         <item>Linear</item>
     </string-array>

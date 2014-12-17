@@ -130,13 +130,14 @@ public class MainActivity extends Activity {
             public void onPageFinished(WebView view, String url)  
             {
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-                currentUnits = prefs.getString("display_options_units", "0").equals("0") ? 1 : Constants.MG_DL_TO_MMOL_L;
-                boolean isLogarithmic = prefs.getString("display_verticle_axis", "0").equals("0") ? true : false;
-                mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) +"," + 
-                        Boolean.toString(isLogarithmic) + ","+ 
-                        prefs.getString("display_low_range", "80") + "," +
-                        prefs.getString("display_high_range", "180") + ")");
-            }  
+                final NightscoutPreferences preferences = new AndroidPreferences(prefs);
+                currentUnits = preferences.isDisplayOptionsMgdl() ? 1 : Constants.MG_DL_TO_MMOL_L;
+
+                mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(!preferences.isDisplayOptionsMgdl()) +"," + 
+                        Boolean.toString(preferences.isLogarithmic()) + ","+ 
+                        preferences.displayLowRange() + "," +
+                        preferences.displayHighRange() + ")");
+            }
         });  
         
         statusBarIcons = new StatusBarIcons();
@@ -220,22 +221,21 @@ public class MainActivity extends Activity {
         mWebView.onResume();
         mWebView.resumeTimers();
 
-        // Set and deal with mmol/L<->mg/dL conversions
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        Log.d(TAG, "display_options_units: " + prefs.getString("display_options_units", "0"));
-        currentUnits = prefs.getString("display_options_units", "0").equals("0") ? 1 : Constants.MG_DL_TO_MMOL_L;
-        boolean isLogarithmic = prefs.getString("display_verticle_axis", "0").equals("0") ? true : false;
+        final NightscoutPreferences preferences = new AndroidPreferences(prefs);
+        
+        // Set and deal with mmol/L<->mg/dL conversions
+        Log.d(TAG, "display_options_units: " + preferences.isDisplayOptionsMgdl());
+        currentUnits =  preferences.isDisplayOptionsMgdl() ? 1 : Constants.MG_DL_TO_MMOL_L;
         int sgv = (Integer) mTextSGV.getTag(R.string.display_sgv);
-
         int direction = (Integer) mTextSGV.getTag(R.string.display_trend);
         if (sgv != -1) {
             mTextSGV.setText(getSGVStringByUnit(sgv, TrendArrow.values()[direction]));
         }
-
-        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(currentUnits == Constants.MG_DL_TO_MMOL_L) +"," + 
-                                                     Boolean.toString(isLogarithmic) + ","+ 
-                                                     prefs.getString("display_low_range", "80") + "," +
-                                                     prefs.getString("display_high_range", "180") + ")");
+        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(!preferences.isDisplayOptionsMgdl()) +"," +
+                                                     Boolean.toString(preferences.isLogarithmic()) + ","+
+                                                     preferences.displayLowRange() + "," +
+                                                     preferences.displayHighRange() + ")");
 
         mHandler.post(updateTimeAgo);
         // FIXME: (klee) need to find a better way to do this. Too many things are hooking in here.

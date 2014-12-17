@@ -92,8 +92,8 @@
 
 <!-- Y axis setting (Linear/analog)-->
     <string name="pref_title_chart_y_axis">verticale axis</string>
-    <string-array name="perf_verticle_axis">
-        <item>Logaritmic</item>
+    <string-array name="perf_vertical_axis">
+        <item>Logarithmic</item>
         <item>Linear</item>
     </string-array>
 
