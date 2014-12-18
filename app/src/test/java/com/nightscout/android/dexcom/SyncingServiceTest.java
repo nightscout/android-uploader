@@ -5,11 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+
 import com.nightscout.android.MainActivity;
 import com.nightscout.android.dexcom.USB.CdcAcmSerialDriver;
 import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.android.test.RobolectricTestBase;
 import com.nightscout.core.dexcom.records.EGVRecord;
+
 import org.json.JSONArray;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +22,13 @@ import org.robolectric.shadows.ShadowToast;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.anyObject;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class SyncingServiceTest extends RobolectricTestBase {
     MainActivity activity;
@@ -108,7 +116,8 @@ public class SyncingServiceTest extends RobolectricTestBase {
         doCallRealMethod().when(syncingService).handleActionSync(anyInt(), (Context) anyObject(), (UsbSerialDriver) anyObject());
         when(syncingService.acquireSerialDevice()).thenReturn(true);
         syncingService.handleActionSync(2, shadowActivity.getApplicationContext(), serialDriver);
-        verify(syncingService).broadcastSGVToUI((EGVRecord) anyObject(), anyBoolean(), anyLong(), anyLong(),(JSONArray) anyObject(), anyInt());
+        verify(syncingService).broadcastSGVToUI();
+//        verify(syncingService).broadcastSGVToUI((EGVRecord) anyObject(), anyBoolean(), anyLong(), anyLong(),(JSONArray) anyObject(), anyInt());
     }
 
 }
