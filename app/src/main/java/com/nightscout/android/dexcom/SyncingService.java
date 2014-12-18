@@ -122,8 +122,8 @@ public class SyncingService extends IntentService {
      */
     protected void handleActionSync(int numOfPages, Context context, UsbSerialDriver mSerialDevice) {
         boolean broadcastSent = false;
-        boolean rootEnabled = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("root_support_enabled", false);
-        Tracker tracker = ((Nightscout) getApplicationContext()).getTracker();
+        boolean rootEnabled = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("root_support_enabled", false);
+        Tracker tracker = ((Nightscout) context).getTracker();
 
         if (rootEnabled) USBPower.PowerOn();
 
@@ -161,7 +161,7 @@ public class SyncingService extends IntentService {
 
                 // convert into json for d3 plot
                 JSONArray array = new JSONArray();
-                for (int i = 0; i < recentRecords.length; i++) array.put(recentRecords[i].toJSON());
+                for (EGVRecord recentRecord : recentRecords) array.put(recentRecord.toJSON());
 
                 NightscoutPreferences preferences = new AndroidPreferences(getApplicationContext());
                 Uploader uploader = new Uploader(mContext, preferences);
