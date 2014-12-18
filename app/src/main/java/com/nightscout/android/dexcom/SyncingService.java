@@ -10,6 +10,7 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
+
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.common.collect.Lists;
@@ -25,8 +26,13 @@ import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.NoiseMode;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.dexcom.records.*;
+import com.nightscout.core.dexcom.records.CalRecord;
+import com.nightscout.core.dexcom.records.EGVRecord;
+import com.nightscout.core.dexcom.records.GlucoseDataSet;
+import com.nightscout.core.dexcom.records.MeterRecord;
+import com.nightscout.core.dexcom.records.SensorRecord;
 import com.nightscout.core.preferences.NightscoutPreferences;
+
 import org.json.JSONArray;
 
 import java.io.IOException;
@@ -82,7 +88,7 @@ public class SyncingService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         // Exit if the user hasn't selected "I understand"
-        if (!prefs.getBoolean("i_understand",false)) {
+        if (!prefs.getBoolean("i_understand", false)) {
             Toast.makeText(context, R.string.message_user_not_understand, Toast.LENGTH_LONG).show();
             return;
         }
@@ -116,8 +122,8 @@ public class SyncingService extends IntentService {
      */
     protected void handleActionSync(int numOfPages, Context context, UsbSerialDriver mSerialDevice) {
         boolean broadcastSent = false;
-        boolean rootEnabled=PreferenceManager.getDefaultSharedPreferences(context).getBoolean("root_support_enabled",false);
-        Tracker tracker = ((Nightscout) context).getTracker();
+        boolean rootEnabled = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("root_support_enabled", false);
+        Tracker tracker = ((Nightscout) getApplicationContext()).getTracker();
 
         if (rootEnabled) USBPower.PowerOn();
 
@@ -150,8 +156,7 @@ public class SyncingService extends IntentService {
                 // set to a negative number. This situation will eventually correct itself.
                 long nextUploadTime = standardMinutes(5).minus(standardSeconds(timeSinceLastRecord)).getMillis();
                 long displayTime = readData.readDisplayTime().getTime();
-                // FIXME: Device seems to flake out on battery level reads. Removing for now.
-//                int batLevel = readData.readBatteryLevel();
+                // FIXME: readData.readBatteryLevel() seems to flake out on battery level reads. Removing for now.
                 int batLevel = 100;
 
                 // convert into json for d3 plot
@@ -167,16 +172,16 @@ public class SyncingService extends IntentService {
                 boolean uploadStatus;
                 if (numOfPages < 20) {
                     uploadStatus = uploader.upload(glucoseDataSetsList.get(glucoseDataSetsList.size() - 1),
-                                    meterRecords.get(meterRecords.size() - 1),
-                                    calRecordsList.get(calRecordsList.size() - 1));
+                            meterRecords.get(meterRecords.size() - 1),
+                            calRecordsList.get(calRecordsList.size() - 1));
                 } else {
                     uploadStatus = uploader.upload(glucoseDataSetsList, meterRecords, calRecordsList);
                 }
 
                 EGVRecord recentEGV = recentRecords[recentRecords.length - 1];
                 broadcastSGVToUI(recentEGV, uploadStatus, nextUploadTime + TIME_SYNC_OFFSET,
-                                 displayTime, array ,batLevel);
-                broadcastSent=true;
+                        displayTime, array, batLevel);
+                broadcastSent = true;
             } catch (ArrayIndexOutOfBoundsException e) {
                 Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Array Index out of bounds")
@@ -192,7 +197,7 @@ public class SyncingService extends IntentService {
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("IndexOutOfBoundsException")
                         .setFatal(false)
                         .build());
-            } catch (CRCFailError e){
+            } catch (CRCFailError e) {
                 // FIXME: may consider localizing this catch at a lower level (like ReadData) so that
                 // if the CRC check fails on one type of record we can capture the values if it
                 // doesn't fail on other types of records. This means we'd need to broadcast back
@@ -253,7 +258,7 @@ public class SyncingService extends IntentService {
         return false;
     }
 
-    static public boolean isG4Connected(Context c){
+    static public boolean isG4Connected(Context c) {
         // Iterate through devices and see if the dexcom is connected
         // Allowing us to start to start syncing if the G4 is already connected
         // vendor-id="8867" product-id="71" class="2" subclass="0" protocol="0"
@@ -261,13 +266,13 @@ public class SyncingService extends IntentService {
         if (manager == null) return false;
         HashMap<String, UsbDevice> deviceList = manager.getDeviceList();
         Iterator<UsbDevice> deviceIterator = deviceList.values().iterator();
-        boolean g4Connected=false;
-        while(deviceIterator.hasNext()){
+        boolean g4Connected = false;
+        while (deviceIterator.hasNext()) {
             UsbDevice device = deviceIterator.next();
             if (device.getVendorId() == 8867 && device.getProductId() == 71
-                    && device.getDeviceClass() == 2 && device.getDeviceSubclass() ==0
-                    && device.getDeviceProtocol() == 0){
-                g4Connected=true;
+                    && device.getDeviceClass() == 2 && device.getDeviceSubclass() == 0
+                    && device.getDeviceProtocol() == 0) {
+                g4Connected = true;
             }
         }
         return g4Connected;
@@ -286,7 +291,7 @@ public class SyncingService extends IntentService {
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, nextUploadTime);
         broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, uploadStatus);
         broadcastIntent.putExtra(RESPONSE_DISPLAY_TIME, displayTime);
-        if (json!=null)
+        if (json != null)
             broadcastIntent.putExtra(RESPONSE_JSON, json.toString());
         broadcastIntent.putExtra(RESPONSE_BAT, batLvl);
         sendBroadcast(broadcastIntent);

@@ -1,25 +1,47 @@
 package com.nightscout.android;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.preference.PreferenceManager;
+import android.widget.TextView;
+
 import com.google.common.collect.Lists;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.test.RobolectricTestBase;
-import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.android.wearables.Pebble;
+import com.nightscout.core.dexcom.TrendArrow;
+import com.nightscout.core.download.GlucoseUnits;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.MockitoAnnotations;
 import org.robolectric.Robolectric;
 import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.util.ActivityController;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyString;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.anyObject;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class MainActivityTest extends RobolectricTestBase {
     ActivityController<MainActivity> activityController;
+    AndroidPreferences preferences;
+
     @Before
     public void setUp() {
         activityController = Robolectric.buildActivity(MainActivity.class);
+        preferences = new AndroidPreferences(getContext());
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
@@ -31,7 +53,6 @@ public class MainActivityTest extends RobolectricTestBase {
 
     @Test
     public void testOnCreate_ShouldCleanUpOldStyleURIs() {
-        NightscoutPreferences preferences = new AndroidPreferences(getContext());
         preferences.setRestApiBaseUris(Lists.newArrayList("abc@http://example.com"));
         activityController.create().get();
         assertThat(preferences.getRestApiBaseUris(), hasSize(1));
@@ -40,7 +61,6 @@ public class MainActivityTest extends RobolectricTestBase {
 
     @Test
     public void testOnCreate_ShouldCleanUpOldStyleUris_Multiple() {
-        NightscoutPreferences preferences = new AndroidPreferences(getContext());
         preferences.setRestApiBaseUris(Lists.newArrayList("abc@http://example.com", "http://example2.com"));
         activityController.create().get();
         assertThat(preferences.getRestApiBaseUris(), hasSize(2));
@@ -50,10 +70,9 @@ public class MainActivityTest extends RobolectricTestBase {
     
     @Test
     public void testOnCreate_ShouldShowIUnderstandDialog() {
-        AndroidPreferences preferences = new AndroidPreferences(getContext());
         preferences.setIUnderstand(false);
         // make sure we don't have another alert dialog
-        PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putBoolean("donate_data_query", true).apply();
+        preferences.setAskedForData(true);
 
         activityController.create().get();
         ShadowAlertDialog alertDialog = getShadowApplication().getLatestAlertDialog();
@@ -65,10 +84,9 @@ public class MainActivityTest extends RobolectricTestBase {
 
     @Test
     public void testOnCreate_ShouldNotShowIUnderstandDialogIfAlreadySet() {
-        AndroidPreferences preferences = new AndroidPreferences(getContext());
         preferences.setIUnderstand(true);
         // make sure we don't have another alert dialog
-        PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putBoolean("donate_data_query", true).apply();
+        preferences.setAskedForData(true);
 
         activityController.create().get();
         ShadowAlertDialog alertDialog = getShadowApplication().getLatestAlertDialog();
@@ -77,7 +95,6 @@ public class MainActivityTest extends RobolectricTestBase {
 
     @Test
     public void testOnCreate_ShouldClearOutInvalidMongoUri() {
-        AndroidPreferences preferences = new AndroidPreferences(getContext());
         preferences.setMongoClientUri("invalid/db");
         activityController.create().get();
         assertThat(preferences.getMongoClientUri(), isEmptyString());
@@ -85,7 +102,6 @@ public class MainActivityTest extends RobolectricTestBase {
 
     @Test
     public void testOnCreate_ShouldClearOutInvalidRestUris() {
-        AndroidPreferences preferences = new AndroidPreferences(getContext());
         preferences.setRestApiBaseUris(Lists.newArrayList("\\invalid"));
         activityController.create().get();
         assertThat(preferences.getRestApiBaseUris(), is(empty()));
@@ -93,10 +109,52 @@ public class MainActivityTest extends RobolectricTestBase {
 
     @Test
     public void testOnCreate_ShouldPartiallyClearOutInvalidRestUris() {
-        AndroidPreferences preferences = new AndroidPreferences(getContext());
         preferences.setRestApiBaseUris(Lists.newArrayList("\\invalid", "http://example.com"));
         activityController.create().get();
         assertThat(preferences.getRestApiBaseUris(), hasSize(1));
         assertThat(preferences.getRestApiBaseUris(), hasItem(is("http://example.com")));
+    }
+
+    @Test
+    public void testOnResume_ShouldCallPebbleConfig() {
+        activityController.create().start();
+        Activity activity = activityController.get();
+        Pebble pebble = mock(Pebble.class);
+        ((MainActivity) activity).setPebble(pebble);
+        activityController.stop().resume();
+        verify(pebble, times(1)).config(anyString(), (GlucoseUnits) anyObject());
+    }
+
+    @Test
+    public void testOnResume_SavedSgViewShouldBeRestored() {
+        activityController.create().start();
+        Activity activity = activityController.get();
+        TextView sgView = (TextView) activity.findViewById(R.id.sgValue);
+        sgView.setTag(R.string.display_sgv, 100);
+        sgView.setTag(R.string.display_trend, 4);
+        activityController.resume();
+        assertThat(sgView.getText().toString(), is("100 " + TrendArrow.FLAT.symbol()));
+    }
+
+    @Test
+    public void testOnResume_SavedSgViewSpecialValueShouldBeRestored() {
+        activityController.create().start();
+        Activity activity = activityController.get();
+        TextView sgView = (TextView) activity.findViewById(R.id.sgValue);
+        sgView.setTag(R.string.display_sgv, 5);
+        sgView.setTag(R.string.display_trend, 0);
+        activityController.resume();
+        assertThat(sgView.getText().toString(), is("?NC"));
+    }
+
+    @Test
+    public void testOnResume_SavedSgViewNoReadingShouldBeRestored() {
+        activityController.create().start();
+        Activity activity = activityController.get();
+        TextView sgView = (TextView) activity.findViewById(R.id.sgValue);
+        sgView.setTag(R.string.display_sgv, -1);
+        sgView.setTag(R.string.display_trend, 0);
+        activityController.resume();
+        assertThat(sgView.getText().toString(), is("---"));
     }
 }
