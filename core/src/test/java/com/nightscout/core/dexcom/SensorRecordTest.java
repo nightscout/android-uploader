@@ -9,16 +9,13 @@ package com.nightscout.core.dexcom;
 import com.nightscout.core.dexcom.records.SensorRecord;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 
-@RunWith(JUnit4.class)
 public class SensorRecordTest {
-    
+
     @Test
     public void shouldParseSensorRecord() throws Exception {
         byte[] record = new byte[]{(byte) 0x56, (byte) 0x30, (byte) 0x1B, (byte) 0x0B, (byte) 0xF3,

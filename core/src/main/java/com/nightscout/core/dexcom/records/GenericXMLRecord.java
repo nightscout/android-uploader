@@ -6,10 +6,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringReader;
 import java.util.Arrays;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 public class GenericXMLRecord extends GenericTimestampRecord {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -27,8 +28,7 @@ public class GenericXMLRecord extends GenericTimestampRecord {
         String xml = new String(Arrays.copyOfRange(packet, XML_START, XML_END));
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder;
-        try
-        {
+        try {
             builder = factory.newDocumentBuilder();
             document = builder.parse(new InputSource(new StringReader(xml)));
             xmlElement = document.getDocumentElement();
@@ -38,7 +38,6 @@ public class GenericXMLRecord extends GenericTimestampRecord {
         }
     }
 
-    @Override
     public <T> T toProtobuf() {
         return null;
     }

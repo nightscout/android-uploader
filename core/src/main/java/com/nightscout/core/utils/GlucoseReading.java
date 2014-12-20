@@ -38,4 +38,21 @@ public class GlucoseReading {
     public GlucoseReading subtract(GlucoseReading reading) {
         return new GlucoseReading(valueMgdl - reading.asMgdl(), GlucoseUnits.MGDL);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GlucoseReading that = (GlucoseReading) o;
+
+        if (valueMgdl != that.valueMgdl) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return valueMgdl;
+    }
 }

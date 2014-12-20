@@ -1,16 +1,14 @@
 package com.nightscout.core.dexcom;
 
 import com.nightscout.core.dexcom.records.EGVRecord;
-import org.json.JSONException;
+import com.nightscout.core.protobuf.G4Download;
+
 import org.json.JSONObject;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-@RunWith(JUnit4.class)
 public class EgvRecordTest {
 //    EGV Record: C4881A0B61341A0B0500583E
 //    EGV: 5 Trend: NOT_COMPUTABLE display time: 1417056321000, system time: 186288324, display time offset: 186266721, noise level: None
@@ -20,67 +18,41 @@ public class EgvRecordTest {
 
     @Test
     public void shouldParseEgvRecord() throws Exception {
-        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
+        byte[] record = new byte[]{(byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
                 (byte) 0x34, (byte) 0x1A, (byte) 0x0B, (byte) 0x05, (byte) 0x00, (byte) 0x58,
-                (byte) 0x3E };
+                (byte) 0x3E};
         EGVRecord egvRecord = new EGVRecord(record);
-        assertThat(egvRecord.getBGValue(), is(5));
+        assertThat(egvRecord.getBgMgdl(), is(5));
         assertThat(egvRecord.getTrend(), is(TrendArrow.NOT_COMPUTABLE));
         assertThat(egvRecord.getRawDisplayTimeSeconds(), is(186266721L));
         assertThat(egvRecord.getRawSystemTimeSeconds(), is(186288324));
-        assertThat(egvRecord.getNoiseMode(), is(NoiseMode.NOT_COMPUTED));
+        assertThat(egvRecord.getNoiseMode(), is(G4Download.Noise.NOT_COMPUTED));
     }
 
     @Test(expected = InvalidRecordLengthException.class)
     public void shouldNotParseSmallEgvRecord() throws Exception {
-        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
+        byte[] record = new byte[]{(byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
                 (byte) 0x34, (byte) 0x1A, (byte) 0x0B, (byte) 0x05, (byte) 0x00, (byte) 0x58};
         EGVRecord egvRecord = new EGVRecord(record);
     }
 
     @Test(expected = InvalidRecordLengthException.class)
     public void shouldNotParseLargeEgvRecord() throws Exception {
-        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
+        byte[] record = new byte[]{(byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
                 (byte) 0x34, (byte) 0x1A, (byte) 0x0B, (byte) 0x05, (byte) 0x00, (byte) 0x58,
-                (byte) 0x3E, (byte) 0x00, (byte) 0x00 };
+                (byte) 0x3E, (byte) 0x00, (byte) 0x00};
         EGVRecord egvRecord = new EGVRecord(record);
     }
 
     @Test
-    public void shouldConvertToJSONString() throws Exception {
-        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
+    public void shouldConvertToJsonString() throws Exception {
+        byte[] record = new byte[]{(byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
                 (byte) 0x34, (byte) 0x1A, (byte) 0x0B, (byte) 0x05, (byte) 0x00, (byte) 0x58,
-                (byte) 0x3E };
+                (byte) 0x3E};
         JSONObject obj = new JSONObject();
-        try {
-            obj.put("sgv", 5);
-            obj.put("date", Utils.receiverTimeToDate(186266721));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        obj.put("sgv", 5);
+        obj.put("date", Utils.receiverTimeToDate(186266721));
         EGVRecord egvRecord = new EGVRecord(record);
         assertThat(egvRecord.toJSON().toString(), is(obj.toString()));
     }
-
-    @Test
-    public void isSpecialValue() throws Exception {
-        byte specialValue = 0x00;
-        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
-                (byte) 0x34, (byte) 0x1A, (byte) 0x0B, specialValue, (byte) 0x00, (byte) 0x58,
-                (byte) 0x3E };
-        EGVRecord egvRecord = new EGVRecord(record);
-        assertThat(egvRecord.isSpecialValue(), is(true));
-    }
-
-    @Test
-    public void isNotSpecialValue() throws Exception {
-        byte sgValue = 0x64;
-        byte[] record = new byte[]{ (byte) 0xC4, (byte) 0x88, (byte) 0x1A, (byte) 0x0B, (byte) 0x61,
-                (byte) 0x34, (byte) 0x1A, (byte) 0x0B, sgValue, (byte) 0x00, (byte) 0x58,
-                (byte) 0x3E };
-        EGVRecord egvRecord = new EGVRecord(record);
-        assertThat(egvRecord.isSpecialValue(), is(false));
-    }
-
-    //TODO (klee) Add tests for different trend arrows and noise modes
 }

@@ -40,16 +40,16 @@ public class ReadDataTest extends RobolectricTestBase {
     public void testPingCommand() throws IOException {
         ReadData readData = new ReadData(usbDevice);
         when(usbDevice.write((byte[]) anyObject(), anyInt())).thenReturn(6);
-        byte[] readResponse = new byte[]{0x01, 0x00, 0x00, 0x00, (byte) 0xB4, 0x76};
+        byte[] readResponse = new byte[]{0x01, 0x00, 0x00, 0x01, (byte) 0x95, 0x66};
         when(usbDevice.read(anyInt(), anyInt())).thenReturn(readResponse);
-        readData.ping();
+        assertThat(readData.ping(), is(true));
     }
 
     @Test(expected = CRCFailError.class)
     public void testPingCommandBadCrc() throws IOException {
         ReadData readData = new ReadData(usbDevice);
         when(usbDevice.write((byte[]) anyObject(), anyInt())).thenReturn(6);
-        byte[] readResponse = new byte[]{0x01, 0x00, 0x00, 0x00, (byte) 0xB4, 0x75};
+        byte[] readResponse = new byte[]{0x01, 0x00, 0x00, 0x01, (byte) 0xB4, 0x75};
         when(usbDevice.read(anyInt(), anyInt())).thenReturn(readResponse);
         readData.ping();
     }

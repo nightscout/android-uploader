@@ -1,15 +1,14 @@
 package com.nightscout.core.dexcom.records;
 
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
-import com.nightscout.core.protobuf.G4Download;
 import com.nightscout.core.dexcom.Utils;
+import com.nightscout.core.protobuf.G4Download;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -24,7 +23,7 @@ public class CalRecord extends GenericTimestampRecord {
     private double scale;
     private int[] unk = new int[3];
     private double decay;
-    private int  numRecords;
+    private int numRecords;
     private CalSubrecord[] calSubrecords;
     private int SUB_LEN = 17;
 
@@ -49,7 +48,7 @@ public class CalRecord extends GenericTimestampRecord {
                 new DateTime(getDisplayTime())).toStandardDuration().getMillis();
         int start = 44;
         for (int i = 0; i < numRecords; i++) {
-            LOG.debug("Loop #"+i);
+            LOG.debug("Loop #" + i);
             byte[] temp = new byte[SUB_LEN];
             System.arraycopy(packet, start, temp, 0, temp.length);
             calSubrecords[i] = new CalSubrecord(temp, displayTimeOffset);
@@ -77,7 +76,6 @@ public class CalRecord extends GenericTimestampRecord {
         this.calSubrecords = subrecord;
     }
 
-    @Override
     public G4Download.CookieMonsterG4Cal toProtobuf() {
         G4Download.CookieMonsterG4Cal.Builder builder = G4Download.CookieMonsterG4Cal.newBuilder();
         return builder.setTimestampSec(rawSystemTimeSeconds)

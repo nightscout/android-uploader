@@ -48,11 +48,7 @@ public enum SpecialValue {
     }
 
     public static boolean isSpecialValue(int val) {
-        for (SpecialValue e : values()) {
-            if (e.getValue() == val)
-                return true;
-        }
-        return false;
+        return getEGVSpecialValue(val).isPresent();
     }
 
 }

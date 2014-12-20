@@ -4,7 +4,6 @@ import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.protobuf.G4Download;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
@@ -30,14 +29,14 @@ public class SensorRecord extends GenericTimestampRecord {
         rssi = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(OFFSET_RSSI);
     }
 
-    public SensorRecord(int filtered, int unfiltered, int rssi, Date displayTime, Date systemTime){
+    public SensorRecord(int filtered, int unfiltered, int rssi, Date displayTime, Date systemTime) {
         super(displayTime, systemTime);
         this.filtered = filtered;
         this.unfiltered = unfiltered;
         this.rssi = rssi;
     }
 
-    public SensorRecord(int filtered, int unfiltered, int rssi, long displayTime, int systemTime){
+    public SensorRecord(int filtered, int unfiltered, int rssi, long displayTime, int systemTime) {
         super(displayTime, systemTime);
         this.filtered = filtered;
         this.unfiltered = unfiltered;
@@ -56,7 +55,6 @@ public class SensorRecord extends GenericTimestampRecord {
         return rssi;
     }
 
-    @Override
     public G4Download.CookieMonsterG4Sensor toProtobuf() {
         G4Download.CookieMonsterG4Sensor.Builder builder = G4Download.CookieMonsterG4Sensor.newBuilder();
         return builder.setTimestampSec(rawSystemTimeSeconds)

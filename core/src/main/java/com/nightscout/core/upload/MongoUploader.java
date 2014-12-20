@@ -8,11 +8,11 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
-import com.nightscout.core.preferences.NightscoutPreferences;
-import com.nightscout.core.records.DeviceStatus;
 import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.MeterRecord;
+import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.records.DeviceStatus;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -93,12 +93,12 @@ public class MongoUploader extends BaseUploader {
         deviceStatusCollection = dbCollection;
     }
 
-    private BasicDBObject toBasicDBObject(GlucoseDataSet glucoseDataSet)  {
+    private BasicDBObject toBasicDBObject(GlucoseDataSet glucoseDataSet) {
         BasicDBObject output = new BasicDBObject();
         output.put("device", "dexcom");
         output.put("date", glucoseDataSet.getDisplayTime().getTime());
         output.put("dateString", glucoseDataSet.getDisplayTime().toString());
-        output.put("sgv", glucoseDataSet.getBGValue());
+        output.put("sgv", glucoseDataSet.getBgMgdl());
         output.put("direction", glucoseDataSet.getTrend().friendlyTrendName());
         output.put("type", "sgv");
         if (getPreferences().isSensorUploadEnabled()) {
@@ -116,7 +116,7 @@ public class MongoUploader extends BaseUploader {
         output.put("type", "mbg");
         output.put("date", meterRecord.getDisplayTime().getTime());
         output.put("dateString", meterRecord.getDisplayTime().toString());
-        output.put("mbg", meterRecord.getMeterBG());
+        output.put("mbg", meterRecord.getBgMgdl());
         return output;
     }
 
