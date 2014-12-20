@@ -4,7 +4,6 @@ import com.nightscout.core.dexcom.Constants;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.download.GlucoseUnits;
 import com.nightscout.core.protobuf.G4Download;
 import com.nightscout.core.utils.GlucoseReading;
 
@@ -28,7 +27,7 @@ public class EGVRecord extends GenericTimestampRecord {
                     ". Expected size: " + RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
         }
         int bGValue = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8) & Constants.EGV_VALUE_MASK;
-        reading = new GlucoseReading(bGValue, GlucoseUnits.MGDL);
+        reading = new GlucoseReading(bGValue, G4Download.GlucoseUnit.MGDL);
         byte trendAndNoise = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).get(10);
         int trendValue = trendAndNoise & Constants.EGV_TREND_ARROW_MASK;
         byte noiseValue = (byte) ((trendAndNoise & Constants.EGV_NOISE_MASK) >> 4);
@@ -38,14 +37,14 @@ public class EGVRecord extends GenericTimestampRecord {
 
     public EGVRecord(int bGValueMgdl, TrendArrow trend, Date displayTime, Date systemTime, G4Download.Noise noise) {
         super(displayTime, systemTime);
-        this.reading = new GlucoseReading(bGValueMgdl, GlucoseUnits.MGDL);
+        this.reading = new GlucoseReading(bGValueMgdl, G4Download.GlucoseUnit.MGDL);
         this.trend = trend;
         this.noiseMode = noise;
     }
 
     public EGVRecord(int bGValueMgdl, TrendArrow trend, long displayTime, int systemTime, G4Download.Noise noise) {
         super(displayTime, systemTime);
-        this.reading = new GlucoseReading(bGValueMgdl, GlucoseUnits.MGDL);
+        this.reading = new GlucoseReading(bGValueMgdl, G4Download.GlucoseUnit.MGDL);
         this.trend = trend;
         this.noiseMode = noise;
     }

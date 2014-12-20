@@ -2,7 +2,6 @@ package com.nightscout.core.dexcom.records;
 
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.download.GlucoseUnits;
 import com.nightscout.core.protobuf.G4Download;
 import com.nightscout.core.utils.GlucoseReading;
 
@@ -22,19 +21,19 @@ public class MeterRecord extends GenericTimestampRecord {
                     ". Expected size: " + RECORD_SIZE + " record: " + Utils.bytesToHex(packet));
         }
         int meterBG = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8);
-        reading = new GlucoseReading(meterBG, GlucoseUnits.MGDL);
+        reading = new GlucoseReading(meterBG, G4Download.GlucoseUnit.MGDL);
         meterTime = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(10);
     }
 
     public MeterRecord(int meterBgMgdl, int meterTime, Date displayTime, Date systemTime) {
         super(displayTime, systemTime);
-        this.reading = new GlucoseReading(meterBgMgdl, GlucoseUnits.MGDL);
+        this.reading = new GlucoseReading(meterBgMgdl, G4Download.GlucoseUnit.MGDL);
         this.meterTime = meterTime;
     }
 
     public MeterRecord(int meterBgMgdl, int meterTime, long displayTime, int systemTime) {
         super(displayTime, systemTime);
-        this.reading = new GlucoseReading(meterBgMgdl, GlucoseUnits.MGDL);
+        this.reading = new GlucoseReading(meterBgMgdl, G4Download.GlucoseUnit.MGDL);
         this.meterTime = meterTime;
     }
 
