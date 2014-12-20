@@ -155,7 +155,9 @@ public class SyncingService extends IntentService {
 
                 // convert into json for d3 plot
                 JSONArray array = new JSONArray();
-                for (EGVRecord recentRecord : recentRecords) array.put(recentRecord.toJSON());
+                for (EGVRecord recentRecord : recentRecords) {
+                    array.put(recentRecord.toJSON());
+                }
 
 
                 Uploader uploader = new Uploader(context, preferences);

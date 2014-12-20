@@ -1,6 +1,11 @@
 package com.nightscout.core.dexcom.records;
 
-import com.nightscout.core.dexcom.*;
+import com.nightscout.core.dexcom.CRC16;
+import com.nightscout.core.dexcom.CRCFailError;
+import com.nightscout.core.dexcom.Constants;
+import com.nightscout.core.dexcom.InvalidRecordLengthException;
+import com.nightscout.core.dexcom.RecordType;
+import com.nightscout.core.dexcom.Utils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -31,20 +36,24 @@ public class PageHeader {
     public PageHeader(byte[] packet) {
         if (packet.length < HEADER_SIZE){
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
-                    ". Expected size: " + HEADER_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
+                    ". Expected size: " + HEADER_SIZE + ". Unparsed record: " +
+                    Utils.bytesToHex(packet));
         }
-        firstRecordIndex = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(FIRSTRECORDINDEX_OFFSET);
+        firstRecordIndex = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN)
+                .getInt(FIRSTRECORDINDEX_OFFSET);
         numOfRecords = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(NUMRECS_OFFSET);
         recordType = RecordType.values()[packet[RECTYPE_OFFSET]];
         revision = packet[REV_OFFSET];
-        pageNumber = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(PAGENUMBER_OFFSET);
+        pageNumber = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN)
+                .getInt(PAGENUMBER_OFFSET);
         reserved2 = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(RESERVED2_OFFSET);
         reserved3 = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(RESERVED3_OFFSET);
         reserved4 = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(RESERVED4_OFFSET);
         System.arraycopy(packet, HEADER_SIZE-Constants.CRC_LEN, crc, 0, Constants.CRC_LEN);
         byte[] crc_calc = CRC16.calculate(packet, 0, HEADER_SIZE - Constants.CRC_LEN);
         if (!Arrays.equals(this.crc, crc_calc)) {
-            throw new CRCFailError("CRC check failed: " + Utils.bytesToHex(this.crc) + " vs " + Utils.bytesToHex(crc_calc));
+            throw new CRCFailError("CRC check failed. Was:" + Utils.bytesToHex(this.crc) +
+                    " Expected: " + Utils.bytesToHex(crc_calc));
         }
 
     }
