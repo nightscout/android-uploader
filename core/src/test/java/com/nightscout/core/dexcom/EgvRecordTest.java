@@ -25,7 +25,7 @@ public class EgvRecordTest {
         assertThat(egvRecord.getBgMgdl(), is(5));
         assertThat(egvRecord.getTrend(), is(TrendArrow.NOT_COMPUTABLE));
         assertThat(egvRecord.getRawDisplayTimeSeconds(), is(186266721L));
-        assertThat(egvRecord.getRawSystemTimeSeconds(), is(186288324));
+        assertThat(egvRecord.getRawSystemTimeSeconds(), is(186288324L));
         assertThat(egvRecord.getNoiseMode(), is(G4Download.Noise.NOT_COMPUTED));
     }
 

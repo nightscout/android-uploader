@@ -32,8 +32,8 @@ public class OnUpgradeReceiverTest extends RobolectricTestBase {
         Intent intent = new Intent(Intent.ACTION_PACKAGE_REPLACED);
         Uri dataUri = Uri.parse("package:com.nightscout.android");
         intent.setData(dataUri);
-        OnUpgradeReceiver onUpgradeReceiver = new OnUpgradeReceiver();
-        onUpgradeReceiver.onReceive(activity.getApplicationContext(),intent);
+        UpgradeReceiver onUpgradeReceiver = new UpgradeReceiver();
+        onUpgradeReceiver.onReceive(activity.getApplicationContext(), intent);
         Intent anIntent = getShadowApplication().getNextStartedActivity();
         assertThat(anIntent.getComponent().getClassName(), is(MainActivity.class.getName()));
     }

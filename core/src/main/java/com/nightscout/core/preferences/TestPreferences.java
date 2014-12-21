@@ -116,6 +116,26 @@ public class TestPreferences implements NightscoutPreferences {
     }
 
     @Override
+    public boolean isMqttEnabled() {
+        return false;
+    }
+
+    @Override
+    public String getMqttEndpoint() {
+        return null;
+    }
+
+    @Override
+    public String getMqttUser() {
+        return null;
+    }
+
+    @Override
+    public String getMqttPass() {
+        return null;
+    }
+
+    @Override
     public boolean getIUnderstand() {
         return understand;
     }

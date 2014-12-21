@@ -11,15 +11,15 @@
     <string name="feebback_dialog_text">Please let us know what you think.</string>
     <string name="feedback_dialog_comment_prompt">Please add your comments below:</string>
     <string name="feedback_dialog_ok_toast">Thank you!</string>
-    <string name="feedback_toast_text"/>
+    <string name="feedback_toast_text" />
     <string name="message_user_not_understand">Reading from device is disabled until you review and accept &#8220;I understand&#8221; in preferences</string>
     <string name="button_force_sync">Force sync</string>
     <string name="acra_enabled_summary">Crash reporting is enabled</string>
     <string name="acra_disabled_summary">Crash reporting is disabled</string>
     <string name="acra_email_dialog_title">Email</string>
     <string name="acra_user_email_dialog_message">This is the email address included in bug reports and automatic crash reports. This field is optional</string>
-    <string name="display_sgv"/>
-    <string name="display_trend"/>
+    <string name="display_sgv" />
+    <string name="display_trend" />
 
     <string name="close_menu_text">Close</string>
     <string name="feedback_menu_text">Feedback</string>
@@ -36,7 +36,26 @@
     <string name="donate_dialog_summary">Will you anonymously donate your CGM data for research in order to speed up diabetes innovation?</string>
     <string name="donate_dialog_yes">Yes</string>
     <string name="donate_dialog_no">No</string>
+
     <string name="auto_configure_title">Auto configure</string>
+    <string name="pref_title_mqtt">MQTT</string>
+    <string name="pref_title_mqtt_enabled">Enabled</string>
+    <string name="pref_summary_mqtt_enabled">If you\'re using eg CloudMQTT this should be enabled</string>
+
+    <string name="pref_title_mqtt_endpoint">URI</string>
+    <string name="pref_dialog_mqtt_endpoint">Enter MQTT URI"</string>
+    <string name="pref_message_mqtt_endpoint">Replace example values in {}\'s with your correct values</string>
+    <string name="pref_default_mqtt_endpoint">ssl://{host}.cloudmqtt.com:{11111}</string>
+
+    <string name="pref_title_mqtt_user">MQTT user name</string>
+    <string name="pref_dialog_mqtt_user">Enter mqtt user name</string>
+    <string name="pref_message_mqtt_user">This the mqtt user name.</string>
+    <string name="pref_default_mqtt_user" />
+
+    <string name="pref_title_mqtt_pass">MQTT password</string>
+    <string name="pref_dialog_mqtt_pass">Enter mqtt password</string>
+    <string name="pref_message_mqtt_pass">This the mqtt password.</string>
+    <string name="pref_default_mqtt_pass" />
 
     <string name="TimeChangeDetected">Time change detected</string>
     <string name="illegal_mongo_uri">Mongo uri has invalid syntax. Please double check.</string>

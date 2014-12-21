@@ -39,6 +39,15 @@ public interface NightscoutPreferences {
 
     String getMongoDeviceStatusCollection();
 
+    boolean isMqttEnabled();
+
+    String getMqttEndpoint();
+
+    String getMqttUser();
+
+    // TODO: (klee) look into how to securely store this information
+    String getMqttPass();
+
     void setMongoDeviceStatusCollection(String deviceStatusCollection);
 
     boolean getIUnderstand();
@@ -50,6 +59,7 @@ public interface NightscoutPreferences {
     void setPreferredUnits(G4Download.GlucoseUnit units);
 
     String getPwdName();
+
     void setPwdName(String pwdName);
 
     boolean hasAskedForData();

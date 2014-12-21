@@ -8,6 +8,7 @@ import com.nightscout.core.protobuf.G4Download;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Date;
 
 public class SensorRecord extends GenericTimestampRecord {
 
@@ -32,6 +33,14 @@ public class SensorRecord extends GenericTimestampRecord {
 
     public SensorRecord(long unfiltered, long filtered, int rssi, long time) {
         super(time);
+        this.unfiltered = unfiltered;
+        this.filtered = filtered;
+        this.rssi = rssi;
+    }
+
+    public SensorRecord(int filtered, int unfiltered, int rssi, Date displayTime, Date systemTime) {
+        super(displayTime, systemTime);
+        this.filtered = filtered;
         this.unfiltered = unfiltered;
         this.rssi = rssi;
     }
@@ -65,6 +74,16 @@ public class SensorRecord extends GenericTimestampRecord {
 
     }
 
+    public Optional<SensorRecord> fromProtoBuf(byte[] byteArray) {
+        try {
+            G4Download.CookieMonsterG4Sensor record = G4Download.CookieMonsterG4Sensor.parseFrom(byteArray);
+            return Optional.of(new SensorRecord(record.getUnfiltered(), record.getFiltered(), record.getRssi(), record.getTimestampSec()));
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+        return Optional.absent();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -83,19 +102,9 @@ public class SensorRecord extends GenericTimestampRecord {
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + unfiltered;
-        result = 31 * result + filtered;
+        result = 31 * result + (int) (unfiltered ^ (unfiltered >>> 32));
+        result = 31 * result + (int) (filtered ^ (filtered >>> 32));
         result = 31 * result + rssi;
         return result;
-    }
-    
-    public Optional<SensorRecord> fromProtoBuf(byte[] byteArray) {
-        try {
-            G4Download.CookieMonsterG4Sensor record = G4Download.CookieMonsterG4Sensor.parseFrom(byteArray);
-            return Optional.of(new SensorRecord(record.getUnfiltered(), record.getFiltered(), record.getRssi(), record.getTimestampSec()));
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
-        }
-        return Optional.absent();
     }
 }

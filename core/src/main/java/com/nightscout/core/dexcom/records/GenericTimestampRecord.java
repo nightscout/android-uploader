@@ -10,7 +10,7 @@ abstract public class GenericTimestampRecord {
     protected final int OFFSET_SYS_TIME = 0;
     protected final int OFFSET_DISPLAY_TIME = 4;
     protected Date systemTime;
-    protected int rawSystemTimeSeconds;
+    protected long rawSystemTimeSeconds;
     protected Date displayTime;
     protected long rawDisplayTimeSeconds;
 
@@ -26,8 +26,12 @@ abstract public class GenericTimestampRecord {
         this.systemTime = systemTime;
     }
 
-    public GenericTimestampRecord(long rawDisplayTimeSeconds, int rawSystemTimeSeconds) {
+    public GenericTimestampRecord(long rawDisplayTimeSeconds, long rawSystemTimeSeconds) {
         this.rawDisplayTimeSeconds = rawDisplayTimeSeconds;
+        this.rawSystemTimeSeconds = rawSystemTimeSeconds;
+    }
+
+    public GenericTimestampRecord(long rawSystemTimeSeconds) {
         this.rawSystemTimeSeconds = rawSystemTimeSeconds;
     }
 
@@ -35,12 +39,21 @@ abstract public class GenericTimestampRecord {
         return systemTime;
     }
 
-    public int getRawSystemTimeSeconds() {
+    public long getSystemTimeSeconds() {
+        return systemTime.getTime();
+    }
+
+
+    public long getRawSystemTimeSeconds() {
         return rawSystemTimeSeconds;
     }
 
     public Date getDisplayTime() {
         return displayTime;
+    }
+
+    public long getDisplayTimeSeconds() {
+        return displayTime.getTime();
     }
 
     public long getRawDisplayTimeSeconds() {
@@ -62,7 +75,7 @@ abstract public class GenericTimestampRecord {
 
     @Override
     public int hashCode() {
-        int result = rawSystemTimeSeconds;
+        int result = (int) (rawSystemTimeSeconds ^ (rawSystemTimeSeconds >>> 32));
         result = 31 * result + (int) (rawDisplayTimeSeconds ^ (rawDisplayTimeSeconds >>> 32));
         return result;
     }

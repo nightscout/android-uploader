@@ -11,6 +11,7 @@ import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.test.RobolectricTestBase;
 import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.protobuf.G4Download;
 
 import org.json.JSONArray;
 import org.junit.Before;
@@ -71,10 +72,10 @@ public class SyncingServiceTest extends RobolectricTestBase {
                 (Context) anyObject(), (UsbSerialDriver) anyObject());
         doCallRealMethod().when(mockSyncingService).broadcastSGVToUI();
         doCallRealMethod().when(mockSyncingService).broadcastSGVToUI((EGVRecord) anyObject(),
-                anyBoolean(), anyLong(), anyLong(), (JSONArray) anyObject(), anyInt());
+                anyBoolean(), anyLong(), anyLong(), (JSONArray) anyObject(), anyInt(), (byte[]) anyObject());
         mockSyncingService.handleActionSync(2, shadowActivity.getApplicationContext(), null);
         verify(mockSyncingService).broadcastSGVToUI((EGVRecord) anyObject(), anyBoolean(),
-                anyLong(), anyLong(), (JSONArray) anyObject(), anyInt());
+                anyLong(), anyLong(), (JSONArray) anyObject(), anyInt(), (byte[]) anyObject());
     }
 
     @Test
@@ -117,7 +118,7 @@ public class SyncingServiceTest extends RobolectricTestBase {
                 (Context) anyObject(), (UsbSerialDriver) anyObject());
         mockSyncingService.handleActionSync(2, shadowActivity.getApplicationContext(), serialDriver);
         verify(mockSyncingService).broadcastSGVToUI((EGVRecord) anyObject(), anyBoolean(),
-                anyLong(), anyLong(), (JSONArray) anyObject(), anyInt());
+                anyLong(), anyLong(), (JSONArray) anyObject(), anyInt(), (byte[]) anyObject());
     }
 
 }

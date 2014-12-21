@@ -33,11 +33,18 @@ public class MeterRecord extends GenericTimestampRecord {
         this.meterTime = meterTime;
     }
 
-    public MeterRecord(int meterBgMgdl, int meterTime, long displayTime, int systemTime) {
+    public MeterRecord(int meterBgMgdl, int meterTime, long displayTime, long systemTime) {
         super(displayTime, systemTime);
         this.reading = new GlucoseReading(meterBgMgdl, G4Download.GlucoseUnit.MGDL);
         this.meterTime = meterTime;
     }
+
+    public MeterRecord(int meterBgMgdl, int meterTime, long systemTime) {
+        super(systemTime);
+        this.reading = new GlucoseReading(meterBgMgdl, G4Download.GlucoseUnit.MGDL);
+        this.meterTime = meterTime;
+    }
+
 
     public GlucoseReading getMeterBG() {
         return reading;
@@ -80,7 +87,7 @@ public class MeterRecord extends GenericTimestampRecord {
         result = 31 * result + reading.hashCode();
         return result;
     }
-    
+
     public Optional<MeterRecord> fromProtoBuf(byte[] byteArray) {
         try {
             G4Download.CookieMonsterG4Meter record = G4Download.CookieMonsterG4Meter.parseFrom(byteArray);

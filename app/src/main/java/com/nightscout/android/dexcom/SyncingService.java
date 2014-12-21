@@ -23,12 +23,13 @@ import com.nightscout.android.upload.Uploader;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.dexcom.records.CalRecord;
-import com.nightscout.core.dexcom.records.EGVRecord;
-import com.nightscout.core.dexcom.records.GlucoseDataSet;
-import com.nightscout.core.dexcom.records.MeterRecord;
-import com.nightscout.core.dexcom.records.SensorRecord;
+import com.nightscout.core.dexcom.records.*;
 import com.nightscout.core.preferences.NightscoutPreferences;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
+
 import com.nightscout.core.protobuf.G4Download;
 
 import org.json.JSONArray;
@@ -63,6 +64,7 @@ public class SyncingService extends IntentService {
     public static final String RESPONSE_DISPLAY_TIME = "myDisplayTimeMs";
     public static final String RESPONSE_JSON = "myJSON";
     public static final String RESPONSE_BAT = "myBatLvl";
+    public static final String RESPONSE_PROTO = "myProtoDownload";
 
     private final String TAG = SyncingService.class.getSimpleName();
 
@@ -175,8 +177,68 @@ public class SyncingService extends IntentService {
                 }
 
                 EGVRecord recentEGV = recentRecords[recentRecords.length - 1];
+
+                DateTime dt = new DateTime();
+                DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
+                String iso8601Str = fmt.print(dt);
+
+                G4Download.CookieMonsterG4Download.Builder builder = G4Download.CookieMonsterG4Download.newBuilder();
+                builder.setDownloadTimestamp(iso8601Str)
+                        .setDownloadStatus(G4Download.DownloadStatus.SUCCESS)
+                        .setReceiverBattery(batLevel)
+                        .setUploaderBattery(MainActivity.batLevel)
+                        .setUnits(G4Download.GlucoseUnit.MGDL);
+
+                long egvTime = ((AndroidPreferences) preferences).getLastEgvMqttUpload();
+                long meterTime = ((AndroidPreferences) preferences).getLastMeterMqttUpload();
+                long sensorTime = ((AndroidPreferences) preferences).getLastSensorMqttUpload();
+                long calTime = ((AndroidPreferences) preferences).getLastCalMqttUpload();
+                long lastRecord = 0;
+                for (EGVRecord aRecord : recentRecords) {
+                    if (aRecord.getSystemTimeSeconds() > egvTime) {
+                        builder.addSgv(aRecord.toProtobuf());
+                        lastRecord = aRecord.getSystemTimeSeconds();
+                    }
+                }
+                if (lastRecord != 0) {
+                    ((AndroidPreferences) preferences).setLastEgvMqttUpload(lastRecord);
+                }
+                lastRecord = 0;
+                for (MeterRecord aRecord : meterRecords) {
+                    if (aRecord.getSystemTimeSeconds() > meterTime) {
+                        builder.addMeter(aRecord.toProtobuf());
+                        lastRecord = aRecord.getSystemTimeSeconds();
+                    }
+                }
+                // FIXME (klee) these values should be stored only after we are sure the message has been delivered.
+                if (lastRecord != 0) {
+                    ((AndroidPreferences) preferences).setLastMeterMqttUpload(lastRecord);
+                }
+                lastRecord = 0;
+                for (SensorRecord aRecord : sensorRecords) {
+                    if (aRecord.getSystemTimeSeconds() > sensorTime) {
+                        builder.addSensor(aRecord.toProtobuf());
+                        lastRecord = aRecord.getSystemTimeSeconds();
+                    }
+                }
+                if (lastRecord != 0) {
+                    ((AndroidPreferences) preferences).setLastSensorMqttUpload(lastRecord);
+                }
+                lastRecord = 0;
+                for (CalRecord aRecord : calRecordsList) {
+                    if (aRecord == null) {
+                        break;
+                    }
+                    if (aRecord.getSystemTimeSeconds() > calTime) {
+                        builder.addCal(aRecord.toProtoBuf());
+                        lastRecord = aRecord.getSystemTimeSeconds();
+                    }
+                }
+                if (lastRecord != 0) {
+                    ((AndroidPreferences) preferences).setLastCalMqttUpload(lastRecord);
+                }
                 broadcastSGVToUI(recentEGV, uploadStatus, nextUploadTime + TIME_SYNC_OFFSET,
-                        displayTime, array, batLevel);
+                        displayTime, array, batLevel, builder.build().toByteArray());
                 broadcastSent = true;
             } catch (ArrayIndexOutOfBoundsException e) {
                 Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);
@@ -274,9 +336,9 @@ public class SyncingService extends IntentService {
         return g4Connected;
     }
 
-    protected void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus,
-                                    long nextUploadTime, long displayTime,
-                                    JSONArray json, int batLvl) {
+    public void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus,
+                                 long nextUploadTime, long displayTime,
+                                 JSONArray json, int batLvl, byte[] proto) {
         Log.d(TAG, "Current EGV: " + egvRecord.getBgMgdl());
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
@@ -287,6 +349,9 @@ public class SyncingService extends IntentService {
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, nextUploadTime);
         broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, uploadStatus);
         broadcastIntent.putExtra(RESPONSE_DISPLAY_TIME, displayTime);
+        if (proto != null) {
+            broadcastIntent.putExtra(RESPONSE_PROTO, proto);
+        }
         if (json != null)
             broadcastIntent.putExtra(RESPONSE_JSON, json.toString());
         broadcastIntent.putExtra(RESPONSE_BAT, batLvl);
@@ -295,7 +360,7 @@ public class SyncingService extends IntentService {
 
     protected void broadcastSGVToUI() {
         EGVRecord record = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(), G4Download.Noise.NO_NOISE);
-        broadcastSGVToUI(record, false, standardMinutes(5).getMillis() + TIME_SYNC_OFFSET, new Date().getTime(), null, 0);
+        broadcastSGVToUI(record, false, standardMinutes(5).getMillis() + TIME_SYNC_OFFSET, new Date().getTime(), null, 0, new byte[0]);
     }
 
 }

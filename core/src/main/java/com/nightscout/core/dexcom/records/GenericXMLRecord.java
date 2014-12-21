@@ -17,6 +17,9 @@ import java.util.Arrays;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import java.io.StringReader;
+import java.util.Arrays;
+
 public class GenericXMLRecord extends GenericTimestampRecord {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     int XML_START = 8;
@@ -46,5 +49,13 @@ public class GenericXMLRecord extends GenericTimestampRecord {
     // example: String sn = getXmlElement().getAttribute("SerialNumber");
     public Element getXmlElement() {
         return xmlElement;
+    }
+
+    public <T> T toProtoBuf() {
+        return null;
+    }
+
+    public Optional<GenericXMLRecord> fromProtoBuf(byte[] protoArray) {
+        return null;
     }
 }

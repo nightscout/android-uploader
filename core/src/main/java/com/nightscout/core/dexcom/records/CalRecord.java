@@ -59,6 +59,13 @@ public class CalRecord extends GenericTimestampRecord {
         }
     }
 
+    CalRecord(double slope, double intercept, double scale, long time) {
+        super(time);
+        this.slope = slope;
+        this.scale = scale;
+        this.intercept = intercept;
+    }
+
     public CalRecord(double intercept, double slope, double scale, double decay, Date displayTime, Date systemTime, CalSubrecord[] subrecord) {
         super(displayTime, systemTime);
         this.intercept = intercept;
@@ -69,7 +76,7 @@ public class CalRecord extends GenericTimestampRecord {
         this.calSubrecords = subrecord;
     }
 
-    public CalRecord(double intercept, double slope, double scale, double decay, long displayTime, int systemTime, CalSubrecord[] subrecord) {
+    public CalRecord(double intercept, double slope, double scale, double decay, long displayTime, long systemTime, CalSubrecord[] subrecord) {
         super(displayTime, systemTime);
         this.intercept = intercept;
         this.slope = slope;
@@ -78,6 +85,15 @@ public class CalRecord extends GenericTimestampRecord {
         this.numRecords = subrecord.length;
         this.calSubrecords = subrecord;
     }
+
+    public CalRecord(double intercept, double slope, double scale, double decay, long systemTime) {
+        super(systemTime);
+        this.intercept = intercept;
+        this.slope = slope;
+        this.scale = scale;
+        this.decay = decay;
+    }
+
 
     public G4Download.CookieMonsterG4Cal toProtobuf() {
         G4Download.CookieMonsterG4Cal.Builder builder = G4Download.CookieMonsterG4Cal.newBuilder();
@@ -164,7 +180,7 @@ public class CalRecord extends GenericTimestampRecord {
         try {
             G4Download.CookieMonsterG4Cal record = G4Download.CookieMonsterG4Cal.parseFrom(byteArray);
             return Optional.of(new CalRecord(record.getSlope(),
-                    record.getIntercept(), record.getScale(), record.getTimestampSec()));
+                    record.getIntercept(), record.getScale(), record.getDecay(), record.getTimestampSec()));
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
         }

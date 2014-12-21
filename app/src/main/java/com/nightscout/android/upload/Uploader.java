@@ -32,14 +32,14 @@ public class Uploader {
         checkNotNull(context);
         uploaders = Lists.newArrayList();
         if (preferences.isMongoUploadEnabled()) {
-            allUploadersInitalized &= initializeMongoUploader(context, preferences);            
+            allUploadersInitalized &= initializeMongoUploader(context, preferences);
         }
         if (preferences.isRestApiEnabled()) {
-            allUploadersInitalized &= initializeRestUploaders(context, preferences);            
+            allUploadersInitalized &= initializeRestUploaders(context, preferences);
         }
     }
 
-    private boolean initializeMongoUploader(Context context,NightscoutPreferences preferences) {
+    private boolean initializeMongoUploader(Context context, NightscoutPreferences preferences) {
         String dbURI = preferences.getMongoClientUri();
         String collectionName = preferences.getMongoCollection();
         String dsCollectionName = preferences.getMongoDeviceStatusCollection();
@@ -54,12 +54,16 @@ public class Uploader {
             Log.e(LOG_TAG, "Error creating mongo client uri for null value.", e);
             context.sendBroadcast(ToastReceiver.createIntent(context, R.string.unknown_mongo_host));
             return false;
+        } catch (StringIndexOutOfBoundsException e) {
+            Log.e(LOG_TAG, "Error creating mongo client uri for null value.", e);
+            context.sendBroadcast(ToastReceiver.createIntent(context, R.string.unknown_mongo_host));
+            return false;
         }
         uploaders.add(new MongoUploader(preferences, uri, collectionName, dsCollectionName));
         return true;
     }
 
-    private boolean initializeRestUploaders(Context context ,NightscoutPreferences preferences) {
+    private boolean initializeRestUploaders(Context context, NightscoutPreferences preferences) {
         List<String> baseUrisSetting = preferences.getRestApiBaseUris();
         List<URI> baseUris = Lists.newArrayList();
         boolean allInitialized = true;

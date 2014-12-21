@@ -95,7 +95,7 @@ public class CalRecordTest {
         assertThat(calRecord.getDecay(), is(1.1368778423793695));
         assertThat(calRecord.getNumRecords(), is(3));
         assertThat(calRecord.getRawDisplayTimeSeconds(), is(186285321L));
-        assertThat(calRecord.getRawSystemTimeSeconds(), is(186306923));
+        assertThat(calRecord.getRawSystemTimeSeconds(), is(186306923L));
     }
 
     @Test
@@ -107,7 +107,7 @@ public class CalRecordTest {
         assertThat(calRecord.getNumRecords(), is(3));
         assertThat(calRecord.getDecay(), is(2.0833333333333335));
         assertThat(calRecord.getRawDisplayTimeSeconds(), is(186285017L));
-        assertThat(calRecord.getRawSystemTimeSeconds(), is(186317086));
+        assertThat(calRecord.getRawSystemTimeSeconds(), is(186317086L));
     }
 
     @Test(expected = InvalidRecordLengthException.class)
