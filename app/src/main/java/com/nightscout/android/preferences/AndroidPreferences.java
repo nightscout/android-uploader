@@ -1,5 +1,7 @@
 package com.nightscout.android.preferences;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -7,6 +9,7 @@ import android.preference.PreferenceManager;
 import com.google.common.base.Joiner;
 import com.nightscout.android.R;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.protobuf.Download;
 import com.nightscout.core.protobuf.G4Download;
 import com.nightscout.core.utils.RestUriUtils;
 

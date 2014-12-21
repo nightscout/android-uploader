@@ -52,6 +52,7 @@ public abstract class AbstractRestUploader extends BaseUploader {
         httpPost.setEntity(new StringEntity(jsonObject.toString()));
         HttpResponse response = getClient().execute(httpPost);
         int statusCodeFamily = response.getStatusLine().getStatusCode() / 100;
+        response.getEntity().consumeContent();
         return statusCodeFamily == 2;
     }
 }

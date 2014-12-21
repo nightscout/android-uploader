@@ -4,6 +4,9 @@ import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.protobuf.G4Download;
 
+import com.google.common.base.Optional;
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 import org.slf4j.Logger;
@@ -130,6 +133,15 @@ public class CalRecord extends GenericTimestampRecord {
 
         return true;
     }
+    
+    public G4Download.CookieMonsterG4Cal toProtoBuf() {
+        return G4Download.CookieMonsterG4Cal.newBuilder()
+                .setTimestampSec(rawSystemTimeSeconds)
+                .setIntercept(intercept)
+                .setSlope(slope)
+                .setScale(scale)
+                .build();
+    }
 
     @Override
     public int hashCode() {
@@ -146,5 +158,16 @@ public class CalRecord extends GenericTimestampRecord {
         result = 31 * result + numRecords;
         result = 31 * result + Arrays.hashCode(calSubrecords);
         return result;
+    }
+    
+    public Optional<CalRecord> fromProtoBuf(byte[] byteArray) {
+        try {
+            G4Download.CookieMonsterG4Cal record = G4Download.CookieMonsterG4Cal.parseFrom(byteArray);
+            return Optional.of(new CalRecord(record.getSlope(),
+                    record.getIntercept(), record.getScale(), record.getTimestampSec()));
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+        return Optional.absent();
     }
 }

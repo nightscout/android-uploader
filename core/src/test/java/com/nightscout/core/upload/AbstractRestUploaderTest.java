@@ -12,6 +12,7 @@ import org.apache.http.ProtocolVersion;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.message.AbstractHttpMessage;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
@@ -78,6 +79,7 @@ public class AbstractRestUploaderTest {
     public void setUpExecuteCaptor(int status) throws IOException {
         HttpResponse response = new BasicHttpResponse(
                 new BasicStatusLine(new ProtocolVersion("mock", 1, 2), status, ""));
+        response.setEntity(new StringEntity(""));
         when(mockHttpClient.execute(captor.capture())).thenReturn(response);
     }
 

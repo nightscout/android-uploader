@@ -1,5 +1,7 @@
 package com.nightscout.core.dexcom.records;
 
+import com.google.common.base.Optional;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.protobuf.G4Download;
@@ -77,5 +79,15 @@ public class MeterRecord extends GenericTimestampRecord {
         result = 31 * result + meterTime;
         result = 31 * result + reading.hashCode();
         return result;
+    }
+    
+    public Optional<MeterRecord> fromProtoBuf(byte[] byteArray) {
+        try {
+            G4Download.CookieMonsterG4Meter record = G4Download.CookieMonsterG4Meter.parseFrom(byteArray);
+            return Optional.of(new MeterRecord(record.getMeterBgMgdl(), record.getMeterTime(), record.getTimestampSec()));
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+        return Optional.absent();
     }
 }

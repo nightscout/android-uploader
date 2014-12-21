@@ -1,10 +1,15 @@
 package com.nightscout.core.dexcom.records;
 
+import com.google.common.base.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import java.io.StringReader;
 import java.util.Arrays;
@@ -36,10 +41,6 @@ public class GenericXMLRecord extends GenericTimestampRecord {
             // TODO(trhodeos): DONT DO THIS
             log.error(TAG, "Unable to build xml element", e);
         }
-    }
-
-    public <T> T toProtobuf() {
-        return null;
     }
 
     // example: String sn = getXmlElement().getAttribute("SerialNumber");

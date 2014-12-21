@@ -36,7 +36,10 @@ import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.android.wearables.Pebble;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
+import com.nightscout.core.mqtt.MqttPinger;
+import com.nightscout.core.mqtt.MqttTimer;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.protobuf.Download;
 import com.nightscout.core.protobuf.G4Download;
 import com.nightscout.core.utils.GlucoseReading;
 import com.nightscout.core.utils.RestUriUtils;
@@ -199,6 +202,15 @@ public class MainActivity extends Activity {
         }
         if (preferences.isMongoUploadEnabled()) {
             tracker.send(new HitBuilders.EventBuilder("Upload", "Mongo").build());
+        }
+        if (preferences.isMqttEnabled()) {
+            if (!preferences.getMqttUser().equals("") && !preferences.getMqttPass().equals("") &&
+                    !preferences.getMqttEndpoint().equals("")) {
+                mqttMgr = new MqttMgr(preferences.getMqttUser(), preferences.getMqttPass(), "abc123");
+                MqttPinger pinger = new AndroidMqttPinger(getApplicationContext(), 0);
+                MqttTimer timer = new AndroidMqttTimer(getApplicationContext(), 0);
+                mqttMgr.connect(preferences.getMqttEndpoint(), pinger, timer);
+            }
         }
     }
 
