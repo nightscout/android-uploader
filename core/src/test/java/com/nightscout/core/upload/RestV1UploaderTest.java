@@ -11,6 +11,7 @@ import org.apache.http.ProtocolVersion;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
 import org.json.JSONException;
@@ -59,6 +60,7 @@ public class RestV1UploaderTest {
         captor = ArgumentCaptor.forClass(HttpUriRequest.class);
         HttpResponse response = new BasicHttpResponse(
                 new BasicStatusLine(new ProtocolVersion("mock", 1, 2), status, ""));
+        response.setEntity(new StringEntity(""));
         when(mockHttpClient.execute(captor.capture())).thenReturn(response);
     }
 
