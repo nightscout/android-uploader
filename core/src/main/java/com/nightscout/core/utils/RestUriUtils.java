@@ -4,7 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
 
 import java.net.URI;
 import java.util.List;
@@ -39,7 +39,7 @@ public class RestUriUtils {
      */
     public static String generateSecret(String secret) {
         checkArgument(!Strings.isNullOrEmpty(secret));
-        return HashCode.fromBytes(secret.getBytes(Charsets.UTF_8)).toString();
+        return Hashing.sha1().hashBytes(secret.getBytes(Charsets.UTF_8)).toString();
     }
 
     public static List<String> splitIntoMultipleUris(String combinedUris) {
