@@ -74,7 +74,7 @@ public class RestUriUtilsTest {
 
     @Test
     public void testGenerateSecret_withString() {
-        assertThat(RestUriUtils.generateSecret("token"), is("746f6b656e"));
+        assertThat(RestUriUtils.generateSecret("testingtesting"), is("b0212be2cc6081fba3e0b6f3dc6e0109d6f7b4cb"));
     }
 
     @Test

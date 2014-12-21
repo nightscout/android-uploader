@@ -5,6 +5,7 @@ import com.google.common.io.CharStreams;
 import com.nightscout.core.preferences.TestPreferences;
 import com.nightscout.core.records.DeviceStatus;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.HttpClient;
@@ -44,7 +45,7 @@ public class RestV1UploaderTest {
     @Before
     public void setUp() throws Exception {
         preferences = new TestPreferences();
-        restUploader = new RestV1Uploader(preferences, URI.create("http://token@test.com/v1"));
+        restUploader = new RestV1Uploader(preferences, URI.create("http://testingtesting@test.com/v1"));
         mockHttpClient = Mockito.mock(HttpClient.class);
         restUploader.setClient(mockHttpClient);
         setUpExecuteCaptor();
@@ -106,16 +107,16 @@ public class RestV1UploaderTest {
     @Test
     public void testInitialize_StripUserInfo() {
         RestV1Uploader uploader = new RestV1Uploader(preferences,
-                URI.create("http://123@test.com/v1"));
+                URI.create("http://testingtesting@test.com/v1"));
         assertThat(uploader.getUri().toString(), is("http://test.com/v1"));
     }
 
     @Test
     public void testInitialize_GenerateToken() {
         RestV1Uploader uploader = new RestV1Uploader(preferences,
-                URI.create("http://123@test.com/v1"));
+                URI.create("http://testingtesting@test.com/v1"));
         assertThat(uploader.getSecret(), is(not(nullValue())));
-        assertThat(uploader.getSecret(), is("313233"));
+        assertThat(uploader.getSecret(), is("b0212be2cc6081fba3e0b6f3dc6e0109d6f7b4cb"));
     }
 
     @Test
@@ -132,6 +133,15 @@ public class RestV1UploaderTest {
     public void testGlucoseDataSet_Endpoint() throws Exception {
         restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
         assertThat(captor.getValue().getURI().toString(), containsString("entries"));
+    }
+
+    @Test
+    public void testAPISecret() throws Exception {
+        restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
+        HttpPost post = (HttpPost) captor.getValue();
+        Header[] headers = post.getHeaders("api-secret");
+        assertThat(headers.length, is(1));
+        assertThat(headers[0].getValue(), is("b0212be2cc6081fba3e0b6f3dc6e0109d6f7b4cb"));
     }
 
     @Test
