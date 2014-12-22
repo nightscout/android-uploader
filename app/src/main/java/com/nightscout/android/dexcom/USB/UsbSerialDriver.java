@@ -106,6 +106,16 @@ public interface UsbSerialDriver {
     public int read(final byte[] dest, final int timeoutMillis) throws IOException;
 
     /**
+     * Reads as many bytes as possible into the destination buffer.
+     *
+     * @param size size to read
+     * @param timeoutMillis the timeout for reading
+     * @return the actual number of bytes read
+     * @throws java.io.IOException if an error occurred during reading
+     */
+    public byte[] read(int size, final int timeoutMillis) throws IOException;
+
+    /**
      * Writes as many bytes as possible from the source buffer.
      *
      * @param src the source byte buffer

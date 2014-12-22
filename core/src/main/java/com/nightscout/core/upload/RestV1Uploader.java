@@ -39,7 +39,7 @@ public class RestV1Uploader extends AbstractRestUploader {
         json.put("device", "dexcom");
         json.put("date", record.getDisplayTime().getTime());
         json.put("dateString", record.getDisplayTime().toString());
-        json.put("sgv", Integer.parseInt(String.valueOf(record.getBGValue())));
+        json.put("sgv", Integer.parseInt(String.valueOf(record.getBgMgdl())));
         json.put("direction", record.getTrend().friendlyTrendName());
         json.put("type", "sgv");
         if (getPreferences().isSensorUploadEnabled()) {
@@ -56,7 +56,7 @@ public class RestV1Uploader extends AbstractRestUploader {
         json.put("type", "mbg");
         json.put("date", record.getDisplayTime().getTime());
         json.put("dateString", record.getDisplayTime().toString());
-        json.put("mbg", Integer.parseInt(String.valueOf(record.getMeterBG())));
+        json.put("mbg", Integer.parseInt(String.valueOf(record.getBgMgdl())));
         return json;
     }
 

@@ -1,6 +1,6 @@
 package com.nightscout.core.preferences;
 
-import com.nightscout.core.download.GlucoseUnits;
+import com.nightscout.core.protobuf.G4Download;
 
 import java.util.List;
 
@@ -45,8 +45,9 @@ public interface NightscoutPreferences {
 
     void setIUnderstand(boolean bool);
 
-    GlucoseUnits getPreferredUnits();
-    void setPreferredUnits(GlucoseUnits units);
+    G4Download.GlucoseUnit getPreferredUnits();
+
+    void setPreferredUnits(G4Download.GlucoseUnit units);
 
     String getPwdName();
     void setPwdName(String pwdName);

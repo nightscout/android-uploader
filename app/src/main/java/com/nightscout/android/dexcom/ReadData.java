@@ -174,7 +174,7 @@ public class ReadData {
         }
     }
 
-    private void writeCommand(Command command) {
+    protected void writeCommand(Command command) {
         byte[] packet = new PacketBuilder(command).build();
         if (mSerialDevice != null) {
             try {
@@ -186,10 +186,11 @@ public class ReadData {
     }
 
     private ReadPacket read(int numOfBytes) {
-        byte[] readData = new byte[numOfBytes];
+        byte[] response = new byte[numOfBytes];
         int len = 0;
         try {
-            len = mSerialDevice.read(readData, IO_TIMEOUT);
+            response = mSerialDevice.read(numOfBytes, IO_TIMEOUT);
+            len = response.length;
             Log.d(TAG, "Read " + len + " byte(s) complete.");
 
             // Add a 100ms delay for when multiple write/reads are occurring in series
@@ -199,17 +200,15 @@ public class ReadData {
             // finding the source of the reading issue
             String bytes = "";
             int readAmount = len;
-            for (int i = 0; i < readAmount; i++) bytes += String.format("%02x", readData[i]) + " ";
+            for (int i = 0; i < readAmount; i++) bytes += String.format("%02x", response[i]) + " ";
             Log.d(TAG, "Read data: " + bytes);
             ////////////////////////////////////////////////////////////////////////////////////////
-
         } catch (IOException e) {
             Log.e(TAG, "Unable to read from serial device.", e);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        byte[] data = Arrays.copyOfRange(readData, 0, len);
-        return new ReadPacket(data);
+        return new ReadPacket(response);
     }
 
     private <T> T ParsePage(byte[] data, RecordType recordType) {
@@ -274,6 +273,6 @@ public class ReadData {
                 break;
         }
 
-        return (T) null;
+        return null;
     }
 }

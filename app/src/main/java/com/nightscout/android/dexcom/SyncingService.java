@@ -3,11 +3,9 @@ package com.nightscout.android.dexcom;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.PowerManager;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -23,7 +21,6 @@ import com.nightscout.android.dexcom.USB.UsbSerialProber;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.upload.Uploader;
 import com.nightscout.core.dexcom.CRCFailError;
-import com.nightscout.core.dexcom.NoiseMode;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.CalRecord;
@@ -32,6 +29,7 @@ import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.SensorRecord;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.protobuf.G4Download;
 
 import org.json.JSONArray;
 
@@ -57,19 +55,16 @@ public class SyncingService extends IntentService {
     private static final String SYNC_PERIOD = "com.nightscout.android.dexcom.extra.SYNC_PERIOD";
 
     // Response to broadcast to activity
-    public static final String RESPONSE_SGV = "mySGV";
+    public static final String RESPONSE_SGV = "mySGVMgdl";
     public static final String RESPONSE_TREND = "myTrend";
-    public static final String RESPONSE_TIMESTAMP = "myTimestamp";
-    public static final String RESPONSE_NEXT_UPLOAD_TIME = "myUploadTime";
+    public static final String RESPONSE_TIMESTAMP = "myTimestampMs";
+    public static final String RESPONSE_NEXT_UPLOAD_TIME = "myUploadTimeMs";
     public static final String RESPONSE_UPLOAD_STATUS = "myUploadStatus";
-    public static final String RESPONSE_DISPLAY_TIME = "myDisplayTime";
+    public static final String RESPONSE_DISPLAY_TIME = "myDisplayTimeMs";
     public static final String RESPONSE_JSON = "myJSON";
     public static final String RESPONSE_BAT = "myBatLvl";
 
     private final String TAG = SyncingService.class.getSimpleName();
-    private Context mContext;
-    private UsbManager mUsbManager;
-    private UsbSerialDriver mSerialDevice;
 
     // Constants
     private final int TIME_SYNC_OFFSET = 10000;
@@ -85,10 +80,10 @@ public class SyncingService extends IntentService {
      */
     public static void startActionSingleSync(Context context, int numOfPages) {
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        NightscoutPreferences preferences = new AndroidPreferences(context);
 
         // Exit if the user hasn't selected "I understand"
-        if (!prefs.getBoolean("i_understand", false)) {
+        if (!preferences.getIUnderstand()) {
             Toast.makeText(context, R.string.message_user_not_understand, Toast.LENGTH_LONG).show();
             return;
         }
@@ -105,12 +100,14 @@ public class SyncingService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        mContext = getApplicationContext();
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_SYNC.equals(action)) {
                 final int param1 = intent.getIntExtra(SYNC_PERIOD, 1);
-                handleActionSync(param1);
+                UsbSerialDriver driver = acquireSerialDevice();
+                if (driver != null) {
+                    handleActionSync(param1, getApplicationContext(), driver);
+                }
             }
         }
     }
@@ -119,20 +116,20 @@ public class SyncingService extends IntentService {
      * Handle action Sync in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionSync(int numOfPages) {
+    protected void handleActionSync(int numOfPages, Context context, UsbSerialDriver serialDriver) {
         boolean broadcastSent = false;
-        boolean rootEnabled = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("root_support_enabled", false);
-        Tracker tracker = ((Nightscout) getApplicationContext()).getTracker();
+        AndroidPreferences preferences = new AndroidPreferences(context);
+//        boolean rootEnabled = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("root_support_enabled", false);
+        Tracker tracker = ((Nightscout) context).getTracker();
 
-        if (rootEnabled) USBPower.PowerOn();
+        if (preferences.isRootEnabled()) USBPower.PowerOn();
 
-        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NSDownload");
         wl.acquire();
-
-        if (acquireSerialDevice()) {
+        if (serialDriver != null) {
             try {
-                ReadData readData = new ReadData(mSerialDevice);
+                ReadData readData = new ReadData(serialDriver);
                 // TODO: need to check if numOfPages if valid on ReadData side
                 EGVRecord[] recentRecords = readData.getRecentEGVsPages(numOfPages);
                 List<MeterRecord> meterRecords = Lists.newArrayList(readData.getRecentMeterRecords());
@@ -140,10 +137,8 @@ public class SyncingService extends IntentService {
                 SensorRecord[] sensorRecords = readData.getRecentSensorRecords(numOfPages);
                 GlucoseDataSet[] glucoseDataSets = Utils.mergeGlucoseDataRecords(recentRecords, sensorRecords);
 
-                // FIXME: This is a workaround for the new Dexcom AP which seems to have a new format
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
                 CalRecord[] calRecords = new CalRecord[1];
-                if (prefs.getBoolean("cloud_cal_data", false)) {
+                if (preferences.isCalibrationUploadEnabled()) {
                     calRecords = readData.getRecentCalRecords();
                 }
                 List<GlucoseDataSet> glucoseDataSetsList = Lists.newArrayList(glucoseDataSets);
@@ -160,10 +155,12 @@ public class SyncingService extends IntentService {
 
                 // convert into json for d3 plot
                 JSONArray array = new JSONArray();
-                for (int i = 0; i < recentRecords.length; i++) array.put(recentRecords[i].toJSON());
+                for (EGVRecord recentRecord : recentRecords) {
+                    array.put(recentRecord.toJSON());
+                }
 
-                NightscoutPreferences preferences = new AndroidPreferences(getApplicationContext());
-                Uploader uploader = new Uploader(mContext, preferences);
+
+                Uploader uploader = new Uploader(context, preferences);
                 // TODO: This should be cleaned up, 5 should be a constant, maybe handle in uploader,
                 // and maybe might not have to read 5 pages (that was only done for single sync for UI
                 // plot updating and might be able to be done in javascript d3 code as a FIFO array
@@ -214,7 +211,7 @@ public class SyncingService extends IntentService {
             } finally {
                 // Close serial
                 try {
-                    mSerialDevice.close();
+                    serialDriver.close();
                 } catch (IOException e) {
                     tracker.send(new HitBuilders.ExceptionBuilder()
                                     .setDescription("Unable to close serial connection")
@@ -225,7 +222,7 @@ public class SyncingService extends IntentService {
                 }
 
                 // Try powering off, will only work if rooted
-                if (rootEnabled) USBPower.PowerOff();
+                if (preferences.isRootEnabled()) USBPower.PowerOff();
             }
         }
 
@@ -234,13 +231,13 @@ public class SyncingService extends IntentService {
         wl.release();
     }
 
-    private boolean acquireSerialDevice() {
-        mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-        mSerialDevice = UsbSerialProber.acquire(mUsbManager);
-        if (mSerialDevice != null) {
+    protected UsbSerialDriver acquireSerialDevice() {
+        UsbManager mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        UsbSerialDriver serialDevice = UsbSerialProber.acquire(mUsbManager);
+        if (serialDevice != null) {
             try {
-                mSerialDevice.open();
-                return true;
+                serialDevice.open();
+                return serialDevice;
             } catch (IOException e) {
                 Log.e(TAG, "Unable to open USB. ", e);
                 Tracker tracker;
@@ -254,7 +251,7 @@ public class SyncingService extends IntentService {
         } else {
             Log.d(TAG, "Unable to acquire USB device from manager.");
         }
-        return false;
+        return serialDevice;
     }
 
     static public boolean isG4Connected(Context c) {
@@ -277,14 +274,14 @@ public class SyncingService extends IntentService {
         return g4Connected;
     }
 
-    private void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus,
-                                  long nextUploadTime, long displayTime,
-                                  JSONArray json, int batLvl) {
-        Log.d(TAG, "Current EGV: " + egvRecord.getBGValue());
+    protected void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus,
+                                    long nextUploadTime, long displayTime,
+                                    JSONArray json, int batLvl) {
+        Log.d(TAG, "Current EGV: " + egvRecord.getBgMgdl());
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.putExtra(RESPONSE_SGV, egvRecord.getBGValue());
+        broadcastIntent.putExtra(RESPONSE_SGV, egvRecord.getBgMgdl());
         broadcastIntent.putExtra(RESPONSE_TREND, egvRecord.getTrend().getID());
         broadcastIntent.putExtra(RESPONSE_TIMESTAMP, egvRecord.getDisplayTime().getTime());
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, nextUploadTime);
@@ -296,8 +293,8 @@ public class SyncingService extends IntentService {
         sendBroadcast(broadcastIntent);
     }
 
-    private void broadcastSGVToUI() {
-        EGVRecord record = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(), NoiseMode.None);
+    protected void broadcastSGVToUI() {
+        EGVRecord record = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(), G4Download.Noise.NO_NOISE);
         broadcastSGVToUI(record, false, standardMinutes(5).getMillis() + TIME_SYNC_OFFSET, new Date().getTime(), null, 0);
     }
 

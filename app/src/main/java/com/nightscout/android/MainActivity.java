@@ -36,8 +36,8 @@ import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.android.wearables.Pebble;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.download.GlucoseUnits;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.protobuf.G4Download;
 import com.nightscout.core.utils.GlucoseReading;
 import com.nightscout.core.utils.RestUriUtils;
 
@@ -283,11 +283,11 @@ public class MainActivity extends Activity {
 
         int direction = (Integer) mTextSGV.getTag(R.string.display_trend);
         if (sgv != -1) {
-            GlucoseReading sgvReading = new GlucoseReading(sgv, GlucoseUnits.MGDL);
+            GlucoseReading sgvReading = new GlucoseReading(sgv, G4Download.GlucoseUnit.MGDL);
             mTextSGV.setText(getSGVStringByUnit(sgvReading, TrendArrow.values()[direction]));
         }
 
-        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(preferences.getPreferredUnits() == GlucoseUnits.MMOL) + ")");
+        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(preferences.getPreferredUnits() == G4Download.GlucoseUnit.MMOL) + ")");
 
         mHandler.post(updateTimeAgo);
         // FIXME: (klee) need to find a better way to do this. Too many things are hooking in here.
@@ -358,7 +358,7 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             // Get response messages from broadcast
             int responseSGV = intent.getIntExtra(SyncingService.RESPONSE_SGV, -1);
-            GlucoseReading reading = new GlucoseReading(responseSGV, GlucoseUnits.MGDL);
+            GlucoseReading reading = new GlucoseReading(responseSGV, G4Download.GlucoseUnit.MGDL);
             TrendArrow trend = TrendArrow.values()[intent.getIntExtra(SyncingService.RESPONSE_TREND, 0)];
             long responseSGVTimestamp = intent.getLongExtra(SyncingService.RESPONSE_TIMESTAMP, -1L);
             boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);

@@ -1,7 +1,7 @@
 package com.nightscout.core.preferences;
 
 import com.google.common.collect.Lists;
-import com.nightscout.core.download.GlucoseUnits;
+import com.nightscout.core.protobuf.G4Download;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class TestPreferences implements NightscoutPreferences {
     private String mongoCollection = null;
     private String mongoDeviceStatusCollection = null;
     private boolean dataDonateEnabled;
-    private GlucoseUnits units;
+    private G4Download.GlucoseUnit units;
     private String pwdName;
     private boolean understand;
     private boolean askedForData;
@@ -31,12 +31,12 @@ public class TestPreferences implements NightscoutPreferences {
     }
 
     @Override
-    public GlucoseUnits getPreferredUnits() {
+    public G4Download.GlucoseUnit getPreferredUnits() {
         return units;
     }
 
     @Override
-    public void setPreferredUnits(GlucoseUnits units) {
+    public void setPreferredUnits(G4Download.GlucoseUnit units) {
         this.units = units;
     }
 

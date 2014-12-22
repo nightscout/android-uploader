@@ -5,20 +5,18 @@ import com.nightscout.core.dexcom.records.CalRecord;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import java.util.Arrays;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-@RunWith(JUnit4.class)
 public class CalRecordTest {
     private byte[] record505;
     private byte[] recordPre505;
+
     @Before
-    public void setUp(){
+    public void setUp() {
         record505 = new byte[]{(byte) 0x1E, (byte) 0xF9, (byte) 0x1A, (byte) 0x0B, (byte) 0xD9,
                 (byte) 0x7B, (byte) 0x1A, (byte) 0x0B, (byte) 0x92, (byte) 0xEE, (byte) 0x4C,
                 (byte) 0x6B, (byte) 0x71, (byte) 0x77, (byte) 0x88, (byte) 0x40, (byte) 0x58,
@@ -88,9 +86,6 @@ public class CalRecordTest {
                 (byte) 0xE5, (byte) 0x3F, (byte) 0x03};
     }
 
-    // Cal record Version: pre-505
-    // Cal Record: 1EF91A0BD97B1A0B92EE4C6B7177884058E9C6B1020CDC40000000000000F03F030601ABAAAAAAAAAA0040030CDE1A0B460000005049010056DF1A0B0023DE1A0B480000005049010056DF1A0B00E0F71A0B06010000809103001DF91A0B00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000C7
-    // Record Cal Slope: 813.5875452253041 Intercept: 26543.54390965904 Scale: 1.0 Decay: 1.1368778423793695 Num records: 3 display time: 186285321L system time: 186306923
     @Test
     public void shouldParsePre505CalRecord() throws Exception {
         CalRecord calRecord = new CalRecord(recordPre505);
@@ -98,21 +93,18 @@ public class CalRecordTest {
         assertThat(calRecord.getIntercept(), is(26543.54390965904));
         assertThat(calRecord.getScale(), is(1.0));
         assertThat(calRecord.getDecay(), is(1.1368778423793695));
-        assertThat(calRecord.getNumRecords(),is(3));
+        assertThat(calRecord.getNumRecords(), is(3));
         assertThat(calRecord.getRawDisplayTimeSeconds(), is(186285321L));
         assertThat(calRecord.getRawSystemTimeSeconds(), is(186306923));
     }
 
-    // Cal record Version: 505
-    // Cal Record: 6BD11A0B097D1A0BD13CE94AB36C894064756ACFE2EBD940000000000000F03F0306011E1009D2A630F23F032EB51A0B460000005049010077B61A0B0045B51A0B480000005049010077B61A0B005ED01A0B0601000060A803006BD11A0B0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000333333333333D33F555555555555E53F03
-    // Record Cal Slope: 782.9303804407411 Intercept: 28720.042100646853 Scale: 1.0 Decay: 2.0833333333333335 Num records: 3 display time: 186285017L system time: 186317086
     @Test
     public void shouldParse505CalRecord() throws Exception {
         CalRecord calRecord = new CalRecord(record505);
         assertThat(calRecord.getSlope(), is(782.9303804407411));
         assertThat(calRecord.getIntercept(), is(28720.042100646853));
         assertThat(calRecord.getScale(), is(1.0));
-        assertThat(calRecord.getNumRecords(),is(3));
+        assertThat(calRecord.getNumRecords(), is(3));
         assertThat(calRecord.getDecay(), is(2.0833333333333335));
         assertThat(calRecord.getRawDisplayTimeSeconds(), is(186285017L));
         assertThat(calRecord.getRawSystemTimeSeconds(), is(186317086));
@@ -120,13 +112,13 @@ public class CalRecordTest {
 
     @Test(expected = InvalidRecordLengthException.class)
     public void shouldNotParseSmallCal505Record() throws Exception {
-        record505=Arrays.copyOfRange(record505,0,record505.length - 1);
+        record505 = Arrays.copyOfRange(record505, 0, record505.length - 1);
         CalRecord calRecord = new CalRecord(record505);
     }
 
     @Test(expected = InvalidRecordLengthException.class)
     public void shouldNotParseSmallCalPre505Record() throws Exception {
-        recordPre505=Arrays.copyOfRange(recordPre505, 0, recordPre505.length - 1);
+        recordPre505 = Arrays.copyOfRange(recordPre505, 0, recordPre505.length - 1);
         CalRecord calRecord = new CalRecord(recordPre505);
     }
 
@@ -145,7 +137,7 @@ public class CalRecordTest {
 
 
     @After
-    public void tearDown(){
+    public void tearDown() {
         recordPre505 = null;
         record505 = null;
     }

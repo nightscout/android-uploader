@@ -54,13 +54,10 @@ package com.nightscout.core.dexcom;
 import com.nightscout.core.dexcom.records.PageHeader;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-@RunWith(JUnit4.class)
 public class PageHeaderTest {
     // Page: 0a 14 00 00 26 00 00 00 04 02 87 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 aa c1 62 60 1b 0b ff 0b 1b 0b 71 00 14 05 a9 8e 61 1b 0b 2b 0d 1b 0b 71 00 14 c5 5f ba 62 1b 0b 57 0e 1b 0b 6d 00 14 e2 6e e6 63 1b 0b 83 0f 1b 0b 69 00 14 4e fa 12 65 1b 0b af 10 1b 0b 66 00 14 a5 25 3e 66 1b 0b db 11 1b 0b 62 00 14 1e 11 6a 67 1b 0b 07 13 1b 0b 5f 00 14 45 21 96 68 1b 0b 33 14 1b 0b 5c 00 14 5f bf c2 69 1b 0b 5f 15 1b 0b 5a 00 14 c4 86 ee 6a 1b 0b 8b 16 1b 0b 58 00 14 90 4e 1a 6c 1b 0b b7 17 1b 0b 57 00 14 27 3c 46 6d 1b 0b e3 18 1b 0b 57 00 14 11 5f 72 6e 1b 0b 0f 1a 1b 0b 57 00 14 16 81 9e 6f 1b 0b 3b 1b 1b 0b 56 00 14 44 90 ca 70 1b 0b 67 1c 1b 0b 58 00 14 70 79 f6 71 1b 0b 93 1d 1b 0b 58 00 14 45 b1 22 73 1b 0b bf 1e 1b 0b 56 00 14 b6 4f 4e 74 1b 0b eb 1f 1b 0b 55 00 14 8b 79 7a 75 1b 0b 17 21 1b 0b 55 00 14 12 6a a6 76 1b 0b 43 22 1b 0b 55 00 14 e7 55 d2 77 1b 0b 6f 23 1b 0b 55 00 14 4a a9 fe 78 1b 0b 9b 24 1b 0b 55 00 14 57 80 2a 7a 1b 0b c7 25 1b 0b 57 00 14 e4 04 55 7b 1b 0b f3 26 1b 0b 57 00 14 ab 0d 82 7c 1b 0b 1f 28 1b 0b 58 00 14 b4 46 ae 7d 1b 0b 4b 29 1b 0b 5e 00 14 13 ac d9 7e 1b 0b 77 2a 1b 0b 6a 00 13 77 23 05 80 1b 0b a2 2b 1b 0b 78 00 12 f6 0a 31 81 1b 0b ce 2c 1b 0b 86 00 12 d0 1a 5d 82 1b 0b fa 2d 1b 0b 94 00 11 f2 76 89 83 1b 0b 26 2f 1b 0b a0 00 11 92 51 b6 84 1b 0b 53 30 1b 0b aa 00 12 ff ec 0e 87 1b 0b ab 32 1b 0b bf 00 12 b5 16 39 88 1b 0b d7 33 1b 0b c8 00 12 cc 58 66 89 1b 0b 03 35 1b 0b cf 00 12 8b 25 91 8a 1b 0b 2e 36 1b 0b d3 00 13 fe e3 bd 8b 1b 0b 5a 37 1b 0b d4 00 14 78 20 e9 8c 1b 0b 86 38 1b 0b d7 00 14 7b f3 ff ff ff ff ff ff
     // First record: 5130
@@ -82,6 +79,7 @@ public class PageHeaderTest {
             (byte) 0x87, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
             (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
             (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xaa, (byte) 0xc0};
+
     @Test
     public void testPageHeaderParse() throws Exception {
         PageHeader header = new PageHeader(pageHeader);

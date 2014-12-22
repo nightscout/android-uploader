@@ -7,7 +7,7 @@ import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 import com.nightscout.android.MainActivity;
 import com.nightscout.core.dexcom.TrendArrow;
-import com.nightscout.core.download.GlucoseUnits;
+import com.nightscout.core.protobuf.G4Download;
 import com.nightscout.core.utils.GlucoseReading;
 
 import org.joda.time.DateTime;
@@ -34,7 +34,7 @@ public class Pebble {
     private static final String TAG = Pebble.class.getSimpleName();
     private Context context;
     private PebbleDictionary currentReading;
-    private GlucoseUnits units = GlucoseUnits.MGDL;
+    private G4Download.GlucoseUnit units = G4Download.GlucoseUnit.MGDL;
     private String pwdName = "";
     private GlucoseReading lastReading;
     private GlucoseReading lastDelta;
@@ -66,7 +66,7 @@ public class Pebble {
     }
 
     public void sendDownload(GlucoseReading reading, TrendArrow trend, long recordTime, boolean resend) {
-        GlucoseReading delta = new GlucoseReading(0, GlucoseUnits.MGDL);
+        GlucoseReading delta = new GlucoseReading(0, G4Download.GlucoseUnit.MGDL);
 
         if (currentReading != null) {
             delta = reading.subtract(lastReading);
@@ -120,7 +120,7 @@ public class Pebble {
         });
     }
 
-    public void config(String pwdName, GlucoseUnits units) {
+    public void config(String pwdName, G4Download.GlucoseUnit units) {
         boolean changed = !this.pwdName.equals(pwdName) || this.units != units;
         if (changed) {
             setPwdName(pwdName);
@@ -133,7 +133,7 @@ public class Pebble {
         this.pwdName = pwdName;
     }
 
-    public void setUnits(GlucoseUnits units) {
+    public void setUnits(G4Download.GlucoseUnit units) {
         this.units = units;
     }
 }

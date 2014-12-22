@@ -46,13 +46,13 @@ public enum Command {
     READ_ENABLE_SETUP_WIZARD_FLAG(55),
     READ_SETUP_WIZARD_STATE(57);
 
-    private int value;
+    private byte value;
 
     Command(int command){
-        value = command;
+        value = (byte) command;
     }
 
-    public int getValue() {
+    public byte getValue() {
         return value;
     }
 

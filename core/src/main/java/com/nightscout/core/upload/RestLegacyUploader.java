@@ -21,7 +21,7 @@ public class RestLegacyUploader extends AbstractRestUploader {
         json.put("device", "dexcom");
         json.put("date", record.getDisplayTime().getTime());
         json.put("dateString", record.getDisplayTime().toString());
-        json.put("sgv", Integer.parseInt(String.valueOf(record.getBGValue())));
+        json.put("sgv", Integer.parseInt(String.valueOf(record.getBgMgdl())));
         json.put("direction", record.getTrend().friendlyTrendName());
         return json;
     }

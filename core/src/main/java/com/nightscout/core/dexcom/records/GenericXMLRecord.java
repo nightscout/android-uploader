@@ -28,8 +28,7 @@ public class GenericXMLRecord extends GenericTimestampRecord {
         String xml = new String(Arrays.copyOfRange(packet, XML_START, XML_END));
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder;
-        try
-        {
+        try {
             builder = factory.newDocumentBuilder();
             document = builder.parse(new InputSource(new StringReader(xml)));
             xmlElement = document.getDocumentElement();
@@ -37,6 +36,10 @@ public class GenericXMLRecord extends GenericTimestampRecord {
             // TODO(trhodeos): DONT DO THIS
             log.error(TAG, "Unable to build xml element", e);
         }
+    }
+
+    public <T> T toProtobuf() {
+        return null;
     }
 
     // example: String sn = getXmlElement().getAttribute("SerialNumber");

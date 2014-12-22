@@ -21,9 +21,14 @@ abstract public class GenericTimestampRecord {
         displayTime = Utils.receiverTimeToDate(rawDisplayTimeSeconds);
     }
 
-    public GenericTimestampRecord(Date displayTime, Date systemTime){
-        this.displayTime=displayTime;
-        this.systemTime=systemTime;
+    public GenericTimestampRecord(Date displayTime, Date systemTime) {
+        this.displayTime = displayTime;
+        this.systemTime = systemTime;
+    }
+
+    public GenericTimestampRecord(long rawDisplayTimeSeconds, int rawSystemTimeSeconds) {
+        this.rawDisplayTimeSeconds = rawDisplayTimeSeconds;
+        this.rawSystemTimeSeconds = rawSystemTimeSeconds;
     }
 
     public Date getSystemTime() {
@@ -42,4 +47,23 @@ abstract public class GenericTimestampRecord {
         return rawDisplayTimeSeconds;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GenericTimestampRecord that = (GenericTimestampRecord) o;
+
+        if (rawDisplayTimeSeconds != that.rawDisplayTimeSeconds) return false;
+        if (rawSystemTimeSeconds != that.rawSystemTimeSeconds) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = rawSystemTimeSeconds;
+        result = 31 * result + (int) (rawDisplayTimeSeconds ^ (rawDisplayTimeSeconds >>> 32));
+        return result;
+    }
 }

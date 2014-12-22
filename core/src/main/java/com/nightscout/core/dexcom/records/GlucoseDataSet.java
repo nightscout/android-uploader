@@ -1,6 +1,7 @@
 package com.nightscout.core.dexcom.records;
 
 import com.nightscout.core.dexcom.TrendArrow;
+import com.nightscout.core.utils.GlucoseReading;
 
 import java.util.Date;
 
@@ -8,7 +9,7 @@ public class GlucoseDataSet {
 
     private Date systemTime;
     private Date displayTime;
-    private int bGValue;
+    private GlucoseReading reading;
     private TrendArrow trend;
     private int noise;
     private long unfiltered;
@@ -19,9 +20,9 @@ public class GlucoseDataSet {
         // TODO check times match between record
         systemTime = egvRecord.getSystemTime();
         displayTime = egvRecord.getDisplayTime();
-        bGValue = egvRecord.getBGValue();
+        reading = egvRecord.getReading();
         trend = egvRecord.getTrend();
-        noise = egvRecord.getNoiseMode().getValue();
+        noise = egvRecord.getNoiseMode().ordinal();
         unfiltered = sensorRecord.getUnfiltered();
         filtered = sensorRecord.getFiltered();
         rssi = sensorRecord.getRssi();
@@ -35,8 +36,12 @@ public class GlucoseDataSet {
         return displayTime;
     }
 
-    public int getBGValue() {
-        return bGValue;
+    public int getBgMgdl() {
+        return reading.asMgdl();
+    }
+
+    public GlucoseReading getReading() {
+        return reading;
     }
 
     public TrendArrow getTrend() {

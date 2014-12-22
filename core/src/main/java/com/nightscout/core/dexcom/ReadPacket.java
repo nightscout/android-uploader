@@ -24,7 +24,7 @@ public class ReadPacket {
         this.crc = Arrays.copyOfRange(readPacket, readPacket.length - CRC_LEN, readPacket.length);
         this.crc_calc = CRC16.calculate(readPacket, 0, readPacket.length - 2);
         if (!Arrays.equals(this.crc, this.crc_calc)) {
-            throw new CRCFailError("CRC check failed: " + Utils.bytesToHex(this.crc) + " vs " + Utils.bytesToHex(this.crc_calc));
+            throw new CRCFailError("CRC check failed. Was: " + Utils.bytesToHex(this.crc) + " Expected: " + Utils.bytesToHex(this.crc_calc));
         }
     }
 

@@ -20,13 +20,10 @@ package com.nightscout.core.dexcom;
 import com.nightscout.core.dexcom.records.MeterRecord;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-@RunWith(JUnit4.class)
 public class MeterRecordTest {
     // Meter Record: 28 80 18 0B C5 2B 18 0B 71 00 0A 80 18 0B AC
     // Record EGV: 113 Meter time: 186155018 display time: 1416926645000 system time: 186155048
@@ -39,7 +36,7 @@ public class MeterRecordTest {
                 (byte) 0x2B, (byte) 0x18, (byte) 0x0B, (byte) 0x71, (byte) 0x00, (byte) 0x0A,
                 (byte) 0x80, (byte) 0x18, (byte) 0x0B, (byte) 0xAC};
         MeterRecord meterRecord = new MeterRecord(record);
-        assertThat(meterRecord.getMeterBG(), is(113));
+        assertThat(meterRecord.getBgMgdl(), is(113));
         assertThat(meterRecord.getRawDisplayTimeSeconds(), is(186133445L));
         assertThat(meterRecord.getRawSystemTimeSeconds(), is(186155048));
         assertThat(meterRecord.getMeterTime(), is(186155018));

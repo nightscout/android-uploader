@@ -4,6 +4,7 @@ import android.hardware.usb.*;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 //import com.hoho.android.usbserial.driver.UsbId;
 
@@ -79,6 +80,12 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
     @Override
     public void close() throws IOException {
         mConnection.close();
+    }
+
+    public byte[] read(int size, int timeoutMillis) throws IOException {
+        byte[] data = new byte[size];
+        int readSize = read(data, timeoutMillis);
+        return Arrays.copyOfRange(data, 0, readSize);
     }
 
     @Override

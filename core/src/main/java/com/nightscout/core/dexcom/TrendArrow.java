@@ -1,5 +1,7 @@
 package com.nightscout.core.dexcom;
 
+import com.nightscout.core.protobuf.G4Download;
+
 public enum TrendArrow {
     NONE(0),
     DOUBLE_UP(1,"\u21C8", "DoubleUp"),
@@ -44,6 +46,10 @@ public enum TrendArrow {
 
     public int getID(){
         return myID;
+    }
+
+    public G4Download.Trend toProtobuf(){
+        return G4Download.Trend.values()[myID];
     }
 
 }
