@@ -1,6 +1,6 @@
 android-uploader
 ====================
-[![Build Status](https://travis-ci.org/nightscout/android-uploader.png)](https://travis-ci.org/nightscout/android-uploader)
+[![Build Status](https://travis-ci.org/nightscout/android-uploader.png)](https://travis-ci.org/nightscout/android-uploader?branch=dev)
 [![Gitter chat](https://badges.gitter.im/nightscout.png)](https://gitter.im/nightscout/public) [![Stories in Ready](https://badge.waffle.io/nightscout/android-uploader.png?label=ready&title=Ready)](https://waffle.io/nightscout/android-uploader)
 
 <a href="https://play.google.com/store/apps/details?id=com.nightscout.android"><img alt="Android app on Google Play" src="https://developer.android.com/images/brand/en_app_rgb_wo_45.png" />
