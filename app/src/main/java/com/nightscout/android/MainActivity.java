@@ -3,7 +3,6 @@ package com.nightscout.android;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.*;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Menu;
@@ -30,11 +30,10 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.mqtt.AndroidMqttPinger;
 import com.nightscout.android.mqtt.AndroidMqttTimer;
-import com.nightscout.android.mqtt.MqttMgr;
+import com.nightscout.android.mqtt.MqttEventMgr;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.preferences.PreferencesValidator;
 import com.nightscout.android.settings.SettingsActivity;
@@ -52,6 +51,10 @@ import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.acra.ACRAConfigurationException;
 import org.acra.ReportingInteractionMode;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 
@@ -90,7 +93,8 @@ public class MainActivity extends Activity {
     private TextView mTextTimestamp;
     private StatusBarIcons statusBarIcons;
     private Pebble pebble;
-    private MqttMgr mqttMgr;
+    //    private MqttMgr mqttMgr;
+    private MqttEventMgr mqttManager;
 
     // TODO: should try and avoid use static
     public static int batLevel = 0;
@@ -196,6 +200,33 @@ public class MainActivity extends Activity {
         pebble.setUnits(preferences.getPreferredUnits());
         pebble.setPwdName(preferences.getPwdName());
 
+        try {
+            setupMqtt();
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void setupMqtt() throws MqttException {
+        if (preferences.isMqttEnabled()) {
+            if (!preferences.getMqttUser().equals("") && !preferences.getMqttPass().equals("") &&
+                    !preferences.getMqttEndpoint().equals("")) {
+                MqttConnectOptions mqttOptions = new MqttConnectOptions();
+                mqttOptions.setCleanSession(false);
+                mqttOptions.setKeepAliveInterval(150000);
+                mqttOptions.setUserName(preferences.getMqttUser());
+                mqttOptions.setPassword(preferences.getMqttPass().toCharArray());
+                String androidId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+                Log.d(TAG, "Directory: " + getApplicationContext().getFilesDir().getAbsolutePath());
+                MqttDefaultFilePersistence dataStore = new MqttDefaultFilePersistence(getApplicationContext().getFilesDir().getAbsolutePath());
+                MqttClient client = new MqttClient(preferences.getMqttEndpoint(), androidId, dataStore);
+                MqttPinger pinger = new AndroidMqttPinger(getApplicationContext(), 0, client, 150000);
+                MqttTimer timer = new AndroidMqttTimer(getApplicationContext(), 0);
+                mqttManager = new MqttEventMgr(client, mqttOptions, pinger, timer);
+                mqttManager.connect();
+            }
+        }
     }
 
     public void reportUploadMethods(Tracker tracker) {
@@ -207,15 +238,6 @@ public class MainActivity extends Activity {
         }
         if (preferences.isMongoUploadEnabled()) {
             tracker.send(new HitBuilders.EventBuilder("Upload", "Mongo").build());
-        }
-        if (preferences.isMqttEnabled()) {
-            if (!preferences.getMqttUser().equals("") && !preferences.getMqttPass().equals("") &&
-                    !preferences.getMqttEndpoint().equals("")) {
-                mqttMgr = new MqttMgr(preferences.getMqttUser(), preferences.getMqttPass(), "abc123");
-                MqttPinger pinger = new AndroidMqttPinger(getApplicationContext(), 0);
-                MqttTimer timer = new AndroidMqttTimer(getApplicationContext(), 0);
-                mqttMgr.connect(preferences.getMqttEndpoint(), pinger, timer);
-            }
         }
     }
 
@@ -311,6 +333,30 @@ public class MainActivity extends Activity {
         if (statusBarIcons != null) {
             statusBarIcons.checkForRootOptionChanged();
         }
+        try {
+            if (mqttManager != null && mqttManager.isConnected()) {
+                MqttClient client = mqttManager.getClient();
+                MqttConnectOptions options = mqttManager.getOptions();
+                boolean mqttOptsChanged = !preferences.getMqttEndpoint().equals(client.getServerURI());
+                mqttOptsChanged &= !preferences.getMqttUser().equals(options.getUserName());
+                mqttOptsChanged &= !preferences.getMqttPass().equals(String.valueOf(options.getPassword()));
+                if (mqttOptsChanged) {
+                    mqttManager.disconnect();
+                    setupMqtt();
+                }
+            }
+
+            if ((mqttManager == null || !mqttManager.isConnected()) && preferences.isMqttEnabled()) {
+                setupMqtt();
+            }
+
+            if (mqttManager != null && mqttManager.isConnected() && !preferences.isMqttEnabled()) {
+                mqttManager.close();
+            }
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private String getSGVStringByUnit(GlucoseReading sgv, TrendArrow trend) {
@@ -327,9 +373,8 @@ public class MainActivity extends Activity {
         unregisterReceiver(mCGMStatusReceiver);
         unregisterReceiver(mDeviceStatusReceiver);
         unregisterReceiver(toastReceiver);
-        if (mqttMgr != null) {
-            mqttMgr.disconnect();
-            mqttMgr.close();
+        if (mqttManager != null) {
+            mqttManager.close();
         }
     }
 
@@ -391,8 +436,8 @@ public class MainActivity extends Activity {
             String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
             byte[] proto = intent.getByteArrayExtra(SyncingService.RESPONSE_PROTO);
             if (proto != null) {
-                if (mqttMgr != null) {
-                    mqttMgr.publish(proto, "/downloads/protobuf");
+                if (mqttManager != null) {
+                    mqttManager.publish(proto, "/downloads/protobuf");
                 } else {
                     Log.e(TAG, "Not publishing for some reason");
                 }
@@ -569,11 +614,11 @@ public class MainActivity extends Activity {
 
         public void checkForRootOptionChanged() {
             if (((AndroidPreferences) preferences).isRootEnabled()) {
-                mImageRcvrBattery.setVisibility(View.GONE);
-                mRcvrBatteryLabel.setVisibility(View.GONE);
-            } else {
                 mImageRcvrBattery.setVisibility(View.VISIBLE);
                 mRcvrBatteryLabel.setVisibility(View.VISIBLE);
+            } else {
+                mImageRcvrBattery.setVisibility(View.GONE);
+                mRcvrBatteryLabel.setVisibility(View.GONE);
             }
         }
 
@@ -583,6 +628,7 @@ public class MainActivity extends Activity {
             setUpload(false);
             setTimeIndicator(false);
             setBatteryIndicator(0);
+            checkForRootOptionChanged();
         }
 
         public void setUSB(boolean active) {

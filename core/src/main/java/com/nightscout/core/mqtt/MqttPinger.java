@@ -15,7 +15,7 @@ public interface MqttPinger extends MqttPingerObservable {
 
     public boolean isNetworkActive();
 
-    public void setKeepAliveInterval(long ms);
+    public void setKeepAliveInterval(int ms);
 
     public void setMqttClient(MqttClient mqttClient);
 }

@@ -18,7 +18,7 @@
  * Project home page: http://code.google.com/p/usb-serial-for-android/
  */
 
-package com.nightscout.android.dexcom.USB;
+package com.nightscout.android.USB;
 
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
@@ -42,10 +42,14 @@ abstract class CommonUsbSerialDriver implements UsbSerialDriver {
     protected final Object mReadBufferLock = new Object();
     protected final Object mWriteBufferLock = new Object();
 
-    /** Internal read buffer.  Guarded by {@link #mReadBufferLock}. */
+    /**
+     * Internal read buffer.  Guarded by {@link #mReadBufferLock}.
+     */
     protected byte[] mReadBuffer;
 
-    /** Internal write buffer.  Guarded by {@link #mWriteBufferLock}. */
+    /**
+     * Internal write buffer.  Guarded by {@link #mWriteBufferLock}.
+     */
     protected byte[] mWriteBuffer;
 
     public CommonUsbSerialDriver(UsbDevice device, UsbDeviceConnection connection) {

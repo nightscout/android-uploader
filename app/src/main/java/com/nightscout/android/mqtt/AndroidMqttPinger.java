@@ -21,27 +21,27 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.util.List;
-import java.util.Locale;
 
 public class AndroidMqttPinger implements MqttPinger, MqttPingerObservable {
     private static final String TAG = AndroidMqttPinger.class.getSimpleName();
     private Context context;
     private MqttPingerReceiver pingerReceiver;
     private PendingIntent pingerPendingIntent;
-    private Intent pingerIntent;
     private int instanceId;
     private MqttClient mqttClient = null;
     private boolean active = false;
     private AlarmManager alarmMgr;
-    private long keepAliveInterval;
+    private int keepAliveInterval;
     private String keepAliveTopic = "/users/%s/keepalive";
     private List<MqttPingerObserver> observers;
 
-    public AndroidMqttPinger(Context context, int instanceId) {
+    public AndroidMqttPinger(Context context, int instanceId, MqttClient mqttClient, int keepAliveInterval) {
         this.context = context;
         this.instanceId = instanceId;
-        alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        observers = Lists.newArrayList();
+        this.alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        this.observers = Lists.newArrayList();
+        this.mqttClient = mqttClient;
+        this.keepAliveInterval = keepAliveInterval;
         Log.d(TAG, "Creating MQTT pinger");
     }
 
@@ -65,8 +65,7 @@ public class AndroidMqttPinger implements MqttPinger, MqttPingerObservable {
         MqttMessage message = new MqttMessage(Constants.MQTT_KEEP_ALIVE_MESSAGE);
         message.setQos(Constants.MQTT_KEEP_ALIVE_QOS);
         try {
-            mqttClient.publish(String.format(Locale.US, Constants.MQTT_KEEP_ALIVE_TOPIC_FORMAT, mqttClient.getClientId()), message);
-            reset();
+            mqttClient.publish(String.format(keepAliveTopic, mqttClient.getClientId()), message);
         } catch (MqttException e) {
             Log.wtf(TAG, "Exception during ping. Reason code:" + e.getReasonCode() + " Message: " + e.getMessage());
             for (MqttPingerObserver observer : observers) {
@@ -108,21 +107,20 @@ public class AndroidMqttPinger implements MqttPinger, MqttPingerObservable {
     }
 
     @Override
-    public void setKeepAliveInterval(long ms) {
+    public void setKeepAliveInterval(int ms) {
         keepAliveInterval = ms;
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public void reset() {
-//        Log.i(TAG,"Resetting ping timer");
         if (!isActive()) {
             Log.d(TAG, "Can't reset pinger because it is not active");
             return;
         }
         alarmMgr.cancel(pingerPendingIntent);
         Log.d(TAG, "Setting next keep alive to trigger in " + (Constants.KEEPALIVE_INTERVAL - 3000) / 1000 + " seconds");
-        pingerIntent = new Intent(Constants.KEEPALIVE_INTENT_FILTER);
+        Intent pingerIntent = new Intent(Constants.KEEPALIVE_INTENT_FILTER);
         pingerIntent.putExtra("device", instanceId);
         pingerPendingIntent = PendingIntent.getBroadcast(context, 61, pingerIntent, 0);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

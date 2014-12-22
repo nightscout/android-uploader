@@ -15,9 +15,9 @@ import com.google.common.collect.Lists;
 import com.nightscout.android.MainActivity;
 import com.nightscout.android.Nightscout;
 import com.nightscout.android.R;
-import com.nightscout.android.dexcom.USB.USBPower;
-import com.nightscout.android.dexcom.USB.UsbSerialDriver;
-import com.nightscout.android.dexcom.USB.UsbSerialProber;
+import com.nightscout.android.USB.USBPower;
+import com.nightscout.android.USB.UsbSerialDriver;
+import com.nightscout.android.USB.UsbSerialProber;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.upload.Uploader;
 import com.nightscout.core.dexcom.CRCFailError;
@@ -189,10 +189,10 @@ public class SyncingService extends IntentService {
                         .setUploaderBattery(MainActivity.batLevel)
                         .setUnits(G4Download.GlucoseUnit.MGDL);
 
-                long egvTime = ((AndroidPreferences) preferences).getLastEgvMqttUpload();
-                long meterTime = ((AndroidPreferences) preferences).getLastMeterMqttUpload();
-                long sensorTime = ((AndroidPreferences) preferences).getLastSensorMqttUpload();
-                long calTime = ((AndroidPreferences) preferences).getLastCalMqttUpload();
+                long egvTime = preferences.getLastEgvMqttUpload();
+                long meterTime = preferences.getLastMeterMqttUpload();
+                long sensorTime = preferences.getLastSensorMqttUpload();
+                long calTime = preferences.getLastCalMqttUpload();
                 long lastRecord = 0;
                 for (EGVRecord aRecord : recentRecords) {
                     if (aRecord.getSystemTimeSeconds() > egvTime) {
@@ -201,7 +201,7 @@ public class SyncingService extends IntentService {
                     }
                 }
                 if (lastRecord != 0) {
-                    ((AndroidPreferences) preferences).setLastEgvMqttUpload(lastRecord);
+                    preferences.setLastEgvMqttUpload(lastRecord);
                 }
                 lastRecord = 0;
                 for (MeterRecord aRecord : meterRecords) {

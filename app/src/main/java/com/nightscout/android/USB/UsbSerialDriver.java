@@ -18,7 +18,7 @@
  * Project home page: http://code.google.com/p/usb-serial-for-android/
  */
 
-package com.nightscout.android.dexcom.USB;
+package com.nightscout.android.USB;
 
 import java.io.IOException;
 
@@ -29,55 +29,89 @@ import java.io.IOException;
  */
 public interface UsbSerialDriver {
 
-    /** 5 data bits. */
+    /**
+     * 5 data bits.
+     */
     public static final int DATABITS_5 = 5;
 
-    /** 6 data bits. */
+    /**
+     * 6 data bits.
+     */
     public static final int DATABITS_6 = 6;
 
-    /** 7 data bits. */
+    /**
+     * 7 data bits.
+     */
     public static final int DATABITS_7 = 7;
 
-    /** 8 data bits. */
+    /**
+     * 8 data bits.
+     */
     public static final int DATABITS_8 = 8;
 
-    /** No flow control. */
+    /**
+     * No flow control.
+     */
     public static final int FLOWCONTROL_NONE = 0;
 
-    /** RTS/CTS input flow control. */
+    /**
+     * RTS/CTS input flow control.
+     */
     public static final int FLOWCONTROL_RTSCTS_IN = 1;
 
-    /** RTS/CTS output flow control. */
+    /**
+     * RTS/CTS output flow control.
+     */
     public static final int FLOWCONTROL_RTSCTS_OUT = 2;
 
-    /** XON/XOFF input flow control. */
+    /**
+     * XON/XOFF input flow control.
+     */
     public static final int FLOWCONTROL_XONXOFF_IN = 4;
 
-    /** XON/XOFF output flow control. */
+    /**
+     * XON/XOFF output flow control.
+     */
     public static final int FLOWCONTROL_XONXOFF_OUT = 8;
 
-    /** No parity. */
+    /**
+     * No parity.
+     */
     public static final int PARITY_NONE = 0;
 
-    /** Odd parity. */
+    /**
+     * Odd parity.
+     */
     public static final int PARITY_ODD = 1;
 
-    /** Even parity. */
+    /**
+     * Even parity.
+     */
     public static final int PARITY_EVEN = 2;
 
-    /** Mark parity. */
+    /**
+     * Mark parity.
+     */
     public static final int PARITY_MARK = 3;
 
-    /** Space parity. */
+    /**
+     * Space parity.
+     */
     public static final int PARITY_SPACE = 4;
 
-    /** 1 stop bit. */
+    /**
+     * 1 stop bit.
+     */
     public static final int STOPBITS_1 = 1;
 
-    /** 1.5 stop bits. */
+    /**
+     * 1.5 stop bits.
+     */
     public static final int STOPBITS_1_5 = 3;
 
-    /** 2 stop bits. */
+    /**
+     * 2 stop bits.
+     */
     public static final int STOPBITS_2 = 2;
 
     /**
@@ -98,7 +132,7 @@ public interface UsbSerialDriver {
     /**
      * Reads as many bytes as possible into the destination buffer.
      *
-     * @param dest the destination byte buffer
+     * @param dest          the destination byte buffer
      * @param timeoutMillis the timeout for reading
      * @return the actual number of bytes read
      * @throws java.io.IOException if an error occurred during reading
@@ -108,7 +142,7 @@ public interface UsbSerialDriver {
     /**
      * Reads as many bytes as possible into the destination buffer.
      *
-     * @param size size to read
+     * @param size          size to read
      * @param timeoutMillis the timeout for reading
      * @return the actual number of bytes read
      * @throws java.io.IOException if an error occurred during reading
@@ -118,7 +152,7 @@ public interface UsbSerialDriver {
     /**
      * Writes as many bytes as possible from the source buffer.
      *
-     * @param src the source byte buffer
+     * @param src           the source byte buffer
      * @param timeoutMillis the timeout for writing
      * @return the actual number of bytes written
      * @throws java.io.IOException if an error occurred during writing
@@ -130,12 +164,12 @@ public interface UsbSerialDriver {
      *
      * @param baudRate baud rate as an integer, for example {@code 115200}.
      * @param dataBits one of {@link #DATABITS_5}, {@link #DATABITS_6},
-     *            {@link #DATABITS_7}, or {@link #DATABITS_8}.
+     *                 {@link #DATABITS_7}, or {@link #DATABITS_8}.
      * @param stopBits one of {@link #STOPBITS_1}, {@link #STOPBITS_1_5}, or
-     *            {@link #STOPBITS_2}.
-     * @param parity one of {@link #PARITY_NONE}, {@link #PARITY_ODD},
-     *            {@link #PARITY_EVEN}, {@link #PARITY_MARK}, or
-     *            {@link #PARITY_SPACE}.
+     *                 {@link #STOPBITS_2}.
+     * @param parity   one of {@link #PARITY_NONE}, {@link #PARITY_ODD},
+     *                 {@link #PARITY_EVEN}, {@link #PARITY_MARK}, or
+     *                 {@link #PARITY_SPACE}.
      * @throws java.io.IOException on error setting the port parameters
      */
     public void setParameters(

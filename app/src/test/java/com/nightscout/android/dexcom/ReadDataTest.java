@@ -1,8 +1,8 @@
 package com.nightscout.android.dexcom;
 
 import com.nightscout.android.MainActivity;
-import com.nightscout.android.dexcom.USB.CdcAcmSerialDriver;
-import com.nightscout.android.dexcom.USB.UsbSerialDriver;
+import com.nightscout.android.USB.CdcAcmSerialDriver;
+import com.nightscout.android.USB.UsbSerialDriver;
 import com.nightscout.android.test.RobolectricTestBase;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.records.CalRecord;

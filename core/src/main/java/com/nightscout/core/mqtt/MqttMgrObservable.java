@@ -7,7 +7,7 @@ public interface MqttMgrObservable {
 
     public void unregisterObserver(MqttMgrObserver observer);
 
-    public void notifyObservers(String topic, MqttMessage message);
+    public void notifyOnMessage(String topic, MqttMessage message);
 
-    public void notifyDisconnect();
+    public void notifyOnDisconnect();
 }

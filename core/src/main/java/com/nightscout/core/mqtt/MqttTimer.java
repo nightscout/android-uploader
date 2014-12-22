@@ -10,4 +10,8 @@ public interface MqttTimer {
     public void deactivate();
 
     public boolean isActive();
+
+    public void registerObserver(MqttTimerObserver observer);
+
+    public void unregisterObserver(MqttTimerObserver observer);
 }

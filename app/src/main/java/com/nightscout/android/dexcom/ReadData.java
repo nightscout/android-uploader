@@ -2,7 +2,7 @@ package com.nightscout.android.dexcom;
 
 import android.util.Log;
 
-import com.nightscout.android.dexcom.USB.UsbSerialDriver;
+import com.nightscout.android.USB.UsbSerialDriver;
 import com.nightscout.core.dexcom.Command;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.PacketBuilder;
@@ -50,7 +50,7 @@ public class ReadData {
         Log.d(TAG, "Reading " + numOfRecentPages + " EGV page(s)...");
         numOfRecentPages = numOfRecentPages - 1;
         EGVRecord[] allPages = new EGVRecord[0];
-        for (int i = Math.min(numOfRecentPages,endPage); i >= 0; i--) {
+        for (int i = Math.min(numOfRecentPages, endPage); i >= 0; i--) {
             int nextPage = endPage - i;
             Log.d(TAG, "Reading #" + i + " EGV pages (page number " + nextPage + ")");
             EGVRecord[] ithEGVRecordPage = readDataBasePage(RecordType.EGV_DATA, nextPage);
@@ -81,7 +81,7 @@ public class ReadData {
         Log.d(TAG, "Reading " + numOfRecentPages + " Sensor page(s)...");
         numOfRecentPages = numOfRecentPages - 1;
         SensorRecord[] allPages = new SensorRecord[0];
-        for (int i = Math.min(numOfRecentPages,endPage); i >= 0; i--) {
+        for (int i = Math.min(numOfRecentPages, endPage); i >= 0; i--) {
             int nextPage = endPage - i;
             Log.d(TAG, "Reading #" + i + " Sensor pages (page number " + nextPage + ")");
             SensorRecord[] ithSensorRecordPage = readDataBasePage(RecordType.SENSOR_DATA, nextPage);
@@ -147,7 +147,7 @@ public class ReadData {
 
     private <T> T readDataBasePage(RecordType recordType, int page) {
         byte numOfPages = 1;
-        if (page < 0){
+        if (page < 0) {
             throw new IllegalArgumentException("Invalid page requested:" + page);
         }
         ArrayList<Byte> payload = new ArrayList<>();
@@ -187,7 +187,7 @@ public class ReadData {
 
     private ReadPacket read(int numOfBytes) {
         byte[] response = new byte[numOfBytes];
-        int len = 0;
+        int len;
         try {
             response = mSerialDevice.read(numOfBytes, IO_TIMEOUT);
             len = response.length;
@@ -212,7 +212,7 @@ public class ReadData {
     }
 
     private <T> T ParsePage(byte[] data, RecordType recordType) {
-        PageHeader pageHeader=new PageHeader(data);
+        PageHeader pageHeader = new PageHeader(data);
         int NUM_REC_OFFSET = 4;
         int numRec = data[NUM_REC_OFFSET];
 
@@ -255,7 +255,7 @@ public class ReadData {
                 return (T) meterRecords;
             case CAL_SET:
                 int rec_len = CalRecord.RECORD_V2_SIZE;
-                if (pageHeader.getRevision()<=2) {
+                if (pageHeader.getRevision() <= 2) {
                     rec_len = CalRecord.RECORD_SIZE;
                 }
                 CalRecord[] calRecords = new CalRecord[numRec];

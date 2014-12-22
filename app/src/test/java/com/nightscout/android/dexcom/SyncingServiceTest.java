@@ -5,13 +5,12 @@ import android.content.Intent;
 
 import com.nightscout.android.MainActivity;
 import com.nightscout.android.R;
-import com.nightscout.android.dexcom.USB.CdcAcmSerialDriver;
-import com.nightscout.android.dexcom.USB.UsbSerialDriver;
+import com.nightscout.android.USB.CdcAcmSerialDriver;
+import com.nightscout.android.USB.UsbSerialDriver;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.test.RobolectricTestBase;
 import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.preferences.NightscoutPreferences;
-import com.nightscout.core.protobuf.G4Download;
 
 import org.json.JSONArray;
 import org.junit.Before;

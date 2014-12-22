@@ -12,13 +12,12 @@ import android.util.Log;
 import com.google.common.collect.Lists;
 import com.nightscout.core.mqtt.Constants;
 import com.nightscout.core.mqtt.MqttTimer;
-import com.nightscout.core.mqtt.MqttTimerObservable;
 import com.nightscout.core.mqtt.MqttTimerObserver;
 
 import java.util.Date;
 import java.util.List;
 
-public class AndroidMqttTimer implements MqttTimer, MqttTimerObservable {
+public class AndroidMqttTimer implements MqttTimer {
     private static final String TAG = AndroidMqttTimer.class.getSimpleName();
     private List<MqttTimerObserver> observers = Lists.newArrayList();
     private MqttTimerReceiver timerReceiver;

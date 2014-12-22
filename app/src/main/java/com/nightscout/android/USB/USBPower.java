@@ -1,4 +1,4 @@
-package com.nightscout.android.dexcom.USB;
+package com.nightscout.android.USB;
 
 import android.util.Log;
 
@@ -23,7 +23,7 @@ public class USBPower {
         }
     }
 
-    public static void PowerOn(){
+    public static void PowerOn() {
         try {
             runCommand(SET_POWER_ON_COMMAND);
             Log.i(TAG, "PowerOn USB complete");
