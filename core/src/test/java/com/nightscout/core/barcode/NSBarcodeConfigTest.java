@@ -2,32 +2,27 @@ package com.nightscout.core.barcode;
 
 
 import com.google.common.collect.Lists;
-import com.nightscout.core.preferences.TestPreferences;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-@RunWith(JUnit4.class)
 public class NSBarcodeConfigTest {
-    TestPreferences prefs;
-    String jsonConfig = "";
+    String jsonConfig;
     NSBarcodeConfig barcode;
 
     @Before
     public void setUp() {
-        prefs = new TestPreferences();
+        jsonConfig = "";
+        barcode = null;
     }
 
     private void setBarcode() {
-        barcode = new NSBarcodeConfig(jsonConfig, prefs);
+        barcode = new NSBarcodeConfig(jsonConfig);
     }
 
     private void setValidMongoOnlyNoCollections() {
@@ -208,12 +203,5 @@ public class NSBarcodeConfigTest {
     public void testInvalidJsonDoesNotEnableApi() {
         setInvalidJson();
         assertThat(barcode.hasApiConfig(), is(false));
-    }
-
-    @After
-    public void tearDown() {
-        prefs = null;
-        jsonConfig = "";
-        barcode = null;
     }
 }
