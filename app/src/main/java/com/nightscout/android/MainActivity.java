@@ -22,6 +22,7 @@ import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
@@ -31,9 +32,13 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.nightscout.android.dexcom.SyncingService;
+import com.nightscout.android.events.AndroidEventReporter;
+import com.nightscout.core.events.EventSeverity;
+import com.nightscout.core.events.EventType;
+import com.nightscout.android.events.UserEventPanelActivity;
 import com.nightscout.android.mqtt.AndroidMqttPinger;
 import com.nightscout.android.mqtt.AndroidMqttTimer;
-import com.nightscout.android.mqtt.MqttEventMgr;
+import com.nightscout.core.mqtt.MqttEventMgr;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.preferences.PreferencesValidator;
 import com.nightscout.android.settings.SettingsActivity;
@@ -61,7 +66,8 @@ import org.joda.time.Minutes;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import static com.nightscout.core.dexcom.SpecialValue.getEGVSpecialValue;
 import static com.nightscout.core.dexcom.SpecialValue.isSpecialValue;
@@ -93,8 +99,9 @@ public class MainActivity extends Activity {
     private TextView mTextTimestamp;
     private StatusBarIcons statusBarIcons;
     private Pebble pebble;
-    //    private MqttMgr mqttMgr;
     private MqttEventMgr mqttManager;
+    private AndroidEventReporter reporter;
+//    private ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle",Locale.getDefault());
 
     // TODO: should try and avoid use static
     public static int batLevel = 0;
@@ -105,13 +112,17 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "OnCreate called.");
 
+        reporter = AndroidEventReporter.getReporter(getApplicationContext());
+        reporter.report(EventType.APPLICATION, EventSeverity.INFO,
+                getApplicationContext().getString(R.string.app_started));
+
         preferences = new AndroidPreferences(getApplicationContext());
         migrateToNewStyleRestUris();
         ensureSavedUrisAreValid();
         ensureIUnderstandDialogDisplayed();
 
         // Add timezone ID to ACRA report
-        ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
+//        ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
 
         mTracker = ((Nightscout) getApplicationContext()).getTracker();
 
@@ -159,7 +170,10 @@ public class MainActivity extends Activity {
         // If app started due to android.hardware.usb.action.USB_DEVICE_ATTACHED intent, start syncing
         Intent startIntent = getIntent();
         String action = startIntent.getAction();
-        if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) || SyncingService.isG4Connected(getApplicationContext())) {
+        if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) ||
+                SyncingService.isG4Connected(getApplicationContext())) {
+            reporter.report(EventType.DEVICE, EventSeverity.INFO,
+                    getApplicationContext().getString(R.string.g4_connected));
             statusBarIcons.setUSB(true);
             Log.d(TAG, "Starting syncing in OnCreate...");
             SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
@@ -205,7 +219,6 @@ public class MainActivity extends Activity {
         } catch (MqttException e) {
             e.printStackTrace();
         }
-
     }
 
     public void setupMqtt() throws MqttException {
@@ -223,7 +236,7 @@ public class MainActivity extends Activity {
                 MqttClient client = new MqttClient(preferences.getMqttEndpoint(), androidId, dataStore);
                 MqttPinger pinger = new AndroidMqttPinger(getApplicationContext(), 0, client, 150000);
                 MqttTimer timer = new AndroidMqttTimer(getApplicationContext(), 0);
-                mqttManager = new MqttEventMgr(client, mqttOptions, pinger, timer);
+                mqttManager = new MqttEventMgr(client, mqttOptions, pinger, timer, reporter);
                 mqttManager.connect();
             }
         }
@@ -269,6 +282,10 @@ public class MainActivity extends Activity {
             }
         }
         preferences.setRestApiBaseUris(filteredRestUris);
+        if (PreferencesValidator.validateMqttEndpointSyntax(getApplicationContext(),
+                preferences.getMqttEndpoint()).isPresent()) {
+            preferences.setMqttEndpoint(null);
+        }
     }
 
     private void ensureIUnderstandDialogDisplayed() {
@@ -505,12 +522,17 @@ public class MainActivity extends Activity {
     BroadcastReceiver mDeviceStatusReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+
             switch (action) {
                 case UsbManager.ACTION_USB_DEVICE_DETACHED:
+                    reporter.report(EventType.DEVICE, EventSeverity.INFO,
+                            getApplicationContext().getString(R.string.g4_disconnected));
                     statusBarIcons.setDefaults();
                     mHandler.removeCallbacks(syncCGM);
                     break;
                 case UsbManager.ACTION_USB_DEVICE_ATTACHED:
+                    reporter.report(EventType.DEVICE, EventSeverity.INFO,
+                            getApplicationContext().getString(R.string.g4_connected));
                     statusBarIcons.setUSB(true);
                     Log.d(TAG, "Starting syncing on USB attached...");
                     SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
@@ -595,6 +617,7 @@ public class MainActivity extends Activity {
         private ImageView mImageViewTimeIndicator;
         private ImageView mImageRcvrBattery;
         private TextView mRcvrBatteryLabel;
+        private ListView mListView;
         private boolean usbActive;
         private boolean uploadActive;
         private boolean displayTimeSync;
@@ -608,6 +631,26 @@ public class MainActivity extends Activity {
             mImageRcvrBattery = (ImageView) findViewById(R.id.imageViewRcvrBattery);
             mImageRcvrBattery.setImageResource(R.drawable.battery);
             mRcvrBatteryLabel = (TextView) findViewById(R.id.rcvrBatteryLabel);
+            mListView = (ListView) findViewById(R.id.listView);
+
+            mImageViewUSB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), UserEventPanelActivity.class);
+                    intent.putExtra("Filter", EventType.APPLICATION.ordinal());
+                    startActivity(intent);
+                }
+            });
+
+            mImageViewUpload.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), UserEventPanelActivity.class);
+                    intent.putExtra("Filter", EventType.UPLOADER.ordinal());
+                    startActivity(intent);
+                }
+            });
+
 
             setDefaults();
         }

@@ -76,6 +76,15 @@
                 android:value="com.nightscout.android.MainActivity" />
         </activity>
 
+        <activity
+            android:name=".events.UserEventPanelActivity"
+            android:label="Events"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
     </application>
 
 </manifest>

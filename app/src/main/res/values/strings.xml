@@ -61,9 +61,13 @@
     <string name="illegal_mongo_uri">Mongo uri has invalid syntax. Please double check.</string>
     <string name="unknown_rest_host">Cannot connect to %s, please check that you are connected to the internet, and that the url is correct.</string>
     <string name="invalid_rest_uri">Invalid rest url %s, please double check formatting.</string>
+    <string name="invalid_mqtt_endpoint">Invalid mqtt url %s, please double check formatting.</string>
     <string name="rest_uri_missing_token">Missing token for rest uri %s.</string>
     <string name="invalid_input_title">Invalid Input</string>
     <string name="ok">OK</string>
     <string name="version_unknown">Unknown version</string>
     <string name="default_pwd_name">Camping</string>
+    <string name="app_started">Application started</string>
+    <string name="g4_connected">G4 receiver is connected</string>
+    <string name="g4_disconnected">G4 has been disconnected</string>
 </resources>

@@ -67,7 +67,7 @@ public class SettingsActivity extends FragmentActivity {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         NightscoutPreferences prefs = new AndroidPreferences(getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
         if (scanResult != null && scanResult.getContents() != null) {
-            NSBarcodeConfig barcode=new NSBarcodeConfig(scanResult.getContents(), prefs);
+            NSBarcodeConfig barcode = new NSBarcodeConfig(scanResult.getContents(), prefs);
             if (barcode.hasMongoConfig()) {
                 prefs.setMongoUploadEnabled(true);
                 if (barcode.getMongoUri().isPresent()) {
@@ -152,6 +152,22 @@ public class SettingsActivity extends FragmentActivity {
                             return true;
                         }
                     });
+            findPreference(PreferenceKeys.MQTT_ENDPOINT).setOnPreferenceChangeListener(
+                    new Preference.OnPreferenceChangeListener() {
+                        @Override
+                        public boolean onPreferenceChange(Preference preference, Object newValue) {
+                            String mqttEndpoint = (String) newValue;
+                            Optional<String> error = PreferencesValidator.validateMqttEndpointSyntax(
+                                    getActivity(), mqttEndpoint);
+                            if (error.isPresent()) {
+                                showValidationError(getActivity(), error.get());
+                                return false;
+                            }
+                            return true;
+                        }
+                    });
+
+
         }
 
 

@@ -43,6 +43,8 @@ public interface NightscoutPreferences {
 
     String getMqttEndpoint();
 
+    void setMqttEndpoint(String endpoint);
+
     String getMqttUser();
 
     // TODO: (klee) look into how to securely store this information

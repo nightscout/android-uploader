@@ -19,6 +19,7 @@ public class TestPreferences implements NightscoutPreferences {
     private String pwdName;
     private boolean understand;
     private boolean askedForData;
+    private String mqttEndpoint;
 
     @Override
     public boolean isRestApiEnabled() {
@@ -122,7 +123,12 @@ public class TestPreferences implements NightscoutPreferences {
 
     @Override
     public String getMqttEndpoint() {
-        return null;
+        return mqttEndpoint;
+    }
+
+    @Override
+    public void setMqttEndpoint(String endpoint) {
+        mqttEndpoint = endpoint;
     }
 
     @Override

@@ -12,7 +12,7 @@ import java.util.List;
 
 public class MqttTimerReceiver extends BroadcastReceiver {
     private static final String TAG = MqttTimerReceiver.class.getSimpleName();
-    List<MqttTimerObserver> observers;
+    private List<MqttTimerObserver> observers;
 
     public MqttTimerReceiver(List<MqttTimerObserver> observers) {
         this.observers = observers;

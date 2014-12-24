@@ -13,6 +13,7 @@ import java.net.URI;
 public class PreferencesValidator {
     /**
      * Validate the syntax of the given mongo uri.
+     *
      * @param mongoUriString String to validated.
      * @return Optional localized validation error, if one occurs.
      */
@@ -27,6 +28,7 @@ public class PreferencesValidator {
 
     /**
      * Validate the syntax of a single rest api uri. Can be either legacy or v1 format.
+     *
      * @param restApiUri Uri to validate.
      * @return Localized validation error, if one occurs.
      */
@@ -37,9 +39,7 @@ public class PreferencesValidator {
         URI uri;
         try {
             uri = URI.create(restApiUri);
-        } catch (NullPointerException e) {
-            return Optional.of(context.getString(R.string.invalid_rest_uri, restApiUri));
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | NullPointerException e) {
             return Optional.of(context.getString(R.string.invalid_rest_uri, restApiUri));
         }
         if (RestUriUtils.isV1Uri(uri)) {
@@ -48,5 +48,19 @@ public class PreferencesValidator {
             }
         }
         return Optional.absent();
+    }
+
+    public static Optional<String> validateMqttEndpointSyntax(Context context, String mqttUri) {
+        if (Strings.isNullOrEmpty(mqttUri)) {
+            return Optional.of(context.getString(R.string.invalid_mqtt_endpoint, mqttUri));
+        }
+        URI uri;
+        try {
+            uri = URI.create(mqttUri);
+        } catch (NullPointerException | IllegalArgumentException e) {
+            return Optional.of(context.getString(R.string.invalid_mqtt_endpoint, mqttUri));
+        }
+        return Optional.absent();
+
     }
 }

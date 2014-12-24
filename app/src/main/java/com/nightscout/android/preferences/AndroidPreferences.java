@@ -100,6 +100,11 @@ public class AndroidPreferences implements NightscoutPreferences {
     }
 
     @Override
+    public void setMqttEndpoint(String endpoint) {
+        preferences.edit().putString(PreferenceKeys.MQTT_ENDPOINT, endpoint);
+    }
+
+    @Override
     public String getMqttUser() {
         return preferences.getString(PreferenceKeys.MQTT_USER, "");
     }

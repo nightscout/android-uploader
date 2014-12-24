@@ -1,6 +1,8 @@
 package com.nightscout.android.mqtt;
 
+import com.nightscout.android.test.RobolectricTestBase;
 import com.nightscout.core.mqtt.Constants;
+import com.nightscout.core.mqtt.MqttEventMgr;
 import com.nightscout.core.mqtt.MqttMgrObserver;
 import com.nightscout.core.mqtt.MqttPinger;
 import com.nightscout.core.mqtt.MqttPingerObserver;
@@ -30,7 +32,7 @@ import static org.mockito.Mockito.when;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-public class MqttEventMgrTest {
+public class MqttEventMgrTest extends RobolectricTestBase {
     private MqttClient mockClient;
     private MqttPinger mockPinger;
     private MqttTimer mockTimer;
@@ -48,7 +50,7 @@ public class MqttEventMgrTest {
         mockClient = mock(MqttClient.class);
         mockPinger = mock(MqttPinger.class);
         mockTimer = mock(MqttTimer.class);
-        manager = new MqttEventMgr(mockClient, options, mockPinger, mockTimer);
+        manager = new MqttEventMgr(getShadowApplication().getApplicationContext(), mockClient, options, mockPinger, mockTimer);
     }
 
     private void setupConnectWithSecurityException() throws Exception {

@@ -68,4 +68,8 @@
     <string name="unknown_rest_host">Impossibile connettersi a %s, si prega di verificare che si è connessi a Internet, e che l\'URL sia corretto.</string>
     <string name="version_unknown">Versione sconosciuta</string>
     <string name="default_pwd_name">Camping</string>
+    <string name="app_started">Application started</string>
+    <string name="g4_connected">G4 receiver is connected</string>
+    <string name="g4_disconnected">G4 has been disconnected</string>
+    <string name="invalid_mqtt_endpoint">Invalid mqtt url %s, please double check formatting.</string>
 </resources>

@@ -53,4 +53,17 @@ public class PreferencesValidatorTest extends RobolectricTestBase {
                         .get(),
                 is(getContext().getString(R.string.rest_uri_missing_token, "http://test.com/v1")));
     }
+
+    @Test
+    public void testValidateMqttEndpointSyntax_Valid() {
+        assertThat(PreferencesValidator.validateMqttEndpointSyntax(getContext(),
+                "mqtt://m10.cloudmqtt.com:23966").isPresent(), is(false));
+    }
+
+    @Test
+    public void testValidateMqttUriSyntax_Invalid() {
+        assertThat(PreferencesValidator.validateRestApiUriSyntax(getContext(), "\\invalid").get(),
+                is(getContext().getString(R.string.invalid_mqtt_endpoint, "\\invalid")));
+    }
+
 }
