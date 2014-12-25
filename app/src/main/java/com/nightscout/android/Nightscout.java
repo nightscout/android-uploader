@@ -8,7 +8,7 @@ import com.google.android.gms.analytics.Tracker;
 
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
-import org.acra.annotation.*;
+import org.acra.annotation.ReportsCrashes;
 
 @ReportsCrashes(
         formKey = "",
@@ -34,7 +34,7 @@ public class Nightscout extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-//        ACRA.init(this);
+        ACRA.init(this);
     }
 
     synchronized public Tracker getTracker() {

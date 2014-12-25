@@ -3,6 +3,7 @@ package com.nightscout.android.events;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
@@ -29,7 +30,8 @@ public class AndroidEventReporter implements EventReporter {
         return instance;
     }
 
-    public void report(EventType type, EventSeverity severity, String message) {
+    public synchronized void report(EventType type, EventSeverity severity, String message) {
+        Log.d("AndroidEventReporter", type.name() + " " + severity.name() + " " + message);
         ContentValues values = new ContentValues();
         values.put(EventsContract.EventEntry.COLUMN_NAME_TIME_STAMP,
                 new DateTime().toString(DateTimeFormat.forPattern("MM-dd HH:mm Z")));

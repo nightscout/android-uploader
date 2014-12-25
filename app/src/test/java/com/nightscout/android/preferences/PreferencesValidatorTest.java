@@ -62,7 +62,7 @@ public class PreferencesValidatorTest extends RobolectricTestBase {
 
     @Test
     public void testValidateMqttUriSyntax_Invalid() {
-        assertThat(PreferencesValidator.validateRestApiUriSyntax(getContext(), "\\invalid").get(),
+        assertThat(PreferencesValidator.validateMqttEndpointSyntax(getContext(), "\\invalid").get(),
                 is(getContext().getString(R.string.invalid_mqtt_endpoint, "\\invalid")));
     }
 

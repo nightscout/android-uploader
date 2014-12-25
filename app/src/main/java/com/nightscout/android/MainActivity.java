@@ -22,7 +22,6 @@ import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
@@ -33,18 +32,18 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.nightscout.android.dexcom.SyncingService;
 import com.nightscout.android.events.AndroidEventReporter;
-import com.nightscout.core.events.EventSeverity;
-import com.nightscout.core.events.EventType;
 import com.nightscout.android.events.UserEventPanelActivity;
 import com.nightscout.android.mqtt.AndroidMqttPinger;
 import com.nightscout.android.mqtt.AndroidMqttTimer;
-import com.nightscout.core.mqtt.MqttEventMgr;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.preferences.PreferencesValidator;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.android.wearables.Pebble;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
+import com.nightscout.core.events.EventSeverity;
+import com.nightscout.core.events.EventType;
+import com.nightscout.core.mqtt.MqttEventMgr;
 import com.nightscout.core.mqtt.MqttPinger;
 import com.nightscout.core.mqtt.MqttTimer;
 import com.nightscout.core.preferences.NightscoutPreferences;
@@ -66,8 +65,7 @@ import org.joda.time.Minutes;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.TimeZone;
 
 import static com.nightscout.core.dexcom.SpecialValue.getEGVSpecialValue;
 import static com.nightscout.core.dexcom.SpecialValue.isSpecialValue;
@@ -122,7 +120,7 @@ public class MainActivity extends Activity {
         ensureIUnderstandDialogDisplayed();
 
         // Add timezone ID to ACRA report
-//        ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
+        ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
 
         mTracker = ((Nightscout) getApplicationContext()).getTracker();
 
@@ -602,7 +600,12 @@ public class MainActivity extends Activity {
                 e.printStackTrace();
             }
         } else if (id == R.id.gap_sync) {
-            SyncingService.startActionSingleSync(getApplicationContext(), SyncingService.GAP_SYNC_PAGES);
+            SyncingService.startActionSingleSync(getApplicationContext(),
+                    SyncingService.GAP_SYNC_PAGES);
+        } else if (id == R.id.event_log) {
+            Intent intent = new Intent(getApplicationContext(), UserEventPanelActivity.class);
+            intent.putExtra("Filter", EventType.ALL.ordinal());
+            startActivity(intent);
         } else if (id == R.id.close_settings) {
             mHandler.removeCallbacks(syncCGM);
             finish();
@@ -617,7 +620,6 @@ public class MainActivity extends Activity {
         private ImageView mImageViewTimeIndicator;
         private ImageView mImageRcvrBattery;
         private TextView mRcvrBatteryLabel;
-        private ListView mListView;
         private boolean usbActive;
         private boolean uploadActive;
         private boolean displayTimeSync;
@@ -631,13 +633,12 @@ public class MainActivity extends Activity {
             mImageRcvrBattery = (ImageView) findViewById(R.id.imageViewRcvrBattery);
             mImageRcvrBattery.setImageResource(R.drawable.battery);
             mRcvrBatteryLabel = (TextView) findViewById(R.id.rcvrBatteryLabel);
-            mListView = (ListView) findViewById(R.id.listView);
 
             mImageViewUSB.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(getApplicationContext(), UserEventPanelActivity.class);
-                    intent.putExtra("Filter", EventType.APPLICATION.ordinal());
+                    intent.putExtra("Filter", EventType.DEVICE.ordinal());
                     startActivity(intent);
                 }
             });

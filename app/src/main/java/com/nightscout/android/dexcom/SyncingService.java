@@ -18,20 +18,26 @@ import com.nightscout.android.R;
 import com.nightscout.android.USB.USBPower;
 import com.nightscout.android.USB.UsbSerialDriver;
 import com.nightscout.android.USB.UsbSerialProber;
+import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.upload.Uploader;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.dexcom.records.*;
+import com.nightscout.core.dexcom.records.CalRecord;
+import com.nightscout.core.dexcom.records.EGVRecord;
+import com.nightscout.core.dexcom.records.GlucoseDataSet;
+import com.nightscout.core.dexcom.records.MeterRecord;
+import com.nightscout.core.dexcom.records.SensorRecord;
+import com.nightscout.core.events.EventReporter;
+import com.nightscout.core.events.EventSeverity;
+import com.nightscout.core.events.EventType;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.protobuf.G4Download;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-
-import com.nightscout.core.protobuf.G4Download;
-
 import org.json.JSONArray;
 
 import java.io.IOException;
@@ -65,6 +71,8 @@ public class SyncingService extends IntentService {
     public static final String RESPONSE_JSON = "myJSON";
     public static final String RESPONSE_BAT = "myBatLvl";
     public static final String RESPONSE_PROTO = "myProtoDownload";
+
+    private EventReporter reporter;
 
     private final String TAG = SyncingService.class.getSimpleName();
 
@@ -119,9 +127,9 @@ public class SyncingService extends IntentService {
      * parameters.
      */
     protected void handleActionSync(int numOfPages, Context context, UsbSerialDriver serialDriver) {
+        reporter = AndroidEventReporter.getReporter(context);
         boolean broadcastSent = false;
         AndroidPreferences preferences = new AndroidPreferences(context);
-//        boolean rootEnabled = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("root_support_enabled", false);
         Tracker tracker = ((Nightscout) context).getTracker();
 
         if (preferences.isRootEnabled()) USBPower.PowerOn();
@@ -212,7 +220,7 @@ public class SyncingService extends IntentService {
                 }
                 // FIXME (klee) these values should be stored only after we are sure the message has been delivered.
                 if (lastRecord != 0) {
-                    ((AndroidPreferences) preferences).setLastMeterMqttUpload(lastRecord);
+                    preferences.setLastMeterMqttUpload(lastRecord);
                 }
                 lastRecord = 0;
                 for (SensorRecord aRecord : sensorRecords) {
@@ -222,7 +230,7 @@ public class SyncingService extends IntentService {
                     }
                 }
                 if (lastRecord != 0) {
-                    ((AndroidPreferences) preferences).setLastSensorMqttUpload(lastRecord);
+                    preferences.setLastSensorMqttUpload(lastRecord);
                 }
                 lastRecord = 0;
                 for (CalRecord aRecord : calRecordsList) {
@@ -235,22 +243,30 @@ public class SyncingService extends IntentService {
                     }
                 }
                 if (lastRecord != 0) {
-                    ((AndroidPreferences) preferences).setLastCalMqttUpload(lastRecord);
+                    preferences.setLastCalMqttUpload(lastRecord);
                 }
                 broadcastSGVToUI(recentEGV, uploadStatus, nextUploadTime + TIME_SYNC_OFFSET,
                         displayTime, array, batLevel, builder.build().toByteArray());
                 broadcastSent = true;
+                reporter.report(EventType.DEVICE, EventSeverity.INFO,
+                        getApplicationContext().getString(R.string.event_sync_log));
             } catch (ArrayIndexOutOfBoundsException e) {
+                reporter.report(EventType.DEVICE, EventSeverity.ERROR,
+                        getApplicationContext().getString(R.string.event_fail_log));
                 Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Array Index out of bounds")
                         .setFatal(false)
                         .build());
             } catch (NegativeArraySizeException e) {
+                reporter.report(EventType.DEVICE, EventSeverity.ERROR,
+                        getApplicationContext().getString(R.string.event_fail_log));
                 Log.wtf("Negative array exception from receiver", e);
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Negative Array size")
                         .setFatal(false)
                         .build());
             } catch (IndexOutOfBoundsException e) {
+                reporter.report(EventType.DEVICE, EventSeverity.ERROR,
+                        getApplicationContext().getString(R.string.event_fail_log));
                 Log.wtf("IndexOutOfBounds exception from receiver", e);
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("IndexOutOfBoundsException")
                         .setFatal(false)
@@ -261,11 +277,15 @@ public class SyncingService extends IntentService {
                 // doesn't fail on other types of records. This means we'd need to broadcast back
                 // partial results to the UI. Adding it to a lower level could make the ReadData class
                 // more difficult to maintain - needs discussion.
+                reporter.report(EventType.DEVICE, EventSeverity.ERROR,
+                        getApplicationContext().getString(R.string.crc_fail_log));
                 Log.wtf("CRC failed", e);
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("CRC Failed")
                         .setFatal(false)
                         .build());
             } catch (Exception e) {
+                reporter.report(EventType.DEVICE, EventSeverity.ERROR,
+                        context.getString(R.string.unknown_fail_log));
                 Log.wtf("Unhandled exception caught", e);
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Catch all exception in handleActionSync")
                         .setFatal(false)

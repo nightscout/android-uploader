@@ -2,11 +2,9 @@ package com.nightscout.android.preferences;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.google.common.collect.Lists;
 import com.google.common.base.Joiner;
 import com.nightscout.android.R;
 import com.nightscout.core.preferences.NightscoutPreferences;
@@ -101,7 +99,7 @@ public class AndroidPreferences implements NightscoutPreferences {
 
     @Override
     public void setMqttEndpoint(String endpoint) {
-        preferences.edit().putString(PreferenceKeys.MQTT_ENDPOINT, endpoint);
+        preferences.edit().putString(PreferenceKeys.MQTT_ENDPOINT, endpoint).apply();
     }
 
     @Override

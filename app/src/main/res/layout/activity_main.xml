@@ -46,7 +46,10 @@
         android:layout_marginBottom="45dp"
         android:visibility="invisible"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/timeAgo"
         android:layout_below="@+id/timeAgo" />
 
     <WebView
@@ -57,6 +60,7 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/timeAgo"
         android:layout_alignEnd="@+id/timeAgo"
+        android:layout_alignRight="@+id/timeAgo"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="false"

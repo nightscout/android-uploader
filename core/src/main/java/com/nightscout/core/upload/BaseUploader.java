@@ -18,6 +18,7 @@ public abstract class BaseUploader {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final NightscoutPreferences preferences;
+    protected String identifier;
 
     protected abstract boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException;
 
@@ -120,6 +121,10 @@ public abstract class BaseUploader {
             log.error("Error uploading device status", e);
             return false;
         }
+    }
+
+    public String getIdentifier() {
+        return identifier;
     }
 
     protected NightscoutPreferences getPreferences() {

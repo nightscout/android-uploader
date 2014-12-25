@@ -16,7 +16,8 @@ public class UserEventPanelActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.event_panel);
         Intent intent = getIntent();
-        EventType eventType = EventType.values()[intent.getIntExtra("Filter", 0)];
+        EventType eventType = EventType.values()[intent.getIntExtra("Filter",
+                EventType.ALL.ordinal())];
         if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
             getActionBar().setTitle(String.format("%s Events",

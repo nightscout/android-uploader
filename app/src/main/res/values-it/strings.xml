@@ -72,4 +72,10 @@
     <string name="g4_connected">G4 receiver is connected</string>
     <string name="g4_disconnected">G4 has been disconnected</string>
     <string name="invalid_mqtt_endpoint">Invalid mqtt url %s, please double check formatting.</string>
+    <string name="event_log_menu_text">Event log</string>
+    <string name="event_sync_log">Receiver download complete</string>
+    <string name="crc_fail_log">CRC check failed. Will try again in 5 minutes</string>
+    <string name="unknown_fail_log">Unknown error encountered. Will try again in 5 minutes</string>
+    <string name="event_fail_log">Application error encountered while reading from receiver.</string>
+    <string name="event_success_upload">Successful upload to %s</string>
 </resources>

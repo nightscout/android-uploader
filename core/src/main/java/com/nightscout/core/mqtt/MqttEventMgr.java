@@ -1,9 +1,9 @@
 package com.nightscout.core.mqtt;
 
 import com.google.common.collect.Lists;
+import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
-import com.nightscout.core.events.EventReporter;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -12,6 +12,8 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Locale;
@@ -21,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrObservable,
         MqttTimerObserver {
+    protected final Logger log = LoggerFactory.getLogger(MqttEventMgr.class);
     private final static String TAG = MqttEventMgr.class.getSimpleName();
     private List<MqttMgrObserver> observers = Lists.newArrayList();
     private MqttClient client;
@@ -46,6 +49,7 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
 
     public void connect() {
         try {
+            log.info("MQTT connect issued");
             client.connect(options);
             reporter.report(EventType.UPLOADER, EventSeverity.INFO,
                     messages.getString("mqtt_connected"));
@@ -56,6 +60,7 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
             state = MqttConnectionState.CONNECTED;
         } catch (MqttSecurityException e) {
             // TODO: Determine how to notify user
+            log.info("MQTT security issue");
             reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
                     messages.getString("mqtt_invalid_credentials"));
             if (timer.isActive()) {
@@ -74,17 +79,24 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
     }
 
     public void delayedReconnect(long delayMs) {
-        ;
+        if (state == MqttConnectionState.RECONNECTING) {
+            return;
+        }
+        log.info("MQTT delayed reconnect");
         if (!timer.isActive()) {
             timer.registerObserver(this);
             timer.activate();
         }
         timer.setTimer(delayMs);
         state = MqttConnectionState.RECONNECTING;
+        log.info(messages.getString("mqtt_reconnect"));
+        reporter.report(EventType.UPLOADER, EventSeverity.INFO,
+                messages.getString("mqtt_reconnect"));
     }
 
     public void reconnect() {
         if (pinger.isNetworkActive()) {
+            log.info("MQTT issuing reconnect");
             disconnect();
             connect();
         } else {
@@ -98,6 +110,7 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
         try {
             if (client.isConnected()) {
                 client.disconnect();
+                log.info(messages.getString("mqtt_disconnected"));
                 reporter.report(EventType.UPLOADER, EventSeverity.INFO,
                         messages.getString("mqtt_disconnected"));
             }
@@ -105,6 +118,7 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
             pinger.stop();
         } catch (MqttException e) {
             // TODO: determine how to handle this
+            log.info(messages.getString("mqtt_disconnect_fail"));
             reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
                     messages.getString("mqtt_disconnect_fail"));
         }
@@ -115,10 +129,12 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
         try {
             disconnect();
             client.close();
+            log.info(messages.getString("mqtt_close"));
             reporter.report(EventType.UPLOADER, EventSeverity.INFO,
                     messages.getString("mqtt_close"));
         } catch (MqttException e) {
             // TODO: determine how to handle this
+            log.info(messages.getString("mqtt_close_fail"));
             reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
                     messages.getString("mqtt_close_fail"));
         }
@@ -129,29 +145,31 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
 
     @Override
     public void onFailedPing() {
+        log.info(messages.getString("mqtt_ping_fail"));
         reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
                 messages.getString("mqtt_ping_fail"));
-//        notifyOnDisconnect();
-//        delayedReconnect();
+        notifyOnDisconnect();
+        delayedReconnect();
     }
 
     @Override
     public void timerUp() {
-        reporter.report(EventType.UPLOADER, EventSeverity.INFO,
-                messages.getString("mqtt_reconnect"));
         reconnect();
     }
 
-    // Test Everything after this
     @Override
     public void connectionLost(Throwable cause) {
         if (state != MqttConnectionState.CONNECTED) {
             return;
         }
+        log.info(messages.getString("mqtt_lost_connection"));
+
         reporter.report(EventType.UPLOADER, EventSeverity.WARN,
                 messages.getString("mqtt_lost_connection"));
-        notifyOnDisconnect();
-        delayedReconnect();
+        if (state != MqttConnectionState.RECONNECTING) {
+            notifyOnDisconnect();
+            delayedReconnect();
+        }
     }
 
     public boolean isConnected() {
@@ -201,6 +219,7 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
                 // TODO: Determine what to do here
                 reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
                         messages.getString("mqtt_subscribe_fail"));
+                log.info(e.getMessage());
                 // FIXME: a bit heavy handed here. Need to inspect error code to determine correct
                 // actions
                 if (!willReconnect) {
