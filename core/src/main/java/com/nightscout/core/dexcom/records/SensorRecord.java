@@ -1,11 +1,12 @@
 package com.nightscout.core.dexcom.records;
 
 import com.google.common.base.Optional;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.protobuf.G4Download;
+import com.nightscout.core.protobuf.CookieMonsterG4Sensor;
+import com.squareup.wire.Wire;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
@@ -64,21 +65,22 @@ public class SensorRecord extends GenericTimestampRecord {
         return rssi;
     }
 
-    public G4Download.CookieMonsterG4Sensor toProtobuf() {
-        G4Download.CookieMonsterG4Sensor.Builder builder = G4Download.CookieMonsterG4Sensor.newBuilder();
-        return builder.setTimestampSec(rawSystemTimeSeconds)
-                .setRssi(rssi)
-                .setFiltered(filtered)
-                .setUnfiltered(unfiltered)
+    public CookieMonsterG4Sensor toProtobuf() {
+        CookieMonsterG4Sensor.Builder builder = new CookieMonsterG4Sensor.Builder();
+        return builder.timestamp_sec(rawSystemTimeSeconds)
+                .rssi(rssi)
+                .filtered(filtered)
+                .unfiltered(unfiltered)
                 .build();
 
     }
 
     public Optional<SensorRecord> fromProtoBuf(byte[] byteArray) {
         try {
-            G4Download.CookieMonsterG4Sensor record = G4Download.CookieMonsterG4Sensor.parseFrom(byteArray);
-            return Optional.of(new SensorRecord(record.getUnfiltered(), record.getFiltered(), record.getRssi(), record.getTimestampSec()));
-        } catch (InvalidProtocolBufferException e) {
+            Wire wire = new Wire();
+            CookieMonsterG4Sensor record = wire.parseFrom(byteArray, CookieMonsterG4Sensor.class);
+            return Optional.of(new SensorRecord(record.unfiltered, record.filtered, record.rssi, record.timestamp_sec));
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return Optional.absent();

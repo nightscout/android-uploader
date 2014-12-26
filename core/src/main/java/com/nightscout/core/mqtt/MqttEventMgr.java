@@ -1,6 +1,7 @@
 package com.nightscout.core.mqtt;
 
 import com.google.common.collect.Lists;
+import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
@@ -237,6 +238,9 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
     public void publish(byte[] message, String topic, int QOS) {
         try {
             client.publish(topic, message, QOS, true);
+            reporter.report(EventType.UPLOADER, EventSeverity.INFO,
+                    messages.getString("mqtt_publish_success"));
+            log.info("MainActivity: Published \"" + Utils.bytesToHex(message) + "\" to \"" + topic + "\"");
         } catch (MqttException e) {
             // TODO: Determine what to do here
             reporter.report(EventType.UPLOADER, EventSeverity.ERROR,

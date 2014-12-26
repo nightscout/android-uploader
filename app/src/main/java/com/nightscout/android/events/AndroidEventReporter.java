@@ -34,7 +34,7 @@ public class AndroidEventReporter implements EventReporter {
         Log.d("AndroidEventReporter", type.name() + " " + severity.name() + " " + message);
         ContentValues values = new ContentValues();
         values.put(EventsContract.EventEntry.COLUMN_NAME_TIME_STAMP,
-                new DateTime().toString(DateTimeFormat.forPattern("MM-dd HH:mm Z")));
+                new DateTime().toString(DateTimeFormat.forPattern("MM-dd HH:mm:ss Z")));
         values.put(EventsContract.EventEntry.COLUMN_NAME_EVENT_TYPE, type.ordinal());
         values.put(EventsContract.EventEntry.COLUMN_NAME_SEVERITY, severity.name());
         values.put(EventsContract.EventEntry.COLUMN_NAME_MESSAGE, message);

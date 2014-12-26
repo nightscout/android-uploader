@@ -3,6 +3,7 @@ package com.nightscout.android.barcode;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+
 import com.google.common.collect.Lists;
 import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -11,11 +12,10 @@ import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.android.test.RobolectricTestBase;
 import com.nightscout.core.preferences.NightscoutPreferences;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowPreferenceManager;
 
@@ -25,7 +25,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 @Config(emulateSdk = 16)
-@RunWith(RobolectricTestRunner.class)
 public class AndroidBarcodeTest extends RobolectricTestBase {
     Activity activity;
     SharedPreferences sharedPrefs;

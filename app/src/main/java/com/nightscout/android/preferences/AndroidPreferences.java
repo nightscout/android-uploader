@@ -8,7 +8,7 @@ import android.preference.PreferenceManager;
 import com.google.common.base.Joiner;
 import com.nightscout.android.R;
 import com.nightscout.core.preferences.NightscoutPreferences;
-import com.nightscout.core.protobuf.G4Download;
+import com.nightscout.core.protobuf.GlucoseUnit;
 import com.nightscout.core.utils.RestUriUtils;
 
 import java.util.List;
@@ -136,14 +136,14 @@ public class AndroidPreferences implements NightscoutPreferences {
     }
 
     @Override
-    public G4Download.GlucoseUnit getPreferredUnits() {
+    public GlucoseUnit getPreferredUnits() {
         return preferences.getString(PreferenceKeys.PREFERRED_UNITS, "0").equals("0")
-                ? G4Download.GlucoseUnit.MGDL : G4Download.GlucoseUnit.MMOL;
+                ? GlucoseUnit.MGDL : GlucoseUnit.MMOL;
     }
 
     @Override
-    public void setPreferredUnits(G4Download.GlucoseUnit units) {
-        String unitString = (units == G4Download.GlucoseUnit.MGDL) ? "0" : "1";
+    public void setPreferredUnits(GlucoseUnit units) {
+        String unitString = (units == GlucoseUnit.MGDL) ? "0" : "1";
         preferences.edit().putString(PreferenceKeys.PREFERRED_UNITS, unitString).apply();
     }
 

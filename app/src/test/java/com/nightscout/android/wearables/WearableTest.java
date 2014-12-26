@@ -1,10 +1,12 @@
 package com.nightscout.android.wearables;
 
 import android.content.Intent;
+
 import com.getpebble.android.kit.util.PebbleDictionary;
 import com.nightscout.android.MainActivity;
 import com.nightscout.android.test.RobolectricTestBase;
 import com.nightscout.core.dexcom.TrendArrow;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.robolectric.Robolectric;

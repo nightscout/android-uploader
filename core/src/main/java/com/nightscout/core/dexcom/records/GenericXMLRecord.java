@@ -7,20 +7,17 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
-import java.io.StringReader;
-import java.util.Arrays;
-
-public class GenericXMLRecord extends GenericTimestampRecord {
+public class GenericXMLRecord {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     int XML_START = 8;
     int XML_END = 241;
@@ -30,9 +27,9 @@ public class GenericXMLRecord extends GenericTimestampRecord {
     private Element xmlElement;
 
     public GenericXMLRecord(byte[] packet) {
-        super(packet);
         Document document;
-        // TODO: it would be best if we could just remove /x00 characters and read till end
+        // May not be correct. Looking for a null terminated string here. Sometimes the receiver
+        // has leading nulls that might lead to truncating the xml document.
         String xml = new String(Arrays.copyOfRange(packet, XML_START, XML_END));
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder;
@@ -40,8 +37,8 @@ public class GenericXMLRecord extends GenericTimestampRecord {
             builder = factory.newDocumentBuilder();
             document = builder.parse(new InputSource(new StringReader(xml)));
             xmlElement = document.getDocumentElement();
-        } catch (Exception e) {
-            // TODO(trhodeos): DONT DO THIS
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            // TODO: report to events.
             log.error(TAG, "Unable to build xml element", e);
         }
     }

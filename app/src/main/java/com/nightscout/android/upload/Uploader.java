@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.common.collect.Lists;
 import com.mongodb.MongoClientURI;
+import com.mongodb.MongoException;
 import com.nightscout.android.MainActivity;
 import com.nightscout.android.R;
 import com.nightscout.android.ToastReceiver;
@@ -130,18 +131,30 @@ public class Uploader {
         for (BaseUploader uploader : uploaders) {
             // TODO(klee): capture any exceptions here so that all configured uploaders will attempt
             // to upload
-            allSuccessful &= uploader.uploadGlucoseDataSets(glucoseDataSets);
-            allSuccessful &= uploader.uploadMeterRecords(meterRecords);
-            allSuccessful &= uploader.uploadCalRecords(calRecords);
-            allSuccessful &= uploader.uploadDeviceStatus(deviceStatus);
-            reporter.report(EventType.UPLOADER, EventSeverity.INFO,
-                    String.format(context.getString(R.string.event_success_upload),
-                            uploader.getIdentifier()));
+            try {
+                allSuccessful &= uploader.uploadGlucoseDataSets(glucoseDataSets);
+                allSuccessful &= uploader.uploadMeterRecords(meterRecords);
+                allSuccessful &= uploader.uploadCalRecords(calRecords);
+                allSuccessful &= uploader.uploadDeviceStatus(deviceStatus);
+                reporter.report(EventType.UPLOADER, EventSeverity.INFO,
+                        String.format(context.getString(R.string.event_success_upload),
+                                uploader.getIdentifier()));
+            } catch (MongoException e) {
+                if (e.getCode() == 18) {
+                    reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
+                            context.getString(R.string.event_mongo_invalid_credentials));
+                } else {
+                    reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
+                            String.format(context.getString(R.string.event_fail_upload),
+                                    uploader.getIdentifier()));
+                }
+                allSuccessful &= false;
+            }
         }
 
         // Force a failure if an uploader was not properly initialized, but only after the other
         // uploaders were executed.
-        return allUploadersInitalized && allSuccessful;
+        return allUploadersInitalized && allSuccessful && uploaders.size() != 0;
     }
 
     protected List<BaseUploader> getUploaders() {

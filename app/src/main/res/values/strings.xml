@@ -76,4 +76,6 @@
     <string name="unknown_fail_log">Unknown error encountered. Will try again in 5 minutes</string>
     <string name="event_fail_log">Application error encountered while reading from receiver.</string>
     <string name="event_success_upload">Successful upload to %s</string>
+    <string name="event_fail_upload">Upload to %s has failed</string>
+    <string name="event_mongo_invalid_credentials">Please double check your Mongo username and password.</string>
 </resources>

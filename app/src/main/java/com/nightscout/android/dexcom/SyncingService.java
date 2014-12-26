@@ -33,7 +33,14 @@ import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
 import com.nightscout.core.preferences.NightscoutPreferences;
-import com.nightscout.core.protobuf.G4Download;
+import com.nightscout.core.protobuf.CookieMonsterG4Cal;
+import com.nightscout.core.protobuf.CookieMonsterG4Download;
+import com.nightscout.core.protobuf.CookieMonsterG4Meter;
+import com.nightscout.core.protobuf.CookieMonsterG4SGV;
+import com.nightscout.core.protobuf.CookieMonsterG4Sensor;
+import com.nightscout.core.protobuf.DownloadStatus;
+import com.nightscout.core.protobuf.GlucoseUnit;
+import com.nightscout.core.protobuf.Noise;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
@@ -155,6 +162,8 @@ public class SyncingService extends IntentService {
                 List<CalRecord> calRecordsList = Lists.newArrayList(calRecords);
 
                 long timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
+                reporter.report(EventType.DEVICE, EventSeverity.INFO,
+                        getApplicationContext().getString(R.string.event_sync_log));
                 // TODO: determine if the logic here is correct. I suspect it assumes the last record was less than 5
                 // minutes ago. If a reading is skipped and the device is plugged in then nextUploadTime will be
                 // set to a negative number. This situation will eventually correct itself.
@@ -190,66 +199,72 @@ public class SyncingService extends IntentService {
                 DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
                 String iso8601Str = fmt.print(dt);
 
-                G4Download.CookieMonsterG4Download.Builder builder = G4Download.CookieMonsterG4Download.newBuilder();
-                builder.setDownloadTimestamp(iso8601Str)
-                        .setDownloadStatus(G4Download.DownloadStatus.SUCCESS)
-                        .setReceiverBattery(batLevel)
-                        .setUploaderBattery(MainActivity.batLevel)
-                        .setUnits(G4Download.GlucoseUnit.MGDL);
+                CookieMonsterG4Download.Builder builder = new CookieMonsterG4Download.Builder();
+                builder.download_timestamp(iso8601Str)
+                        .download_status(DownloadStatus.SUCCESS)
+                        .receiver_battery(batLevel)
+                        .uploader_battery(MainActivity.batLevel)
+                        .units(GlucoseUnit.MGDL);
 
                 long egvTime = preferences.getLastEgvMqttUpload();
                 long meterTime = preferences.getLastMeterMqttUpload();
                 long sensorTime = preferences.getLastSensorMqttUpload();
                 long calTime = preferences.getLastCalMqttUpload();
                 long lastRecord = 0;
+                List<CookieMonsterG4SGV> sgvList = Lists.newArrayList();
                 for (EGVRecord aRecord : recentRecords) {
                     if (aRecord.getSystemTimeSeconds() > egvTime) {
-                        builder.addSgv(aRecord.toProtobuf());
+                        sgvList.add(aRecord.toProtobuf());
                         lastRecord = aRecord.getSystemTimeSeconds();
                     }
                 }
+                builder.sgv(sgvList);
                 if (lastRecord != 0) {
                     preferences.setLastEgvMqttUpload(lastRecord);
                 }
                 lastRecord = 0;
+                List<CookieMonsterG4Meter> meterRecordList = Lists.newArrayList();
                 for (MeterRecord aRecord : meterRecords) {
                     if (aRecord.getSystemTimeSeconds() > meterTime) {
-                        builder.addMeter(aRecord.toProtobuf());
+                        meterRecordList.add(aRecord.toProtobuf());
                         lastRecord = aRecord.getSystemTimeSeconds();
                     }
                 }
+                builder.meter(meterRecordList);
                 // FIXME (klee) these values should be stored only after we are sure the message has been delivered.
                 if (lastRecord != 0) {
                     preferences.setLastMeterMqttUpload(lastRecord);
                 }
                 lastRecord = 0;
+                List<CookieMonsterG4Sensor> sensorList = Lists.newArrayList();
                 for (SensorRecord aRecord : sensorRecords) {
                     if (aRecord.getSystemTimeSeconds() > sensorTime) {
-                        builder.addSensor(aRecord.toProtobuf());
+                        sensorList.add(aRecord.toProtobuf());
                         lastRecord = aRecord.getSystemTimeSeconds();
                     }
                 }
+                builder.sensor(sensorList);
                 if (lastRecord != 0) {
                     preferences.setLastSensorMqttUpload(lastRecord);
                 }
                 lastRecord = 0;
+                List<CookieMonsterG4Cal> calList = Lists.newArrayList();
                 for (CalRecord aRecord : calRecordsList) {
                     if (aRecord == null) {
                         break;
                     }
                     if (aRecord.getSystemTimeSeconds() > calTime) {
-                        builder.addCal(aRecord.toProtoBuf());
+                        calList.add(aRecord.toProtobuf());
                         lastRecord = aRecord.getSystemTimeSeconds();
                     }
                 }
+                builder.cal(calList);
                 if (lastRecord != 0) {
                     preferences.setLastCalMqttUpload(lastRecord);
                 }
                 broadcastSGVToUI(recentEGV, uploadStatus, nextUploadTime + TIME_SYNC_OFFSET,
                         displayTime, array, batLevel, builder.build().toByteArray());
                 broadcastSent = true;
-                reporter.report(EventType.DEVICE, EventSeverity.INFO,
-                        getApplicationContext().getString(R.string.event_sync_log));
             } catch (ArrayIndexOutOfBoundsException e) {
                 reporter.report(EventType.DEVICE, EventSeverity.ERROR,
                         getApplicationContext().getString(R.string.event_fail_log));
@@ -359,7 +374,6 @@ public class SyncingService extends IntentService {
     public void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus,
                                  long nextUploadTime, long displayTime,
                                  JSONArray json, int batLvl, byte[] proto) {
-        Log.d(TAG, "Current EGV: " + egvRecord.getBgMgdl());
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -379,8 +393,8 @@ public class SyncingService extends IntentService {
     }
 
     protected void broadcastSGVToUI() {
-        EGVRecord record = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(), G4Download.Noise.NO_NOISE);
-        broadcastSGVToUI(record, false, standardMinutes(5).getMillis() + TIME_SYNC_OFFSET, new Date().getTime(), null, 0, new byte[0]);
+        EGVRecord record = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(), Noise.NOISE_NONE);
+        broadcastSGVToUI(record, false, standardMinutes(5).getMillis() + TIME_SYNC_OFFSET, new Date().getTime(), null, 0, null);
     }
 
 }
