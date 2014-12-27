@@ -163,7 +163,7 @@ public class SyncingService extends IntentService {
 
                 long timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
                 reporter.report(EventType.DEVICE, EventSeverity.INFO,
-                        getApplicationContext().getString(R.string.event_sync_log));
+                        context.getString(R.string.event_sync_log));
                 // TODO: determine if the logic here is correct. I suspect it assumes the last record was less than 5
                 // minutes ago. If a reading is skipped and the device is plugged in then nextUploadTime will be
                 // set to a negative number. This situation will eventually correct itself.
