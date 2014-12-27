@@ -1,7 +1,7 @@
 android-uploader
 ====================
-[![Build Status](https://travis-ci.org/nightscout/cgm-remote-monitor.png)](https://travis-ci.org/nightscout/android-uploader)
-[![codecov.io](https://codecov.io/github/nightscout/android-uploader/coverage.svg?branch=master)](https://codecov.io/github/nightscout/android-uploader?branch=master)
+[![Build Status](https://travis-ci.org/nightscout/cgm-remote-monitor.png)](https://travis-ci.org/nightscout/android-uploader?branch=dev)
+[![codecov.io](https://codecov.io/github/nightscout/android-uploader/coverage.svg?branch=master)](https://codecov.io/github/nightscout/android-uploader?branch=dev)
 [![Gitter chat](https://badges.gitter.im/nightscout.png)](https://gitter.im/nightscout/public)
 
 <a href="https://play.google.com/store/apps/details?id=com.nightscout.android"><img alt="Android app on Google Play" src="https://developer.android.com/images/brand/en_app_rgb_wo_45.png" />

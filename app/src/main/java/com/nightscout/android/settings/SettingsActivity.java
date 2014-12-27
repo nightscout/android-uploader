@@ -1,5 +1,9 @@
 package com.nightscout.android.settings;
 
+import com.google.common.base.Optional;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -13,9 +17,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
-import com.google.common.base.Optional;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
 import com.nightscout.android.R;
 import com.nightscout.android.barcode.AndroidBarcode;
 import com.nightscout.android.preferences.AndroidPreferences;
@@ -169,7 +170,5 @@ public class SettingsActivity extends FragmentActivity {
 
 
         }
-
-
     }
 }
