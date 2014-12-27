@@ -229,7 +229,6 @@ public class MainActivity extends Activity {
 
         try {
             setupMqtt();
-            mqttManager.connect();
             mSyncButton.setBackgroundResource(R.drawable.ic_cloud);
         } catch (MqttException e) {
             mSyncButton.setBackgroundResource(R.drawable.ic_nocloud);
@@ -251,6 +250,8 @@ public class MainActivity extends Activity {
                 MqttPinger pinger = new AndroidMqttPinger(getApplicationContext(), 0, client, 150000);
                 MqttTimer timer = new AndroidMqttTimer(getApplicationContext(), 0);
                 mqttManager = new MqttEventMgr(client, mqttOptions, pinger, timer, reporter);
+                mqttManager.connect();
+                mSyncButton.setBackgroundResource(R.drawable.ic_cloud);
             }
         }
     }
@@ -369,15 +370,11 @@ public class MainActivity extends Activity {
                 if (mqttOptsChanged) {
                     mqttManager.disconnect();
                     setupMqtt();
-                    mqttManager.connect();
-                    mSyncButton.setBackgroundResource(R.drawable.ic_cloud);
                 }
             }
 
             if ((mqttManager == null || !mqttManager.isConnected()) && preferences.isMqttEnabled()) {
                 setupMqtt();
-                mqttManager.connect();
-                mSyncButton.setBackgroundResource(R.drawable.ic_cloud);
             }
 
             if (mqttManager != null && mqttManager.isConnected() && !preferences.isMqttEnabled()) {
