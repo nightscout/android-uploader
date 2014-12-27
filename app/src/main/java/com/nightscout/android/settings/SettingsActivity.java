@@ -12,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
@@ -29,14 +28,20 @@ import com.nightscout.core.utils.RestUriUtils;
 import java.util.List;
 
 public class SettingsActivity extends FragmentActivity {
+    private MainPreferenceFragment mainPreferenceFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
 
-        // Display the fragment as the main content.
-        getFragmentManager().beginTransaction().replace(android.R.id.content,
-                new MainPreferenceFragment()).commit();
+        refreshFragments();
+    }
+
+    private void refreshFragments() {
+      mainPreferenceFragment = new MainPreferenceFragment();
+      getFragmentManager().beginTransaction().replace(android.R.id.content,
+                                                      mainPreferenceFragment).commit();
     }
 
     private void setupActionBar() {
@@ -66,17 +71,16 @@ public class SettingsActivity extends FragmentActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        NightscoutPreferences prefs = new AndroidPreferences(getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
+        NightscoutPreferences prefs = new AndroidPreferences(this);
         if (scanResult != null && scanResult.getContents() != null) {
-            NSBarcodeConfig barcode = new NSBarcodeConfig(scanResult.getContents(), prefs);
+            NSBarcodeConfig barcode = new NSBarcodeConfig(scanResult.getContents());
             if (barcode.hasMongoConfig()) {
                 prefs.setMongoUploadEnabled(true);
                 if (barcode.getMongoUri().isPresent()) {
                     prefs.setMongoClientUri(barcode.getMongoUri().get());
-                    prefs.setMongoCollection(
-                            barcode.getMongoCollection().or(getApplicationContext().getString(R.string.pref_default_mongodb_collection)));
+                    prefs.setMongoCollection(barcode.getMongoCollection().orNull());
                     prefs.setMongoDeviceStatusCollection(
-                            barcode.getMongoDeviceStatusCollection().or(getApplicationContext().getString(R.string.pref_default_mongodb_device_status_collection)));
+                        barcode.getMongoDeviceStatusCollection().orNull());
                 }
             } else {
                 prefs.setMongoUploadEnabled(false);
@@ -87,6 +91,7 @@ public class SettingsActivity extends FragmentActivity {
             } else {
                 prefs.setRestApiEnabled(false);
             }
+            refreshFragments();
         }
     }
 
@@ -102,7 +107,7 @@ public class SettingsActivity extends FragmentActivity {
 
         private void setupVersionNumbers() {
             try {
-                PackageInfo pInfo = null;
+                PackageInfo pInfo;
                 pInfo = getActivity().getPackageManager().getPackageInfo(
                         getActivity().getPackageName(), 0);
                 findPreference("about_version_number").setSummary(pInfo.versionName);
