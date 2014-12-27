@@ -61,7 +61,7 @@
             android:disableDependentsState="false"
             android:summary="@string/pref_summary_api_enabled" />
 
-        <EditTextPreference
+        <com.nightscout.android.settings.SummaryBoundEditTextPreference
             android:dependency="cloud_storage_api_enable"
             android:title="@string/pref_title_api_url"
             android:key="cloud_storage_api_base"
@@ -81,7 +81,7 @@
             android:disableDependentsState="false"
             android:summary="@string/pref_summary_mongodb_enabled" />
 
-        <EditTextPreference
+        <com.nightscout.android.settings.SummaryBoundEditTextPreference
             android:dependency="cloud_storage_mongodb_enable"
             android:title="@string/pref_title_mongodb_uri"
             android:key="cloud_storage_mongodb_uri"
@@ -89,7 +89,7 @@
             android:dialogMessage="@string/pref_message_mongodb_uri"
             android:hint="@string/pref_default_mongodb_uri" />
 
-        <EditTextPreference
+        <com.nightscout.android.settings.SummaryBoundEditTextPreference
             android:dependency="cloud_storage_mongodb_enable"
             android:title="@string/pref_title_mongodb_collection"
             android:key="cloud_storage_mongodb_collection"
@@ -97,7 +97,7 @@
             android:dialogMessage="@string/pref_message_mongodb_collection"
             android:defaultValue="@string/pref_default_mongodb_collection" />
 
-        <EditTextPreference
+        <com.nightscout.android.settings.SummaryBoundEditTextPreference
             android:dependency="cloud_storage_mongodb_enable"
             android:title="@string/pref_title_mongodb_device_status_collection"
             android:key="cloud_storage_mongodb_device_status_collection"
@@ -183,8 +183,8 @@
             android:title="@string/pref_enable_acra"
             android:summaryOn="@string/acra_enabled_summary"
             android:summaryOff="@string/acra_disabled_summary"
-            android:defaultValue="true" />
-        <EditTextPreference
+            android:defaultValue="true"/>
+        <com.nightscout.android.settings.SummaryBoundEditTextPreference
             android:key="acra.user.email"
             android:dependency="acra.enable"
             android:title="@string/pref_acra_user_email"
