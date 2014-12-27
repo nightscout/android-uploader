@@ -3,6 +3,7 @@ package com.nightscout.android.barcode;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+
 import com.google.common.collect.Lists;
 import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -11,6 +12,7 @@ import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.android.test.RobolectricTestBase;
 import com.nightscout.core.preferences.NightscoutPreferences;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,7 +83,12 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
 
     private void fakeActivityResult(){
         Intent intent = createFakeScanIntent(jsonConfig);
-        new SettingsActivity().onActivityResult(IntentIntegrator.REQUEST_CODE, Activity.RESULT_OK, intent);
+        SettingsActivity activity = Robolectric.buildActivity(SettingsActivity.class)
+                .create()
+                .start()
+                .resume()
+                .get();
+        activity.onActivityResult(IntentIntegrator.REQUEST_CODE, Activity.RESULT_OK, intent);
     }
 
     @Test

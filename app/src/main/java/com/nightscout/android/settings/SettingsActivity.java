@@ -1,9 +1,5 @@
 package com.nightscout.android.settings;
 
-import com.google.common.base.Optional;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +12,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
+import com.google.common.base.Optional;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.nightscout.android.R;
 import com.nightscout.android.barcode.AndroidBarcode;
 import com.nightscout.android.preferences.AndroidPreferences;
@@ -71,9 +70,7 @@ public class SettingsActivity extends FragmentActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        NightscoutPreferences prefs = new AndroidPreferences(
-            this,
-            mainPreferenceFragment.getPreferenceManager().getSharedPreferences());
+        NightscoutPreferences prefs = new AndroidPreferences(this);
         if (scanResult != null && scanResult.getContents() != null) {
             NSBarcodeConfig barcode = new NSBarcodeConfig(scanResult.getContents());
             if (barcode.hasMongoConfig()) {
@@ -109,7 +106,7 @@ public class SettingsActivity extends FragmentActivity {
 
         private void setupVersionNumbers() {
             try {
-                PackageInfo pInfo = null;
+                PackageInfo pInfo;
                 pInfo = getActivity().getPackageManager().getPackageInfo(
                         getActivity().getPackageName(), 0);
                 findPreference("about_version_number").setSummary(pInfo.versionName);
