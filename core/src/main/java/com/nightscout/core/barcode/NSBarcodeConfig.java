@@ -2,7 +2,6 @@ package com.nightscout.core.barcode;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
-import com.nightscout.core.preferences.NightscoutPreferences;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,10 +17,8 @@ import java.util.List;
 public class NSBarcodeConfig {
     protected static final Logger log = LoggerFactory.getLogger(NSBarcodeConfig.class);
     private JSONObject config = new JSONObject();
-    private NightscoutPreferences prefs;
 
-    public NSBarcodeConfig(String decodeResults, NightscoutPreferences prefs) {
-        this.prefs = prefs;
+    public NSBarcodeConfig(String decodeResults) {
         configureBarcode(decodeResults);
     }
 
@@ -72,8 +69,8 @@ public class NSBarcodeConfig {
         return apiUris;
     }
 
-    public Optional<String> getMongoCollection(){
-        if (! hasMongoConfig()) {
+    public Optional<String> getMongoCollection() {
+        if (!hasMongoConfig()) {
             return Optional.absent();
         }
         String mongoCollection = null;

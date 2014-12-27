@@ -80,7 +80,12 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
 
     private void fakeActivityResult(){
         Intent intent = createFakeScanIntent(jsonConfig);
-        new SettingsActivity().onActivityResult(IntentIntegrator.REQUEST_CODE, Activity.RESULT_OK, intent);
+        SettingsActivity activity = Robolectric.buildActivity(SettingsActivity.class)
+                .create()
+                .start()
+                .resume()
+                .get();
+        activity.onActivityResult(IntentIntegrator.REQUEST_CODE, Activity.RESULT_OK, intent);
     }
 
     @Test
