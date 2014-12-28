@@ -25,11 +25,6 @@ import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
 
-import java.util.Map;
-
-//import com.hoho.android.usbserial.driver.Cp2102SerialDriver;
-//import com.hoho.android.usbserial.driver.FtdiSerialDriver;
-
 /**
  * Helper class to assist in detecting and building {@link UsbSerialDriver}
  * instances from available hardware.
@@ -38,52 +33,16 @@ import java.util.Map;
  */
 public enum UsbSerialProber {
 
-    /**
-     * Prober for {@link FtdiSerialDriver}.
-     *
-     * @see FtdiSerialDriver
-     */
-/*    FTDI_SERIAL {
-        @Override
-        public UsbSerialDriver getDevice(final UsbManager manager, final UsbDevice usbDevice) {
-            if (!testIfSupported(usbDevice, FtdiSerialDriver.getSupportedDevices())) {
-                return null;
-            }
-            final UsbDeviceConnection connection = manager.openDevice(usbDevice);
-            if (connection == null) {
-                return null;
-            }
-            return new FtdiSerialDriver(usbDevice, connection);
-        }
-    },*/
-
     CDC_ACM_SERIAL {
         @Override
         public UsbSerialDriver getDevice(UsbManager manager, UsbDevice usbDevice) {
-//            if (!testIfSupported(usbDevice, CdcAcmSerialDriver.getSupportedDevices())) {
-//               return null;
-//            }
             final UsbDeviceConnection connection = manager.openDevice(usbDevice);
             if (connection == null) {
                 return null;
             }
             return new CdcAcmSerialDriver(usbDevice, connection);
         }
-    }; //,
-    
-/*    SILAB_SERIAL {
-        @Override
-        public UsbSerialDriver getDevice(final UsbManager manager, final UsbDevice usbDevice) {
-            if (!testIfSupported(usbDevice, Cp2102SerialDriver.getSupportedDevices())) {
-                return null;
-            }
-            final UsbDeviceConnection connection = manager.openDevice(usbDevice);
-            if (connection == null) {
-                return null;
-            }
-            return new Cp2102SerialDriver(usbDevice, connection);
-        }
-    };*/
+    };
 
     private static final String TAG = UsbSerialProber.class.getSimpleName();
 
@@ -92,10 +51,10 @@ public enum UsbSerialProber {
      * returns <code>null</code> if it could not be built (for example, if the
      * probe failed).
      *
-     * @param manager the {@link android.hardware.usb.UsbManager} to use
+     * @param manager   the {@link android.hardware.usb.UsbManager} to use
      * @param usbDevice the raw {@link android.hardware.usb.UsbDevice} to use
      * @return the first available {@link UsbSerialDriver}, or {@code null} if
-     *         no devices could be acquired
+     * no devices could be acquired
      */
     public abstract UsbSerialDriver getDevice(final UsbManager manager, final UsbDevice usbDevice);
 
@@ -106,7 +65,7 @@ public enum UsbSerialProber {
      *
      * @param usbManager the {@link android.hardware.usb.UsbManager} to use
      * @return the first available {@link UsbSerialDriver}, or {@code null} if
-     *         no devices could be acquired
+     * no devices could be acquired
      */
     public static UsbSerialDriver acquire(final UsbManager usbManager) {
         for (final UsbDevice usbDevice : usbManager.getDeviceList().values()) {
@@ -124,9 +83,9 @@ public enum UsbSerialProber {
      * device.
      *
      * @param usbManager the {@link android.hardware.usb.UsbManager} to use
-     * @param usbDevice the {@link android.hardware.usb.UsbDevice} to use
+     * @param usbDevice  the {@link android.hardware.usb.UsbDevice} to use
      * @return a new {@link UsbSerialDriver}, or {@code null} if no devices
-     *         could be acquired
+     * could be acquired
      */
     public static UsbSerialDriver acquire(final UsbManager usbManager, final UsbDevice usbDevice) {
         if (!usbManager.hasPermission(usbDevice)) {
@@ -141,29 +100,4 @@ public enum UsbSerialProber {
         }
         return null;
     }
-
-    /**
-     * Returns {@code true} if the given device is found in the vendor/product map.
-     *
-     * @param usbDevice the device to test
-     * @param supportedDevices map of vendor ids to product id(s)
-     * @return {@code true} if supported
-     */
-    private static boolean testIfSupported(final UsbDevice usbDevice,
-            final Map<Integer, int[]> supportedDevices) {
-        final int[] supportedProducts = supportedDevices.get(
-                Integer.valueOf(usbDevice.getVendorId()));
-        if (supportedProducts == null) {
-            return false;
-        }
-
-        final int productId = usbDevice.getProductId();
-        for (int supportedProductId : supportedProducts) {
-            if (productId == supportedProductId) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 }

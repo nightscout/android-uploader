@@ -20,6 +20,8 @@
 
 package com.nightscout.android.dexcom.USB;
 
+import com.nightscout.core.drivers.DeviceTransport;
+
 import java.io.IOException;
 
 /**
@@ -27,7 +29,7 @@ import java.io.IOException;
  *
  * @author mike wakerly (opensource@hoho.com)
  */
-public interface UsbSerialDriver {
+public interface UsbSerialDriver extends DeviceTransport {
 
     /** 5 data bits. */
     public static final int DATABITS_5 = 5;
@@ -79,51 +81,6 @@ public interface UsbSerialDriver {
 
     /** 2 stop bits. */
     public static final int STOPBITS_2 = 2;
-
-    /**
-     * Opens and initializes the device as a USB serial device. Upon success,
-     * caller must ensure that {@link #close()} is eventually called.
-     *
-     * @throws java.io.IOException on error opening or initializing the device.
-     */
-    public void open() throws IOException;
-
-    /**
-     * Closes the serial device.
-     *
-     * @throws java.io.IOException on error closing the device.
-     */
-    public void close() throws IOException;
-
-    /**
-     * Reads as many bytes as possible into the destination buffer.
-     *
-     * @param dest the destination byte buffer
-     * @param timeoutMillis the timeout for reading
-     * @return the actual number of bytes read
-     * @throws java.io.IOException if an error occurred during reading
-     */
-    public int read(final byte[] dest, final int timeoutMillis) throws IOException;
-
-    /**
-     * Reads as many bytes as possible into the destination buffer.
-     *
-     * @param size size to read
-     * @param timeoutMillis the timeout for reading
-     * @return the actual number of bytes read
-     * @throws java.io.IOException if an error occurred during reading
-     */
-    public byte[] read(int size, final int timeoutMillis) throws IOException;
-
-    /**
-     * Writes as many bytes as possible from the source buffer.
-     *
-     * @param src the source byte buffer
-     * @param timeoutMillis the timeout for writing
-     * @return the actual number of bytes written
-     * @throws java.io.IOException if an error occurred during writing
-     */
-    public int write(final byte[] src, final int timeoutMillis) throws IOException;
 
     /**
      * Sets various serial port parameters.
