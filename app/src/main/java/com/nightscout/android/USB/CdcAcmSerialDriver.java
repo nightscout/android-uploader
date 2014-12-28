@@ -1,6 +1,10 @@
 package com.nightscout.android.USB;
 
-import android.hardware.usb.*;
+import android.hardware.usb.UsbConstants;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbEndpoint;
+import android.hardware.usb.UsbInterface;
 import android.util.Log;
 
 import java.io.IOException;
@@ -45,9 +49,11 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
 
     @Override
     public void open() throws IOException {
+        if (mPowerManagementEnabled) {
+            USBPower.powerOn();
+        }
         Log.d(TAG, "claiming interfaces, count=" + mDevice.getInterfaceCount());
 
-        Log.d(TAG, "Claiming control interface.");
         mControlInterface = mDevice.getInterface(0);
         Log.d(TAG, "Control iface=" + mControlInterface);
         // class should be USB_CLASS_COMM
@@ -58,7 +64,6 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
         mControlEndpoint = mControlInterface.getEndpoint(0);
         Log.d(TAG, "Control endpoint direction: " + mControlEndpoint.getDirection());
 
-        Log.d(TAG, "Claiming data interface.");
         mDataInterface = mDevice.getInterface(1);
         Log.d(TAG, "data iface=" + mDataInterface);
         // class should be USB_CLASS_CDC_DATA
@@ -80,6 +85,9 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
     @Override
     public void close() throws IOException {
         mConnection.close();
+        if (mPowerManagementEnabled) {
+            USBPower.powerOff();
+        }
     }
 
     public byte[] read(int size, int timeoutMillis) throws IOException {
@@ -237,36 +245,4 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
         int value = (mRts ? 0x2 : 0) | (mDtr ? 0x1 : 0);
         sendAcmControlMessage(SET_CONTROL_LINE_STATE, value, null);
     }
-
-
-
-/*    public static Map<Integer, int[]> getSupportedDevices() {
-        final Map<Integer, int[]> supportedDevices = new LinkedHashMap<Integer, int[]>();
-        supportedDevices.put(Integer.valueOf(UsbId.VENDOR_ARDUINO),
-                new int[] {
-                        UsbId.ARDUINO_UNO,
-                        UsbId.ARDUINO_UNO_R3,
-                        UsbId.ARDUINO_MEGA_2560,
-                        UsbId.ARDUINO_MEGA_2560_R3,
-                        UsbId.ARDUINO_SERIAL_ADAPTER,
-                        UsbId.ARDUINO_SERIAL_ADAPTER_R3,
-                        UsbId.ARDUINO_MEGA_ADK,
-                        UsbId.ARDUINO_MEGA_ADK_R3,
-                        UsbId.ARDUINO_LEONARDO,
-                });
-        supportedDevices.put(Integer.valueOf(UsbId.VENDOR_VAN_OOIJEN_TECH),
-                new int[] {
-                    UsbId.VAN_OOIJEN_TECH_TEENSYDUINO_SERIAL,
-                });
-        supportedDevices.put(Integer.valueOf(UsbId.VENDOR_ATMEL),
-                new int[] {
-                    UsbId.ATMEL_LUFA_CDC_DEMO_APP,
-                });
-        supportedDevices.put(Integer.valueOf(UsbId.VENDOR_LEAFLABS),
-                new int[] {
-                    UsbId.LEAFLABS_MAPLE,
-                });
-        return supportedDevices;
-    }*/
-
 }

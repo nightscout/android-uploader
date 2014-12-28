@@ -15,10 +15,8 @@ import com.google.common.collect.Lists;
 import com.nightscout.android.MainActivity;
 import com.nightscout.android.Nightscout;
 import com.nightscout.android.R;
-import com.nightscout.android.USB.USBPower;
 import com.nightscout.android.USB.UsbSerialDriver;
 import com.nightscout.android.USB.UsbSerialProber;
-import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.upload.Uploader;
 import com.nightscout.core.dexcom.CRCFailError;
@@ -29,6 +27,8 @@ import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.SensorRecord;
+import com.nightscout.core.drivers.DeviceTransport;
+import com.nightscout.core.drivers.ReadData;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
@@ -114,7 +114,7 @@ public class SyncingService extends IntentService {
             final String action = intent.getAction();
             if (ACTION_SYNC.equals(action)) {
                 final int param1 = intent.getIntExtra(SYNC_PERIOD, 1);
-                UsbSerialDriver driver = acquireSerialDevice();
+                DeviceTransport driver = acquireSerialDevice();
                 if (driver != null) {
                     handleActionSync(param1, getApplicationContext(), driver);
                 }
@@ -126,18 +126,17 @@ public class SyncingService extends IntentService {
      * Handle action Sync in the provided background thread with the provided
      * parameters.
      */
-    protected void handleActionSync(int numOfPages, Context context, UsbSerialDriver serialDriver) {
+    protected void handleActionSync(int numOfPages, Context context, DeviceTransport serialDriver) {
         reporter = AndroidEventReporter.getReporter(context);
         boolean broadcastSent = false;
         AndroidPreferences preferences = new AndroidPreferences(context);
         Tracker tracker = ((Nightscout) context).getTracker();
 
-        if (preferences.isRootEnabled()) USBPower.PowerOn();
-
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NSDownload");
         wl.acquire();
         if (serialDriver != null) {
+            ((CdcAcmSerialDriver) serialDriver).setPowerManagementEnabled(preferences.isRootEnabled());
             try {
                 ReadData readData = new ReadData(serialDriver);
                 // TODO: need to check if numOfPages if valid on ReadData side
@@ -302,9 +301,6 @@ public class SyncingService extends IntentService {
                     );
                     Log.e(TAG, "Unable to close", e);
                 }
-
-                // Try powering off, will only work if rooted
-                if (preferences.isRootEnabled()) USBPower.PowerOff();
             }
         }
 
@@ -313,9 +309,9 @@ public class SyncingService extends IntentService {
         wl.release();
     }
 
-    protected UsbSerialDriver acquireSerialDevice() {
+    protected DeviceTransport acquireSerialDevice() {
         UsbManager mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-        UsbSerialDriver serialDevice = UsbSerialProber.acquire(mUsbManager);
+        DeviceTransport serialDevice = UsbSerialProber.acquire(mUsbManager);
         if (serialDevice != null) {
             try {
                 serialDevice.open();
