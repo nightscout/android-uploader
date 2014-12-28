@@ -46,12 +46,12 @@ public class ReadData {
         }
         log.debug("Reading EGV page range...");
         int endPage = readDataBasePageRange(RecordType.EGV_DATA);
-        log.debug("Reading " + numOfRecentPages + " EGV page(s)...");
+        log.debug("Reading {} EGV page(s)...", numOfRecentPages);
         numOfRecentPages = numOfRecentPages - 1;
         EGVRecord[] allPages = new EGVRecord[0];
         for (int i = Math.min(numOfRecentPages,endPage); i >= 0; i--) {
             int nextPage = endPage - i;
-            log.debug("Reading #" + i + " EGV pages (page number " + nextPage + ")");
+            log.debug("Reading #{} EGV pages (page number {})", i, nextPage);
             EGVRecord[] ithEGVRecordPage = readDataBasePage(RecordType.EGV_DATA, nextPage);
             EGVRecord[] result = Arrays.copyOf(allPages, allPages.length + ithEGVRecordPage.length);
             System.arraycopy(ithEGVRecordPage, 0, result, allPages.length, ithEGVRecordPage.length);
@@ -77,12 +77,12 @@ public class ReadData {
         }
         log.debug("Reading Sensor page range...");
         int endPage = readDataBasePageRange(RecordType.SENSOR_DATA);
-        log.debug("Reading " + numOfRecentPages + " Sensor page(s)...");
+        log.debug("Reading {} Sensor page(s)...", numOfRecentPages);
         numOfRecentPages = numOfRecentPages - 1;
         SensorRecord[] allPages = new SensorRecord[0];
         for (int i = Math.min(numOfRecentPages,endPage); i >= 0; i--) {
             int nextPage = endPage - i;
-            log.debug("Reading #" + i + " Sensor pages (page number " + nextPage + ")");
+            log.debug("Reading #{} Sensor pages (page number {})", i, nextPage);
             SensorRecord[] ithSensorRecordPage = readDataBasePage(RecordType.SENSOR_DATA, nextPage);
             SensorRecord[] result = Arrays.copyOf(allPages, allPages.length + ithSensorRecordPage.length);
             System.arraycopy(ithSensorRecordPage, 0, result, allPages.length, ithSensorRecordPage.length);
@@ -168,7 +168,7 @@ public class ReadData {
             try {
                 mSerialDevice.write(packet, IO_TIMEOUT);
             } catch (IOException e) {
-                log.error("Unable to write to serial device.", e);
+                log.error("Unable to write to serial device. {}", e);
             }
         }
     }
@@ -179,7 +179,7 @@ public class ReadData {
             try {
                 mSerialDevice.write(packet, IO_TIMEOUT);
             } catch (IOException e) {
-                log.error("Unable to write to serial device.", e);
+                log.error("Unable to write to serial device. {}", e);
             }
         }
     }
@@ -190,7 +190,7 @@ public class ReadData {
         try {
             response = mSerialDevice.read(numOfBytes, IO_TIMEOUT);
             len = response.length;
-            log.debug("Read " + len + " byte(s) complete.");
+            log.debug("Read {} byte(s) complete.", len);
 
             // Add a 100ms delay for when multiple write/reads are occurring in series
             Thread.sleep(100);
@@ -200,10 +200,10 @@ public class ReadData {
             String bytes = "";
             int readAmount = len;
             for (int i = 0; i < readAmount; i++) bytes += String.format("%02x", response[i]) + " ";
-            log.debug("Read data: " + bytes);
+            log.debug("Read data: {}", bytes);
             ////////////////////////////////////////////////////////////////////////////////////////
         } catch (IOException e) {
-            log.error("Unable to read from serial device.", e);
+            log.error("Unable to read from serial device. {}", e);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
