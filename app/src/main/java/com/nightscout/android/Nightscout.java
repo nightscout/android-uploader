@@ -6,9 +6,11 @@ import android.util.Log;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
-import org.acra.annotation.*;
+import org.acra.annotation.ReportsCrashes;
 
 @ReportsCrashes(
         formKey = "",
@@ -35,6 +37,7 @@ public class Nightscout extends Application {
     public void onCreate() {
         super.onCreate();
         ACRA.init(this);
+        JodaTimeAndroid.init(this);
     }
 
     synchronized public Tracker getTracker() {
