@@ -1,19 +1,28 @@
-apply plugin: 'jacoco'
-
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+ext.versionName="0.1.11-dev"
+ext.versionCode=17
+
 buildscript {
     repositories {
         jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.0.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
     }
 }
+
+apply plugin: 'jacoco'
 
 allprojects {
     repositories {
         jcenter()
     }
+
+    apply plugin: 'idea'
+
+    group = 'com.nightscout.android'
+    version = rootProject.versionName
 }
 
 subprojects {
@@ -28,6 +37,5 @@ subprojects {
             }
         }
     }
-
 }
 

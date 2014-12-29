@@ -1,4 +1,6 @@
 apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
 
 sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
@@ -37,5 +39,51 @@ jacocoTestReport {
         html.enabled = true
         xml.enabled = true
         csv.enabled = false
+    }
+}
+
+// custom tasks for creating source/javadoc jars
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+// add javadoc/source jar tasks as artifacts
+artifacts {
+    archives sourcesJar, javadocJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            artifact sourcesJar {
+                classifier "sources"
+            }
+
+            artifact javadocJar {
+                classifier "javadoc"
+            }
+        }
+    }
+}
+
+bintray {
+    user = bintrayUser  //this usually comes form gradle.properties file in ~/.gradle
+    key = bintrayKey //this usually comes form gradle.properties file in ~/.gradle
+    publications = ['mavenJava'] // see publications closure
+    pkg { //package will be created if does not exist
+        repo = 'android-uploader'
+        userOrg = 'nightscout' // an optional organization name when the repo belongs to one of the user's orgs
+        name = 'core'
+        desc = 'Nightscout core library, containing all non-android specific code.'
+        licenses = ['GPLv3']
+        labels = ['android', 'java', 'nightscout']
     }
 }

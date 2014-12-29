@@ -19,6 +19,8 @@ android {
         applicationId "com.nightscout.android"
         minSdkVersion 12
         targetSdkVersion 18
+        versionName rootProject.versionName
+        versionCode rootProject.versionCode
     }
 
     lintOptions {
