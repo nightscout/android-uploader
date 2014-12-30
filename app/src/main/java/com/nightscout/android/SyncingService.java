@@ -33,6 +33,7 @@ import com.nightscout.core.model.CookieMonsterG4Meter;
 import com.nightscout.core.model.CookieMonsterG4SGV;
 import com.nightscout.core.model.CookieMonsterG4Sensor;
 import com.nightscout.core.model.DownloadResults;
+import com.nightscout.core.model.DownloadStatus;
 import com.nightscout.core.model.Noise;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
@@ -154,7 +155,13 @@ public class SyncingService extends IntentService {
                     uploadStatus = uploader.upload(results);
                 }
 
-                EGVRecord recentEGV = new EGVRecord(download.sgv.get(download.sgv.size() - 1));
+                EGVRecord recentEGV;
+                if (download.download_status == DownloadStatus.SUCCESS) {
+                    recentEGV = new EGVRecord(download.sgv.get(download.sgv.size() - 1));
+                } else {
+                    recentEGV = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(),
+                            Noise.NOISE_NONE);
+                }
 
                 DateTime dt = new DateTime();
                 DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
