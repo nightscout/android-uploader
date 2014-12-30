@@ -18,7 +18,7 @@
  * Project home page: http://code.google.com/p/usb-serial-for-android/
  */
 
-package com.nightscout.android.dexcom.USB;
+package com.nightscout.android.drivers.USB;
 
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
@@ -40,7 +40,7 @@ public enum UsbSerialProber {
             if (connection == null) {
                 return null;
             }
-            return new CdcAcmSerialDriver(usbDevice, connection);
+            return new CdcAcmSerialDriver(usbDevice, connection, manager);
         }
     };
 

@@ -4,7 +4,9 @@ import com.nightscout.core.dexcom.Constants;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.protobuf.G4Download;
+import com.nightscout.core.model.CookieMonsterG4SGV;
+import com.nightscout.core.model.GlucoseUnit;
+import com.nightscout.core.model.Noise;
 import com.nightscout.core.utils.GlucoseReading;
 
 import org.json.JSONException;
@@ -13,12 +15,13 @@ import org.json.JSONObject;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
+import java.util.List;
 
 public class EGVRecord extends GenericTimestampRecord {
     public final static int RECORD_SIZE = 12;
     private GlucoseReading reading;
     private TrendArrow trend;
-    private G4Download.Noise noiseMode;
+    private Noise noiseMode;
 
     public EGVRecord(byte[] packet) {
         super(packet);
@@ -27,26 +30,33 @@ public class EGVRecord extends GenericTimestampRecord {
                     ". Expected size: " + RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
         }
         int bGValue = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8) & Constants.EGV_VALUE_MASK;
-        reading = new GlucoseReading(bGValue, G4Download.GlucoseUnit.MGDL);
+        reading = new GlucoseReading(bGValue, GlucoseUnit.MGDL);
         byte trendAndNoise = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).get(10);
         int trendValue = trendAndNoise & Constants.EGV_TREND_ARROW_MASK;
         byte noiseValue = (byte) ((trendAndNoise & Constants.EGV_NOISE_MASK) >> 4);
         trend = TrendArrow.values()[trendValue];
-        noiseMode = G4Download.Noise.values()[noiseValue];
+        noiseMode = Noise.values()[noiseValue];
     }
 
-    public EGVRecord(int bGValueMgdl, TrendArrow trend, Date displayTime, Date systemTime, G4Download.Noise noise) {
+    public EGVRecord(int bGValueMgdl, TrendArrow trend, Date displayTime, Date systemTime, Noise noise) {
         super(displayTime, systemTime);
-        this.reading = new GlucoseReading(bGValueMgdl, G4Download.GlucoseUnit.MGDL);
+        this.reading = new GlucoseReading(bGValueMgdl, GlucoseUnit.MGDL);
         this.trend = trend;
         this.noiseMode = noise;
     }
 
-    public EGVRecord(int bGValueMgdl, TrendArrow trend, long displayTime, int systemTime, G4Download.Noise noise) {
+    public EGVRecord(int bGValueMgdl, TrendArrow trend, long displayTime, long systemTime, Noise noise) {
         super(displayTime, systemTime);
-        this.reading = new GlucoseReading(bGValueMgdl, G4Download.GlucoseUnit.MGDL);
+        this.reading = new GlucoseReading(bGValueMgdl, GlucoseUnit.MGDL);
         this.trend = trend;
         this.noiseMode = noise;
+    }
+
+    public EGVRecord(CookieMonsterG4SGV sgv) {
+        super(sgv.disp_timestamp_sec, sgv.sys_timestamp_sec);
+        this.reading = new GlucoseReading(sgv.sgv_mgdl, GlucoseUnit.MGDL);
+        this.trend = TrendArrow.values()[sgv.trend.ordinal()];
+        this.noiseMode = sgv.noise;
     }
 
     public int getBgMgdl() {
@@ -57,7 +67,7 @@ public class EGVRecord extends GenericTimestampRecord {
         return trend;
     }
 
-    public G4Download.Noise getNoiseMode() {
+    public Noise getNoiseMode() {
         return noiseMode;
     }
 
@@ -68,13 +78,19 @@ public class EGVRecord extends GenericTimestampRecord {
         return obj;
     }
 
-    public G4Download.CookieMonsterG4EGV toProtobuf() {
-        G4Download.CookieMonsterG4EGV.Builder builder = G4Download.CookieMonsterG4EGV.newBuilder();
-        return builder.setTimestampSec(rawSystemTimeSeconds)
-                .setSgvMgdl(reading.asMgdl())
-                .setTrend(trend.toProtobuf())
-                .setNoise(noiseMode)
+    @Override
+    public CookieMonsterG4SGV toProtobuf() {
+        CookieMonsterG4SGV.Builder builder = new CookieMonsterG4SGV.Builder();
+        return builder.sys_timestamp_sec(rawSystemTimeSeconds)
+                .disp_timestamp_sec(rawDisplayTimeSeconds)
+                .sgv_mgdl(reading.asMgdl())
+                .trend(trend.toProtobuf())
+                .noise(noiseMode)
                 .build();
+    }
+
+    public static List<CookieMonsterG4SGV> toProtobufList(List<EGVRecord> list) {
+        return toProtobufList(list, CookieMonsterG4SGV.class);
     }
 
     public GlucoseReading getReading() {

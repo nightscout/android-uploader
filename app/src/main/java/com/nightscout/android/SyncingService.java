@@ -1,4 +1,4 @@
-package com.nightscout.android.dexcom;
+package com.nightscout.android;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -11,37 +11,30 @@ import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.google.common.collect.Lists;
-import com.nightscout.android.MainActivity;
-import com.nightscout.android.Nightscout;
-import com.nightscout.android.R;
-import com.nightscout.android.dexcom.USB.CdcAcmSerialDriver;
-import com.nightscout.android.dexcom.USB.UsbSerialProber;
+import com.nightscout.android.drivers.AndroidUploaderDevice;
+import com.nightscout.android.drivers.USB.CdcAcmSerialDriver;
+import com.nightscout.android.drivers.USB.UsbSerialProber;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.upload.Uploader;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.TrendArrow;
-import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.EGVRecord;
-import com.nightscout.core.dexcom.records.GlucoseDataSet;
-import com.nightscout.core.dexcom.records.MeterRecord;
-import com.nightscout.core.dexcom.records.SensorRecord;
+import com.nightscout.core.drivers.AbstractDevice;
+import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.drivers.DeviceTransport;
-import com.nightscout.core.drivers.ReadData;
+import com.nightscout.core.drivers.DexcomG4;
+import com.nightscout.core.model.CookieMonsterDownload;
+import com.nightscout.core.model.DownloadResults;
+import com.nightscout.core.model.Noise;
 import com.nightscout.core.preferences.NightscoutPreferences;
-import com.nightscout.core.protobuf.G4Download;
 
 import org.json.JSONArray;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
 import static org.joda.time.Duration.standardMinutes;
-import static org.joda.time.Duration.standardSeconds;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous CGM Receiver downloads and cloud uploads
@@ -105,7 +98,8 @@ public class SyncingService extends IntentService {
             final String action = intent.getAction();
             if (ACTION_SYNC.equals(action)) {
                 final int param1 = intent.getIntExtra(SYNC_PERIOD, 1);
-                DeviceTransport driver = acquireSerialDevice();
+//                DeviceTransport driver = acquireSerialDevice();
+                DeviceTransport driver = UsbSerialProber.acquire((UsbManager) getSystemService(USB_SERVICE));
                 if (driver != null) {
                     handleActionSync(param1, getApplicationContext(), driver);
                 }
@@ -120,63 +114,34 @@ public class SyncingService extends IntentService {
     protected void handleActionSync(int numOfPages, Context context, DeviceTransport serialDriver) {
         boolean broadcastSent = false;
         AndroidPreferences preferences = new AndroidPreferences(context);
-//        boolean rootEnabled = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("root_support_enabled", false);
         Tracker tracker = ((Nightscout) context).getTracker();
 
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NSDownload");
         wl.acquire();
         if (serialDriver != null) {
+            AbstractUploaderDevice uploaderDevice = AndroidUploaderDevice.getUploaderDevice(context);
+            AbstractDevice device = new DexcomG4(serialDriver, preferences, uploaderDevice);
+
+            ((DexcomG4) device).setNumOfPages(numOfPages);
             ((CdcAcmSerialDriver) serialDriver).setPowerManagementEnabled(preferences.isRootEnabled());
             try {
-                ReadData readData = new ReadData(serialDriver);
-                // TODO: need to check if numOfPages if valid on ReadData side
-                EGVRecord[] recentRecords = readData.getRecentEGVsPages(numOfPages);
-                List<MeterRecord> meterRecords = Lists.newArrayList(readData.getRecentMeterRecords());
-                // TODO: need to check if numOfPages if valid on ReadData side
-                SensorRecord[] sensorRecords = readData.getRecentSensorRecords(numOfPages);
-                GlucoseDataSet[] glucoseDataSets = Utils.mergeGlucoseDataRecords(recentRecords, sensorRecords);
-
-                CalRecord[] calRecords = new CalRecord[1];
-                if (preferences.isCalibrationUploadEnabled()) {
-                    calRecords = readData.getRecentCalRecords();
-                }
-                List<GlucoseDataSet> glucoseDataSetsList = Lists.newArrayList(glucoseDataSets);
-                List<CalRecord> calRecordsList = Lists.newArrayList(calRecords);
-
-                long timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords[recentRecords.length - 1]);
-                // TODO: determine if the logic here is correct. I suspect it assumes the last record was less than 5
-                // minutes ago. If a reading is skipped and the device is plugged in then nextUploadTime will be
-                // set to a negative number. This situation will eventually correct itself.
-                long nextUploadTime = standardMinutes(5).minus(standardSeconds(timeSinceLastRecord)).getMillis();
-                long displayTime = readData.readDisplayTime().getTime();
-                // FIXME: readData.readBatteryLevel() seems to flake out on battery level reads. Removing for now.
-                int batLevel = 100;
-
-                // convert into json for d3 plot
-                JSONArray array = new JSONArray();
-                for (EGVRecord recentRecord : recentRecords) {
-                    array.put(recentRecord.toJSON());
-                }
-
+                DownloadResults results = device.download();
+                CookieMonsterDownload download = results.getDownload();
 
                 Uploader uploader = new Uploader(context, preferences);
-                // TODO: This should be cleaned up, 5 should be a constant, maybe handle in uploader,
-                // and maybe might not have to read 5 pages (that was only done for single sync for UI
-                // plot updating and might be able to be done in javascript d3 code as a FIFO array
-                // Only upload 1 record unless forcing a sync
                 boolean uploadStatus;
                 if (numOfPages < 20) {
-                    uploadStatus = uploader.upload(glucoseDataSetsList.get(glucoseDataSetsList.size() - 1),
-                            meterRecords.get(meterRecords.size() - 1),
-                            calRecordsList.get(calRecordsList.size() - 1));
+                    uploadStatus = uploader.upload(results, 1);
                 } else {
-                    uploadStatus = uploader.upload(glucoseDataSetsList, meterRecords, calRecordsList);
+                    uploadStatus = uploader.upload(results);
                 }
 
-                EGVRecord recentEGV = recentRecords[recentRecords.length - 1];
-                broadcastSGVToUI(recentEGV, uploadStatus, nextUploadTime + TIME_SYNC_OFFSET,
-                        displayTime, array, batLevel);
+                Log.d(TAG, "Status: " + download.download_status.name());
+                EGVRecord recentEGV = new EGVRecord(download.sgv.get(download.sgv.size() - 1));
+
+                broadcastSGVToUI(recentEGV, uploadStatus, results.getNextUploadTime() + TIME_SYNC_OFFSET,
+                        results.getDisplayTime(), results.getResultArray(), download.receiver_battery);
                 broadcastSent = true;
             } catch (ArrayIndexOutOfBoundsException e) {
                 Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);
@@ -208,18 +173,6 @@ public class SyncingService extends IntentService {
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Catch all exception in handleActionSync")
                         .setFatal(false)
                         .build());
-            } finally {
-                // Close serial
-                try {
-                    serialDriver.close();
-                } catch (IOException e) {
-                    tracker.send(new HitBuilders.ExceptionBuilder()
-                                    .setDescription("Unable to close serial connection")
-                                    .setFatal(false)
-                                    .build()
-                    );
-                    Log.e(TAG, "Unable to close", e);
-                }
             }
         }
 
@@ -228,28 +181,28 @@ public class SyncingService extends IntentService {
         wl.release();
     }
 
-    protected DeviceTransport acquireSerialDevice() {
-        UsbManager mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-        DeviceTransport serialDevice = UsbSerialProber.acquire(mUsbManager);
-        if (serialDevice != null) {
-            try {
-                serialDevice.open();
-                return serialDevice;
-            } catch (IOException e) {
-                Log.e(TAG, "Unable to open USB. ", e);
-                Tracker tracker;
-                tracker = ((Nightscout) getApplicationContext()).getTracker();
-                tracker.send(new HitBuilders.ExceptionBuilder()
-                                .setDescription("Unable to open serial connection")
-                                .setFatal(false)
-                                .build()
-                );
-            }
-        } else {
-            Log.d(TAG, "Unable to acquire USB device from manager.");
-        }
-        return serialDevice;
-    }
+//    protected DeviceTransport acquireSerialDevice(UsbManager usbManager) {
+////        UsbManager mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+//        DeviceTransport serialDevice = UsbSerialProber.acquire(usbManager);
+//        if (serialDevice != null) {
+////            try {
+////                serialDevice.open();
+//                return serialDevice;
+////            } catch (IOException e) {
+////                Log.e(TAG, "Unable to open USB. ", e);
+////                Tracker tracker;
+////                tracker = ((Nightscout) getApplicationContext()).getTracker();
+////                tracker.send(new HitBuilders.ExceptionBuilder()
+////                                .setDescription("Unable to open serial connection")
+////                                .setFatal(false)
+////                                .build()
+////                );
+////            }
+//        } else {
+//            Log.d(TAG, "Unable to acquire USB device from manager.");
+//        }
+//        return null;
+//    }
 
     static public boolean isG4Connected(Context c) {
         // Iterate through devices and see if the dexcom is connected
@@ -291,7 +244,7 @@ public class SyncingService extends IntentService {
     }
 
     protected void broadcastSGVToUI() {
-        EGVRecord record = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(), G4Download.Noise.NO_NOISE);
+        EGVRecord record = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(), Noise.NOISE_NONE);
         broadcastSGVToUI(record, false, standardMinutes(5).getMillis() + TIME_SYNC_OFFSET, new Date().getTime(), null, 0);
     }
 
