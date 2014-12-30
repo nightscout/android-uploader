@@ -1,17 +1,15 @@
 package com.nightscout.core.dexcom.records;
 
-import com.google.common.base.Optional;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.protobuf.CookieMonsterG4Meter;
-import com.nightscout.core.protobuf.GlucoseUnit;
+import com.nightscout.core.model.CookieMonsterG4Meter;
+import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.utils.GlucoseReading;
-import com.squareup.wire.Wire;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
+import java.util.List;
 
 public class MeterRecord extends GenericTimestampRecord {
     public final static int RECORD_SIZE = 15;
@@ -41,6 +39,12 @@ public class MeterRecord extends GenericTimestampRecord {
         this.meterTime = meterTime;
     }
 
+    public MeterRecord(CookieMonsterG4Meter meter) {
+        super(meter.disp_timestamp_sec, meter.sys_timestamp_sec);
+        this.reading = new GlucoseReading(meter.meter_bg_mgdl, GlucoseUnit.MGDL);
+        this.meterTime = meter.meter_time;
+    }
+
     public MeterRecord(int meterBgMgdl, int meterTime, long systemTime) {
         super(systemTime);
         this.reading = new GlucoseReading(meterBgMgdl, GlucoseUnit.MGDL);
@@ -60,12 +64,18 @@ public class MeterRecord extends GenericTimestampRecord {
         return meterTime;
     }
 
+    @Override
     public CookieMonsterG4Meter toProtobuf() {
         CookieMonsterG4Meter.Builder builder = new CookieMonsterG4Meter.Builder();
-        return builder.timestamp_sec(rawSystemTimeSeconds)
+        return builder.sys_timestamp_sec(rawSystemTimeSeconds)
+                .disp_timestamp_sec(rawDisplayTimeSeconds)
                 .meter_time(meterTime)
                 .meter_bg_mgdl(reading.asMgdl())
                 .build();
+    }
+
+    public static List<CookieMonsterG4Meter> toProtobufList(List<MeterRecord> list) {
+        return toProtobufList(list, CookieMonsterG4Meter.class);
     }
 
     @Override
@@ -90,14 +100,4 @@ public class MeterRecord extends GenericTimestampRecord {
         return result;
     }
 
-    public Optional<MeterRecord> fromProtoBuf(byte[] byteArray) {
-        try {
-            Wire wire = new Wire();
-            CookieMonsterG4Meter record = wire.parseFrom(byteArray, CookieMonsterG4Meter.class);
-            return Optional.of(new MeterRecord(record.meter_bg_mgdl, record.meter_time, record.timestamp_sec));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Optional.absent();
-    }
 }

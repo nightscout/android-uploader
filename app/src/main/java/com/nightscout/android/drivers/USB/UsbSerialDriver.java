@@ -18,7 +18,7 @@
  * Project home page: http://code.google.com/p/usb-serial-for-android/
  */
 
-package com.nightscout.android.USB;
+package com.nightscout.android.drivers.USB;
 
 import com.nightscout.core.drivers.DeviceTransport;
 

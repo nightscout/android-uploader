@@ -26,14 +26,14 @@ public class UploaderTest extends RobolectricTestBase {
 
         whenOnBroadcastReceived(ToastReceiver.ACTION_SEND_NOTIFICATION,
                 new Function<Intent, Void>() {
-            @Override
-            public Void apply(Intent input) {
-                assertThat(input.getStringExtra(ToastReceiver.TOAST_MESSAGE), is(not(nullValue())));
-                assertThat(input.getStringExtra(ToastReceiver.TOAST_MESSAGE),
-                        is(getContext().getString(R.string.unknown_mongo_host)));
-                return null;
-            }
-        });
+                    @Override
+                    public Void apply(Intent input) {
+                        assertThat(input.getStringExtra(ToastReceiver.TOAST_MESSAGE), is(not(nullValue())));
+                        assertThat(input.getStringExtra(ToastReceiver.TOAST_MESSAGE),
+                                is(getContext().getString(R.string.unknown_mongo_host)));
+                        return null;
+                    }
+                });
 
         new Uploader(getContext(), prefs);
         assertIntentSeen();
@@ -44,7 +44,7 @@ public class UploaderTest extends RobolectricTestBase {
         TestPreferences prefs = new TestPreferences();
         prefs.setMongoUploadEnabled(true);
         prefs.setMongoClientUri("http://test.com");
-        Uploader uploader = new Uploader(getContext(),prefs);
+        Uploader uploader = new Uploader(getContext(), prefs);
         assertThat(uploader.areAllUploadersInitialized(), is(false));
     }
 
@@ -56,14 +56,14 @@ public class UploaderTest extends RobolectricTestBase {
 
         whenOnBroadcastReceived(ToastReceiver.ACTION_SEND_NOTIFICATION,
                 new Function<Intent, Void>() {
-            @Override
-            public Void apply(Intent input) {
-                assertThat(input.getStringExtra(ToastReceiver.TOAST_MESSAGE), is(not(nullValue())));
-                assertThat(input.getStringExtra(ToastReceiver.TOAST_MESSAGE),
-                        is(getContext().getString(R.string.illegal_rest_url)));
-                return null;
-            }
-        });
+                    @Override
+                    public Void apply(Intent input) {
+                        assertThat(input.getStringExtra(ToastReceiver.TOAST_MESSAGE), is(not(nullValue())));
+                        assertThat(input.getStringExtra(ToastReceiver.TOAST_MESSAGE),
+                                is(getContext().getString(R.string.illegal_rest_url)));
+                        return null;
+                    }
+                });
         new Uploader(getContext(), prefs);
         assertIntentSeen();
     }

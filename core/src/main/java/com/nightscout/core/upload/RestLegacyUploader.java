@@ -1,8 +1,8 @@
 package com.nightscout.core.upload;
 
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
+import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.preferences.NightscoutPreferences;
-import com.nightscout.core.records.DeviceStatus;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,7 +26,7 @@ public class RestLegacyUploader extends AbstractRestUploader {
         return json;
     }
 
-    private JSONObject toJSONObject(DeviceStatus deviceStatus) throws JSONException {
+    private JSONObject toJSONObject(AbstractUploaderDevice deviceStatus) throws JSONException {
         JSONObject json = new JSONObject();
         json.put("uploaderBattery", deviceStatus.getBatteryLevel());
         return json;
@@ -44,7 +44,7 @@ public class RestLegacyUploader extends AbstractRestUploader {
 
     // TODO(trhodeos): is devicestatus supported in legacy apis?
     @Override
-    protected boolean doUpload(DeviceStatus deviceStatus) throws IOException {
+    protected boolean doUpload(AbstractUploaderDevice deviceStatus) throws IOException {
         try {
             return doPost("devicestatus", toJSONObject(deviceStatus));
         } catch (JSONException e) {

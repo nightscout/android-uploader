@@ -1,7 +1,7 @@
 package com.nightscout.core.preferences;
 
 import com.google.common.collect.Lists;
-import com.nightscout.core.protobuf.GlucoseUnit;
+import com.nightscout.core.model.GlucoseUnit;
 
 import java.util.List;
 
@@ -12,8 +12,8 @@ public class TestPreferences implements NightscoutPreferences {
     private boolean sensorUploadEnabled = false;
     private boolean mongoUploadEnabled = false;
     private String mongoClientUri = null;
-    private String mongoCollection = null;
-    private String mongoDeviceStatusCollection = null;
+    private String mongoCollection = "entries";
+    private String mongoDeviceStatusCollection = "devicestatus";
     private boolean dataDonateEnabled;
     private GlucoseUnit units;
     private String pwdName;

@@ -1,7 +1,6 @@
 package com.nightscout.core.preferences;
 
-
-import com.nightscout.core.protobuf.GlucoseUnit;
+import com.nightscout.core.model.GlucoseUnit;
 
 import java.util.List;
 

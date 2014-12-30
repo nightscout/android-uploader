@@ -1,7 +1,7 @@
 package com.nightscout.core.utils;
 
 import com.nightscout.core.dexcom.Constants;
-import com.nightscout.core.protobuf.GlucoseUnit;
+import com.nightscout.core.model.GlucoseUnit;
 
 public class GlucoseReading {
     private int valueMgdl;

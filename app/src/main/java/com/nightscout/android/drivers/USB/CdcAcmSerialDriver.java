@@ -1,10 +1,11 @@
-package com.nightscout.android.USB;
+package com.nightscout.android.drivers.USB;
 
 import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
+import android.hardware.usb.UsbManager;
 import android.util.Log;
 
 import java.io.IOException;
@@ -43,8 +44,8 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
     private static final int SEND_BREAK = 0x23;
     private static final String SET_POWER_ON_COMMAND = "echo 'on' > \"/sys/bus/usb/devices/1-1/power/level\"";
 
-    public CdcAcmSerialDriver(UsbDevice device, UsbDeviceConnection connection) {
-        super(device, connection);
+    public CdcAcmSerialDriver(UsbDevice device, UsbDeviceConnection connection, UsbManager manager) {
+        super(device, connection, manager);
     }
 
     @Override
@@ -105,11 +106,12 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
                     timeoutMillis);
             if (numBytesRead < 0) {
                 Log.d(TAG, "Read timeout occurred.");
+                throw new IOException("Read timeout");
                 // This sucks: we get -1 on timeout, not 0 as preferred.
                 // We *should* use UsbRequest, except it has a bug/api oversight
                 // where there is no way to determine the number of bytes read
                 // in response :\ -- http://b.android.com/28023
-                return 0;
+//                return 0;
             }
             System.arraycopy(mReadBuffer, 0, dest, 0, numBytesRead);
         }

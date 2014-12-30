@@ -7,8 +7,8 @@ import android.preference.PreferenceManager;
 
 import com.google.common.base.Joiner;
 import com.nightscout.android.R;
+import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.preferences.NightscoutPreferences;
-import com.nightscout.core.protobuf.GlucoseUnit;
 import com.nightscout.core.utils.RestUriUtils;
 
 import java.util.List;
@@ -79,12 +79,15 @@ public class AndroidPreferences implements NightscoutPreferences {
 
     @Override
     public String getMongoCollection() {
-        return preferences.getString(PreferenceKeys.MONGO_COLLECTION, getDefaultMongoCollection());
+        return preferences.getString(PreferenceKeys.MONGO_COLLECTION,
+                getDefaultMongoCollection());
     }
 
     @Override
     public String getMongoDeviceStatusCollection() {
-        return preferences.getString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION, "devicestatus");
+        String result = preferences.getString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION,
+                getDefaultMongoDeviceStatusCollection());
+        return result.equals("") ? getDefaultMongoDeviceStatusCollection() : result;
     }
 
     @Override

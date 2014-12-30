@@ -1,7 +1,7 @@
 package com.nightscout.core.dexcom;
 
 import com.nightscout.core.dexcom.records.EGVRecord;
-import com.nightscout.core.protobuf.Noise;
+import com.nightscout.core.model.Noise;
 
 import org.json.JSONObject;
 import org.junit.Test;

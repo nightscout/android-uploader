@@ -1,6 +1,7 @@
 package com.nightscout.core.dexcom;
 
-import com.nightscout.core.protobuf.Trend;
+
+import com.nightscout.core.model.Trend;
 
 public enum TrendArrow {
     NONE(0),

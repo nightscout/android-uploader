@@ -9,7 +9,7 @@ import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.test.RobolectricTestBase;
 import com.nightscout.android.wearables.Pebble;
 import com.nightscout.core.dexcom.TrendArrow;
-import com.nightscout.core.protobuf.GlucoseUnit;
+import com.nightscout.core.model.GlucoseUnit;
 
 import org.junit.Before;
 import org.junit.Test;
