@@ -1,12 +1,10 @@
-package com.nightscout.android.dexcom;
+package com.nightscout.android;
 
 import android.content.Context;
 import android.content.Intent;
 
-import com.nightscout.android.MainActivity;
-import com.nightscout.android.R;
-import com.nightscout.android.dexcom.USB.CdcAcmSerialDriver;
-import com.nightscout.android.dexcom.USB.UsbSerialDriver;
+import com.nightscout.android.drivers.USB.CdcAcmSerialDriver;
+import com.nightscout.android.drivers.USB.UsbSerialDriver;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.test.RobolectricTestBase;
 import com.nightscout.core.dexcom.records.EGVRecord;

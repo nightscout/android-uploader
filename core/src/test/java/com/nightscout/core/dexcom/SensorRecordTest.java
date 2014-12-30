@@ -27,7 +27,7 @@ public class SensorRecordTest {
         assertThat(sensorRecord.getFiltered(), is(130384L));
         assertThat(sensorRecord.getRssi(), is(166));
         assertThat(sensorRecord.getRawDisplayTimeSeconds(), is(186309619L));
-        assertThat(sensorRecord.getRawSystemTimeSeconds(), is(186331222));
+        assertThat(sensorRecord.getRawSystemTimeSeconds(), is(186331222L));
     }
 
     @Test(expected = InvalidRecordLengthException.class)

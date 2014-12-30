@@ -9,7 +9,7 @@ import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.test.RobolectricTestBase;
 import com.nightscout.android.wearables.Pebble;
 import com.nightscout.core.dexcom.TrendArrow;
-import com.nightscout.core.protobuf.G4Download;
+import com.nightscout.core.model.GlucoseUnit;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -67,7 +67,7 @@ public class MainActivityTest extends RobolectricTestBase {
         assertThat(preferences.getRestApiBaseUris(), containsInAnyOrder(
                 "http://abc@example.com", "http://example2.com"));
     }
-    
+
     @Test
     public void testOnCreate_ShouldShowIUnderstandDialog() {
         preferences.setIUnderstand(false);
@@ -122,7 +122,7 @@ public class MainActivityTest extends RobolectricTestBase {
         Pebble pebble = mock(Pebble.class);
         ((MainActivity) activity).setPebble(pebble);
         activityController.stop().resume();
-        verify(pebble, times(1)).config(anyString(), (G4Download.GlucoseUnit) anyObject());
+        verify(pebble, times(1)).config(anyString(), (GlucoseUnit) anyObject());
     }
 
     @Test

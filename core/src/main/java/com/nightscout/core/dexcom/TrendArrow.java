@@ -1,16 +1,17 @@
 package com.nightscout.core.dexcom;
 
-import com.nightscout.core.protobuf.G4Download;
+
+import com.nightscout.core.model.Trend;
 
 public enum TrendArrow {
     NONE(0),
-    DOUBLE_UP(1,"\u21C8", "DoubleUp"),
-    SINGLE_UP(2,"\u2191", "SingleUp"),
-    UP_45(3,"\u2197", "FortyFiveUp"),
-    FLAT(4,"\u2192", "Flat"),
-    DOWN_45(5,"\u2198", "FortyFiveDown"),
-    SINGLE_DOWN(6,"\u2193", "SingleDown"),
-    DOUBLE_DOWN(7,"\u21CA", "DoubleDown"),
+    DOUBLE_UP(1, "\u21C8", "DoubleUp"),
+    SINGLE_UP(2, "\u2191", "SingleUp"),
+    UP_45(3, "\u2197", "FortyFiveUp"),
+    FLAT(4, "\u2192", "Flat"),
+    DOWN_45(5, "\u2198", "FortyFiveDown"),
+    SINGLE_DOWN(6, "\u2193", "SingleDown"),
+    DOUBLE_DOWN(7, "\u21CA", "DoubleDown"),
     NOT_COMPUTABLE(8),
     OUT_OF_RANGE(9);
 
@@ -19,13 +20,13 @@ public enum TrendArrow {
     private int myID;
 
     TrendArrow(int id, String a, String t) {
-        myID=id;
+        myID = id;
         arrowSymbol = a;
         trendName = t;
     }
 
     TrendArrow(int id) {
-        this(id,null, null);
+        this(id, null, null);
     }
 
     public String symbol() {
@@ -44,12 +45,12 @@ public enum TrendArrow {
         }
     }
 
-    public int getID(){
+    public int getID() {
         return myID;
     }
 
-    public G4Download.Trend toProtobuf(){
-        return G4Download.Trend.values()[myID];
+    public Trend toProtobuf() {
+        return Trend.values()[myID];
     }
 
 }

@@ -38,7 +38,7 @@ public class MeterRecordTest {
         MeterRecord meterRecord = new MeterRecord(record);
         assertThat(meterRecord.getBgMgdl(), is(113));
         assertThat(meterRecord.getRawDisplayTimeSeconds(), is(186133445L));
-        assertThat(meterRecord.getRawSystemTimeSeconds(), is(186155048));
+        assertThat(meterRecord.getRawSystemTimeSeconds(), is(186155048L));
         assertThat(meterRecord.getMeterTime(), is(186155018));
     }
 

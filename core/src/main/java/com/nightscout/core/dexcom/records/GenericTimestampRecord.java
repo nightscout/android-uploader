@@ -1,16 +1,19 @@
 package com.nightscout.core.dexcom.records;
 
+import com.google.common.collect.Lists;
 import com.nightscout.core.dexcom.Utils;
+import com.squareup.wire.Message;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
+import java.util.List;
 
 abstract public class GenericTimestampRecord {
     protected final int OFFSET_SYS_TIME = 0;
     protected final int OFFSET_DISPLAY_TIME = 4;
     protected Date systemTime;
-    protected int rawSystemTimeSeconds;
+    protected long rawSystemTimeSeconds;
     protected Date displayTime;
     protected long rawDisplayTimeSeconds;
 
@@ -26,16 +29,18 @@ abstract public class GenericTimestampRecord {
         this.systemTime = systemTime;
     }
 
-    public GenericTimestampRecord(long rawDisplayTimeSeconds, int rawSystemTimeSeconds) {
+    public GenericTimestampRecord(long rawDisplayTimeSeconds, long rawSystemTimeSeconds) {
         this.rawDisplayTimeSeconds = rawDisplayTimeSeconds;
         this.rawSystemTimeSeconds = rawSystemTimeSeconds;
+        this.systemTime = Utils.receiverTimeToDate(rawSystemTimeSeconds);
+        this.displayTime = Utils.receiverTimeToDate(rawDisplayTimeSeconds);
     }
 
     public Date getSystemTime() {
         return systemTime;
     }
 
-    public int getRawSystemTimeSeconds() {
+    public long getRawSystemTimeSeconds() {
         return rawSystemTimeSeconds;
     }
 
@@ -45,6 +50,18 @@ abstract public class GenericTimestampRecord {
 
     public long getRawDisplayTimeSeconds() {
         return rawDisplayTimeSeconds;
+    }
+
+    abstract protected Message toProtobuf();
+
+    public static <T extends Message, S extends GenericTimestampRecord> List<T> toProtobufList(
+            List<S> list, Class<T> clazz) {
+        List<T> results = Lists.newArrayList();
+
+        for (GenericTimestampRecord record : list) {
+            results.add(clazz.cast(record.toProtobuf()));
+        }
+        return results;
     }
 
     @Override
@@ -62,7 +79,7 @@ abstract public class GenericTimestampRecord {
 
     @Override
     public int hashCode() {
-        int result = rawSystemTimeSeconds;
+        int result = (int) (rawSystemTimeSeconds ^ (rawSystemTimeSeconds >>> 32));
         result = 31 * result + (int) (rawDisplayTimeSeconds ^ (rawDisplayTimeSeconds >>> 32));
         return result;
     }

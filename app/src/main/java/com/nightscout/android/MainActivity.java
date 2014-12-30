@@ -29,15 +29,15 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.nightscout.android.dexcom.SyncingService;
+import com.nightscout.android.drivers.AndroidUploaderDevice;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.preferences.PreferencesValidator;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.android.wearables.Pebble;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
+import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.preferences.NightscoutPreferences;
-import com.nightscout.core.protobuf.G4Download;
 import com.nightscout.core.utils.GlucoseReading;
 import com.nightscout.core.utils.RestUriUtils;
 
@@ -83,9 +83,7 @@ public class MainActivity extends Activity {
     private TextView mTextTimestamp;
     private StatusBarIcons statusBarIcons;
     private Pebble pebble;
-
-    // TODO: should try and avoid use static
-    public static int batLevel = 0;
+    private AndroidUploaderDevice uploaderDevice;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -109,7 +107,6 @@ public class MainActivity extends Activity {
         IntentFilter deviceStatusFilter = new IntentFilter();
         deviceStatusFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         deviceStatusFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-        deviceStatusFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver(mDeviceStatusReceiver, deviceStatusFilter);
 
         // Register Broadcast Receiver for response messages from mSyncingServiceIntent service
@@ -147,7 +144,8 @@ public class MainActivity extends Activity {
         // If app started due to android.hardware.usb.action.USB_DEVICE_ATTACHED intent, start syncing
         Intent startIntent = getIntent();
         String action = startIntent.getAction();
-        if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) || SyncingService.isG4Connected(getApplicationContext())) {
+        if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) ||
+                SyncingService.isG4Connected(getApplicationContext())) {
             statusBarIcons.setUSB(true);
             Log.d(TAG, "Starting syncing in OnCreate...");
             SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
@@ -187,6 +185,8 @@ public class MainActivity extends Activity {
         pebble = new Pebble(getApplicationContext());
         pebble.setUnits(preferences.getPreferredUnits());
         pebble.setPwdName(preferences.getPwdName());
+
+        uploaderDevice = AndroidUploaderDevice.getUploaderDevice(getApplicationContext());
 
     }
 
@@ -234,7 +234,6 @@ public class MainActivity extends Activity {
 
     private void ensureIUnderstandDialogDisplayed() {
         if (!preferences.getIUnderstand()) {
-            final Activity activity = this;
             // Prompt user to ask to donate data to research
             AlertDialog.Builder dataDialog = new AlertDialog.Builder(this)
                     .setCancelable(false)
@@ -283,11 +282,11 @@ public class MainActivity extends Activity {
 
         int direction = (Integer) mTextSGV.getTag(R.string.display_trend);
         if (sgv != -1) {
-            GlucoseReading sgvReading = new GlucoseReading(sgv, G4Download.GlucoseUnit.MGDL);
+            GlucoseReading sgvReading = new GlucoseReading(sgv, GlucoseUnit.MGDL);
             mTextSGV.setText(getSGVStringByUnit(sgvReading, TrendArrow.values()[direction]));
         }
 
-        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(preferences.getPreferredUnits() == G4Download.GlucoseUnit.MMOL) + ")");
+        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(preferences.getPreferredUnits() == GlucoseUnit.MMOL) + ")");
 
         mHandler.post(updateTimeAgo);
         // FIXME: (klee) need to find a better way to do this. Too many things are hooking in here.
@@ -310,6 +309,7 @@ public class MainActivity extends Activity {
         unregisterReceiver(mCGMStatusReceiver);
         unregisterReceiver(mDeviceStatusReceiver);
         unregisterReceiver(toastReceiver);
+        uploaderDevice.close();
     }
 
     @Override
@@ -358,7 +358,7 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             // Get response messages from broadcast
             int responseSGV = intent.getIntExtra(SyncingService.RESPONSE_SGV, -1);
-            GlucoseReading reading = new GlucoseReading(responseSGV, G4Download.GlucoseUnit.MGDL);
+            GlucoseReading reading = new GlucoseReading(responseSGV, GlucoseUnit.MGDL);
             TrendArrow trend = TrendArrow.values()[intent.getIntExtra(SyncingService.RESPONSE_TREND, 0)];
             long responseSGVTimestamp = intent.getLongExtra(SyncingService.RESPONSE_TIMESTAMP, -1L);
             boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
@@ -440,9 +440,6 @@ public class MainActivity extends Activity {
                     statusBarIcons.setUSB(true);
                     Log.d(TAG, "Starting syncing on USB attached...");
                     SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
-                    break;
-                case Intent.ACTION_BATTERY_CHANGED:
-                    batLevel = intent.getIntExtra("level", 0);
                     break;
             }
         }

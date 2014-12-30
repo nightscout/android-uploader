@@ -1,4 +1,4 @@
-package com.nightscout.android.dexcom.USB;
+package com.nightscout.android.drivers.USB;
 
 import android.util.Log;
 

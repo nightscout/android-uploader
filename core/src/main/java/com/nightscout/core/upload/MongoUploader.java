@@ -8,11 +8,12 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
-import com.nightscout.core.dexcom.records.CalRecord;
+import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
-import com.nightscout.core.dexcom.records.MeterRecord;
+import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.model.CookieMonsterG4Cal;
+import com.nightscout.core.model.CookieMonsterG4Meter;
 import com.nightscout.core.preferences.NightscoutPreferences;
-import com.nightscout.core.records.DeviceStatus;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -110,29 +111,31 @@ public class MongoUploader extends BaseUploader {
         return output;
     }
 
-    private BasicDBObject toBasicDBObject(MeterRecord meterRecord) {
+    private BasicDBObject toBasicDBObject(CookieMonsterG4Meter meterRecord) {
         BasicDBObject output = new BasicDBObject();
+        Date timestamp = Utils.receiverTimeToDate(meterRecord.disp_timestamp_sec);
         output.put("device", "dexcom");
         output.put("type", "mbg");
-        output.put("date", meterRecord.getDisplayTime().getTime());
-        output.put("dateString", meterRecord.getDisplayTime().toString());
-        output.put("mbg", meterRecord.getBgMgdl());
+        output.put("date", timestamp.getTime());
+        output.put("dateString", timestamp.toString());
+        output.put("mbg", meterRecord.meter_bg_mgdl);
         return output;
     }
 
-    private BasicDBObject toBasicDBObject(CalRecord calRecord) {
+    private BasicDBObject toBasicDBObject(CookieMonsterG4Cal calRecord) {
         BasicDBObject output = new BasicDBObject();
+        Date timestamp = Utils.receiverTimeToDate(calRecord.disp_timestamp_sec);
         output.put("device", "dexcom");
-        output.put("date", calRecord.getDisplayTime().getTime());
-        output.put("dateString", calRecord.getDisplayTime().toString());
-        output.put("slope", calRecord.getSlope());
-        output.put("intercept", calRecord.getIntercept());
-        output.put("scale", calRecord.getScale());
+        output.put("date", timestamp.getTime());
+        output.put("dateString", timestamp.toString());
+        output.put("slope", calRecord.slope);
+        output.put("intercept", calRecord.intercept);
+        output.put("scale", calRecord.scale);
         output.put("type", "cal");
         return output;
     }
 
-    private BasicDBObject toBasicDBObject(DeviceStatus deviceStatus) {
+    private BasicDBObject toBasicDBObject(AbstractUploaderDevice deviceStatus) {
         BasicDBObject output = new BasicDBObject();
         output.put("uploaderBattery", deviceStatus.getBatteryLevel());
         output.put("created_at", new Date());
@@ -155,17 +158,17 @@ public class MongoUploader extends BaseUploader {
     }
 
     @Override
-    protected boolean doUpload(MeterRecord meterRecord) throws IOException {
+    protected boolean doUpload(CookieMonsterG4Meter meterRecord) throws IOException {
         return upsert(toBasicDBObject(meterRecord));
     }
 
     @Override
-    protected boolean doUpload(CalRecord calRecord) throws IOException {
+    protected boolean doUpload(CookieMonsterG4Cal calRecord) throws IOException {
         return upsert(toBasicDBObject(calRecord));
     }
 
     @Override
-    protected boolean doUpload(DeviceStatus deviceStatus) throws IOException {
+    protected boolean doUpload(AbstractUploaderDevice deviceStatus) throws IOException {
         return upsert(getDeviceStatusCollection(), toBasicDBObject(deviceStatus));
     }
 

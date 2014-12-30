@@ -2,12 +2,12 @@ package com.nightscout.core.upload;
 
 import com.google.common.collect.Lists;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
-import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
-import com.nightscout.core.dexcom.records.MeterRecord;
+import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.model.CookieMonsterG4Cal;
+import com.nightscout.core.model.CookieMonsterG4Meter;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.preferences.TestPreferences;
-import com.nightscout.core.records.DeviceStatus;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,9 +32,9 @@ public class BaseUploaderTest {
     private TestPreferences preferences;
 
     class MockUploader extends BaseUploader {
-        public List<CalRecord> calRecords;
+        public List<CookieMonsterG4Cal> calRecords;
         public List<GlucoseDataSet> glucoseDataSets;
-        public List<MeterRecord> meterRecords;
+        public List<CookieMonsterG4Meter> meterRecords;
 
         public MockUploader(NightscoutPreferences preferences) {
             super(preferences);
@@ -54,13 +54,13 @@ public class BaseUploaderTest {
         }
 
         @Override
-        protected boolean doUpload(MeterRecord meterRecord) throws IOException {
+        protected boolean doUpload(CookieMonsterG4Meter meterRecord) throws IOException {
             meterRecords.add(meterRecord);
             return true;
         }
 
         @Override
-        protected boolean doUpload(CalRecord calRecord) throws IOException {
+        protected boolean doUpload(CookieMonsterG4Cal calRecord) throws IOException {
             calRecords.add(calRecord);
             return true;
         }
@@ -77,17 +77,17 @@ public class BaseUploaderTest {
         }
 
         @Override
-        protected boolean doUpload(MeterRecord meterRecord) throws IOException {
+        protected boolean doUpload(CookieMonsterG4Meter meterRecord) throws IOException {
             throw new IOException("meter");
         }
 
         @Override
-        protected boolean doUpload(CalRecord calRecord) throws IOException {
+        protected boolean doUpload(CookieMonsterG4Cal calRecord) throws IOException {
             throw new IOException("cal");
         }
 
         @Override
-        protected boolean doUpload(DeviceStatus deviceStatus) throws IOException {
+        protected boolean doUpload(AbstractUploaderDevice deviceStatus) throws IOException {
             throw new IOException("device");
         }
     }
@@ -151,20 +151,20 @@ public class BaseUploaderTest {
 
     @Test
     public void testUploadMeterRecords_Zero() {
-        mockUploader.uploadMeterRecords(new ArrayList<MeterRecord>());
+        mockUploader.uploadMeterRecords(new ArrayList<CookieMonsterG4Meter>());
         assertThat(mockUploader.meterRecords, is(empty()));
     }
 
     @Test
     public void testUploadMeterRecords_One() throws Exception {
-        List<MeterRecord> list = Lists.newArrayList(mockMeterRecord());
+        List<CookieMonsterG4Meter> list = Lists.newArrayList(mockMeterRecord());
         mockUploader.uploadMeterRecords(list);
         assertThat(mockUploader.meterRecords, hasSize(1));
     }
 
     @Test
     public void testUploadMeterRecords_Many() throws Exception {
-        List<MeterRecord> list = Lists.newArrayList(
+        List<CookieMonsterG4Meter> list = Lists.newArrayList(
                 mockMeterRecord(),
                 mockMeterRecord(),
                 mockMeterRecord());
@@ -194,14 +194,14 @@ public class BaseUploaderTest {
     @Test
     public void testUploadCalRecords_Zero() {
         preferences.setCalibrationUploadEnabled(true);
-        mockUploader.uploadCalRecords(new ArrayList<CalRecord>());
+        mockUploader.uploadCalRecords(new ArrayList<CookieMonsterG4Cal>());
         assertThat(mockUploader.calRecords, is(empty()));
     }
 
     @Test
     public void testUploadCalRecords_One() {
         preferences.setCalibrationUploadEnabled(true);
-        List<CalRecord> list = null;
+        List<CookieMonsterG4Cal> list = null;
         try {
             list = Lists.newArrayList(mockCalRecord());
         } catch (InvalidRecordLengthException e) {
@@ -214,7 +214,7 @@ public class BaseUploaderTest {
     @Test
     public void testUploadCalRecords_Many() {
         preferences.setCalibrationUploadEnabled(true);
-        List<CalRecord> list = null;
+        List<CookieMonsterG4Cal> list = null;
         try {
             list = Lists.newArrayList(
                     mockCalRecord(),
