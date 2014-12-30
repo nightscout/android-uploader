@@ -13,23 +13,23 @@ public class USBPower {
     private static final String SET_POWER_SUSPEND_COMMAND_B = "echo \"auto\" > \"/sys/bus/usb/devices/1-1/power/control\"";
     public static final int POWER_ON_DELAY = 5000;
 
-    public static void PowerOff() {
+    public static void powerOff() {
         try {
             runCommand(SET_POWER_SUSPEND_COMMAND_A);
             runCommand(SET_POWER_SUSPEND_COMMAND_B);
-            Log.i(TAG, "PowerOff USB complete");
+            Log.i(TAG, "powerOff USB complete");
         } catch (Exception e) {
-            Log.e(TAG, "Unable to PowerOff USB");
+            Log.e(TAG, "Unable to powerOff USB");
         }
     }
 
-    public static void PowerOn(){
+    public static void powerOn() {
         try {
             runCommand(SET_POWER_ON_COMMAND);
-            Log.i(TAG, "PowerOn USB complete");
+            Log.i(TAG, "powerOn USB complete");
             Thread.sleep(POWER_ON_DELAY);
         } catch (Exception e) {
-            Log.e(TAG, "Unable to PowerOn USB");
+            Log.e(TAG, "Unable to powerOn USB");
         }
     }
 

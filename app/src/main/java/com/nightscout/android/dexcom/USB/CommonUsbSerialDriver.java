@@ -42,6 +42,8 @@ abstract class CommonUsbSerialDriver implements UsbSerialDriver {
     protected final Object mReadBufferLock = new Object();
     protected final Object mWriteBufferLock = new Object();
 
+    protected boolean mPowerManagementEnabled = false;
+
     /** Internal read buffer.  Guarded by {@link #mReadBufferLock}. */
     protected byte[] mReadBuffer;
 
@@ -54,6 +56,10 @@ abstract class CommonUsbSerialDriver implements UsbSerialDriver {
 
         mReadBuffer = new byte[DEFAULT_READ_BUFFER_SIZE];
         mWriteBuffer = new byte[DEFAULT_WRITE_BUFFER_SIZE];
+    }
+
+    public void setPowerManagementEnabled(boolean powerManagementEnabled) {
+        this.mPowerManagementEnabled = powerManagementEnabled;
     }
 
     /**

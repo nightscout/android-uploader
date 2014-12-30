@@ -1,8 +1,5 @@
-package com.nightscout.android.dexcom;
+package com.nightscout.core.drivers;
 
-import android.util.Log;
-
-import com.nightscout.android.dexcom.USB.UsbSerialDriver;
 import com.nightscout.core.dexcom.Command;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.PacketBuilder;
@@ -16,6 +13,8 @@ import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.PageHeader;
 import com.nightscout.core.dexcom.records.SensorRecord;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
@@ -27,12 +26,12 @@ import java.util.Date;
 
 public class ReadData {
 
-    private static final String TAG = ReadData.class.getSimpleName();
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
     private static final int IO_TIMEOUT = 1000;
     private static final int MIN_LEN = 256;
-    private UsbSerialDriver mSerialDevice;
+    private DeviceTransport mSerialDevice;
 
-    public ReadData(UsbSerialDriver device) {
+    public ReadData(DeviceTransport device) {
         mSerialDevice = device;
     }
 
@@ -45,20 +44,20 @@ public class ReadData {
         if (numOfRecentPages < 1) {
             throw new IllegalArgumentException("Number of pages must be greater than 1.");
         }
-        Log.d(TAG, "Reading EGV page range...");
+        log.debug("Reading EGV page range...");
         int endPage = readDataBasePageRange(RecordType.EGV_DATA);
-        Log.d(TAG, "Reading " + numOfRecentPages + " EGV page(s)...");
+        log.debug("Reading {} EGV page(s)...", numOfRecentPages);
         numOfRecentPages = numOfRecentPages - 1;
         EGVRecord[] allPages = new EGVRecord[0];
         for (int i = Math.min(numOfRecentPages,endPage); i >= 0; i--) {
             int nextPage = endPage - i;
-            Log.d(TAG, "Reading #" + i + " EGV pages (page number " + nextPage + ")");
+            log.debug("Reading #{} EGV pages (page number {})", i, nextPage);
             EGVRecord[] ithEGVRecordPage = readDataBasePage(RecordType.EGV_DATA, nextPage);
             EGVRecord[] result = Arrays.copyOf(allPages, allPages.length + ithEGVRecordPage.length);
             System.arraycopy(ithEGVRecordPage, 0, result, allPages.length, ithEGVRecordPage.length);
             allPages = result;
         }
-        Log.d(TAG, "Read complete of EGV pages.");
+        log.debug("Read complete of EGV pages.");
         return allPages;
     }
 
@@ -67,7 +66,7 @@ public class ReadData {
     }
 
     public MeterRecord[] getRecentMeterRecords() {
-        Log.d(TAG, "Reading Meter page...");
+        log.debug("Reading Meter page...");
         int endPage = readDataBasePageRange(RecordType.METER_DATA);
         return readDataBasePage(RecordType.METER_DATA, endPage);
     }
@@ -76,27 +75,27 @@ public class ReadData {
         if (numOfRecentPages < 1) {
             throw new IllegalArgumentException("Number of pages must be greater than 1.");
         }
-        Log.d(TAG, "Reading Sensor page range...");
+        log.debug("Reading Sensor page range...");
         int endPage = readDataBasePageRange(RecordType.SENSOR_DATA);
-        Log.d(TAG, "Reading " + numOfRecentPages + " Sensor page(s)...");
+        log.debug("Reading {} Sensor page(s)...", numOfRecentPages);
         numOfRecentPages = numOfRecentPages - 1;
         SensorRecord[] allPages = new SensorRecord[0];
         for (int i = Math.min(numOfRecentPages,endPage); i >= 0; i--) {
             int nextPage = endPage - i;
-            Log.d(TAG, "Reading #" + i + " Sensor pages (page number " + nextPage + ")");
+            log.debug("Reading #{} Sensor pages (page number {})", i, nextPage);
             SensorRecord[] ithSensorRecordPage = readDataBasePage(RecordType.SENSOR_DATA, nextPage);
             SensorRecord[] result = Arrays.copyOf(allPages, allPages.length + ithSensorRecordPage.length);
             System.arraycopy(ithSensorRecordPage, 0, result, allPages.length, ithSensorRecordPage.length);
             allPages = result;
         }
-        Log.d(TAG, "Read complete of Sensor pages.");
+        log.debug("Read complete of Sensor pages.");
         return allPages;
     }
 
     public CalRecord[] getRecentCalRecords() {
-        Log.d(TAG, "Reading Cal Records page range...");
+        log.debug("Reading Cal Records page range...");
         int endPage = readDataBasePageRange(RecordType.CAL_SET);
-        Log.d(TAG, "Reading Cal Records page...");
+        log.debug("Reading Cal Records page...");
         return readDataBasePage(RecordType.CAL_SET, endPage);
     }
 
@@ -106,7 +105,7 @@ public class ReadData {
     }
 
     public int readBatteryLevel() {
-        Log.d(TAG, "Reading battery level...");
+        log.debug("Reading battery level...");
         writeCommand(Command.READ_BATTERY_LEVEL);
         byte[] readData = read(MIN_LEN).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
@@ -124,21 +123,21 @@ public class ReadData {
     }
 
     public long readSystemTime() {
-        Log.d(TAG, "Reading system time...");
+        log.debug("Reading system time...");
         writeCommand(Command.READ_SYSTEM_TIME);
         byte[] readData = read(MIN_LEN).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
     public int readDisplayTimeOffset() {
-        Log.d(TAG, "Reading display time offset...");
+        log.debug("Reading display time offset...");
         writeCommand(Command.READ_DISPLAY_TIME_OFFSET);
         byte[] readData = read(MIN_LEN).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
     private int readDataBasePageRange(RecordType recordType) {
-        ArrayList<Byte> payload = new ArrayList<Byte>();
+        ArrayList<Byte> payload = new ArrayList<>();
         payload.add((byte) recordType.ordinal());
         writeCommand(Command.READ_DATABASE_PAGE_RANGE, payload);
         byte[] readData = read(MIN_LEN).getData();
@@ -169,7 +168,7 @@ public class ReadData {
             try {
                 mSerialDevice.write(packet, IO_TIMEOUT);
             } catch (IOException e) {
-                Log.e(TAG, "Unable to write to serial device.", e);
+                log.error("Unable to write to serial device. {}", e);
             }
         }
     }
@@ -180,18 +179,18 @@ public class ReadData {
             try {
                 mSerialDevice.write(packet, IO_TIMEOUT);
             } catch (IOException e) {
-                Log.e(TAG, "Unable to write to serial device.", e);
+                log.error("Unable to write to serial device. {}", e);
             }
         }
     }
 
     private ReadPacket read(int numOfBytes) {
         byte[] response = new byte[numOfBytes];
-        int len = 0;
+        int len;
         try {
             response = mSerialDevice.read(numOfBytes, IO_TIMEOUT);
             len = response.length;
-            Log.d(TAG, "Read " + len + " byte(s) complete.");
+            log.debug("Read {} byte(s) complete.", len);
 
             // Add a 100ms delay for when multiple write/reads are occurring in series
             Thread.sleep(100);
@@ -201,10 +200,10 @@ public class ReadData {
             String bytes = "";
             int readAmount = len;
             for (int i = 0; i < readAmount; i++) bytes += String.format("%02x", response[i]) + " ";
-            Log.d(TAG, "Read data: " + bytes);
+            log.debug("Read data: {}", bytes);
             ////////////////////////////////////////////////////////////////////////////////////////
         } catch (IOException e) {
-            Log.e(TAG, "Unable to read from serial device.", e);
+            log.error("Unable to read from serial device. {}", e);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
