@@ -80,9 +80,14 @@ public class DexcomG4 extends AbstractDevice {
                 if (preferences.isCalibrationUploadEnabled()) {
                     calRecords = readData.getRecentCalRecords();
                 }
+                if (recentRecords.size() == 0) {
+                    status = DownloadStatus.NO_DATA;
+                }
 
                 displayTime = readData.readDisplayTime().getTime();
-                timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords.get(recentRecords.size() - 1));
+                if (status == DownloadStatus.SUCCESS) {
+                    timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords.get(recentRecords.size() - 1));
+                }
                 // FIXME: readData.readBatteryLevel() seems to flake out on battery level reads. Removing for now.
                 batLevel = 100;
                 // TODO pull in other exceptions once we have the analytics/acra reporters

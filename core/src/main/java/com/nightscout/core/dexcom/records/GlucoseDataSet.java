@@ -45,8 +45,8 @@ public class GlucoseDataSet {
     }
 
     public GlucoseDataSet(CookieMonsterG4SGV egvRecord, CookieMonsterG4Sensor sensorRecord) {
-        this.systemTime = new Date(egvRecord.sys_timestamp_sec);
-        this.displayTime = new Date(egvRecord.disp_timestamp_sec);
+        this.systemTime = Utils.receiverTimeToDate(egvRecord.sys_timestamp_sec);
+        this.displayTime = Utils.receiverTimeToDate(egvRecord.disp_timestamp_sec);
         this.reading = new GlucoseReading(egvRecord.sgv_mgdl, GlucoseUnit.MGDL);
         this.trend = TrendArrow.values()[egvRecord.trend.ordinal()];
         this.noise = egvRecord.noise.ordinal();

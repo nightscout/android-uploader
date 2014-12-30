@@ -25,6 +25,7 @@ import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DexcomG4;
 import com.nightscout.core.model.CookieMonsterDownload;
 import com.nightscout.core.model.DownloadResults;
+import com.nightscout.core.model.DownloadStatus;
 import com.nightscout.core.model.Noise;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
@@ -137,8 +138,13 @@ public class SyncingService extends IntentService {
                     uploadStatus = uploader.upload(results);
                 }
 
-                Log.d(TAG, "Status: " + download.download_status.name());
-                EGVRecord recentEGV = new EGVRecord(download.sgv.get(download.sgv.size() - 1));
+                EGVRecord recentEGV;
+                if (download.download_status == DownloadStatus.SUCCESS) {
+                    recentEGV = new EGVRecord(download.sgv.get(download.sgv.size() - 1));
+                } else {
+                    recentEGV = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(),
+                            Noise.NOISE_NONE);
+                }
 
                 broadcastSGVToUI(recentEGV, uploadStatus, results.getNextUploadTime() + TIME_SYNC_OFFSET,
                         results.getDisplayTime(), results.getResultArray(), download.receiver_battery);
