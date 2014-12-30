@@ -1,17 +1,14 @@
 package com.nightscout.core.dexcom.records;
 
-import com.google.common.base.Optional;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.protobuf.G4Download;
+import com.nightscout.core.model.CookieMonsterG4Sensor;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Date;
+import java.util.List;
 
 public class SensorRecord extends GenericTimestampRecord {
-
     public static final int RECORD_SIZE = 19;
     private long unfiltered;
     private long filtered;
@@ -31,25 +28,18 @@ public class SensorRecord extends GenericTimestampRecord {
         rssi = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(OFFSET_RSSI);
     }
 
-    public SensorRecord(long unfiltered, long filtered, int rssi, long time) {
-        super(time);
-        this.unfiltered = unfiltered;
-        this.filtered = filtered;
-        this.rssi = rssi;
-    }
-
-    public SensorRecord(int filtered, int unfiltered, int rssi, Date displayTime, Date systemTime) {
-        super(displayTime, systemTime);
-        this.filtered = filtered;
-        this.unfiltered = unfiltered;
-        this.rssi = rssi;
-    }
-
     public SensorRecord(int filtered, int unfiltered, int rssi, long displayTime, int systemTime) {
         super(displayTime, systemTime);
         this.filtered = filtered;
         this.unfiltered = unfiltered;
         this.rssi = rssi;
+    }
+
+    public SensorRecord(CookieMonsterG4Sensor sensor) {
+        super(sensor.disp_timestamp_sec, sensor.sys_timestamp_sec);
+        this.filtered = sensor.filtered;
+        this.unfiltered = sensor.unfiltered;
+        this.rssi = sensor.rssi;
     }
 
     public long getUnfiltered() {
@@ -64,24 +54,20 @@ public class SensorRecord extends GenericTimestampRecord {
         return rssi;
     }
 
-    public G4Download.CookieMonsterG4Sensor toProtobuf() {
-        G4Download.CookieMonsterG4Sensor.Builder builder = G4Download.CookieMonsterG4Sensor.newBuilder();
-        return builder.setTimestampSec(rawSystemTimeSeconds)
-                .setRssi(rssi)
-                .setFiltered(filtered)
-                .setUnfiltered(unfiltered)
+    @Override
+    public CookieMonsterG4Sensor toProtobuf() {
+        CookieMonsterG4Sensor.Builder builder = new CookieMonsterG4Sensor.Builder();
+        return builder.sys_timestamp_sec(rawSystemTimeSeconds)
+                .disp_timestamp_sec(rawDisplayTimeSeconds)
+                .rssi(rssi)
+                .filtered(filtered)
+                .unfiltered(unfiltered)
                 .build();
 
     }
 
-    public Optional<SensorRecord> fromProtoBuf(byte[] byteArray) {
-        try {
-            G4Download.CookieMonsterG4Sensor record = G4Download.CookieMonsterG4Sensor.parseFrom(byteArray);
-            return Optional.of(new SensorRecord(record.getUnfiltered(), record.getFiltered(), record.getRssi(), record.getTimestampSec()));
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
-        }
-        return Optional.absent();
+    public static List<CookieMonsterG4Sensor> toProtobufList(List<SensorRecord> list) {
+        return toProtobufList(list, CookieMonsterG4Sensor.class);
     }
 
     @Override

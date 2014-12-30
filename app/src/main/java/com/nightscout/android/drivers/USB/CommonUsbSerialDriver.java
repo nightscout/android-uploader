@@ -18,12 +18,14 @@
  * Project home page: http://code.google.com/p/usb-serial-for-android/
  */
 
-package com.nightscout.android.USB;
+package com.nightscout.android.drivers.USB;
 
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbManager;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 
 /**
@@ -41,10 +43,13 @@ abstract class CommonUsbSerialDriver implements UsbSerialDriver {
 
     protected final Object mReadBufferLock = new Object();
     protected final Object mWriteBufferLock = new Object();
+    protected UsbManager mManager;
 
     protected boolean mPowerManagementEnabled = false;
 
-    /** Internal read buffer.  Guarded by {@link #mReadBufferLock}. */
+    /**
+     * Internal read buffer.  Guarded by {@link #mReadBufferLock}.
+     */
     protected byte[] mReadBuffer;
 
     /**
@@ -52,9 +57,10 @@ abstract class CommonUsbSerialDriver implements UsbSerialDriver {
      */
     protected byte[] mWriteBuffer;
 
-    public CommonUsbSerialDriver(UsbDevice device, UsbDeviceConnection connection) {
+    public CommonUsbSerialDriver(UsbDevice device, UsbDeviceConnection connection, UsbManager manager) {
         mDevice = device;
         mConnection = connection;
+        mManager = manager;
 
         mReadBuffer = new byte[DEFAULT_READ_BUFFER_SIZE];
         mWriteBuffer = new byte[DEFAULT_WRITE_BUFFER_SIZE];
@@ -142,5 +148,21 @@ abstract class CommonUsbSerialDriver implements UsbSerialDriver {
 
     @Override
     public abstract void setRTS(boolean value) throws IOException;
+
+    @Override
+    public boolean isConnected(int vendorId, int productId, int deviceClass, int subClass,
+                               int protocol) {
+        if (mManager == null) return false;
+        HashMap<String, UsbDevice> deviceList = mManager.getDeviceList();
+        for (UsbDevice device : deviceList.values()) {
+            if (device.getVendorId() == vendorId && device.getProductId() == productId &&
+                    device.getDeviceClass() == deviceClass &&
+                    device.getDeviceSubclass() == subClass &&
+                    device.getDeviceProtocol() == protocol) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

@@ -19,7 +19,7 @@ android {
         applicationId "com.nightscout.android"
         minSdkVersion 12
         targetSdkVersion 18
-        versionCode 16
+        versionCode 18
         versionName "0.2.0-dev"
     }
 

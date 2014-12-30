@@ -1,15 +1,15 @@
 package com.nightscout.core.dexcom.records;
 
-import com.google.common.base.Optional;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.protobuf.G4Download;
+import com.nightscout.core.model.CookieMonsterG4Meter;
+import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.utils.GlucoseReading;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
+import java.util.List;
 
 public class MeterRecord extends GenericTimestampRecord {
     public final static int RECORD_SIZE = 15;
@@ -23,25 +23,31 @@ public class MeterRecord extends GenericTimestampRecord {
                     ". Expected size: " + RECORD_SIZE + " record: " + Utils.bytesToHex(packet));
         }
         int meterBG = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8);
-        reading = new GlucoseReading(meterBG, G4Download.GlucoseUnit.MGDL);
+        reading = new GlucoseReading(meterBG, GlucoseUnit.MGDL);
         meterTime = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(10);
     }
 
     public MeterRecord(int meterBgMgdl, int meterTime, Date displayTime, Date systemTime) {
         super(displayTime, systemTime);
-        this.reading = new GlucoseReading(meterBgMgdl, G4Download.GlucoseUnit.MGDL);
+        this.reading = new GlucoseReading(meterBgMgdl, GlucoseUnit.MGDL);
         this.meterTime = meterTime;
     }
 
     public MeterRecord(int meterBgMgdl, int meterTime, long displayTime, long systemTime) {
         super(displayTime, systemTime);
-        this.reading = new GlucoseReading(meterBgMgdl, G4Download.GlucoseUnit.MGDL);
+        this.reading = new GlucoseReading(meterBgMgdl, GlucoseUnit.MGDL);
         this.meterTime = meterTime;
+    }
+
+    public MeterRecord(CookieMonsterG4Meter meter) {
+        super(meter.disp_timestamp_sec, meter.sys_timestamp_sec);
+        this.reading = new GlucoseReading(meter.meter_bg_mgdl, GlucoseUnit.MGDL);
+        this.meterTime = meter.meter_time;
     }
 
     public MeterRecord(int meterBgMgdl, int meterTime, long systemTime) {
         super(systemTime);
-        this.reading = new GlucoseReading(meterBgMgdl, G4Download.GlucoseUnit.MGDL);
+        this.reading = new GlucoseReading(meterBgMgdl, GlucoseUnit.MGDL);
         this.meterTime = meterTime;
     }
 
@@ -58,12 +64,18 @@ public class MeterRecord extends GenericTimestampRecord {
         return meterTime;
     }
 
-    public G4Download.CookieMonsterG4Meter toProtobuf() {
-        G4Download.CookieMonsterG4Meter.Builder builder = G4Download.CookieMonsterG4Meter.newBuilder();
-        return builder.setTimestampSec(rawSystemTimeSeconds)
-                .setMeterTime(meterTime)
-                .setMeterBgMgdl(reading.asMgdl())
+    @Override
+    public CookieMonsterG4Meter toProtobuf() {
+        CookieMonsterG4Meter.Builder builder = new CookieMonsterG4Meter.Builder();
+        return builder.sys_timestamp_sec(rawSystemTimeSeconds)
+                .disp_timestamp_sec(rawDisplayTimeSeconds)
+                .meter_time(meterTime)
+                .meter_bg_mgdl(reading.asMgdl())
                 .build();
+    }
+
+    public static List<CookieMonsterG4Meter> toProtobufList(List<MeterRecord> list) {
+        return toProtobufList(list, CookieMonsterG4Meter.class);
     }
 
     @Override
@@ -88,13 +100,4 @@ public class MeterRecord extends GenericTimestampRecord {
         return result;
     }
 
-    public Optional<MeterRecord> fromProtoBuf(byte[] byteArray) {
-        try {
-            G4Download.CookieMonsterG4Meter record = G4Download.CookieMonsterG4Meter.parseFrom(byteArray);
-            return Optional.of(new MeterRecord(record.getMeterBgMgdl(), record.getMeterTime(), record.getTimestampSec()));
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
-        }
-        return Optional.absent();
-    }
 }

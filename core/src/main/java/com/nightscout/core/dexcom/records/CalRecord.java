@@ -1,11 +1,9 @@
 package com.nightscout.core.dexcom.records;
 
+import com.google.common.collect.Lists;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.protobuf.G4Download;
-
-import com.google.common.base.Optional;
-import com.google.protobuf.InvalidProtocolBufferException;
+import com.nightscout.core.model.CookieMonsterG4Cal;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
@@ -14,8 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class CalRecord extends GenericTimestampRecord {
     private static final Logger LOG = LoggerFactory.getLogger(CalRecord.class);
@@ -27,7 +25,7 @@ public class CalRecord extends GenericTimestampRecord {
     private int[] unk = new int[3];
     private double decay;
     private int numRecords;
-    private CalSubrecord[] calSubrecords;
+    private List<CalSubrecord> calSubrecords;
     private int SUB_LEN = 17;
 
     public CalRecord(byte[] packet) {
@@ -44,7 +42,7 @@ public class CalRecord extends GenericTimestampRecord {
         unk[2] = packet[34];
         decay = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getDouble(35);
         numRecords = packet[43];
-        calSubrecords = new CalSubrecord[numRecords];
+        calSubrecords = Lists.newArrayList();
 
         long displayTimeOffset = Seconds.secondsBetween(
                 new DateTime(getSystemTime()),
@@ -54,55 +52,56 @@ public class CalRecord extends GenericTimestampRecord {
             LOG.debug("Loop #" + i);
             byte[] temp = new byte[SUB_LEN];
             System.arraycopy(packet, start, temp, 0, temp.length);
-            calSubrecords[i] = new CalSubrecord(temp, displayTimeOffset);
+            calSubrecords.add(new CalSubrecord(temp, displayTimeOffset));
             start += SUB_LEN;
         }
     }
 
-    CalRecord(double slope, double intercept, double scale, long time) {
-        super(time);
-        this.slope = slope;
-        this.scale = scale;
-        this.intercept = intercept;
-    }
-
-    public CalRecord(double intercept, double slope, double scale, double decay, Date displayTime, Date systemTime, CalSubrecord[] subrecord) {
+    public CalRecord(double intercept, double slope, double scale, double decay, Date displayTime, Date systemTime, List<CalSubrecord> subrecord) {
         super(displayTime, systemTime);
         this.intercept = intercept;
         this.slope = slope;
         this.scale = scale;
         this.decay = decay;
-        this.numRecords = subrecord.length;
+        this.numRecords = subrecord.size();
         this.calSubrecords = subrecord;
     }
 
-    public CalRecord(double intercept, double slope, double scale, double decay, long displayTime, long systemTime, CalSubrecord[] subrecord) {
+    public CalRecord(double intercept, double slope, double scale, double decay, long displayTime, int systemTime, List<CalSubrecord> subrecord) {
         super(displayTime, systemTime);
         this.intercept = intercept;
         this.slope = slope;
         this.scale = scale;
         this.decay = decay;
-        this.numRecords = subrecord.length;
+        this.numRecords = subrecord.size();
         this.calSubrecords = subrecord;
     }
 
-    public CalRecord(double intercept, double slope, double scale, double decay, long systemTime) {
-        super(systemTime);
-        this.intercept = intercept;
-        this.slope = slope;
-        this.scale = scale;
-        this.decay = decay;
+    public CalRecord(CookieMonsterG4Cal cal) {
+        super(cal.disp_timestamp_sec, cal.sys_timestamp_sec);
+        this.intercept = cal.intercept;
+        this.slope = cal.slope;
+        this.scale = cal.scale;
+        this.decay = cal.decay;
+        this.numRecords = 0;
+        this.calSubrecords = Lists.newArrayList();
     }
 
-
-    public G4Download.CookieMonsterG4Cal toProtobuf() {
-        G4Download.CookieMonsterG4Cal.Builder builder = G4Download.CookieMonsterG4Cal.newBuilder();
-        return builder.setTimestampSec(rawSystemTimeSeconds)
-                .setIntercept(intercept)
-                .setScale(scale)
-                .setSlope(slope)
+    @Override
+    public CookieMonsterG4Cal toProtobuf() {
+        CookieMonsterG4Cal.Builder builder = new CookieMonsterG4Cal.Builder();
+        return builder.sys_timestamp_sec(rawSystemTimeSeconds)
+                .disp_timestamp_sec(rawDisplayTimeSeconds)
+                .intercept(intercept)
+                .scale(scale)
+                .slope(slope)
                 .build();
     }
+
+    public static List<CookieMonsterG4Cal> toProtobufList(List<CalRecord> list) {
+        return toProtobufList(list, CookieMonsterG4Cal.class);
+    }
+
 
     public double getSlope() {
         return slope;
@@ -128,7 +127,7 @@ public class CalRecord extends GenericTimestampRecord {
         return numRecords;
     }
 
-    public CalSubrecord[] getCalSubrecords() {
+    public List<CalSubrecord> getCalSubrecords() {
         return calSubrecords;
     }
 
@@ -145,17 +144,19 @@ public class CalRecord extends GenericTimestampRecord {
         if (numRecords != calRecord.numRecords) return false;
         if (Double.compare(calRecord.scale, scale) != 0) return false;
         if (Double.compare(calRecord.slope, slope) != 0) return false;
-        if (!Arrays.equals(calSubrecords, calRecord.calSubrecords)) return false;
+        if (calSubrecords != null ? !calSubrecords.equals(calRecord.calSubrecords) : calRecord.calSubrecords != null)
+            return false;
 
         return true;
     }
-    
-    public G4Download.CookieMonsterG4Cal toProtoBuf() {
-        return G4Download.CookieMonsterG4Cal.newBuilder()
-                .setTimestampSec(rawSystemTimeSeconds)
-                .setIntercept(intercept)
-                .setSlope(slope)
-                .setScale(scale)
+
+    public CookieMonsterG4Cal toProtoBuf() {
+        return new CookieMonsterG4Cal.Builder()
+                .sys_timestamp_sec(rawSystemTimeSeconds)
+                .disp_timestamp_sec(rawDisplayTimeSeconds)
+                .intercept(intercept)
+                .slope(slope)
+                .scale(scale)
                 .build();
     }
 
@@ -172,18 +173,8 @@ public class CalRecord extends GenericTimestampRecord {
         temp = Double.doubleToLongBits(decay);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + numRecords;
-        result = 31 * result + Arrays.hashCode(calSubrecords);
+        result = 31 * result + (calSubrecords != null ? calSubrecords.hashCode() : 0);
         return result;
     }
-    
-    public Optional<CalRecord> fromProtoBuf(byte[] byteArray) {
-        try {
-            G4Download.CookieMonsterG4Cal record = G4Download.CookieMonsterG4Cal.parseFrom(byteArray);
-            return Optional.of(new CalRecord(record.getSlope(),
-                    record.getIntercept(), record.getScale(), record.getDecay(), record.getTimestampSec()));
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
-        }
-        return Optional.absent();
-    }
+
 }

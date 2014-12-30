@@ -1,7 +1,7 @@
 package com.nightscout.core.dexcom;
 
 import com.nightscout.core.dexcom.records.EGVRecord;
-import com.nightscout.core.protobuf.G4Download;
+import com.nightscout.core.model.Noise;
 
 import org.json.JSONObject;
 import org.junit.Test;
@@ -26,7 +26,7 @@ public class EgvRecordTest {
         assertThat(egvRecord.getTrend(), is(TrendArrow.NOT_COMPUTABLE));
         assertThat(egvRecord.getRawDisplayTimeSeconds(), is(186266721L));
         assertThat(egvRecord.getRawSystemTimeSeconds(), is(186288324L));
-        assertThat(egvRecord.getNoiseMode(), is(G4Download.Noise.NOT_COMPUTED));
+        assertThat(egvRecord.getNoiseMode(), is(Noise.NOT_COMPUTED));
     }
 
     @Test(expected = InvalidRecordLengthException.class)
