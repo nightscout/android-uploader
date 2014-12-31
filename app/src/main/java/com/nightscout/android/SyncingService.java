@@ -72,7 +72,10 @@ public class SyncingService extends IntentService {
     public static final String RESPONSE_JSON = "myJSON";
     public static final String RESPONSE_BAT = "myBatLvl";
     public static final String RESPONSE_PROTO = "myProtoDownload";
-
+    public static final String RESPONSE_LAST_SGV_TIME = "lastSgvTimestamp";
+    public static final String RESPONSE_LAST_METER_TIME = "lastMeterTimestamp";
+    public static final String RESPONSE_LAST_SENSOR_TIME = "lastSensorTimestamp";
+    public static final String RESPONSE_LAST_CAL_TIME = "lastCalTimestamp";
     private EventReporter reporter;
 
     private final String TAG = SyncingService.class.getSimpleName();
@@ -179,58 +182,45 @@ public class SyncingService extends IntentService {
                 long meterTime = preferences.getLastMeterMqttUpload();
                 long sensorTime = preferences.getLastSensorMqttUpload();
                 long calTime = preferences.getLastCalMqttUpload();
-                long lastRecord = 0;
+                long lastSgvTimestamp = egvTime;
                 List<CookieMonsterG4SGV> filteredSgvs = new ArrayList<>();
                 for (CookieMonsterG4SGV aRecord : download.sgv) {
-                    if (aRecord.sys_timestamp_sec > egvTime) {
+                    if (aRecord.sys_timestamp_sec > egvTime || numOfPages == GAP_SYNC_PAGES) {
                         filteredSgvs.add(aRecord);
-                        lastRecord = aRecord.sys_timestamp_sec;
+                        lastSgvTimestamp = aRecord.sys_timestamp_sec;
                     }
                 }
                 builder.sgv(filteredSgvs);
-                if (lastRecord != 0) {
-                    preferences.setLastEgvMqttUpload(lastRecord);
-                }
-                lastRecord = 0;
+                long lastMeterTimestamp = meterTime;
                 List<CookieMonsterG4Meter> filteredMeter = new ArrayList<>();
                 for (CookieMonsterG4Meter aRecord : download.meter) {
-                    if (aRecord.sys_timestamp_sec > meterTime) {
+                    if (aRecord.sys_timestamp_sec > meterTime || numOfPages == GAP_SYNC_PAGES) {
                         filteredMeter.add(aRecord);
-                        lastRecord = aRecord.sys_timestamp_sec;
+                        lastMeterTimestamp = aRecord.sys_timestamp_sec;
                     }
                 }
                 builder.meter(filteredMeter);
-                // FIXME (klee) these values should be stored only after we are sure the message has been delivered.
-                if (lastRecord != 0) {
-                    preferences.setLastMeterMqttUpload(lastRecord);
-                }
-                lastRecord = 0;
+                long lastSensorTimestamp = sensorTime;
                 List<CookieMonsterG4Sensor> filteredSensor = new ArrayList<>();
                 for (CookieMonsterG4Sensor aRecord : download.sensor) {
-                    if (aRecord.sys_timestamp_sec > sensorTime) {
+                    if (aRecord.sys_timestamp_sec > sensorTime || numOfPages == GAP_SYNC_PAGES) {
                         filteredSensor.add(aRecord);
-                        lastRecord = aRecord.sys_timestamp_sec;
+                        lastSensorTimestamp = aRecord.sys_timestamp_sec;
                     }
                 }
                 builder.sensor(filteredSensor);
-                if (lastRecord != 0) {
-                    preferences.setLastSensorMqttUpload(lastRecord);
-                }
-                lastRecord = 0;
+                long lastCalTimestamp = calTime;
                 List<CookieMonsterG4Cal> filteredCal = new ArrayList<>();
                 for (CookieMonsterG4Cal aRecord : download.cal) {
-                    if (aRecord.sys_timestamp_sec > calTime) {
+                    if (aRecord.sys_timestamp_sec > calTime || numOfPages == GAP_SYNC_PAGES) {
                         filteredCal.add(aRecord);
-                        lastRecord = aRecord.sys_timestamp_sec;
+                        lastCalTimestamp = aRecord.sys_timestamp_sec;
                     }
                 }
                 builder.cal(filteredCal);
-                if (lastRecord != 0) {
-                    preferences.setLastCalMqttUpload(lastRecord);
-                }
                 broadcastSGVToUI(recentEGV, uploadStatus, results.getNextUploadTime() + TIME_SYNC_OFFSET,
                         results.getDisplayTime(), results.getResultArray(), download.receiver_battery,
-                        builder.build().toByteArray());
+                        builder.build().toByteArray(), lastSgvTimestamp, lastMeterTimestamp, lastSensorTimestamp, lastCalTimestamp);
                 broadcastSent = true;
             } catch (ArrayIndexOutOfBoundsException e) {
                 reporter.report(EventType.DEVICE, EventSeverity.ERROR,
@@ -302,7 +292,9 @@ public class SyncingService extends IntentService {
 
     public void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus,
                                  long nextUploadTime, long displayTime,
-                                 JSONArray json, int batLvl, byte[] proto) {
+                                 JSONArray json, int batLvl, byte[] proto,
+                                 long lastSgvTimestamp, long lastMeterTimestamp,
+                                 long lastSensorTimestamp, long lastCalTimestamp) {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -312,6 +304,13 @@ public class SyncingService extends IntentService {
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, nextUploadTime);
         broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, uploadStatus);
         broadcastIntent.putExtra(RESPONSE_DISPLAY_TIME, displayTime);
+
+        // FIXME: a quick hack to store timestamps once the data has been published in the
+        // MainActivity
+        broadcastIntent.putExtra(RESPONSE_LAST_SGV_TIME, lastSgvTimestamp);
+        broadcastIntent.putExtra(RESPONSE_LAST_METER_TIME, lastMeterTimestamp);
+        broadcastIntent.putExtra(RESPONSE_LAST_SENSOR_TIME, lastSensorTimestamp);
+        broadcastIntent.putExtra(RESPONSE_LAST_CAL_TIME, lastCalTimestamp);
         if (proto != null) {
             broadcastIntent.putExtra(RESPONSE_PROTO, proto);
         }
@@ -322,8 +321,10 @@ public class SyncingService extends IntentService {
     }
 
     protected void broadcastSGVToUI() {
-        EGVRecord record = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(), Noise.NOISE_NONE);
-        broadcastSGVToUI(record, false, standardMinutes(5).getMillis() + TIME_SYNC_OFFSET, new Date().getTime(), null, 0, new byte[0]);
+        EGVRecord record = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(),
+                Noise.NOISE_NONE);
+        broadcastSGVToUI(record, false, standardMinutes(5).getMillis() + TIME_SYNC_OFFSET,
+                new Date().getTime(), null, 0, new byte[0], -1, -1, -1, -1);
     }
 
 }
