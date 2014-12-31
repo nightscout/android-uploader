@@ -172,6 +172,7 @@ public class SyncingService extends IntentService {
                         .download_status(download.download_status)
                         .receiver_battery(download.receiver_battery)
                         .uploader_battery(download.uploader_battery)
+                        .receiver_system_time_sec(download.receiver_system_time_sec)
                         .units(download.units);
 
                 long egvTime = preferences.getLastEgvMqttUpload();

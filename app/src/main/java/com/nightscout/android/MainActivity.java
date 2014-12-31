@@ -63,7 +63,6 @@ import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -455,7 +454,7 @@ public class MainActivity extends Activity {
             String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
             byte[] proto = intent.getByteArrayExtra(SyncingService.RESPONSE_PROTO);
             boolean published = false;
-            if (proto != null && !Arrays.equals(proto, new byte[0])) {
+            if (proto != null && proto.length != 0) {
                 Log.d(TAG, "Proto: " + Utils.bytesToHex(proto));
                 if (mqttManager != null) {
                     Log.d(TAG, "Publishing");
