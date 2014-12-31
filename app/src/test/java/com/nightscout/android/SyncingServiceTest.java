@@ -69,10 +69,12 @@ public class SyncingServiceTest extends RobolectricTestBase {
                 (Context) anyObject(), (UsbSerialDriver) anyObject());
         doCallRealMethod().when(mockSyncingService).broadcastSGVToUI();
         doCallRealMethod().when(mockSyncingService).broadcastSGVToUI((EGVRecord) anyObject(),
-                anyBoolean(), anyLong(), anyLong(), (JSONArray) anyObject(), anyInt(), (byte[]) anyObject());
+                anyBoolean(), anyLong(), anyLong(), (JSONArray) anyObject(), anyInt(),
+                (byte[]) anyObject(), anyLong(), anyLong(), anyLong(), anyLong());
         mockSyncingService.handleActionSync(2, shadowActivity.getApplicationContext(), null);
         verify(mockSyncingService).broadcastSGVToUI((EGVRecord) anyObject(), anyBoolean(),
-                anyLong(), anyLong(), (JSONArray) anyObject(), anyInt(), (byte[]) anyObject());
+                anyLong(), anyLong(), (JSONArray) anyObject(), anyInt(), (byte[]) anyObject(),
+                anyLong(), anyLong(), anyLong(), anyLong());
     }
 
     @Test
@@ -115,7 +117,8 @@ public class SyncingServiceTest extends RobolectricTestBase {
                 (Context) anyObject(), (UsbSerialDriver) anyObject());
         mockSyncingService.handleActionSync(2, shadowActivity.getApplicationContext(), serialDriver);
         verify(mockSyncingService).broadcastSGVToUI((EGVRecord) anyObject(), anyBoolean(),
-                anyLong(), anyLong(), (JSONArray) anyObject(), anyInt(), (byte[]) anyObject());
+                anyLong(), anyLong(), (JSONArray) anyObject(), anyInt(), (byte[]) anyObject(),
+                anyLong(), anyLong(), anyLong(), anyLong());
     }
 
 }

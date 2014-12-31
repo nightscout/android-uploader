@@ -443,6 +443,14 @@ public class MainActivity extends Activity {
             boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
             long responseNextUploadTime = intent.getLongExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
             long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME, new Date().getTime());
+            long lastSgvTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_SGV_TIME,
+                    ((AndroidPreferences) preferences).getLastEgvMqttUpload());
+            long lastMeterTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_METER_TIME,
+                    ((AndroidPreferences) preferences).getLastMeterMqttUpload());
+            long lastSensorTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_SENSOR_TIME,
+                    ((AndroidPreferences) preferences).getLastSensorMqttUpload());
+            long lastCalTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_CAL_TIME,
+                    ((AndroidPreferences) preferences).getLastCalMqttUpload());
             lastRecordTime = responseSGVTimestamp;
             receiverOffsetFromUploader = new Date().getTime() - responseDisplayTime;
             int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT, -1);
@@ -453,6 +461,11 @@ public class MainActivity extends Activity {
                 Log.d(TAG, "Proto: " + Utils.bytesToHex(proto));
                 if (mqttManager != null) {
                     mqttManager.publish(proto, "/downloads/protobuf");
+                    ((AndroidPreferences) preferences).setLastEgvMqttUpload(lastSgvTimestamp);
+                    ((AndroidPreferences) preferences).setLastMeterMqttUpload(lastMeterTimestamp);
+                    ((AndroidPreferences) preferences).setLastSensorMqttUpload(lastSensorTimestamp);
+                    ((AndroidPreferences) preferences).setLastCalMqttUpload(lastCalTimestamp);
+                    published = true;
                 } else {
                     Log.e(TAG, "Not publishing for some reason");
                 }
