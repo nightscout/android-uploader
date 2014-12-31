@@ -69,6 +69,7 @@ public class DexcomG4 extends AbstractDevice {
         long displayTime = 0;
         long timeSinceLastRecord = 0;
         int batLevel = 100;
+        long systemTime = 0;
         if (status == DownloadStatus.SUCCESS) {
             try {
                 recentRecords = readData.getRecentEGVsPages(numOfPages);
@@ -88,6 +89,7 @@ public class DexcomG4 extends AbstractDevice {
                 if (status == DownloadStatus.SUCCESS) {
                     timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords.get(recentRecords.size() - 1));
                 }
+                systemTime = readData.readSystemTime();
                 // FIXME: readData.readBatteryLevel() seems to flake out on battery level reads. Removing for now.
                 batLevel = 100;
                 // TODO pull in other exceptions once we have the analytics/acra reporters
@@ -116,6 +118,7 @@ public class DexcomG4 extends AbstractDevice {
                 .cal(cookieMonsterG4Cals)
                 .sensor(cookieMonsterG4Sensors)
                 .meter(cookieMonsterG4Meters)
+                .receiver_system_time_sec(systemTime)
                 .download_timestamp(new Date().toString())
                 .download_status(status)
                 .uploader_battery(uploaderDevice.getBatteryLevel())
