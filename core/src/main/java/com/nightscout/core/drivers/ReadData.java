@@ -1,6 +1,6 @@
 package com.nightscout.core.drivers;
 
-import com.google.common.collect.Lists;
+import com.google.common.base.Optional;
 import com.nightscout.core.dexcom.Command;
 import com.nightscout.core.dexcom.PacketBuilder;
 import com.nightscout.core.dexcom.ReadPacket;
@@ -9,16 +9,19 @@ import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.dexcom.records.GenericTimestampRecord;
-import com.nightscout.core.dexcom.records.GenericXMLRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.PageHeader;
 import com.nightscout.core.dexcom.records.SensorRecord;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -26,12 +29,19 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 public class ReadData {
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     private static final int IO_TIMEOUT = 1000;
     private static final int MIN_LEN = 256;
     private DeviceTransport mSerialDevice;
+
+    // Storing this to reduce the number of reads from the device for other attributes
+    private Document manufacturingDataXml;
 
     public ReadData(DeviceTransport device) {
         mSerialDevice = device;
@@ -51,7 +61,7 @@ public class ReadData {
         int endPage = readDataBasePageRange(RecordType.EGV_DATA);
         log.debug("Reading {} EGV page(s)...", numOfRecentPages);
         numOfRecentPages = numOfRecentPages - 1;
-        List<EGVRecord> allPages = Lists.newArrayList();
+        List<EGVRecord> allPages = new ArrayList<>();
         for (int i = Math.min(numOfRecentPages, endPage); i >= 0; i--) {
             int nextPage = endPage - i;
             log.debug("Reading #{} EGV pages (page number {})", i, nextPage);
@@ -81,7 +91,7 @@ public class ReadData {
         int endPage = readDataBasePageRange(RecordType.SENSOR_DATA);
         log.debug("Reading {} Sensor page(s)...", numOfRecentPages);
         numOfRecentPages = numOfRecentPages - 1;
-        List<SensorRecord> allPages = Lists.newArrayList();
+        List<SensorRecord> allPages = new ArrayList<>();
         for (int i = Math.min(numOfRecentPages, endPage); i >= 0; i--) {
             int nextPage = endPage - i;
             log.debug("Reading #{} Sensor pages (page number {})", i, nextPage);
@@ -113,10 +123,28 @@ public class ReadData {
     }
 
     public String readSerialNumber() throws IOException {
-        int PAGE_OFFSET = 0;
-        byte[] data = readDataBasePage(RecordType.MANUFACTURING_DATA, PAGE_OFFSET);
-        Element md = new GenericXMLRecord(data).getXmlElement();
-        return md.getAttribute("SerialNumber");
+        return getManufacturingAttribute("SerialNumber").or("");
+    }
+
+    private Optional<String> getManufacturingAttribute(String attribute) throws IOException {
+        String result = null;
+        if (manufacturingDataXml == null) {
+            byte[] packet = readDataBasePage(RecordType.MANUFACTURING_DATA, 0);
+            String xml = new String(Arrays.copyOfRange(packet, 8, 241));
+            // TODO: it would be best if we could just remove /x00 characters and read till end
+            try {
+
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                manufacturingDataXml = builder.parse(new InputSource(new StringReader(xml)));
+            } catch (ParserConfigurationException | SAXException e) {
+                throw new IOException("Unable to parse manufacturing data", e);
+            }
+        } else {
+            Element element = manufacturingDataXml.getDocumentElement();
+            result = element.getAttribute(attribute);
+        }
+        return Optional.fromNullable(result);
     }
 
     public Date readDisplayTime() throws IOException {
@@ -202,7 +230,7 @@ public class ReadData {
 
     private <T extends GenericTimestampRecord> List<T> parsePage(byte[] data, Class<T> clazz) {
         PageHeader pageHeader = new PageHeader(data);
-        List<T> records = Lists.newArrayList();
+        List<T> records = new ArrayList<>();
         try {
             for (int i = 0; i < pageHeader.getNumOfRecords(); i++) {
                 int startIdx;

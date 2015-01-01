@@ -27,14 +27,14 @@ import com.nightscout.core.drivers.DexcomG4;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
-import com.nightscout.core.model.CookieMonsterDownload;
-import com.nightscout.core.model.CookieMonsterG4Cal;
-import com.nightscout.core.model.CookieMonsterG4Meter;
-import com.nightscout.core.model.CookieMonsterG4SGV;
-import com.nightscout.core.model.CookieMonsterG4Sensor;
+import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.model.DownloadResults;
 import com.nightscout.core.model.DownloadStatus;
-import com.nightscout.core.model.Noise;
+import com.nightscout.core.model.G4Download;
+import com.nightscout.core.model.G4Noise;
+import com.nightscout.core.model.MeterEntry;
+import com.nightscout.core.model.SensorEntry;
+import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
 import org.joda.time.DateTime;
@@ -148,7 +148,7 @@ public class SyncingService extends IntentService {
             ((CdcAcmSerialDriver) serialDriver).setPowerManagementEnabled(preferences.isRootEnabled());
             try {
                 DownloadResults results = device.download();
-                CookieMonsterDownload download = results.getDownload();
+                G4Download download = results.getDownload();
 
                 Uploader uploader = new Uploader(context, preferences);
                 boolean uploadStatus;
@@ -163,14 +163,14 @@ public class SyncingService extends IntentService {
                     recentEGV = new EGVRecord(download.sgv.get(download.sgv.size() - 1));
                 } else {
                     recentEGV = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(),
-                            Noise.NOISE_NONE);
+                            G4Noise.NOISE_NONE);
                 }
 
                 DateTime dt = new DateTime();
                 DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
                 String iso8601Str = fmt.print(dt);
 
-                CookieMonsterDownload.Builder builder = new CookieMonsterDownload.Builder();
+                G4Download.Builder builder = new G4Download.Builder();
                 builder.download_timestamp(iso8601Str)
                         .download_status(download.download_status)
                         .receiver_battery(download.receiver_battery)
@@ -183,8 +183,8 @@ public class SyncingService extends IntentService {
                 long sensorTime = preferences.getLastSensorMqttUpload();
                 long calTime = preferences.getLastCalMqttUpload();
                 long lastSgvTimestamp = egvTime;
-                List<CookieMonsterG4SGV> filteredSgvs = new ArrayList<>();
-                for (CookieMonsterG4SGV aRecord : download.sgv) {
+                List<SensorGlucoseValueEntry> filteredSgvs = new ArrayList<>();
+                for (SensorGlucoseValueEntry aRecord : download.sgv) {
                     if (aRecord.sys_timestamp_sec > egvTime || numOfPages == GAP_SYNC_PAGES) {
                         filteredSgvs.add(aRecord);
                         lastSgvTimestamp = aRecord.sys_timestamp_sec;
@@ -192,8 +192,8 @@ public class SyncingService extends IntentService {
                 }
                 builder.sgv(filteredSgvs);
                 long lastMeterTimestamp = meterTime;
-                List<CookieMonsterG4Meter> filteredMeter = new ArrayList<>();
-                for (CookieMonsterG4Meter aRecord : download.meter) {
+                List<MeterEntry> filteredMeter = new ArrayList<>();
+                for (MeterEntry aRecord : download.meter) {
                     if (aRecord.sys_timestamp_sec > meterTime || numOfPages == GAP_SYNC_PAGES) {
                         filteredMeter.add(aRecord);
                         lastMeterTimestamp = aRecord.sys_timestamp_sec;
@@ -201,8 +201,8 @@ public class SyncingService extends IntentService {
                 }
                 builder.meter(filteredMeter);
                 long lastSensorTimestamp = sensorTime;
-                List<CookieMonsterG4Sensor> filteredSensor = new ArrayList<>();
-                for (CookieMonsterG4Sensor aRecord : download.sensor) {
+                List<SensorEntry> filteredSensor = new ArrayList<>();
+                for (SensorEntry aRecord : download.sensor) {
                     if (aRecord.sys_timestamp_sec > sensorTime || numOfPages == GAP_SYNC_PAGES) {
                         filteredSensor.add(aRecord);
                         lastSensorTimestamp = aRecord.sys_timestamp_sec;
@@ -210,8 +210,8 @@ public class SyncingService extends IntentService {
                 }
                 builder.sensor(filteredSensor);
                 long lastCalTimestamp = calTime;
-                List<CookieMonsterG4Cal> filteredCal = new ArrayList<>();
-                for (CookieMonsterG4Cal aRecord : download.cal) {
+                List<CalibrationEntry> filteredCal = new ArrayList<>();
+                for (CalibrationEntry aRecord : download.cal) {
                     if (aRecord.sys_timestamp_sec > calTime || numOfPages == GAP_SYNC_PAGES) {
                         filteredCal.add(aRecord);
                         lastCalTimestamp = aRecord.sys_timestamp_sec;
@@ -301,7 +301,7 @@ public class SyncingService extends IntentService {
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
         broadcastIntent.putExtra(RESPONSE_SGV, egvRecord.getBgMgdl());
-        broadcastIntent.putExtra(RESPONSE_TREND, egvRecord.getTrend().getID());
+        broadcastIntent.putExtra(RESPONSE_TREND, egvRecord.getTrend().ordinal());
         broadcastIntent.putExtra(RESPONSE_TIMESTAMP, egvRecord.getDisplayTime().getTime());
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, nextUploadTime);
         broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, uploadStatus);
@@ -324,7 +324,7 @@ public class SyncingService extends IntentService {
 
     protected void broadcastSGVToUI() {
         EGVRecord record = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(),
-                Noise.NOISE_NONE);
+                G4Noise.NOISE_NONE);
         broadcastSGVToUI(record, false, standardMinutes(5).getMillis() + TIME_SYNC_OFFSET,
                 new Date().getTime(), null, 0, new byte[0], -1, -1, -1, -1);
     }

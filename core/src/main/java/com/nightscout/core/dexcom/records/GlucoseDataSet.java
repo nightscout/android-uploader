@@ -2,9 +2,9 @@ package com.nightscout.core.dexcom.records;
 
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.model.CookieMonsterG4SGV;
-import com.nightscout.core.model.CookieMonsterG4Sensor;
 import com.nightscout.core.model.GlucoseUnit;
+import com.nightscout.core.model.SensorEntry;
+import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.nightscout.core.utils.GlucoseReading;
 
 import java.util.Date;
@@ -20,7 +20,7 @@ public class GlucoseDataSet {
     private long filtered;
     private int rssi;
 
-    public GlucoseDataSet(CookieMonsterG4SGV egvRecord) {
+    public GlucoseDataSet(SensorGlucoseValueEntry egvRecord) {
         systemTime = Utils.receiverTimeToDate(egvRecord.sys_timestamp_sec);
         displayTime = Utils.receiverTimeToDate(egvRecord.disp_timestamp_sec);
         reading = new GlucoseReading(egvRecord.sgv_mgdl, GlucoseUnit.MGDL);
@@ -44,7 +44,7 @@ public class GlucoseDataSet {
         rssi = sensorRecord.getRssi();
     }
 
-    public GlucoseDataSet(CookieMonsterG4SGV egvRecord, CookieMonsterG4Sensor sensorRecord) {
+    public GlucoseDataSet(SensorGlucoseValueEntry egvRecord, SensorEntry sensorRecord) {
         this.systemTime = Utils.receiverTimeToDate(egvRecord.sys_timestamp_sec);
         this.displayTime = Utils.receiverTimeToDate(egvRecord.disp_timestamp_sec);
         this.reading = new GlucoseReading(egvRecord.sgv_mgdl, GlucoseUnit.MGDL);

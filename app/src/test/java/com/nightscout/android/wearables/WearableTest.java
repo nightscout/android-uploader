@@ -1,10 +1,12 @@
 package com.nightscout.android.wearables;
 
 import android.content.Intent;
+
 import com.getpebble.android.kit.util.PebbleDictionary;
 import com.nightscout.android.MainActivity;
 import com.nightscout.android.test.RobolectricTestBase;
 import com.nightscout.core.dexcom.TrendArrow;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.robolectric.Robolectric;
@@ -27,9 +29,9 @@ public class WearableTest extends RobolectricTestBase {
         assertThat(getShadowApplication().hasReceiverForIntent(pebbleIntent), is(true));
     }
 
-    private PebbleDictionary createMockPebbleDictionary(){
+    private PebbleDictionary createMockPebbleDictionary() {
         PebbleDictionary dict = new PebbleDictionary();
-        dict.addString(0, String.valueOf(TrendArrow.FLAT.getID()));
+        dict.addString(0, String.valueOf(TrendArrow.FLAT.ordinal()));
         dict.addString(1, "100");
         dict.addUint32(2, 1417990743);
         dict.addUint32(3, 1417990743);

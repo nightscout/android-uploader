@@ -3,7 +3,6 @@ package com.nightscout.android.upload;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.common.collect.Lists;
 import com.mongodb.MongoClientURI;
 import com.nightscout.android.R;
 import com.nightscout.android.ToastReceiver;
@@ -15,12 +14,12 @@ import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
-import com.nightscout.core.model.CookieMonsterDownload;
-import com.nightscout.core.model.CookieMonsterG4Cal;
-import com.nightscout.core.model.CookieMonsterG4Meter;
-import com.nightscout.core.model.CookieMonsterG4SGV;
-import com.nightscout.core.model.CookieMonsterG4Sensor;
+import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.model.DownloadResults;
+import com.nightscout.core.model.G4Download;
+import com.nightscout.core.model.MeterEntry;
+import com.nightscout.core.model.SensorEntry;
+import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.upload.BaseUploader;
 import com.nightscout.core.upload.MongoUploader;
@@ -29,6 +28,7 @@ import com.nightscout.core.upload.RestV1Uploader;
 import com.squareup.wire.Message;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -44,7 +44,7 @@ public class Uploader {
         checkNotNull(context);
         this.context = context;
         reporter = AndroidEventReporter.getReporter(context);
-        uploaders = Lists.newArrayList();
+        uploaders = new ArrayList<>();
         if (preferences.isMongoUploadEnabled()) {
             allUploadersInitalized &= initializeMongoUploader(context, preferences);
         }
@@ -88,7 +88,7 @@ public class Uploader {
 
     private boolean initializeRestUploaders(Context context, NightscoutPreferences preferences) {
         List<String> baseUrisSetting = preferences.getRestApiBaseUris();
-        List<URI> baseUris = Lists.newArrayList();
+        List<URI> baseUris = new ArrayList<>();
         boolean allInitialized = true;
         for (String baseURLSetting : baseUrisSetting) {
             String baseUriString = baseURLSetting.trim();
@@ -122,11 +122,11 @@ public class Uploader {
     }
 
     public boolean upload(DownloadResults downloadResults, int numRecords) {
-        CookieMonsterDownload download = downloadResults.getDownload();
-        List<CookieMonsterG4SGV> sgvList = filterRecords(numRecords, download.sgv);
-        List<CookieMonsterG4Cal> calList = filterRecords(numRecords, download.cal);
-        List<CookieMonsterG4Meter> meterList = filterRecords(numRecords, download.meter);
-        List<CookieMonsterG4Sensor> sensorList = filterRecords(numRecords, download.sensor);
+        G4Download download = downloadResults.getDownload();
+        List<SensorGlucoseValueEntry> sgvList = filterRecords(numRecords, download.sgv);
+        List<CalibrationEntry> calList = filterRecords(numRecords, download.cal);
+        List<MeterEntry> meterList = filterRecords(numRecords, download.meter);
+        List<SensorEntry> sensorList = filterRecords(numRecords, download.sensor);
 
         List<GlucoseDataSet> glucoseDataSets = Utils.mergeGlucoseDataRecords(sgvList, sensorList);
 
@@ -135,7 +135,7 @@ public class Uploader {
 
     private <T extends Message> List<T> filterRecords(int numRecords, List<T> records) {
         int recordIndexToStop = Math.max(records.size() - numRecords, 0);
-        List<T> results = Lists.newArrayList();
+        List<T> results = new ArrayList<>();
         for (int i = records.size(); i > recordIndexToStop; i--) {
             results.add(records.get(i - 1));
         }
@@ -143,14 +143,14 @@ public class Uploader {
     }
 
     public boolean upload(DownloadResults downloadResults) {
-        CookieMonsterDownload download = downloadResults.getDownload();
+        G4Download download = downloadResults.getDownload();
         List<GlucoseDataSet> glucoseDataSets = Utils.mergeGlucoseDataRecords(download.sgv, download.sensor);
         return upload(glucoseDataSets, download.meter, download.cal);
     }
 
-    public boolean upload(List<GlucoseDataSet> glucoseDataSets,
-                          List<CookieMonsterG4Meter> meterRecords,
-                          List<CookieMonsterG4Cal> calRecords) {
+    private boolean upload(List<GlucoseDataSet> glucoseDataSets,
+                           List<MeterEntry> meterRecords,
+                           List<CalibrationEntry> calRecords) {
 
         AbstractUploaderDevice deviceStatus = AndroidUploaderDevice.getUploaderDevice(context);
 

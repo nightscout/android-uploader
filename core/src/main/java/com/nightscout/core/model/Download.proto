@@ -1,18 +1,18 @@
-option java_package = "com.nightscout.core.protobuf";
+option java_package = "com.nightscout.core.model";
 
 option java_outer_classname = "G4Download";
 
-message CookieMonsterDownload {
-    repeated CookieMonsterG4SGV sgv = 1; // Glucose records as reported by the G4
+message G4Download {
+    repeated SensorGlucoseValueEntry sgv = 1; // Glucose records as reported by the G4
     optional GlucoseUnit units = 2; // Units reported by the device
     required string download_timestamp = 3; // ISO8601 timestamp reported by uploader
     optional uint64 receiver_system_time_sec = 4; // Raw value of the receiver's system time
-    optional DownloadStatus download_status = 5 [default = NA]; // Status of the download
+    optional DownloadStatus download_status = 5 [default = NOT_APPLICABLE]; // Status of the download
     optional uint32 receiver_battery = 6; // Battery level as reported by the receiver
     optional uint32 uploader_battery = 7; // Battery level as reported by the uploader
-    repeated CookieMonsterG4Meter meter = 8;
-    repeated CookieMonsterG4Sensor sensor = 9;
-    repeated CookieMonsterG4Cal cal = 10;
+    repeated MeterEntry meter = 8;
+    repeated SensorEntry sensor = 9;
+    repeated CalibrationEntry cal = 10;
 }
 
 enum GlucoseUnit {
@@ -26,11 +26,11 @@ enum DownloadStatus {
     DEVICE_NOT_FOUND = 2;
     IO_ERROR = 3;
     APPLICATION_ERROR = 4;
-    NA = 6;
-    UNKNOWN = 7;
+    UNKNOWN = 5;
+    NOT_APPLICABLE = 6;
 }
 
-enum Trend {
+enum G4Trend {
     TREND_NONE = 0;
     DOUBLE_UP = 1;
     SINGLE_UP = 2;
@@ -43,7 +43,7 @@ enum Trend {
     RATE_OUT_OF_RANGE = 9;
 }
 
-enum Noise {
+enum G4Noise {
     NOISE_NONE = 0;
     CLEAN = 1;
     LIGHT = 2;
@@ -58,15 +58,15 @@ enum ReceiverStatus {
     RECEIVER_DISCONNECTED = 1;
 }
 
-message CookieMonsterG4SGV {
+message SensorGlucoseValueEntry {
     required uint32 sgv_mgdl = 1; // Glucose value
     optional uint64 sys_timestamp_sec = 2; // system timestamp of the record
     optional uint64 disp_timestamp_sec = 3; // system timestamp of the record
-    optional Trend trend = 4; // Trend arrow
-    optional Noise noise = 5;
+    optional G4Trend trend = 4; // Trend arrow
+    optional G4Noise noise = 5;
 }
 
-message CookieMonsterG4Meter {
+message MeterEntry {
     required uint32 meter_bg_mgdl = 1;
     optional uint32 meter_time = 2;
     optional uint64 sys_timestamp_sec = 3; // system timestamp of the record
@@ -74,7 +74,7 @@ message CookieMonsterG4Meter {
 
 }
 
-message CookieMonsterG4Sensor {
+message SensorEntry {
     required uint64 filtered = 1;
     optional uint64 unfiltered = 2;
     optional uint32 rssi = 3;
@@ -83,7 +83,7 @@ message CookieMonsterG4Sensor {
 
 }
 
-message CookieMonsterG4Cal {
+message CalibrationEntry {
     required double slope = 1;
     optional double intercept = 2;
     optional double scale = 3;
@@ -93,7 +93,7 @@ message CookieMonsterG4Cal {
 
 }
 
-message CookieMonsterReceiverStatus {
+message ReceiverStatus {
     required uint64 timestamp_ms = 1;
     repeated ReceiverStatus event = 2;
 }

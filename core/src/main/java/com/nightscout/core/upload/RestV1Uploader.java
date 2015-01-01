@@ -3,8 +3,8 @@ package com.nightscout.core.upload;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
-import com.nightscout.core.model.CookieMonsterG4Cal;
-import com.nightscout.core.model.CookieMonsterG4Meter;
+import com.nightscout.core.model.CalibrationEntry;
+import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.RestUriUtils;
 
@@ -52,7 +52,7 @@ public class RestV1Uploader extends AbstractRestUploader {
         return json;
     }
 
-    private JSONObject toJSONObject(CookieMonsterG4Meter record) throws JSONException {
+    private JSONObject toJSONObject(MeterEntry record) throws JSONException {
         JSONObject json = new JSONObject();
         Date timestamp = Utils.receiverTimeToDate(record.disp_timestamp_sec);
         json.put("device", "dexcom");
@@ -63,7 +63,7 @@ public class RestV1Uploader extends AbstractRestUploader {
         return json;
     }
 
-    private JSONObject toJSONObject(CookieMonsterG4Cal record) throws JSONException {
+    private JSONObject toJSONObject(CalibrationEntry record) throws JSONException {
         JSONObject json = new JSONObject();
         Date timestamp = Utils.receiverTimeToDate(record.disp_timestamp_sec);
         json.put("device", "dexcom");
@@ -93,7 +93,7 @@ public class RestV1Uploader extends AbstractRestUploader {
     }
 
     @Override
-    protected boolean doUpload(CookieMonsterG4Meter meterRecord) throws IOException {
+    protected boolean doUpload(MeterEntry meterRecord) throws IOException {
         try {
             // TODO(trhodeos): in Uploader.java, this method still used 'entries' as the endpoint,
             // but this seems like a bug to me.
@@ -105,7 +105,7 @@ public class RestV1Uploader extends AbstractRestUploader {
     }
 
     @Override
-    protected boolean doUpload(CookieMonsterG4Cal calRecord) throws IOException {
+    protected boolean doUpload(CalibrationEntry calRecord) throws IOException {
         try {
             // TODO(trhodeos): in Uploader.java, this method still used 'entries' as the endpoint,
             // but this seems like a bug to me.
