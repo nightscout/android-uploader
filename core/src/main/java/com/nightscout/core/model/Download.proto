@@ -93,7 +93,7 @@ message CalibrationEntry {
 
 }
 
-message ReceiverStatus {
+message ReceiverState {
     required uint64 timestamp_ms = 1;
     repeated ReceiverStatus event = 2;
 }
