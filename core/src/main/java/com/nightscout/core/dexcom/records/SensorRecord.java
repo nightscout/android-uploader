@@ -2,7 +2,7 @@ package com.nightscout.core.dexcom.records;
 
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.model.CookieMonsterG4Sensor;
+import com.nightscout.core.model.SensorEntry;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -35,7 +35,7 @@ public class SensorRecord extends GenericTimestampRecord {
         this.rssi = rssi;
     }
 
-    public SensorRecord(CookieMonsterG4Sensor sensor) {
+    public SensorRecord(SensorEntry sensor) {
         super(sensor.disp_timestamp_sec, sensor.sys_timestamp_sec);
         this.filtered = sensor.filtered;
         this.unfiltered = sensor.unfiltered;
@@ -55,8 +55,8 @@ public class SensorRecord extends GenericTimestampRecord {
     }
 
     @Override
-    public CookieMonsterG4Sensor toProtobuf() {
-        CookieMonsterG4Sensor.Builder builder = new CookieMonsterG4Sensor.Builder();
+    public SensorEntry toProtobuf() {
+        SensorEntry.Builder builder = new SensorEntry.Builder();
         return builder.sys_timestamp_sec(rawSystemTimeSeconds)
                 .disp_timestamp_sec(rawDisplayTimeSeconds)
                 .rssi(rssi)
@@ -66,8 +66,8 @@ public class SensorRecord extends GenericTimestampRecord {
 
     }
 
-    public static List<CookieMonsterG4Sensor> toProtobufList(List<SensorRecord> list) {
-        return toProtobufList(list, CookieMonsterG4Sensor.class);
+    public static List<SensorEntry> toProtobufList(List<SensorRecord> list) {
+        return toProtobufList(list, SensorEntry.class);
     }
 
 

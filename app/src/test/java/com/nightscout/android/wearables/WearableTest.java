@@ -29,9 +29,9 @@ public class WearableTest extends RobolectricTestBase {
         assertThat(getShadowApplication().hasReceiverForIntent(pebbleIntent), is(true));
     }
 
-    private PebbleDictionary createMockPebbleDictionary(){
+    private PebbleDictionary createMockPebbleDictionary() {
         PebbleDictionary dict = new PebbleDictionary();
-        dict.addString(0, String.valueOf(TrendArrow.FLAT.getID()));
+        dict.addString(0, String.valueOf(TrendArrow.FLAT.ordinal()));
         dict.addString(1, "100");
         dict.addUint32(2, 1417990743);
         dict.addUint32(3, 1417990743);

@@ -1,7 +1,6 @@
 package com.nightscout.core.barcode;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,6 +8,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,8 +22,8 @@ public class NSBarcodeConfig {
         configureBarcode(decodeResults);
     }
 
-    public void configureBarcode(String jsonConfig){
-        if (jsonConfig == null){
+    public void configureBarcode(String jsonConfig) {
+        if (jsonConfig == null) {
             throw new IllegalArgumentException("Null barcode");
         }
         try {
@@ -48,8 +48,8 @@ public class NSBarcodeConfig {
     }
 
     public List<String> getApiUris() {
-        List<String> apiUris = Lists.newArrayList();
-        if (hasApiConfig()){
+        List<String> apiUris = new ArrayList<>();
+        if (hasApiConfig()) {
             JSONArray jsonArray = null;
             try {
                 jsonArray = config.getJSONObject(NSBarcodeConfigKeys.API_CONFIG)
@@ -86,8 +86,8 @@ public class NSBarcodeConfig {
         return Optional.fromNullable(mongoCollection);
     }
 
-    public Optional<String> getMongoDeviceStatusCollection(){
-        if (! config.has(NSBarcodeConfigKeys.MONGO_CONFIG)) {
+    public Optional<String> getMongoDeviceStatusCollection() {
+        if (!config.has(NSBarcodeConfigKeys.MONGO_CONFIG)) {
             return Optional.absent();
         }
         String deviceStatusCollection = null;
@@ -104,7 +104,7 @@ public class NSBarcodeConfig {
         return Optional.fromNullable(deviceStatusCollection);
     }
 
-    public boolean hasMongoConfig(){
+    public boolean hasMongoConfig() {
         try {
             return config.has(NSBarcodeConfigKeys.MONGO_CONFIG) &&
                     config.getJSONObject(NSBarcodeConfigKeys.MONGO_CONFIG).has(NSBarcodeConfigKeys.MONGO_URI);
@@ -113,7 +113,7 @@ public class NSBarcodeConfig {
         }
     }
 
-    public boolean hasApiConfig(){
+    public boolean hasApiConfig() {
         try {
             return config.has(NSBarcodeConfigKeys.API_CONFIG) &&
                     config.getJSONObject(NSBarcodeConfigKeys.API_CONFIG)

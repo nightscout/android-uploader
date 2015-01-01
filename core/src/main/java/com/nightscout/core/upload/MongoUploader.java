@@ -11,8 +11,8 @@ import com.mongodb.WriteResult;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
-import com.nightscout.core.model.CookieMonsterG4Cal;
-import com.nightscout.core.model.CookieMonsterG4Meter;
+import com.nightscout.core.model.CalibrationEntry;
+import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
 import java.io.IOException;
@@ -112,7 +112,7 @@ public class MongoUploader extends BaseUploader {
         return output;
     }
 
-    private BasicDBObject toBasicDBObject(CookieMonsterG4Meter meterRecord) {
+    private BasicDBObject toBasicDBObject(MeterEntry meterRecord) {
         BasicDBObject output = new BasicDBObject();
         Date timestamp = Utils.receiverTimeToDate(meterRecord.disp_timestamp_sec);
         output.put("device", "dexcom");
@@ -123,7 +123,7 @@ public class MongoUploader extends BaseUploader {
         return output;
     }
 
-    private BasicDBObject toBasicDBObject(CookieMonsterG4Cal calRecord) {
+    private BasicDBObject toBasicDBObject(CalibrationEntry calRecord) {
         BasicDBObject output = new BasicDBObject();
         Date timestamp = Utils.receiverTimeToDate(calRecord.disp_timestamp_sec);
         output.put("device", "dexcom");
@@ -159,12 +159,12 @@ public class MongoUploader extends BaseUploader {
     }
 
     @Override
-    protected boolean doUpload(CookieMonsterG4Meter meterRecord) throws IOException {
+    protected boolean doUpload(MeterEntry meterRecord) throws IOException {
         return upsert(toBasicDBObject(meterRecord));
     }
 
     @Override
-    protected boolean doUpload(CookieMonsterG4Cal calRecord) throws IOException {
+    protected boolean doUpload(CalibrationEntry calRecord) throws IOException {
         return upsert(toBasicDBObject(calRecord));
     }
 

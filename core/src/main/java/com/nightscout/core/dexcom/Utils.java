@@ -1,11 +1,10 @@
 package com.nightscout.core.dexcom;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.hash.HashCode;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
-import com.nightscout.core.model.CookieMonsterG4SGV;
-import com.nightscout.core.model.CookieMonsterG4Sensor;
+import com.nightscout.core.model.SensorEntry;
+import com.nightscout.core.model.SensorGlucoseValueEntry;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -13,6 +12,7 @@ import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -85,11 +85,11 @@ public final class Utils {
         return (timeAgoString.equals("") ? "--" : timeAgoString + "ago");
     }
 
-    public static List<GlucoseDataSet> mergeGlucoseDataRecords(List<CookieMonsterG4SGV> egvRecords,
-                                                               List<CookieMonsterG4Sensor> sensorRecords) {
+    public static List<GlucoseDataSet> mergeGlucoseDataRecords(List<SensorGlucoseValueEntry> egvRecords,
+                                                               List<SensorEntry> sensorRecords) {
         int egvLength = egvRecords.size();
         int sensorLength = sensorRecords.size();
-        List<GlucoseDataSet> glucoseDataSets = Lists.newArrayList();
+        List<GlucoseDataSet> glucoseDataSets = new ArrayList<>();
         if (egvLength >= 0 && sensorLength == 0) {
             for (int i = 1; i <= egvLength; i++) {
                 glucoseDataSets.add(new GlucoseDataSet(egvRecords.get(egvLength - i)));

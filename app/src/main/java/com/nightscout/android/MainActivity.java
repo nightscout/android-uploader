@@ -29,7 +29,6 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
 import com.nightscout.android.drivers.AndroidUploaderDevice;
 import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.events.UserEventPanelActivity;
@@ -63,6 +62,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -268,7 +268,7 @@ public class MainActivity extends Activity {
     }
 
     private void migrateToNewStyleRestUris() {
-        List<String> newUris = Lists.newArrayList();
+        List<String> newUris = new ArrayList<>();
         for (String uriString : preferences.getRestApiBaseUris()) {
             if (uriString.contains("@http")) {
                 List<String> splitUri = Splitter.on('@').splitToList(uriString);
@@ -288,7 +288,7 @@ public class MainActivity extends Activity {
                 preferences.getMongoClientUri()).isPresent()) {
             preferences.setMongoClientUri(null);
         }
-        List<String> filteredRestUris = Lists.newArrayList();
+        List<String> filteredRestUris = new ArrayList<>();
         for (String uri : preferences.getRestApiBaseUris()) {
             if (!PreferencesValidator.validateRestApiUriSyntax(getApplicationContext(), uri).isPresent()) {
                 filteredRestUris.add(uri);
@@ -496,7 +496,7 @@ public class MainActivity extends Activity {
             // Update UI with latest record information
             mTextSGV.setText(getSGVStringByUnit(reading, trend));
             mTextSGV.setTag(R.string.display_sgv, reading.asMgdl());
-            mTextSGV.setTag(R.string.display_trend, trend.getID());
+            mTextSGV.setTag(R.string.display_trend, trend.ordinal());
 
             String timeAgoStr = "---";
             Log.d(TAG, "Date: " + new Date().getTime());

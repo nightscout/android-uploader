@@ -50,7 +50,7 @@ public class Pebble {
     public PebbleDictionary buildDictionary(TrendArrow trend, String bgValue, int recordTime, int uploaderTimeSec,
                                             String delta, String uploaderBattery, String name) {
         PebbleDictionary dictionary = new PebbleDictionary();
-        dictionary.addString(ICON_KEY, String.valueOf(trend.getID()));
+        dictionary.addString(ICON_KEY, String.valueOf(trend.ordinal()));
         dictionary.addString(BG_KEY, bgValue);
         dictionary.addUint32(RECORD_TIME_KEY, recordTime);
         dictionary.addUint32(PHONE_TIME_KEY, uploaderTimeSec);

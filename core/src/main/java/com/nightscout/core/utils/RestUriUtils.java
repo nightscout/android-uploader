@@ -3,10 +3,10 @@ package com.nightscout.core.utils;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.hash.Hashing;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -44,7 +44,7 @@ public class RestUriUtils {
 
     public static List<String> splitIntoMultipleUris(String combinedUris) {
         if (Strings.isNullOrEmpty(combinedUris)) {
-            return Lists.newArrayList();
+            return new ArrayList<>();
         }
         return Splitter.onPattern("\\s+").splitToList(combinedUris.trim());
     }
