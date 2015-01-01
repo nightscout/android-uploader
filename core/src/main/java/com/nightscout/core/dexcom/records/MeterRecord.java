@@ -2,8 +2,8 @@ package com.nightscout.core.dexcom.records;
 
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.model.CookieMonsterG4Meter;
 import com.nightscout.core.model.GlucoseUnit;
+import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.utils.GlucoseReading;
 
 import java.nio.ByteBuffer;
@@ -39,7 +39,7 @@ public class MeterRecord extends GenericTimestampRecord {
         this.meterTime = meterTime;
     }
 
-    public MeterRecord(CookieMonsterG4Meter meter) {
+    public MeterRecord(MeterEntry meter) {
         super(meter.disp_timestamp_sec, meter.sys_timestamp_sec);
         this.reading = new GlucoseReading(meter.meter_bg_mgdl, GlucoseUnit.MGDL);
         this.meterTime = meter.meter_time;
@@ -58,8 +58,8 @@ public class MeterRecord extends GenericTimestampRecord {
     }
 
     @Override
-    public CookieMonsterG4Meter toProtobuf() {
-        CookieMonsterG4Meter.Builder builder = new CookieMonsterG4Meter.Builder();
+    public MeterEntry toProtobuf() {
+        MeterEntry.Builder builder = new MeterEntry.Builder();
         return builder.sys_timestamp_sec(rawSystemTimeSeconds)
                 .disp_timestamp_sec(rawDisplayTimeSeconds)
                 .meter_time(meterTime)
@@ -67,8 +67,8 @@ public class MeterRecord extends GenericTimestampRecord {
                 .build();
     }
 
-    public static List<CookieMonsterG4Meter> toProtobufList(List<MeterRecord> list) {
-        return toProtobufList(list, CookieMonsterG4Meter.class);
+    public static List<MeterEntry> toProtobufList(List<MeterRecord> list) {
+        return toProtobufList(list, MeterEntry.class);
     }
 
     @Override

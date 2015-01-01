@@ -5,14 +5,14 @@ import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.SensorRecord;
-import com.nightscout.core.model.CookieMonsterDownload;
-import com.nightscout.core.model.CookieMonsterG4Cal;
-import com.nightscout.core.model.CookieMonsterG4Meter;
-import com.nightscout.core.model.CookieMonsterG4SGV;
-import com.nightscout.core.model.CookieMonsterG4Sensor;
+import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.model.DownloadResults;
 import com.nightscout.core.model.DownloadStatus;
+import com.nightscout.core.model.G4Download;
 import com.nightscout.core.model.GlucoseUnit;
+import com.nightscout.core.model.MeterEntry;
+import com.nightscout.core.model.SensorEntry;
+import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
 import org.json.JSONArray;
@@ -32,14 +32,17 @@ public class DexcomG4 extends AbstractDevice {
     public static final int DEVICE_CLASS = 2;
     public static final int DEVICE_SUBCLASS = 0;
     public static final int PROTOCOL = 0;
+
     protected NightscoutPreferences preferences;
     protected int numOfPages;
     protected AbstractUploaderDevice uploaderDevice;
 
-    public DexcomG4(DeviceTransport transport, NightscoutPreferences preferences, AbstractUploaderDevice uploaderDevice) {
+    public DexcomG4(DeviceTransport transport, NightscoutPreferences preferences,
+                    AbstractUploaderDevice uploaderDevice) {
         super(transport);
         this.preferences = preferences;
         this.uploaderDevice = uploaderDevice;
+        this.deviceName = "DexcomG4";
     }
 
     public static boolean isConnected(DeviceTransport transport) {
@@ -86,11 +89,13 @@ public class DexcomG4 extends AbstractDevice {
                 }
 
                 displayTime = readData.readDisplayTime().getTime();
-                if (status == DownloadStatus.SUCCESS) {
-                    timeSinceLastRecord = readData.getTimeSinceEGVRecord(recentRecords.get(recentRecords.size() - 1));
+                if (status == DownloadStatus.SUCCESS && recentRecords.size() > 0) {
+                    timeSinceLastRecord = readData.getTimeSinceEGVRecord(
+                            recentRecords.get(recentRecords.size() - 1));
                 }
                 systemTime = readData.readSystemTime();
-                // FIXME: readData.readBatteryLevel() seems to flake out on battery level reads. Removing for now.
+                // FIXME: readData.readBatteryLevel() seems to flake out on battery level reads.
+                // Removing for now.
                 batLevel = 100;
                 // TODO pull in other exceptions once we have the analytics/acra reporters
             } catch (IOException e) {
@@ -108,12 +113,13 @@ public class DexcomG4 extends AbstractDevice {
             }
         }
 
-        List<CookieMonsterG4SGV> cookieMonsterG4SGVs = EGVRecord.toProtobufList(recentRecords);
-        List<CookieMonsterG4Cal> cookieMonsterG4Cals = CalRecord.toProtobufList(calRecords);
-        List<CookieMonsterG4Meter> cookieMonsterG4Meters = MeterRecord.toProtobufList(meterRecords);
-        List<CookieMonsterG4Sensor> cookieMonsterG4Sensors = SensorRecord.toProtobufList(sensorRecords);
+        List<SensorGlucoseValueEntry> cookieMonsterG4SGVs = EGVRecord.toProtobufList(recentRecords);
+        List<CalibrationEntry> cookieMonsterG4Cals = CalRecord.toProtobufList(calRecords);
+        List<MeterEntry> cookieMonsterG4Meters = MeterRecord.toProtobufList(meterRecords);
+        List<SensorEntry> cookieMonsterG4Sensors =
+                SensorRecord.toProtobufList(sensorRecords);
 
-        CookieMonsterDownload.Builder downloadBuilder = new CookieMonsterDownload.Builder();
+        G4Download.Builder downloadBuilder = new G4Download.Builder();
         downloadBuilder.sgv(cookieMonsterG4SGVs)
                 .cal(cookieMonsterG4Cals)
                 .sensor(cookieMonsterG4Sensors)
@@ -126,10 +132,12 @@ public class DexcomG4 extends AbstractDevice {
                 .units(GlucoseUnit.MGDL);
 
 
-        // TODO: determine if the logic here is correct. I suspect it assumes the last record was less than 5
-        // minutes ago. If a reading is skipped and the device is plugged in then nextUploadTime will be
-        // set to a negative number. This situation will eventually correct itself.
-        long nextUploadTime = standardMinutes(5).minus(standardSeconds(timeSinceLastRecord)).getMillis();
+        // TODO: determine if the logic here is correct. I suspect it assumes the last record was
+        // less than 5
+        // minutes ago. If a reading is skipped and the device is plugged in then nextUploadTime
+        // will be set to a negative number. This situation will eventually correct itself.
+        long nextUploadTime = standardMinutes(5).minus(standardSeconds(timeSinceLastRecord))
+                .getMillis();
 
 
         // convert into json for d3 plot

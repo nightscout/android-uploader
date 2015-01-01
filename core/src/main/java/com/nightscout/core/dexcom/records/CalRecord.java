@@ -1,9 +1,8 @@
 package com.nightscout.core.dexcom.records;
 
-import com.google.common.collect.Lists;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.model.CookieMonsterG4Cal;
+import com.nightscout.core.model.CalibrationEntry;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
@@ -12,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -42,7 +42,7 @@ public class CalRecord extends GenericTimestampRecord {
         unk[2] = packet[34];
         decay = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getDouble(35);
         numRecords = packet[43];
-        calSubrecords = Lists.newArrayList();
+        calSubrecords = new ArrayList<>();
 
         long displayTimeOffset = Seconds.secondsBetween(
                 new DateTime(getSystemTime()),
@@ -77,19 +77,19 @@ public class CalRecord extends GenericTimestampRecord {
         this.calSubrecords = subrecord;
     }
 
-    public CalRecord(CookieMonsterG4Cal cal) {
+    public CalRecord(CalibrationEntry cal) {
         super(cal.disp_timestamp_sec, cal.sys_timestamp_sec);
         this.intercept = cal.intercept;
         this.slope = cal.slope;
         this.scale = cal.scale;
         this.decay = cal.decay;
         this.numRecords = 0;
-        this.calSubrecords = Lists.newArrayList();
+        this.calSubrecords = new ArrayList<>();
     }
 
     @Override
-    public CookieMonsterG4Cal toProtobuf() {
-        CookieMonsterG4Cal.Builder builder = new CookieMonsterG4Cal.Builder();
+    public CalibrationEntry toProtobuf() {
+        CalibrationEntry.Builder builder = new CalibrationEntry.Builder();
         return builder.sys_timestamp_sec(rawSystemTimeSeconds)
                 .disp_timestamp_sec(rawDisplayTimeSeconds)
                 .intercept(intercept)
@@ -98,8 +98,8 @@ public class CalRecord extends GenericTimestampRecord {
                 .build();
     }
 
-    public static List<CookieMonsterG4Cal> toProtobufList(List<CalRecord> list) {
-        return toProtobufList(list, CookieMonsterG4Cal.class);
+    public static List<CalibrationEntry> toProtobufList(List<CalRecord> list) {
+        return toProtobufList(list, CalibrationEntry.class);
     }
 
 

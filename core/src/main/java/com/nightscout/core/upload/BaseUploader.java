@@ -2,8 +2,8 @@ package com.nightscout.core.upload;
 
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
-import com.nightscout.core.model.CookieMonsterG4Cal;
-import com.nightscout.core.model.CookieMonsterG4Meter;
+import com.nightscout.core.model.CalibrationEntry;
+import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
 import org.slf4j.Logger;
@@ -21,12 +21,12 @@ public abstract class BaseUploader {
 
     protected abstract boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException;
 
-    protected boolean doUpload(CookieMonsterG4Meter meterRecord) throws IOException {
+    protected boolean doUpload(MeterEntry meterRecord) throws IOException {
         log.info("Meter record upload not supported.");
         return true;
     }
 
-    protected boolean doUpload(CookieMonsterG4Cal calRecord) throws IOException {
+    protected boolean doUpload(CalibrationEntry calRecord) throws IOException {
         log.info("Cal record upload not supported.");
         return true;
     }
@@ -64,12 +64,12 @@ public abstract class BaseUploader {
      * @param meterRecords
      * @return True if the upload was successful, false if the upload was unsuccessful
      */
-    public final boolean uploadMeterRecords(List<CookieMonsterG4Meter> meterRecords) {
+    public final boolean uploadMeterRecords(List<MeterEntry> meterRecords) {
         if (meterRecords == null) {
             return true;
         }
         boolean output = true;
-        for (CookieMonsterG4Meter meterRecord : meterRecords) {
+        for (MeterEntry meterRecord : meterRecords) {
             try {
                 output &= doUpload(meterRecord);
             } catch (IOException e) {
@@ -86,13 +86,13 @@ public abstract class BaseUploader {
      * @param calRecords
      * @return True if the upload was successful, false if the upload was unsuccessful
      */
-    public final boolean uploadCalRecords(List<CookieMonsterG4Cal> calRecords) {
+    public final boolean uploadCalRecords(List<CalibrationEntry> calRecords) {
         if (calRecords == null) {
             return true;
         }
         boolean output = true;
         if (getPreferences().isCalibrationUploadEnabled()) {
-            for (CookieMonsterG4Cal calRecord : calRecords) {
+            for (CalibrationEntry calRecord : calRecords) {
                 try {
                     output &= doUpload(calRecord);
                 } catch (IOException e) {

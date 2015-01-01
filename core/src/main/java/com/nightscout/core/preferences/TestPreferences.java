@@ -1,13 +1,13 @@
 package com.nightscout.core.preferences;
 
-import com.google.common.collect.Lists;
 import com.nightscout.core.model.GlucoseUnit;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TestPreferences implements NightscoutPreferences {
     private boolean restApiEnabled = false;
-    private List<String> restApiBaseUris = Lists.newArrayList();
+    private List<String> restApiBaseUris = new ArrayList<>();
     private boolean calibrationUploadEnabled = false;
     private boolean sensorUploadEnabled = false;
     private boolean mongoUploadEnabled = false;

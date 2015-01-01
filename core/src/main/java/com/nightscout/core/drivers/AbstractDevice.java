@@ -7,7 +7,8 @@ import org.slf4j.LoggerFactory;
 
 abstract public class AbstractDevice {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
-    DeviceTransport transport;
+    protected String deviceName = "Unknown";
+    protected DeviceTransport transport;
 
     public AbstractDevice(DeviceTransport transport) {
         this.transport = transport;
@@ -24,6 +25,10 @@ abstract public class AbstractDevice {
         DownloadResults download = doDownload();
         onDownload();
         return download;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
     }
 
     abstract protected DownloadResults doDownload();

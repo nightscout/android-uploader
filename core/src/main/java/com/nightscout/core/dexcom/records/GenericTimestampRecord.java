@@ -1,11 +1,11 @@
 package com.nightscout.core.dexcom.records;
 
-import com.google.common.collect.Lists;
 import com.nightscout.core.dexcom.Utils;
 import com.squareup.wire.Message;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -56,7 +56,7 @@ abstract public class GenericTimestampRecord {
 
     public static <T extends Message, S extends GenericTimestampRecord> List<T> toProtobufList(
             List<S> list, Class<T> clazz) {
-        List<T> results = Lists.newArrayList();
+        List<T> results = new ArrayList<>();
 
         for (GenericTimestampRecord record : list) {
             results.add(clazz.cast(record.toProtobuf()));

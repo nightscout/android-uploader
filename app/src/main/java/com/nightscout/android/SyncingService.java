@@ -23,10 +23,10 @@ import com.nightscout.core.drivers.AbstractDevice;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DexcomG4;
-import com.nightscout.core.model.CookieMonsterDownload;
 import com.nightscout.core.model.DownloadResults;
 import com.nightscout.core.model.DownloadStatus;
-import com.nightscout.core.model.Noise;
+import com.nightscout.core.model.G4Download;
+import com.nightscout.core.model.G4Noise;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
 import org.json.JSONArray;
@@ -128,7 +128,7 @@ public class SyncingService extends IntentService {
             ((CdcAcmSerialDriver) serialDriver).setPowerManagementEnabled(preferences.isRootEnabled());
             try {
                 DownloadResults results = device.download();
-                CookieMonsterDownload download = results.getDownload();
+                G4Download download = results.getDownload();
 
                 Uploader uploader = new Uploader(context, preferences);
                 boolean uploadStatus;
@@ -143,7 +143,7 @@ public class SyncingService extends IntentService {
                     recentEGV = new EGVRecord(download.sgv.get(download.sgv.size() - 1));
                 } else {
                     recentEGV = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(),
-                            Noise.NOISE_NONE);
+                            G4Noise.NOISE_NONE);
                 }
 
                 broadcastSGVToUI(recentEGV, uploadStatus, results.getNextUploadTime() + TIME_SYNC_OFFSET,
@@ -215,7 +215,7 @@ public class SyncingService extends IntentService {
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
         broadcastIntent.putExtra(RESPONSE_SGV, egvRecord.getBgMgdl());
-        broadcastIntent.putExtra(RESPONSE_TREND, egvRecord.getTrend().getID());
+        broadcastIntent.putExtra(RESPONSE_TREND, egvRecord.getTrend().ordinal());
         broadcastIntent.putExtra(RESPONSE_TIMESTAMP, egvRecord.getDisplayTime().getTime());
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, nextUploadTime);
         broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, uploadStatus);
@@ -227,7 +227,7 @@ public class SyncingService extends IntentService {
     }
 
     protected void broadcastSGVToUI() {
-        EGVRecord record = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(), Noise.NOISE_NONE);
+        EGVRecord record = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(), G4Noise.NOISE_NONE);
         broadcastSGVToUI(record, false, standardMinutes(5).getMillis() + TIME_SYNC_OFFSET, new Date().getTime(), null, 0);
     }
 
