@@ -20,6 +20,7 @@ public class TestPreferences implements NightscoutPreferences {
     private boolean understand;
     private boolean askedForData;
     private String mqttEndpoint;
+    private String medtronicSerialNum = "208850";
 
     @Override
     public boolean isRestApiEnabled() {
@@ -174,5 +175,20 @@ public class TestPreferences implements NightscoutPreferences {
     @Override
     public String getPwdName() {
         return pwdName;
+    }
+
+    @Override
+    public String getMedtronicSerial ( ) {
+        return medtronicSerialNum;
+    }
+
+    @Override
+    public void setMedtronicSerial (String serialnum) {
+      this.medtronicSerialNum = serialnum;
+    }
+
+    @Override
+    public boolean isMedtronicEnabled () {
+        return false;
     }
 }
