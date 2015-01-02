@@ -183,7 +183,12 @@ public class TestPreferences implements NightscoutPreferences {
     }
 
     @Override
-    public void setMedtronicSerialNum (String serialnum) {
+    public void setMedtronicSerial (String serialnum) {
       this.medtronicSerialNum = serialnum;
+    }
+
+    @Override
+    public boolean isMedtronicEnabled () {
+        return false;
     }
 }

@@ -254,7 +254,7 @@ public class AndroidPreferences implements NightscoutPreferences {
     public String getMedtronicSerial ( ) {
         return preferences.getString(PreferenceKeys.MEDTRONIC_SERIAL, "");
     }
-    @Override
+
     public void setMedtronicSerial(String serialnum) {
         preferences.edit().putString(PreferenceKeys.MEDTRONIC_SERIAL, serialnum).apply();
     }
