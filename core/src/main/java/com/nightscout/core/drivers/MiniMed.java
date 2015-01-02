@@ -7,6 +7,7 @@ import com.nightscout.core.drivers.Medtronic.OpCodes;
 import com.nightscout.core.drivers.Medtronic.PowerOnCommand;
 import com.nightscout.core.drivers.Medtronic.ProductInfoResponse;
 import com.nightscout.core.drivers.Medtronic.ReadPumpModelCommand;
+import com.nightscout.core.drivers.Medtronic.ReadRadioRequest;
 import com.nightscout.core.drivers.Medtronic.ReadRadioResponse;
 import com.nightscout.core.drivers.Medtronic.SignalStrengthResponse;
 import com.nightscout.core.drivers.Medtronic.TransmitPacketRequest;
@@ -82,7 +83,7 @@ public class MiniMed extends AbstractDevice {
                 response = serialDriver.read(0, 0);
                 resp = new LinkStatusResponse(response);
                 if (resp.getSize() > 15) {
-                    log.info("Stick has data waiting");
+                    log.info("Stick has data waiting {}", resp.getSize());
                     success = true;
                     break;
                 }
@@ -91,8 +92,35 @@ public class MiniMed extends AbstractDevice {
                 sleep(2000L);
             }
             if (success) {
-                ReadRadioResponse radioResp = downloadPacket(resp.getSize());
-                log.info("Radio response: {}", radioResp.getData());
+                ReadRadioRequest req = new ReadRadioRequest(resp.getSize());
+                ReadRadioResponse readResp = null;
+                try {
+                    for (int i = 0; i < 5; i++) {
+                        log.info("Retry #{}", i);
+                        log.info("Writing: {}", Utils.bytesToHex(req.getPacket()));
+                        serialDriver.write(req.getPacket(), 0);
+                        sleep(2000);
+                        response = serialDriver.read(0, 0);
+                        log.info("My data: {}", Utils.bytesToHex(response));
+                        readResp = new ReadRadioResponse(response);
+                        if (readResp.getData().length == 0) {
+                            sleep(250);
+                            readResp = new ReadRadioResponse(serialDriver.read(0, 0));
+                        }
+                        log.info("ReadRadio Response: {}", new String(readResp.getData()));
+                        log.info("ReadRadio Response size: {}", resp.getSize());
+                        if (readResp.getResultLength() == resp.getSize() + 14) {
+                            log.info("SUCCESS!");
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (resp == null) {
+                    log.info("Returning null =(");
+                }
+//                ReadRadioResponse radioResp = downloadPacket(resp.getSize(), serialDriver);
+//                log.info("Radio response: {}", radioResp.getData());
             }
             serialDriver.close();
         } catch (IOException e) {
@@ -121,20 +149,25 @@ public class MiniMed extends AbstractDevice {
     }
 
     // Default to 5 retries
-    public ReadRadioResponse downloadPacket(int size) {
-        return downloadPacket(size, 5);
+    public ReadRadioResponse downloadPacket(short size, DeviceTransport serialDriver) {
+        return downloadPacket(size, serialDriver, 5);
     }
 
-    public ReadRadioResponse downloadPacket(int size, int retries) {
+    public ReadRadioResponse downloadPacket(short size, DeviceTransport serialDriver, int retries) {
+        ReadRadioRequest req = new ReadRadioRequest(size);
+        ReadRadioResponse resp = null;
         try {
             for (int i = 0; i < retries; i++) {
-                transport.write(OpCodes.READ_RADIO, 0);
+                log.info("Retry #{}", i);
+                log.info("Writing: {}", Utils.bytesToHex(req.getPacket()));
+                serialDriver.write(req.getPacket(), 0);
                 sleep(2000);
-                byte[] response = transport.read(0, 0);
-                ReadRadioResponse resp = new ReadRadioResponse(response);
+                byte[] response = serialDriver.read(0, 0);
+                log.info("My data: {}", Utils.bytesToHex(response));
+                resp = new ReadRadioResponse(response);
                 if (resp.getData().length == 0) {
                     sleep(250);
-                    resp = new ReadRadioResponse(transport.read(0, 0));
+                    resp = new ReadRadioResponse(serialDriver.read(0, 0));
                 }
                 if (resp.getData().length == size) {
                     log.info("SUCCESS!");
@@ -144,6 +177,9 @@ public class MiniMed extends AbstractDevice {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        if (resp == null) {
+            log.info("Returning null =(");
+        }
+        return resp;
     }
 }

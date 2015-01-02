@@ -1,5 +1,7 @@
 package com.nightscout.core.drivers.Medtronic;
 
+import com.google.common.primitives.UnsignedBytes;
+
 // TODO Should probably be imlpmented along with CRC16?
 public class CRC8 {
     private static int[] lookup = {0, 155, 173, 54, 193, 90, 108, 247, 25, 130, 180, 47,
@@ -22,11 +24,11 @@ public class CRC8 {
             127, 228, 210, 73, 149, 14, 56, 163, 84, 207, 249, 98, 140, 23,
             33, 186, 77, 214, 224, 123};
 
-    public static byte calculate(byte[] block) {
+    public static byte calculate(byte... block) {
         int result = 0;
         for (byte c : block) {
             result = lookup[(result ^ c) & 0xFF];
         }
-        return (byte) result;
+        return UnsignedBytes.checkedCast(result);
     }
 }
