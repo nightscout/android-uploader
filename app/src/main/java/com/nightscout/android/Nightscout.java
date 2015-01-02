@@ -9,7 +9,6 @@ import com.google.android.gms.analytics.Tracker;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
-import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 
@@ -37,7 +36,7 @@ public class Nightscout extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        ACRA.init(this);
+//        ACRA.init(this);
         JodaTimeAndroid.init(this);
     }
 
@@ -49,7 +48,7 @@ public class Nightscout extends Application {
             analytics.setDryRun(false);
             analytics.getLogger().setLogLevel(Logger.LogLevel.WARNING);
             analytics.setLocalDispatchPeriod(7200);
-            tracker =  analytics.newTracker(R.xml.app_tracker);
+            tracker = analytics.newTracker(R.xml.app_tracker);
             return tracker;
         }
         return tracker;

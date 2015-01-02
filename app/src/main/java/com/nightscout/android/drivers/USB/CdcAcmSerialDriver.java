@@ -10,6 +10,8 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 //import com.hoho.android.usbserial.driver.UsbId;
 
@@ -42,7 +44,6 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
     private static final int GET_LINE_CODING = 0x21;
     private static final int SET_CONTROL_LINE_STATE = 0x22;
     private static final int SEND_BREAK = 0x23;
-    private static final String SET_POWER_ON_COMMAND = "echo 'on' > \"/sys/bus/usb/devices/1-1/power/level\"";
 
     public CdcAcmSerialDriver(UsbDevice device, UsbDeviceConnection connection, UsbManager manager) {
         super(device, connection, manager);
@@ -246,5 +247,14 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
     private void setDtrRts() {
         int value = (mRts ? 0x2 : 0) | (mDtr ? 0x1 : 0);
         sendAcmControlMessage(SET_CONTROL_LINE_STATE, value, null);
+    }
+
+    public static Map<Integer, Integer[]> getSupportedDevices() {
+        final Map<Integer, Integer[]> supportedDevices = new LinkedHashMap<>();
+        supportedDevices.put(UsbId.VENDOR_DEXCOM,
+                new Integer[]{
+                        UsbId.DEXCOM_G4_PRODUCT
+                });
+        return supportedDevices;
     }
 }

@@ -150,15 +150,17 @@ abstract class CommonUsbSerialDriver implements UsbSerialDriver {
     public abstract void setRTS(boolean value) throws IOException;
 
     @Override
-    public boolean isConnected(int vendorId, int productId, int deviceClass, int subClass,
-                               int protocol) {
+    public boolean isConnected(int vendorId, int productId) {
+//    public boolean isConnected(int vendorId, int productId, int deviceClass, int subClass,
+//                               int protocol) {
         if (mManager == null) return false;
         HashMap<String, UsbDevice> deviceList = mManager.getDeviceList();
         for (UsbDevice device : deviceList.values()) {
-            if (device.getVendorId() == vendorId && device.getProductId() == productId &&
-                    device.getDeviceClass() == deviceClass &&
-                    device.getDeviceSubclass() == subClass &&
-                    device.getDeviceProtocol() == protocol) {
+//            if (device.getVendorId() == vendorId && device.getProductId() == productId &&
+//                    device.getDeviceClass() == deviceClass &&
+//                    device.getDeviceSubclass() == subClass &&
+//                    device.getDeviceProtocol() == protocol) {
+            if (device.getVendorId() == vendorId && device.getProductId() == productId) {
                 return true;
             }
         }

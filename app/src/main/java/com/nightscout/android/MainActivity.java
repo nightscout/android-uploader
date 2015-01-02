@@ -65,7 +65,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import static com.nightscout.core.dexcom.SpecialValue.getEGVSpecialValue;
 import static com.nightscout.core.dexcom.SpecialValue.isSpecialValue;
@@ -118,7 +117,7 @@ public class MainActivity extends Activity {
         ensureIUnderstandDialogDisplayed();
 
         // Add timezone ID to ACRA report
-        ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
+//        ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
 
         mTracker = ((Nightscout) getApplicationContext()).getTracker();
 
@@ -184,7 +183,7 @@ public class MainActivity extends Activity {
         Intent startIntent = getIntent();
         String action = startIntent.getAction();
         if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) ||
-                SyncingService.isG4Connected(getApplicationContext())) {
+                SyncingService.isConnected(getApplicationContext())) {
             reporter.report(EventType.DEVICE, EventSeverity.INFO,
                     getApplicationContext().getString(R.string.g4_connected));
             mUsbButton.setBackgroundResource(R.drawable.ic_usb);

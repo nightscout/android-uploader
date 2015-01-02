@@ -46,12 +46,13 @@ public class DexcomG4 extends AbstractDevice {
     }
 
     public static boolean isConnected(DeviceTransport transport) {
-        return transport.isConnected(VENDOR_ID, PRODUCT_ID, DEVICE_CLASS, DEVICE_SUBCLASS, PROTOCOL);
+        return transport.isConnected(VENDOR_ID, PRODUCT_ID);
     }
 
     @Override
     public boolean isConnected() {
-        return transport.isConnected(VENDOR_ID, PRODUCT_ID, DEVICE_CLASS, DEVICE_SUBCLASS, PROTOCOL);
+        return transport.isConnected(VENDOR_ID, PRODUCT_ID);
+//        return transport.isConnected(VENDOR_ID, PRODUCT_ID, DEVICE_CLASS, DEVICE_SUBCLASS, PROTOCOL);
     }
 
     @Override
