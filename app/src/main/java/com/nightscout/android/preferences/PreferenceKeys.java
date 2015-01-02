@@ -24,4 +24,7 @@ public final class PreferenceKeys {
     public static final String MQTT_LAST_SENSOR_TIME = "last_mqtt_sensor_time";
     public static final String MQTT_LAST_CAL_TIME = "last_mqtt_cal_time";
     public static final String MQTT_LAST_METER_TIME = "last_mqtt_meter_time";
+    public static final String MEDTRONIC_ENABLED = "medtronic_data_flux_enable";
+    public static final String MEDTRONIC_SERIAL = "medtronic_data_flux_serialnum";
+
 }
