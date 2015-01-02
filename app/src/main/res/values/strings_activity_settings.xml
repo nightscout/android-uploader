@@ -71,6 +71,17 @@
     <string name="pref_title_cal_data">Calibration Data</string>
     <string name="pref_summary_cal_data">Calibration data used in converting sensor ISIG values to glucose values</string>
 
+    <!-- Medtronic Settings -->
+
+    <string name="pref_medtronic_data_title_flux">Use Medtronic Data</string>
+    <string name="pref_medtronic_data_summary_flux_enabled">Enable Medtronic Data</string>
+    <string name="pref_medtronic_data_title_flux_enabled">Enable</string>
+
+    <string name="pref_medtronic_title_flux_enabled">Medtronic Serial Enabled</string>
+    <string name="pref_medtronic_dialog_serial">Enable Medtronic</string>
+    <string name="pref_medtronic_serial">Pump Serial</string>
+    <string name="pref_medtronic_data_default_serial">208850</string>
+
     <!-- Settings for Display Options -->
     <string name="pref_header_display_options">Display Options</string>
 
