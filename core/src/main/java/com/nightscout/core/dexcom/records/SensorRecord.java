@@ -2,17 +2,16 @@ package com.nightscout.core.dexcom.records;
 
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.protobuf.G4Download;
+import com.nightscout.core.model.SensorEntry;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Date;
+import java.util.List;
 
 public class SensorRecord extends GenericTimestampRecord {
-
     public static final int RECORD_SIZE = 19;
-    private int unfiltered;
-    private int filtered;
+    private long unfiltered;
+    private long filtered;
     private int rssi;
     private int OFFSET_UNFILTERED = 8;
     private int OFFSET_FILTERED = 12;
@@ -29,18 +28,18 @@ public class SensorRecord extends GenericTimestampRecord {
         rssi = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(OFFSET_RSSI);
     }
 
-    public SensorRecord(int filtered, int unfiltered, int rssi, Date displayTime, Date systemTime) {
+    public SensorRecord(int filtered, int unfiltered, int rssi, long displayTime, int systemTime) {
         super(displayTime, systemTime);
         this.filtered = filtered;
         this.unfiltered = unfiltered;
         this.rssi = rssi;
     }
 
-    public SensorRecord(int filtered, int unfiltered, int rssi, long displayTime, int systemTime) {
-        super(displayTime, systemTime);
-        this.filtered = filtered;
-        this.unfiltered = unfiltered;
-        this.rssi = rssi;
+    public SensorRecord(SensorEntry sensor) {
+        super(sensor.disp_timestamp_sec, sensor.sys_timestamp_sec);
+        this.filtered = sensor.filtered;
+        this.unfiltered = sensor.unfiltered;
+        this.rssi = sensor.rssi;
     }
 
     public long getUnfiltered() {
@@ -55,14 +54,20 @@ public class SensorRecord extends GenericTimestampRecord {
         return rssi;
     }
 
-    public G4Download.CookieMonsterG4Sensor toProtobuf() {
-        G4Download.CookieMonsterG4Sensor.Builder builder = G4Download.CookieMonsterG4Sensor.newBuilder();
-        return builder.setTimestampSec(rawSystemTimeSeconds)
-                .setRssi(rssi)
-                .setFiltered(filtered)
-                .setUnfiltered(unfiltered)
+    @Override
+    public SensorEntry toProtobuf() {
+        SensorEntry.Builder builder = new SensorEntry.Builder();
+        return builder.sys_timestamp_sec(rawSystemTimeSeconds)
+                .disp_timestamp_sec(rawDisplayTimeSeconds)
+                .rssi(rssi)
+                .filtered(filtered)
+                .unfiltered(unfiltered)
                 .build();
 
+    }
+
+    public static List<SensorEntry> toProtobufList(List<SensorRecord> list) {
+        return toProtobufList(list, SensorEntry.class);
     }
 
     @Override
@@ -83,8 +88,8 @@ public class SensorRecord extends GenericTimestampRecord {
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + unfiltered;
-        result = 31 * result + filtered;
+        result = 31 * result + (int) (unfiltered ^ (unfiltered >>> 32));
+        result = 31 * result + (int) (filtered ^ (filtered >>> 32));
         result = 31 * result + rssi;
         return result;
     }

@@ -7,7 +7,6 @@ import java.util.Arrays;
 public class ReadPacket {
     private Command command;
     private byte[] data;
-    private byte[] crc_calc;
     private byte[] crc;
     private int OFFSET_CMD = 3;
     private int OFFSET_DATA = 4;
@@ -15,16 +14,16 @@ public class ReadPacket {
 
     public ReadPacket(byte[] readPacket) {
         Optional<Command> optCmd = Command.getCommandByValue(readPacket[OFFSET_CMD]);
-        if (optCmd.isPresent()){
+        if (optCmd.isPresent()) {
             this.command = optCmd.get();
         } else {
-            throw new IllegalArgumentException("Unknown command: "+readPacket[OFFSET_CMD]);
+            throw new IllegalArgumentException("Unknown command: " + readPacket[OFFSET_CMD]);
         }
         this.data = Arrays.copyOfRange(readPacket, OFFSET_DATA, readPacket.length - CRC_LEN);
         this.crc = Arrays.copyOfRange(readPacket, readPacket.length - CRC_LEN, readPacket.length);
-        this.crc_calc = CRC16.calculate(readPacket, 0, readPacket.length - 2);
-        if (!Arrays.equals(this.crc, this.crc_calc)) {
-            throw new CRCFailError("CRC check failed. Was: " + Utils.bytesToHex(this.crc) + " Expected: " + Utils.bytesToHex(this.crc_calc));
+        byte[] crc_calc = CRC16.calculate(readPacket, 0, readPacket.length - 2);
+        if (!Arrays.equals(this.crc, crc_calc)) {
+            throw new CRCFailError("CRC check failed. Was: " + Utils.bytesToHex(this.crc) + " Expected: " + Utils.bytesToHex(crc_calc));
         }
     }
 

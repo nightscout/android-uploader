@@ -5,9 +5,9 @@ import android.util.Log;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
-import com.nightscout.android.MainActivity;
+import com.nightscout.android.drivers.AndroidUploaderDevice;
 import com.nightscout.core.dexcom.TrendArrow;
-import com.nightscout.core.protobuf.G4Download;
+import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.utils.GlucoseReading;
 
 import org.joda.time.DateTime;
@@ -34,7 +34,7 @@ public class Pebble {
     private static final String TAG = Pebble.class.getSimpleName();
     private Context context;
     private PebbleDictionary currentReading;
-    private G4Download.GlucoseUnit units = G4Download.GlucoseUnit.MGDL;
+    private GlucoseUnit units = GlucoseUnit.MGDL;
     private String pwdName = "";
     private GlucoseReading lastReading;
     private GlucoseReading lastDelta;
@@ -50,7 +50,7 @@ public class Pebble {
     public PebbleDictionary buildDictionary(TrendArrow trend, String bgValue, int recordTime, int uploaderTimeSec,
                                             String delta, String uploaderBattery, String name) {
         PebbleDictionary dictionary = new PebbleDictionary();
-        dictionary.addString(ICON_KEY, String.valueOf(trend.getID()));
+        dictionary.addString(ICON_KEY, String.valueOf(trend.ordinal()));
         dictionary.addString(BG_KEY, bgValue);
         dictionary.addUint32(RECORD_TIME_KEY, recordTime);
         dictionary.addUint32(PHONE_TIME_KEY, uploaderTimeSec);
@@ -66,7 +66,7 @@ public class Pebble {
     }
 
     public void sendDownload(GlucoseReading reading, TrendArrow trend, long recordTime, boolean resend) {
-        GlucoseReading delta = new GlucoseReading(0, G4Download.GlucoseUnit.MGDL);
+        GlucoseReading delta = new GlucoseReading(0, GlucoseUnit.MGDL);
 
         if (currentReading != null) {
             delta = reading.subtract(lastReading);
@@ -87,9 +87,10 @@ public class Pebble {
         lastTrend = trend;
         lastDelta = delta;
         recordTime = DateTimeZone.getDefault().convertUTCToLocal(recordTime);
+        int batLevel = AndroidUploaderDevice.getUploaderDevice(context).getBatteryLevel();
         PebbleDictionary dictionary = buildDictionary(trend, bgStr, (int) (recordTime / 1000),
                 (int) (DateTimeZone.getDefault().convertUTCToLocal(new DateTime().getMillis()) / 1000), deltaStr,
-                String.valueOf(MainActivity.batLevel), pwdName);
+                String.valueOf(batLevel), pwdName);
         currentReading = dictionary;
         sendDownload(dictionary);
     }
@@ -120,7 +121,7 @@ public class Pebble {
         });
     }
 
-    public void config(String pwdName, G4Download.GlucoseUnit units) {
+    public void config(String pwdName, GlucoseUnit units) {
         boolean changed = !this.pwdName.equals(pwdName) || this.units != units;
         if (changed) {
             setPwdName(pwdName);
@@ -133,7 +134,7 @@ public class Pebble {
         this.pwdName = pwdName;
     }
 
-    public void setUnits(G4Download.GlucoseUnit units) {
+    public void setUnits(GlucoseUnit units) {
         this.units = units;
     }
 }

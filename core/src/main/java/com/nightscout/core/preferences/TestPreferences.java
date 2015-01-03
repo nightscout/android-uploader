@@ -1,21 +1,21 @@
 package com.nightscout.core.preferences;
 
-import com.google.common.collect.Lists;
-import com.nightscout.core.protobuf.G4Download;
+import com.nightscout.core.model.GlucoseUnit;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TestPreferences implements NightscoutPreferences {
     private boolean restApiEnabled = false;
-    private List<String> restApiBaseUris = Lists.newArrayList();
+    private List<String> restApiBaseUris = new ArrayList<>();
     private boolean calibrationUploadEnabled = false;
     private boolean sensorUploadEnabled = false;
     private boolean mongoUploadEnabled = false;
     private String mongoClientUri = null;
-    private String mongoCollection = null;
-    private String mongoDeviceStatusCollection = null;
+    private String mongoCollection = "entries";
+    private String mongoDeviceStatusCollection = "devicestatus";
     private boolean dataDonateEnabled;
-    private G4Download.GlucoseUnit units;
+    private GlucoseUnit units;
     private String pwdName;
     private boolean understand;
     private boolean askedForData;
@@ -31,12 +31,12 @@ public class TestPreferences implements NightscoutPreferences {
     }
 
     @Override
-    public G4Download.GlucoseUnit getPreferredUnits() {
+    public GlucoseUnit getPreferredUnits() {
         return units;
     }
 
     @Override
-    public void setPreferredUnits(G4Download.GlucoseUnit units) {
+    public void setPreferredUnits(GlucoseUnit units) {
         this.units = units;
     }
 

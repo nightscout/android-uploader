@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.nightscout.android"
-    android:versionCode="17"
+    android:versionCode="18"
     android:versionName="0.1.11-dev">
 
     <uses-feature android:name="android.hardware.usb.host" />
@@ -50,7 +50,9 @@
         <receiver android:name=".OnUpgradeReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
-                <data android:scheme="package" android:path="com.nightscout.android" />
+                <data
+                    android:scheme="package"
+                    android:path="com.nightscout.android" />
             </intent-filter>
         </receiver>
 
@@ -62,12 +64,12 @@
             android:launchMode="singleInstance"
             android:theme="@android:style/Theme.Dialog" />
 
-        <service android:name=".dexcom.SyncingService" />
+        <service android:name=".SyncingService" />
 
         <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nightscout.android.MainActivity" />

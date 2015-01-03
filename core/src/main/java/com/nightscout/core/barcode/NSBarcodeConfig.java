@@ -1,7 +1,6 @@
 package com.nightscout.core.barcode;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,6 +8,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,7 +48,7 @@ public class NSBarcodeConfig {
     }
 
     public List<String> getApiUris() {
-        List<String> apiUris = Lists.newArrayList();
+        List<String> apiUris = new ArrayList<>();
         if (hasApiConfig()){
             JSONArray jsonArray = null;
             try {
