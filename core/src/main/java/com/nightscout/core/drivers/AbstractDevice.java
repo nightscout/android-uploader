@@ -5,6 +5,9 @@ import com.nightscout.core.model.DownloadResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class is a representation for a device that we want information from e.g. pump or cgm
+ */
 abstract public class AbstractDevice {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     protected String deviceName = "Unknown";
