@@ -49,7 +49,7 @@ public class NSBarcodeConfig {
 
     public List<String> getApiUris() {
         List<String> apiUris = new ArrayList<>();
-        if (hasApiConfig()) {
+        if (hasApiConfig()){
             JSONArray jsonArray = null;
             try {
                 jsonArray = config.getJSONObject(NSBarcodeConfigKeys.API_CONFIG)

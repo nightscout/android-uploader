@@ -32,13 +32,13 @@ enum DownloadStatus {
 
 enum G4Trend {
     TREND_NONE = 0;
-    DOUBLE_UP = 1;
-    SINGLE_UP = 2;
-    FORTY_FIVE_UP = 3;
-    FLAT = 4;
-    FORTY_FIVE_DOWN = 5;
-    SINGLE_DOWN = 6;
-    DOUBLE_DOWN = 7;
+    DOUBLE_UP = 1; // More than 3 mg/dL per minute
+    SINGLE_UP = 2; // +2 to +3 mg/dL per minute
+    FORTY_FIVE_UP = 3; // +1 to +2 mg/dL per minute
+    FLAT = 4; // +/- 1 mg/dL per minute
+    FORTY_FIVE_DOWN = 5; // -1 to -2 mg/dL per minute
+    SINGLE_DOWN = 6; // -2 to -3 mg/dL per minute
+    DOUBLE_DOWN = 7; // more than -3 mg/dL per minute
     NOT_COMPUTABLE = 8;
     RATE_OUT_OF_RANGE = 9;
 }
@@ -54,23 +54,23 @@ enum G4Noise {
 }
 
 enum ReceiverStatus {
-    RECEIVER_CONNECTED = 0;
-    RECEIVER_DISCONNECTED = 1;
+    RECEIVER_CONNECTED = 0; // The receiver is connected to the uploader
+    RECEIVER_DISCONNECTED = 1; // The receiver is not connected to the uploader
 }
 
 message SensorGlucoseValueEntry {
-    required uint32 sgv_mgdl = 1; // Glucose value
-    optional uint64 sys_timestamp_sec = 2; // system timestamp of the record
-    optional uint64 disp_timestamp_sec = 3; // system timestamp of the record
-    optional G4Trend trend = 4; // Trend arrow
-    optional G4Noise noise = 5;
+    required uint32 sgv_mgdl = 1; // Sensor Glucose Value
+    optional uint64 sys_timestamp_sec = 2; // System timestamp - Timestamp representing the internal clock of the receiver
+    optional uint64 disp_timestamp_sec = 3; // Display timestamp - Timestamp representing the user configured time displayed on the receiver
+    optional G4Trend trend = 4; // G4 Glucose trend arrow
+    optional G4Noise noise = 5; // Noise level that potentially affects the G4 sensor readings
 }
 
 message MeterEntry {
     required uint32 meter_bg_mgdl = 1;
     optional uint32 meter_time = 2;
-    optional uint64 sys_timestamp_sec = 3; // system timestamp of the record
-    optional uint64 disp_timestamp_sec = 4; // system timestamp of the record
+    optional uint64 sys_timestamp_sec = 3; // System timestamp - Timestamp representing the internal clock of the receiver
+    optional uint64 disp_timestamp_sec = 4; // Display timestamp - Timestamp representing the user configured time displayed on the receiver
 
 }
 
@@ -78,8 +78,8 @@ message SensorEntry {
     required uint64 filtered = 1;
     optional uint64 unfiltered = 2;
     optional uint32 rssi = 3;
-    optional uint64 sys_timestamp_sec = 4; // system timestamp of the record
-    optional uint64 disp_timestamp_sec = 5; // system timestamp of the record
+    optional uint64 sys_timestamp_sec = 4; // System timestamp - Timestamp representing the internal clock of the receiver
+    optional uint64 disp_timestamp_sec = 5; // Display timestamp - Timestamp representing the user configured time displayed on the receiver
 
 }
 
@@ -88,9 +88,8 @@ message CalibrationEntry {
     optional double intercept = 2;
     optional double scale = 3;
     optional double decay = 4;
-    optional uint64 sys_timestamp_sec = 5; // system timestamp of the record
-    optional uint64 disp_timestamp_sec = 6; // system timestamp of the record
-
+    optional uint64 sys_timestamp_sec = 5; // System timestamp - Timestamp representing the internal clock of the receiver
+    optional uint64 disp_timestamp_sec = 6; // Display timestamp - Timestamp representing the user configured time displayed on the receiver
 }
 
 message ReceiverState {
