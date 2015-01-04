@@ -243,4 +243,19 @@ public class AndroidPreferences implements NightscoutPreferences {
     public long getLastMeterMqttUpload() {
         return preferences.getLong(PreferenceKeys.MQTT_LAST_METER_TIME, 0);
     }
+
+    // Medtronic
+    @Override
+    public boolean isMedtronicEnabled () {
+        return preferences.getBoolean(PreferenceKeys.MEDTRONIC_ENABLED, false);
+    }
+
+    @Override
+    public String getMedtronicSerial ( ) {
+        return preferences.getString(PreferenceKeys.MEDTRONIC_SERIAL, "");
+    }
+
+    public void setMedtronicSerial(String serialnum) {
+        preferences.edit().putString(PreferenceKeys.MEDTRONIC_SERIAL, serialnum).apply();
+    }
 }

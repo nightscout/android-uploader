@@ -64,7 +64,7 @@
         <com.nightscout.android.settings.SummaryBoundEditTextPreference
             android:dependency="medtronic_data_flux_enable"
             android:title="@string/pref_medtronic_title_flux_enabled"
-            android:key="medtronic_data_flux_base"
+            android:key="medtronic_data_flux_serialnum"
             android:dialogTitle="@string/pref_medtronic_dialog_serial"
             android:dialogMessage="@string/pref_medtronic_serial"
             android:hint="@string/pref_medtronic_data_default_serial" />
