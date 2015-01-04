@@ -162,7 +162,8 @@
         android:baselineAlignBottom="false"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:contentDescription="@string/accessibility_uploader_logs" />
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -171,6 +172,7 @@
         android:background="@drawable/ic_nousb"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:contentDescription="@string/accessibility_device_logs" />
 
 </RelativeLayout>

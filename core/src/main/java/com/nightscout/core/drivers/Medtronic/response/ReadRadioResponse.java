@@ -1,11 +1,13 @@
 package com.nightscout.core.drivers.Medtronic.response;
 
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.utils.CRC8;
+import com.nightscout.core.utils.CRC;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -28,13 +30,8 @@ public class ReadRadioResponse extends ResponseBase {
         log.info("Result length: {}", resultLength);
         log.info("Response length: {}", response.length);
         byte crc = response[response.length - 1];
-        if (response.length < resultLength) {
-            this.data = Arrays.copyOfRange(response, 13, 13 + resultLength);
-        } else {
-            this.data = Arrays.copyOfRange(response, 13, 13 + resultLength);
-            log.warn("Something is wrong. Response packet is smaller than anticipated");
-        }
-        byte expected_crc = CRC8.calculate(this.data);
+        this.data = Arrays.copyOfRange(response, 13, 13 + resultLength);
+        byte expected_crc = CRC.calculate8(this.data);
         if (crc != expected_crc) {
             log.warn("CRC Expected: {}, Was: {}", crc, expected_crc);
 //            throw new CRCFailError("CRC failed");
@@ -53,5 +50,19 @@ public class ReadRadioResponse extends ResponseBase {
 
     public boolean isEOD() {
         return eod;
+    }
+
+    public void prependData(byte[] dataToPrepend) {
+        if (dataToPrepend.length > 0 && this.data.length > 0) {
+            log.info("Prepending {} to {}", Utils.bytesToHex(dataToPrepend), Utils.bytesToHex(this.data));
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            try {
+                byteArrayOutputStream.write(dataToPrepend);
+                byteArrayOutputStream.write(this.data);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            this.data = byteArrayOutputStream.toByteArray();
+        }
     }
 }

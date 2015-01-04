@@ -78,4 +78,8 @@
     <string name="event_success_upload">Successful upload to %s</string>
     <string name="event_fail_upload">Upload to %s has failed</string>
     <string name="event_mongo_invalid_credentials">Please double check your Mongo username and password.</string>
+    <string name="event_log_upload_menu_text">Device logs</string>
+    <string name="event_log_device_menu_text">Upload Logs</string>
+    <string name="accessibility_uploader_logs">Uploader logs</string>
+    <string name="accessibility_device_logs">Device logs</string>
 </resources>

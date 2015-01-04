@@ -157,7 +157,7 @@ task jacocoTestReport(type: JacocoReport, dependsOn: "testDebug") {
                        '**/*$ViewInjector*.*',
                        '**/BuildConfig.*',
                        '**/USB/*.*',
-                       '**/proto/*.*',
+                       '**/model/*.*',
                        '**/Manifest*.*']
     )
 

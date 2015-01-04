@@ -1,7 +1,7 @@
 package com.nightscout.core.drivers.Medtronic.request;
 
 import com.nightscout.core.drivers.Medtronic.OpCodes;
-import com.nightscout.core.utils.CRC8;
+import com.nightscout.core.utils.CRC;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -19,7 +19,7 @@ public class ReadRadioRequest extends RequestBase {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        byte crc = CRC8.calculate(outputStream.toByteArray());
+        byte crc = CRC.calculate8(outputStream.toByteArray());
         outputStream.write(crc);
         packet = outputStream.toByteArray();
     }

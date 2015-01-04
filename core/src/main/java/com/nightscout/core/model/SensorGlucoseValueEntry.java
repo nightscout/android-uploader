@@ -22,25 +22,25 @@ public final class SensorGlucoseValueEntry extends Message {
     public final Integer sgv_mgdl;
 
     /**
-     * Glucose value
+     * Sensor Glucose Value
      */
     @ProtoField(tag = 2, type = UINT64)
     public final Long sys_timestamp_sec;
 
     /**
-     * system timestamp of the record
+     * System timestamp - Timestamp representing the internal clock of the receiver
      */
     @ProtoField(tag = 3, type = UINT64)
     public final Long disp_timestamp_sec;
 
     /**
-     * system timestamp of the record
+     * Display timestamp - Timestamp representing the user configured time displayed on the receiver
      */
     @ProtoField(tag = 4, type = ENUM)
     public final G4Trend trend;
 
     /**
-     * Trend arrow
+     * G4 Glucose trend arrow
      */
     @ProtoField(tag = 5, type = ENUM)
     public final G4Noise noise;
@@ -111,7 +111,7 @@ public final class SensorGlucoseValueEntry extends Message {
         }
 
         /**
-         * Glucose value
+         * Sensor Glucose Value
          */
         public Builder sys_timestamp_sec(Long sys_timestamp_sec) {
             this.sys_timestamp_sec = sys_timestamp_sec;
@@ -119,7 +119,7 @@ public final class SensorGlucoseValueEntry extends Message {
         }
 
         /**
-         * system timestamp of the record
+         * System timestamp - Timestamp representing the internal clock of the receiver
          */
         public Builder disp_timestamp_sec(Long disp_timestamp_sec) {
             this.disp_timestamp_sec = disp_timestamp_sec;
@@ -127,7 +127,7 @@ public final class SensorGlucoseValueEntry extends Message {
         }
 
         /**
-         * system timestamp of the record
+         * Display timestamp - Timestamp representing the user configured time displayed on the receiver
          */
         public Builder trend(G4Trend trend) {
             this.trend = trend;
@@ -135,7 +135,7 @@ public final class SensorGlucoseValueEntry extends Message {
         }
 
         /**
-         * Trend arrow
+         * G4 Glucose trend arrow
          */
         public Builder noise(G4Noise noise) {
             this.noise = noise;

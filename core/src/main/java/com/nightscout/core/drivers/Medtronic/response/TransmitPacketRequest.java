@@ -4,7 +4,7 @@ import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.drivers.Medtronic.OpCodes;
 import com.nightscout.core.drivers.Medtronic.remote_commands.CommandBase;
 import com.nightscout.core.drivers.Medtronic.request.RequestBase;
-import com.nightscout.core.utils.CRC8;
+import com.nightscout.core.utils.CRC;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,14 +56,14 @@ public class TransmitPacketRequest extends RequestBase {
         outputStream.write(unk);
         log.info("Code: " + command.getCode());
         outputStream.write(command.getCode());
-        byte packetCrc = CRC8.calculate(outputStream.toByteArray());
+        byte packetCrc = CRC.calculate8(outputStream.toByteArray());
         outputStream.write(packetCrc);
         try {
             outputStream.write(command.getParams());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        outputStream.write(CRC8.calculate(command.getParams()));
+        outputStream.write(CRC.calculate8(command.getParams()));
         log.info("Request: {}", Utils.bytesToHex(outputStream.toByteArray()));
         packet = outputStream.toByteArray();
     }

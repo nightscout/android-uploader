@@ -2,9 +2,14 @@ package com.nightscout.core.utils;
 
 import com.google.common.primitives.UnsignedBytes;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // TODO Should probably be imlpmented along with CRC16?
-public class CRC8 {
-    private static int[] lookup = {0, 155, 173, 54, 193, 90, 108, 247, 25, 130, 180, 47,
+public class CRC {
+    protected final static Logger log = LoggerFactory.getLogger(CRC.class);
+
+    private static int[] lookup8 = {0, 155, 173, 54, 193, 90, 108, 247, 25, 130, 180, 47,
             216, 67, 117, 238, 50, 169, 159, 4, 243, 104, 94, 197, 43, 176,
             134, 29, 234, 113, 71, 220, 100, 255, 201, 82, 165, 62, 8, 147,
             125, 230, 208, 75, 188, 39, 17, 138, 86, 205, 251, 96, 151, 12,
@@ -24,11 +29,26 @@ public class CRC8 {
             127, 228, 210, 73, 149, 14, 56, 163, 84, 207, 249, 98, 140, 23,
             33, 186, 77, 214, 224, 123};
 
-    public static byte calculate(byte... block) {
+    public static byte calculate8(byte... block) {
         int result = 0;
         for (byte c : block) {
-            result = lookup[(result ^ c) & 0xFF];
+            result = lookup8[(result ^ c) & 0xFF];
         }
         return UnsignedBytes.checkedCast(result);
+    }
+
+    public static byte[] calculate16CCITT(byte... block) {
+        int crc = 0xFFFF;
+        int polynomial = 0x1021;
+        for (byte b : block) {
+            for (int i = 0; i < 8; i++) {
+                boolean bit = ((b >> (7 - i) & 1) == 1);
+                boolean c15 = ((crc >> 15 & 1) == 1);
+                crc <<= 1;
+                if (c15 ^ bit) crc ^= polynomial;
+            }
+        }
+        crc &= 0xffff;
+        return new byte[]{(byte) ((crc & 0xFF00) >> 8), (byte) (crc & 0xFF)};
     }
 }

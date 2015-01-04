@@ -58,6 +58,8 @@ public class MinimedClient {
         execute(transmitPacketRequest, TransmitPacketResponse.class);
         sleep(request.getDelayAfterCommand());
 
+        byte[] previousData = new byte[0];
+
         boolean finished = false;
         int counter = 0;
         while (!finished || counter == 30) {
@@ -66,21 +68,22 @@ public class MinimedClient {
             ReadRadioRequest readRadioRequest = new ReadRadioRequest(responseSize);
 //        for (int i = 0; i < retries; i++) {
             response = execute(readRadioRequest, responseSize, ReadRadioResponse.class);
-            sleep(request.getDelayAfterCommand());
+            response.prependData(previousData);
             finished = response.isEOD();
             log.info("My data: {}", Utils.bytesToHex(response.getData()));
             if (response.getData().length == 0) {
                 sleep(250);
                 log.warn("Uh oh, length was 0?");
             }
-            log.info("ReadRadio Response: {}", Utils.bytesToHex(response.getData()).trim());
+            log.info("ReadRadio Response: {}", Utils.bytesToHex(response.getData()));
             log.info("ReadRadio Response size: {}", response.getResultLength());
             log.info("LinkStatus reports size: {}", responseSize);
-            if (response.getResultLength() + 14 == responseSize) {
-                log.info("SUCCESS!");
-//                return Optional.of(response);
+            if (response.isEOD()) {
+                break;
             }
             counter += 1;
+            previousData = response.getData();
+            sleep(request.getDelayAfterCommand());
         }
         return response;
     }
