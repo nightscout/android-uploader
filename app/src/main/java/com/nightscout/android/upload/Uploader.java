@@ -12,6 +12,7 @@ import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;

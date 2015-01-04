@@ -34,7 +34,7 @@ public final class CalibrationEntry extends Message {
     public final Long sys_timestamp_sec;
 
     /**
-     * system timestamp of the record
+     * System timestamp - Timestamp representing the internal clock of the receiver
      */
     @ProtoField(tag = 6, type = UINT64)
     public final Long disp_timestamp_sec;
@@ -130,7 +130,7 @@ public final class CalibrationEntry extends Message {
         }
 
         /**
-         * system timestamp of the record
+         * System timestamp - Timestamp representing the internal clock of the receiver
          */
         public Builder disp_timestamp_sec(Long disp_timestamp_sec) {
             this.disp_timestamp_sec = disp_timestamp_sec;
