@@ -12,10 +12,10 @@ import com.nightscout.core.preferences.NightscoutPreferences;
 
 import org.json.JSONArray;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.robolectric.Robolectric;
 import org.robolectric.shadows.ShadowActivity;
+import org.robolectric.shadows.ShadowLog;
 import org.robolectric.shadows.ShadowToast;
 
 import static org.hamcrest.Matchers.is;
@@ -41,6 +41,7 @@ public class SyncingServiceTest extends RobolectricTestBase {
         prefs = new AndroidPreferences(activity.getApplicationContext());
         shadowActivity = Robolectric.shadowOf(activity);
         mockSyncingService = mock(SyncingService.class);
+        ShadowLog.stream = System.out;
     }
 
     @Test
@@ -79,7 +80,6 @@ public class SyncingServiceTest extends RobolectricTestBase {
     }
 
     //TODO - failing during minimed testing - ignoring for now
-    @Ignore
     @Test
     public void test_startIntentServiceWithUsbConnectedNoCalDataNoSensorNoUploaders() throws Exception {
         Intent intent = new Intent(Robolectric.application, SyncingService.class);

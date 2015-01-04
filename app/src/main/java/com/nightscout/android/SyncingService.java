@@ -146,7 +146,8 @@ public class SyncingService extends IntentService {
             AbstractUploaderDevice uploaderDevice = AndroidUploaderDevice.getUploaderDevice(context);
 
             AbstractDevice device = null;
-            if (serialDriver.getClass() == CdcAcmSerialDriver.class) {
+            Log.d(TAG, "Serial driver: " + serialDriver.getClass().getSimpleName());
+            if (serialDriver.getClass().getSimpleName().startsWith("CdcAcmSerialDriver")) {
                 device = new DexcomG4(serialDriver, preferences, uploaderDevice);
 
                 ((DexcomG4) device).setNumOfPages(numOfPages);
