@@ -25,7 +25,6 @@ public class CareLinkUsb extends CommonUsbSerialDriver {
 
     public CareLinkUsb(UsbDevice device, UsbDeviceConnection connection, UsbManager manager) {
         super(device, connection, manager);
-        Log.d("XXX", "Care link initialized");
     }
 
 //    private void initCareLink(){
@@ -64,10 +63,11 @@ public class CareLinkUsb extends CommonUsbSerialDriver {
         epOUT = mInterface.getEndpoint(0);
         epIN = mInterface.getEndpoint(1);
 
+
         // Open connection
         Log.d(TAG, "Opening connection...");
         mUsbDeviceConnection = mManager.openDevice(mDevice);
-        Log.d(TAG, "Opened connection to\nVendorId: " + mDevice.getVendorId() + "\nProductId: " + mDevice.getProductId());
+//        Log.d(TAG, "Opened connection to\nVendorId: " + mDevice.getVendorId() + "\nProductId: " + mDevice.getProductId());
 
         if (mUsbDeviceConnection == null) {
             throw new IOException("open: no connection available");
@@ -94,6 +94,7 @@ public class CareLinkUsb extends CommonUsbSerialDriver {
 
     @Override
     public byte[] read(int size, int timeoutMillis) throws IOException {
+        Log.d(TAG, "Read size: " + size);
         if (mUsbDeviceConnection == null) {
             throw new IOException("read: no connection available");
         }
@@ -103,13 +104,13 @@ public class CareLinkUsb extends CommonUsbSerialDriver {
             throw new IOException("there is nothing to read");
         }
 
-        ByteBuffer buffer = ByteBuffer.allocate(MAX_PACKAGE_SIZE);
+        ByteBuffer buffer = ByteBuffer.allocate(size);
 
         // Receive data from device
         if (currentRequest.equals(mUsbDeviceConnection.requestWait())) {
             UsbRequest inRequest = new UsbRequest();
             inRequest.initialize(mUsbDeviceConnection, epIN);
-            if (inRequest.queue(buffer, MAX_PACKAGE_SIZE)) {
+            if (inRequest.queue(buffer, size)) {
                 mUsbDeviceConnection.requestWait();
                 return buffer.array();
             }

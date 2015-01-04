@@ -56,16 +56,15 @@ public class AndroidMqttPinger implements MqttPinger, MqttPingerObservable {
 
     @Override
     public void ping() {
-        Log.i(TAG, "Ping");
         if (!isActive()) {
             Log.d(TAG, "Can't ping because connection is not active");
             return;
         }
-        Log.d(TAG, "Sending keepalive to " + mqttClient.getServerURI() + " deviceID=>" + "connection_" + instanceId);
         MqttMessage message = new MqttMessage(Constants.MQTT_KEEP_ALIVE_MESSAGE);
         message.setQos(Constants.MQTT_KEEP_ALIVE_QOS);
         try {
             mqttClient.publish(String.format(keepAliveTopic, mqttClient.getClientId()), message);
+            Log.i(TAG, "MQTT ping success");
         } catch (MqttException e) {
             Log.wtf(TAG, "Exception during ping. Reason code:" + e.getReasonCode() + " Message: " + e.getMessage());
             for (MqttPingerObserver observer : observers) {
@@ -125,10 +124,8 @@ public class AndroidMqttPinger implements MqttPinger, MqttPingerObservable {
         pingerPendingIntent = PendingIntent.getBroadcast(context, 61, pingerIntent, 0);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             alarmMgr.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + keepAliveInterval - 3000, pingerPendingIntent);
-            Log.d(TAG, "KitKat alarm set");
         } else {
             alarmMgr.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + keepAliveInterval - 3000, pingerPendingIntent);
-            Log.d(TAG, "Pre-KitKat alarm set");
         }
 
     }

@@ -1,8 +1,8 @@
-package com.nightscout.core.drivers.Medtronic;
+package com.nightscout.core.drivers.Medtronic.response;
 
 import com.google.common.primitives.UnsignedBytes;
 
-public class SignalStrengthResponse extends ResponsePacketBase {
+public class SignalStrengthResponse extends ResponseBase {
     private byte strength;
 
     public SignalStrengthResponse(byte[] response) {

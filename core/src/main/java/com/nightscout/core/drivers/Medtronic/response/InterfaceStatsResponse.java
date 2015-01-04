@@ -1,6 +1,10 @@
-package com.nightscout.core.drivers.Medtronic;
+package com.nightscout.core.drivers.Medtronic.response;
 
-public class InterfaceStatsResponse extends ResponsePacketBase {
+/**
+ * This class should be used in response to both UsbInterfaceStatsRequest and
+ * RadioInterfaceStatsRequest
+ */
+public class InterfaceStatsResponse extends ResponseBase {
     private byte crcErrors;
     private byte seqErrors;
     private byte nakErrors;
@@ -10,6 +14,7 @@ public class InterfaceStatsResponse extends ResponsePacketBase {
 
     public InterfaceStatsResponse(byte[] response) {
         super(response);
+        log.info("Response length: {}", response.length);
         crcErrors = dataBuffer.get(0);
         seqErrors = dataBuffer.get(1);
         nakErrors = dataBuffer.get(2);

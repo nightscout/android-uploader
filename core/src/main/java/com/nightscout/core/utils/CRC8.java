@@ -1,4 +1,4 @@
-package com.nightscout.core.drivers.Medtronic;
+package com.nightscout.core.utils;
 
 import com.google.common.primitives.UnsignedBytes;
 

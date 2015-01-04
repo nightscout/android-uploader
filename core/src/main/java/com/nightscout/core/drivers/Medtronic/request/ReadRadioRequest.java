@@ -1,19 +1,20 @@
-package com.nightscout.core.drivers.Medtronic;
+package com.nightscout.core.drivers.Medtronic.request;
+
+import com.nightscout.core.drivers.Medtronic.OpCodes;
+import com.nightscout.core.utils.CRC8;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-// Placholder - just using opCode directly for now
-public class ReadRadioRequest {
-    private byte[] packet;
-
+public class ReadRadioRequest extends RequestBase {
     public ReadRadioRequest(short size) {
-        byte[] opCode = OpCodes.READ_RADIO;
+        OPCODE = OpCodes.READ_RADIO;
+//        MAX_RESPONSE_SIZE = size;
         byte[] me = ByteBuffer.allocate(2).putShort(size).array();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
-            outputStream.write(opCode);
+            outputStream.write(OPCODE);
             outputStream.write(me);
         } catch (IOException e) {
             e.printStackTrace();
@@ -21,9 +22,5 @@ public class ReadRadioRequest {
         byte crc = CRC8.calculate(outputStream.toByteArray());
         outputStream.write(crc);
         packet = outputStream.toByteArray();
-    }
-
-    public byte[] getPacket() {
-        return packet;
     }
 }

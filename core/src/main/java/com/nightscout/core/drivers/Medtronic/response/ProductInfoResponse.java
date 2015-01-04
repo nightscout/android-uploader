@@ -1,4 +1,4 @@
-package com.nightscout.core.drivers.Medtronic;
+package com.nightscout.core.drivers.Medtronic.response;
 
 import com.nightscout.core.dexcom.Utils;
 
@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ProductInfoResponse extends ResponsePacketBase {
+public class ProductInfoResponse extends ResponseBase {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private byte rfCode;
@@ -19,9 +19,12 @@ public class ProductInfoResponse extends ResponsePacketBase {
     private String softwareVersion;
     private Map<Integer, String> interfaces;
 
+    public ProductInfoResponse() {
+
+    }
+
     public ProductInfoResponse(byte[] response) {
         super(response);
-
         interfaces = new HashMap<>();
         serialNumber = Utils.bytesToHex(new byte[]{dataBuffer.get(0), dataBuffer.get(1), dataBuffer.get(2)});
         productVersion = String.format("%d1.%d1", dataBuffer.get(3), dataBuffer.get(4));

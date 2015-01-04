@@ -1,16 +1,19 @@
 package com.nightscout.core.drivers;
 
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.drivers.Medtronic.InterfaceStatsResponse;
-import com.nightscout.core.drivers.Medtronic.LinkStatusResponse;
-import com.nightscout.core.drivers.Medtronic.OpCodes;
-import com.nightscout.core.drivers.Medtronic.PowerOnCommand;
-import com.nightscout.core.drivers.Medtronic.ProductInfoResponse;
-import com.nightscout.core.drivers.Medtronic.ReadPumpModelCommand;
-import com.nightscout.core.drivers.Medtronic.ReadRadioRequest;
-import com.nightscout.core.drivers.Medtronic.ReadRadioResponse;
-import com.nightscout.core.drivers.Medtronic.SignalStrengthResponse;
-import com.nightscout.core.drivers.Medtronic.TransmitPacketRequest;
+import com.nightscout.core.drivers.Medtronic.MinimedClient;
+import com.nightscout.core.drivers.Medtronic.remote_commands.CommandBase;
+import com.nightscout.core.drivers.Medtronic.remote_commands.PowerOnCommand;
+import com.nightscout.core.drivers.Medtronic.remote_commands.ReadHistoryDataCommand;
+import com.nightscout.core.drivers.Medtronic.request.ProductInfoRequest;
+import com.nightscout.core.drivers.Medtronic.request.RadioInterfaceStatsRequest;
+import com.nightscout.core.drivers.Medtronic.request.ReadRadioRequest;
+import com.nightscout.core.drivers.Medtronic.request.SignalStrengthRequest;
+import com.nightscout.core.drivers.Medtronic.request.UsbInterfaceStatsRequest;
+import com.nightscout.core.drivers.Medtronic.response.InterfaceStatsResponse;
+import com.nightscout.core.drivers.Medtronic.response.ProductInfoResponse;
+import com.nightscout.core.drivers.Medtronic.response.ReadRadioResponse;
+import com.nightscout.core.drivers.Medtronic.response.SignalStrengthResponse;
 import com.nightscout.core.model.DownloadResults;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
@@ -24,105 +27,118 @@ public class MiniMed extends AbstractDevice {
         super(serialDriver);
         try {
             serialDriver.open();
-            serialDriver.write(OpCodes.PRODUCT_INFO, 0);
-            byte[] response = serialDriver.read(0, 0);
-            log.info("Response: {}", Utils.bytesToHex(response));
-            ProductInfoResponse pi = new ProductInfoResponse(response);
-            serialDriver.write(OpCodes.USB_STATS, 0);
-            response = serialDriver.read(0, 0);
-            InterfaceStatsResponse usbInterfaceStats = new InterfaceStatsResponse(response);
+            MinimedClient client = new MinimedClient(serialDriver);
+            ProductInfoRequest productInfoRequest = new ProductInfoRequest();
+            ProductInfoResponse productInfo = client.execute(productInfoRequest, ProductInfoResponse.class);
+            log.info("Serial number: {}", productInfo.getSerialNumber());
 
-            log.info("USB CRC Errors: {}", usbInterfaceStats.getCrcErrors());
-            log.info("USB Sequence Errors: {}", usbInterfaceStats.getSeqErrors());
-            log.info("USB NAK Errors: {}", usbInterfaceStats.getNakErrors());
-            log.info("USB Timeouts: {}", usbInterfaceStats.getTimeouts());
-            log.info("USB Transmitted: {}", usbInterfaceStats.getTransmitted());
-            log.info("USB Received: {}", usbInterfaceStats.getReceived());
+            UsbInterfaceStatsRequest usbStatsRequest = new UsbInterfaceStatsRequest();
+            InterfaceStatsResponse statsResponse = client.execute(usbStatsRequest, InterfaceStatsResponse.class);
+            log.info("USB CRC Errors: {}", statsResponse.getCrcErrors());
+            log.info("USB Sequence Errors: {}", statsResponse.getSeqErrors());
+            log.info("USB NAK Errors: {}", statsResponse.getNakErrors());
+            log.info("USB Timeouts: {}", statsResponse.getTimeouts());
+            log.info("USB Transmitted: {}", statsResponse.getTransmitted());
+            log.info("USB Received: {}", statsResponse.getReceived());
 
-            serialDriver.write(OpCodes.RADIO_STATS, 0);
-            response = serialDriver.read(0, 0);
-            InterfaceStatsResponse radioInterfaceStats = new InterfaceStatsResponse(response);
+            RadioInterfaceStatsRequest radioStatsRequest = new RadioInterfaceStatsRequest();
+            statsResponse = client.execute(radioStatsRequest, InterfaceStatsResponse.class);
+            log.info("Radio CRC Errors: {}", statsResponse.getCrcErrors());
+            log.info("Radio Sequence Errors: {}", statsResponse.getSeqErrors());
+            log.info("Radio NAK Errors: {}", statsResponse.getNakErrors());
+            log.info("Radio Timeouts: {}", statsResponse.getTimeouts());
+            log.info("Radio Transmitted: {}", statsResponse.getTransmitted());
+            log.info("Radio Received: {}", statsResponse.getReceived());
 
-            log.info("Radio CRC Errors: {}", radioInterfaceStats.getCrcErrors());
-            log.info("Radio Sequence Errors: {}", radioInterfaceStats.getSeqErrors());
-            log.info("Radio NAK Errors: {}", radioInterfaceStats.getNakErrors());
-            log.info("Radio Timeouts: {}", radioInterfaceStats.getTimeouts());
-            log.info("Radio Transmitted: {}", radioInterfaceStats.getTransmitted());
-            log.info("Radio Received: {}", radioInterfaceStats.getReceived());
+            SignalStrengthRequest signalStrengthRequest = new SignalStrengthRequest();
+            SignalStrengthResponse signalStrengthResponse = client.execute(signalStrengthRequest, SignalStrengthResponse.class);
+            log.info("Signal Strength: {}", signalStrengthResponse.getStrength());
 
-            serialDriver.write(OpCodes.SIGNAL_STRENGTH, 0);
-            response = serialDriver.read(0, 0);
-            SignalStrengthResponse signalStrength = new SignalStrengthResponse(response);
+//            LinkStatusRequest linkStatusRequest = new LinkStatusRequest();
+//            LinkStatusResponse linkStatusResponse = client.execute(linkStatusRequest, LinkStatusResponse.class);
+//            log.info("Size of carelink buffer: {}", linkStatusResponse.getSize());
 
-            log.info("Signal strength: {}", signalStrength.getStrength());
-
-            serialDriver.write(OpCodes.LINK_STATUS, 0);
-            response = serialDriver.read(0, 0);
-            LinkStatusResponse linkStatus = new LinkStatusResponse(response);
-
-            log.info("Link Size: {}", linkStatus.getSize());
-
-//            byte[] bensTestSerial = new byte[]{0x66, 0x54, 0x55};
             byte[] serial = new byte[]{(byte) 0x86, (byte) 0x80, 0x42};
-            TransmitPacketRequest transmitRequest = new TransmitPacketRequest(serial, new PowerOnCommand(), (byte) 0);
-            log.info("Transmit packet: {}", Utils.bytesToHex(transmitRequest.getPacket()));
+//            byte[] serial = new byte[]{ (byte) 0x66, (byte) 0x54, (byte) 0x55};
+            CommandBase command = new PowerOnCommand(serial);
+            ReadRadioResponse r = client.execute(command);
+//            command = new ReadPumpModelCommand(serial);
+//            r = client.execute(command);
 
-            serialDriver.write(transmitRequest.getPacket(), 0);
-            sleep(30000L);
-            log.info("Response: ", Utils.bytesToHex(serialDriver.read(0, 0)));
-            ReadPumpModelCommand readPump = new ReadPumpModelCommand();
-            transmitRequest = new TransmitPacketRequest(serial, readPump, (byte) 3);
-            serialDriver.write(transmitRequest.getPacket(), 0);
-            response = serialDriver.read(0, 0);
-            log.info("Response: {}", Utils.bytesToHex(response));
-            sleep(1000);
-            LinkStatusResponse resp = null;
-            boolean success = false;
-            for (int i = 0; i < 30; i++) {
-                serialDriver.write(OpCodes.LINK_STATUS, 0);
-                response = serialDriver.read(0, 0);
-                resp = new LinkStatusResponse(response);
-                if (resp.getSize() > 15) {
-                    log.info("Stick has data waiting {}", resp.getSize());
-                    success = true;
-                    break;
-                }
-                log.info("Response: {}", Utils.bytesToHex(response));
-                log.info("Response size: {}", resp.getSize());
-                sleep(2000L);
+            command = new ReadHistoryDataCommand(serial, (byte) 0x00);
+            r = client.execute(command);
+
+            if (r != null) {
+                log.info("Command Response: {}", Utils.bytesToHex(r.getData()));
+                log.info("Command Response size: {}", r.getResultLength());
+            } else {
+                log.warn("Command failed");
             }
-            if (success) {
-                ReadRadioRequest req = new ReadRadioRequest(resp.getSize());
-                ReadRadioResponse readResp = null;
-                try {
-                    for (int i = 0; i < 5; i++) {
-                        log.info("Retry #{}", i);
-                        log.info("Writing: {}", Utils.bytesToHex(req.getPacket()));
-                        serialDriver.write(req.getPacket(), 0);
-                        sleep(2000);
-                        response = serialDriver.read(0, 0);
-                        log.info("My data: {}", Utils.bytesToHex(response));
-                        readResp = new ReadRadioResponse(response);
-                        if (readResp.getData().length == 0) {
-                            sleep(250);
-                            readResp = new ReadRadioResponse(serialDriver.read(0, 0));
-                        }
-                        log.info("ReadRadio Response: {}", new String(readResp.getData()));
-                        log.info("ReadRadio Response size: {}", resp.getSize());
-                        if (readResp.getResultLength() == resp.getSize() + 14) {
-                            log.info("SUCCESS!");
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if (resp == null) {
-                    log.info("Returning null =(");
-                }
-//                ReadRadioResponse radioResp = downloadPacket(resp.getSize(), serialDriver);
-//                log.info("Radio response: {}", radioResp.getData());
-            }
-            serialDriver.close();
+
+
+//
+////            byte[] bensTestSerial = new byte[]{0x66, 0x54, 0x55};
+//            byte[] serial = new byte[]{(byte) 0x86, (byte) 0x80, 0x42};
+//            TransmitPacketRequest transmitRequest = new TransmitPacketRequest(serial, new PowerOnCommand(), (byte) 0);
+//            log.info("Transmit packet: {}", Utils.bytesToHex(transmitRequest.getPacket()));
+//
+//            serialDriver.write(transmitRequest.getPacket(), 0);
+//            sleep(30000L);
+//            log.info("Response: ", Utils.bytesToHex(serialDriver.read(0, 0)));
+
+//            ReadPumpModelCommand readPump = new ReadPumpModelCommand();
+//            transmitRequest = new TransmitPacketRequest(serial, readPump, (byte) 3);
+//            serialDriver.write(transmitRequest.getPacket(), 0);
+//            response = serialDriver.read(0, 0);
+//            log.info("Response: {}", Utils.bytesToHex(response));
+//            sleep(1000);
+//            LinkStatusResponse resp = null;
+//            boolean success = false;
+//            for (int i = 0; i < 30; i++) {
+//                serialDriver.write(OpCodes.LINK_STATUS, 0);
+//                response = serialDriver.read(0, 0);
+//                resp = new LinkStatusResponse(response);
+//                if (resp.getSize() > 15) {
+//                    log.info("Stick has data waiting {}", resp.getSize());
+//                    success = true;
+//                    break;
+//                }
+//                log.info("Response: {}", Utils.bytesToHex(response));
+//                log.info("Response size: {}", resp.getSize());
+//                sleep(2000L);
+//            }
+//            if (success) {
+//                ReadRadioRequest req = new ReadRadioRequest(resp.getSize());
+//                ReadRadioResponse readResp = null;
+//                try {
+//                    for (int i = 0; i < 5; i++) {
+//                        log.info("Retry #{}", i);
+//                        log.info("Writing: {}", Utils.bytesToHex(req.getPacket()));
+//                        serialDriver.write(req.getPacket(), 0);
+//                        sleep(2000);
+//                        response = serialDriver.read(0, 0);
+//                        log.info("My data: {}", Utils.bytesToHex(response));
+//                        readResp = new ReadRadioResponse(response);
+//                        if (readResp.getData().length == 0) {
+//                            sleep(250);
+//                            readResp = new ReadRadioResponse(serialDriver.read(0, 0));
+//                        }
+//                        log.info("ReadRadio Response: {}", new String(readResp.getData()));
+//                        log.info("ReadRadio Response size: {}", resp.getSize());
+//                        if (readResp.getResultLength() == resp.getSize() + 14) {
+//                            log.info("SUCCESS!");
+//                        }
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                if (resp == null) {
+//                    log.info("Returning null =(");
+//                }
+////                ReadRadioResponse radioResp = downloadPacket(resp.getSize(), serialDriver);
+////                log.info("Radio response: {}", radioResp.getData());
+//            }
+//            serialDriver.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

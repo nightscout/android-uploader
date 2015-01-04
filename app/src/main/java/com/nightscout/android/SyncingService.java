@@ -145,10 +145,6 @@ public class SyncingService extends IntentService {
         if (serialDriver != null) {
             AbstractUploaderDevice uploaderDevice = AndroidUploaderDevice.getUploaderDevice(context);
 
-            Log.d("XXX", "Driver: " + serialDriver.getClass().getSimpleName());
-            if (serialDriver.getClass() == CareLinkUsb.class) {
-                Log.d("XXX", "YAY carelink!");
-            }
             AbstractDevice device = null;
             if (serialDriver.getClass() == CdcAcmSerialDriver.class) {
                 device = new DexcomG4(serialDriver, preferences, uploaderDevice);

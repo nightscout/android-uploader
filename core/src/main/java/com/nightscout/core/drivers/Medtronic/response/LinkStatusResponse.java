@@ -1,7 +1,7 @@
-package com.nightscout.core.drivers.Medtronic;
+package com.nightscout.core.drivers.Medtronic.response;
 
 
-public class LinkStatusResponse extends ResponsePacketBase {
+public class LinkStatusResponse extends ResponseBase {
     private short size;
 
     public LinkStatusResponse(byte[] response) {
