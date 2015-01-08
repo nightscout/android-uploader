@@ -1,6 +1,7 @@
 package com.nightscout.android;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -618,6 +619,7 @@ public class MainActivity extends Activity {
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     public void setNextPoll(long millis) {
         Log.d(TAG, "Setting next poll with Alarm for " + (millis) + " ms from now");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
