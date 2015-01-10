@@ -58,7 +58,9 @@ public class MiniMed extends AbstractDevice {
 //            LinkStatusResponse linkStatusResponse = client.execute(linkStatusRequest, LinkStatusResponse.class);
 //            log.info("Size of carelink buffer: {}", linkStatusResponse.getSize());
 
-            byte[] serial = new byte[]{(byte) 0x86, (byte) 0x80, 0x42};
+            byte[] serial = convertSerialBytes(getSerialNum(preferences));
+            log.info("Using Serial {}", Utils.bytesToHex(serial));
+            // byte[] serial = new byte[]{(byte) 0x86, (byte) 0x80, 0x42};
 //            byte[] serial = new byte[]{ (byte) 0x66, (byte) 0x54, (byte) 0x55};
             CommandBase command = new PowerOnCommand(serial);
             ReadRadioResponse r = client.execute(command);
@@ -154,6 +156,16 @@ public class MiniMed extends AbstractDevice {
         }
     }
 
+    public String getSerialNum (NightscoutPreferences preferences) {
+        return preferences.getMedtronicSerial();
+    }
+    public byte[] convertSerialBytes (String serialnum) {
+        byte[] bytes = new byte[3];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = Byte.valueOf(serialnum.substring(i * 2, i * 2 + 2), 16);
+        }
+        return bytes;
+    }
     @Override
     public boolean isConnected() {
         return false;
