@@ -11,7 +11,6 @@ import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
-import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
@@ -40,9 +39,11 @@ public class Uploader {
     private boolean allUploadersInitalized = true;
     private EventReporter reporter;
     private Context context;
+    private NightscoutPreferences preferences;
 
     public Uploader(Context context, NightscoutPreferences preferences) {
         checkNotNull(context);
+        this.preferences = preferences;
         this.context = context;
         reporter = AndroidEventReporter.getReporter(context);
         uploaders = new ArrayList<>();
@@ -168,9 +169,11 @@ public class Uploader {
                             uploader.getIdentifier()));
         }
 
+        // Quick hack to prevent MQTT only from reporting not uploading to cloud
+        int otherUploaders = (preferences.isMqttEnabled()) ? 1 : 0;
         // Force a failure if an uploader was not properly initialized, but only after the other
         // uploaders were executed.
-        return allUploadersInitalized && allSuccessful && (uploaders.size() != 0);
+        return allUploadersInitalized && allSuccessful && (uploaders.size() + otherUploaders != 0);
     }
 
     protected List<BaseUploader> getUploaders() {
