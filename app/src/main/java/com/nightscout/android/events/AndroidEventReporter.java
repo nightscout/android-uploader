@@ -9,8 +9,7 @@ import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
+import java.util.Date;
 
 
 public class AndroidEventReporter implements EventReporter {
@@ -33,8 +32,7 @@ public class AndroidEventReporter implements EventReporter {
     public synchronized void report(EventType type, EventSeverity severity, String message) {
         Log.d("AndroidEventReporter", type.name() + " " + severity.name() + " " + message);
         ContentValues values = new ContentValues();
-        values.put(EventsContract.EventEntry.COLUMN_NAME_TIME_STAMP,
-                new DateTime().toString(DateTimeFormat.forPattern("MM-dd HH:mm:ss Z")));
+        values.put(EventsContract.EventEntry.COLUMN_NAME_TIME_STAMP, new Date().getTime());
         values.put(EventsContract.EventEntry.COLUMN_NAME_EVENT_TYPE, type.ordinal());
         values.put(EventsContract.EventEntry.COLUMN_NAME_SEVERITY, severity.name());
         values.put(EventsContract.EventEntry.COLUMN_NAME_MESSAGE, message);

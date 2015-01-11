@@ -11,7 +11,7 @@ public class EventsDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + EventsContract.EventEntry.TABLE_NAME + " (" +
                     EventsContract.EventEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    EventsContract.EventEntry.COLUMN_NAME_TIME_STAMP + " STRING NOT NULL, " +
+                    EventsContract.EventEntry.COLUMN_NAME_TIME_STAMP + " INTEGER NOT NULL, " +
                     EventsContract.EventEntry.COLUMN_NAME_EVENT_TYPE + " INTEGER NOT NULL, " +
                     EventsContract.EventEntry.COLUMN_NAME_SEVERITY + " STRING NOT NULL, " +
                     EventsContract.EventEntry.COLUMN_NAME_MESSAGE + " TEXT NOT NULL" +

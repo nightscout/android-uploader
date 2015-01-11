@@ -3,15 +3,21 @@ package com.nightscout.android.events;
 import android.app.ListFragment;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 import com.nightscout.android.R;
+import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
 public class EventFragment extends ListFragment {
 
@@ -55,22 +61,29 @@ public class EventFragment extends ListFragment {
                 },
                 new int[]{R.id.event_message, R.id.event_timestamp},
                 CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
-//        cursorAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-//            @Override
-//            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-//                String severity = cursor.getString(
-//                        cursor.getColumnIndex(EventsContract.EventEntry.COLUMN_NAME_SEVERITY));
-//                EventSeverity sev = EventSeverity.valueOf(severity);
-//                if (sev == EventSeverity.WARN) {
-//                    ((TextView) view).setTextColor(Color.YELLOW);
-//                }
-//                if (sev == EventSeverity.ERROR) {
-//                    ((TextView) view).setTextColor(Color.RED);
-//                }
-//                ((TextView) view).setText(cursor.getString(columnIndex));
-//                return true;
-//            }
-//        });
+
+        cursorAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+            @Override
+            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+                String severity = cursor.getString(
+                        cursor.getColumnIndex(EventsContract.EventEntry.COLUMN_NAME_SEVERITY));
+                EventSeverity sev = EventSeverity.valueOf(severity);
+                if (sev == EventSeverity.WARN) {
+                    ((TextView) view).setTextColor(Color.YELLOW);
+                }
+                if (sev == EventSeverity.ERROR) {
+                    ((TextView) view).setTextColor(Color.RED);
+                }
+                if (cursor.getColumnIndex(EventsContract.EventEntry.COLUMN_NAME_TIME_STAMP) == columnIndex) {
+                    ((TextView) view).setText(new DateTime(cursor.getLong(columnIndex)).toString(DateTimeFormat.forPattern("MM-dd HH:mm:ss Z")));
+//                    ((TextView) view).setText(cursor.getString(columnIndex));
+                } else {
+                    ((TextView) view).setText(cursor.getString(columnIndex));
+
+                }
+                return true;
+            }
+        });
         return cursorAdapter;
     }
 }
