@@ -56,18 +56,10 @@ public class MiniMed extends AbstractDevice {
             SignalStrengthResponse signalStrengthResponse = client.execute(signalStrengthRequest, SignalStrengthResponse.class);
             log.info("Signal Strength: {}", signalStrengthResponse.getStrength());
 
-//            LinkStatusRequest linkStatusRequest = new LinkStatusRequest();
-//            LinkStatusResponse linkStatusResponse = client.execute(linkStatusRequest, LinkStatusResponse.class);
-//            log.info("Size of carelink buffer: {}", linkStatusResponse.getSize());
-
-            byte[] serial = convertSerialBytes(getSerialNum(preferences));
+            byte[] serial = convertSerialBytes(preferences.getMedtronicSerial());
             log.info("Using Serial {}", Utils.bytesToHex(serial));
-            // byte[] serial = new byte[]{(byte) 0x86, (byte) 0x80, 0x42};
-//            byte[] serial = new byte[]{ (byte) 0x66, (byte) 0x54, (byte) 0x55};
             CommandBase command = new PowerOnCommand(serial);
             ReadRadioResponse r = client.execute(command);
-//            command = new ReadPumpModelCommand(serial);
-//            r = client.execute(command);
 
             command = new ReadHistoryDataCommand(serial, (byte) 0x00);
             r = client.execute(command);
@@ -80,70 +72,6 @@ public class MiniMed extends AbstractDevice {
                 log.warn("Command failed");
             }
 
-
-//
-////            byte[] bensTestSerial = new byte[]{0x66, 0x54, 0x55};
-//            byte[] serial = new byte[]{(byte) 0x86, (byte) 0x80, 0x42};
-//            TransmitPacketRequest transmitRequest = new TransmitPacketRequest(serial, new PowerOnCommand(), (byte) 0);
-//            log.info("Transmit packet: {}", Utils.bytesToHex(transmitRequest.getPacket()));
-//
-//            serialDriver.write(transmitRequest.getPacket(), 0);
-//            sleep(30000L);
-//            log.info("Response: ", Utils.bytesToHex(serialDriver.read(0, 0)));
-
-//            ReadPumpModelCommand readPump = new ReadPumpModelCommand();
-//            transmitRequest = new TransmitPacketRequest(serial, readPump, (byte) 3);
-//            serialDriver.write(transmitRequest.getPacket(), 0);
-//            response = serialDriver.read(0, 0);
-//            log.info("Response: {}", Utils.bytesToHex(response));
-//            sleep(1000);
-//            LinkStatusResponse resp = null;
-//            boolean success = false;
-//            for (int i = 0; i < 30; i++) {
-//                serialDriver.write(OpCodes.LINK_STATUS, 0);
-//                response = serialDriver.read(0, 0);
-//                resp = new LinkStatusResponse(response);
-//                if (resp.getSize() > 15) {
-//                    log.info("Stick has data waiting {}", resp.getSize());
-//                    success = true;
-//                    break;
-//                }
-//                log.info("Response: {}", Utils.bytesToHex(response));
-//                log.info("Response size: {}", resp.getSize());
-//                sleep(2000L);
-//            }
-//            if (success) {
-//                ReadRadioRequest req = new ReadRadioRequest(resp.getSize());
-//                ReadRadioResponse readResp = null;
-//                try {
-//                    for (int i = 0; i < 5; i++) {
-//                        log.info("Retry #{}", i);
-//                        log.info("Writing: {}", Utils.bytesToHex(req.getPacket()));
-//                        serialDriver.write(req.getPacket(), 0);
-//                        sleep(2000);
-//                        response = serialDriver.read(0, 0);
-//                        log.info("My data: {}", Utils.bytesToHex(response));
-//                        readResp = new ReadRadioResponse(response);
-//                        if (readResp.getData().length == 0) {
-//                            sleep(250);
-//                            readResp = new ReadRadioResponse(serialDriver.read(0, 0));
-//                        }
-//                        log.info("ReadRadio Response: {}", new String(readResp.getData()));
-//                        log.info("ReadRadio Response size: {}", resp.getSize());
-//                        if (readResp.getResultLength() == resp.getSize() + 14) {
-//                            log.info("SUCCESS!");
-//                        }
-//                    }
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                if (resp == null) {
-//                    log.info("Returning null =(");
-//                }
-////                ReadRadioResponse radioResp = downloadPacket(resp.getSize(), serialDriver);
-////                log.info("Radio response: {}", radioResp.getData());
-//            }
-//            serialDriver.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -159,16 +87,16 @@ public class MiniMed extends AbstractDevice {
         }
     }
 
-    public String getSerialNum (NightscoutPreferences preferences) {
-        return preferences.getMedtronicSerial();
-    }
     public byte[] convertSerialBytes (String serialnum) {
-        byte[] bytes = new byte[3];
-        for (int i = 0; i < bytes.length; i++) {
-            bytes[i] = Byte.valueOf(serialnum.substring(i * 2, i * 2 + 2), 16);
+        int len = serialnum.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(serialnum.charAt(i), 16) << 4)
+                    + Character.digit(serialnum.charAt(i + 1), 16));
         }
-        return bytes;
+        return data;
     }
+
     @Override
     public boolean isConnected() {
         return false;
