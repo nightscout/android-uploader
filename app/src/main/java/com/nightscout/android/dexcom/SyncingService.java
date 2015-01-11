@@ -30,9 +30,7 @@ import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.SensorRecord;
-
 import org.json.JSONArray;
-
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;

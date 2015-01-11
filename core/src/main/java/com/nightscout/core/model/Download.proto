@@ -1,0 +1,98 @@
+option java_package = "com.nightscout.core.model";
+
+option java_outer_classname = "G4Download";
+
+message G4Download {
+    repeated SensorGlucoseValueEntry sgv = 1; // Glucose records as reported by the G4
+    optional GlucoseUnit units = 2; // Units reported by the device
+    required string download_timestamp = 3; // ISO8601 timestamp reported by uploader
+    optional uint64 receiver_system_time_sec = 4; // Raw value of the receiver's system time
+    optional DownloadStatus download_status = 5 [default = NOT_APPLICABLE]; // Status of the download
+    optional uint32 receiver_battery = 6; // Battery level as reported by the receiver
+    optional uint32 uploader_battery = 7; // Battery level as reported by the uploader
+    repeated MeterEntry meter = 8;
+    repeated SensorEntry sensor = 9;
+    repeated CalibrationEntry cal = 10;
+}
+
+enum GlucoseUnit {
+    MGDL = 0;
+    MMOL = 1;
+}
+
+enum DownloadStatus {
+    SUCCESS = 0;
+    NO_DATA = 1;
+    DEVICE_NOT_FOUND = 2;
+    IO_ERROR = 3;
+    APPLICATION_ERROR = 4;
+    UNKNOWN = 5;
+    NOT_APPLICABLE = 6;
+}
+
+enum G4Trend {
+    TREND_NONE = 0;
+    DOUBLE_UP = 1; // More than 3 mg/dL per minute
+    SINGLE_UP = 2; // +2 to +3 mg/dL per minute
+    FORTY_FIVE_UP = 3; // +1 to +2 mg/dL per minute
+    FLAT = 4; // +/- 1 mg/dL per minute
+    FORTY_FIVE_DOWN = 5; // -1 to -2 mg/dL per minute
+    SINGLE_DOWN = 6; // -2 to -3 mg/dL per minute
+    DOUBLE_DOWN = 7; // more than -3 mg/dL per minute
+    NOT_COMPUTABLE = 8;
+    RATE_OUT_OF_RANGE = 9;
+}
+
+enum G4Noise {
+    NOISE_NONE = 0;
+    CLEAN = 1;
+    LIGHT = 2;
+    MEDIUM = 3;
+    HEAVY = 4;
+    NOT_COMPUTED = 5;
+    MAX = 6;
+}
+
+enum ReceiverStatus {
+    RECEIVER_CONNECTED = 0; // The receiver is connected to the uploader
+    RECEIVER_DISCONNECTED = 1; // The receiver is not connected to the uploader
+}
+
+message SensorGlucoseValueEntry {
+    required uint32 sgv_mgdl = 1; // Sensor Glucose Value
+    optional uint64 sys_timestamp_sec = 2; // System timestamp - Timestamp representing the internal clock of the receiver
+    optional uint64 disp_timestamp_sec = 3; // Display timestamp - Timestamp representing the user configured time displayed on the receiver
+    optional G4Trend trend = 4; // G4 Glucose trend arrow
+    optional G4Noise noise = 5; // Noise level that potentially affects the G4 sensor readings
+}
+
+message MeterEntry {
+    required uint32 meter_bg_mgdl = 1;
+    optional uint32 meter_time = 2;
+    optional uint64 sys_timestamp_sec = 3; // System timestamp - Timestamp representing the internal clock of the receiver
+    optional uint64 disp_timestamp_sec = 4; // Display timestamp - Timestamp representing the user configured time displayed on the receiver
+
+}
+
+message SensorEntry {
+    required uint64 filtered = 1;
+    optional uint64 unfiltered = 2;
+    optional uint32 rssi = 3;
+    optional uint64 sys_timestamp_sec = 4; // System timestamp - Timestamp representing the internal clock of the receiver
+    optional uint64 disp_timestamp_sec = 5; // Display timestamp - Timestamp representing the user configured time displayed on the receiver
+
+}
+
+message CalibrationEntry {
+    required double slope = 1;
+    optional double intercept = 2;
+    optional double scale = 3;
+    optional double decay = 4;
+    optional uint64 sys_timestamp_sec = 5; // System timestamp - Timestamp representing the internal clock of the receiver
+    optional uint64 disp_timestamp_sec = 6; // Display timestamp - Timestamp representing the user configured time displayed on the receiver
+}
+
+message ReceiverState {
+    required uint64 timestamp_ms = 1;
+    repeated ReceiverStatus event = 2;
+}

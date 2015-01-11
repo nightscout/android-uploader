@@ -7,8 +7,9 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClientURI;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
+import com.nightscout.core.dexcom.InvalidRecordLengthException;
+import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.preferences.TestPreferences;
-import com.nightscout.core.records.DeviceStatus;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +19,7 @@ import static com.nightscout.core.test.MockFactory.mockCalRecord;
 import static com.nightscout.core.test.MockFactory.mockDeviceStatus;
 import static com.nightscout.core.test.MockFactory.mockGlucoseDataSet;
 import static com.nightscout.core.test.MockFactory.mockMeterRecord;
+import static junit.framework.TestCase.fail;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -87,7 +89,7 @@ public class MongoUploaderTest {
         assertThat(dbObject.get("scale"), is(not(nullValue())));
     }
 
-    public void verifyDeviceStatus(DeviceStatus deviceStatus) {
+    public void verifyDeviceStatus(AbstractUploaderDevice deviceStatus) {
         BasicDBObject dbObject = captor.getValue();
         assertThat(dbObject.getInt("uploaderBattery"), is(deviceStatus.getBatteryLevel()));
         assertThat(dbObject.get("created_at"), is(not(nullValue())));
@@ -120,7 +122,7 @@ public class MongoUploaderTest {
     }
 
     @Test
-    public void testUploadMeterRecord() {
+    public void testUploadMeterRecord() throws Exception {
         mongoUploader.uploadMeterRecords(Lists.newArrayList(mockMeterRecord()));
         verifyMeterRecord();
     }
@@ -128,13 +130,17 @@ public class MongoUploaderTest {
     @Test
     public void testUploadCalRecord() {
         preferences.setCalibrationUploadEnabled(true);
-        mongoUploader.uploadCalRecords(Lists.newArrayList(mockCalRecord()));
+        try {
+            mongoUploader.uploadCalRecords(Lists.newArrayList(mockCalRecord()));
+        } catch (InvalidRecordLengthException e) {
+            fail("Shouldn't get an exception");
+        }
         verifyCalRecord();
     }
 
     @Test
     public void testUploadDeviceStatus() {
-        DeviceStatus deviceStatus = mockDeviceStatus();
+        AbstractUploaderDevice deviceStatus = mockDeviceStatus();
         mongoUploader.uploadDeviceStatus(deviceStatus);
         verifyDeviceStatus(deviceStatus);
     }
@@ -146,7 +152,7 @@ public class MongoUploaderTest {
                 new MongoClientURI("mongodb://foobar/db"),
                 "collection",
                 "dsCollection");
-        DeviceStatus deviceStatus = mockDeviceStatus();
+        AbstractUploaderDevice deviceStatus = mockDeviceStatus();
         assertThat(mongoUploader.uploadDeviceStatus(deviceStatus), is(false));
     }
 }

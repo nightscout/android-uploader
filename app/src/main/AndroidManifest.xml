@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.nightscout.android"
-    android:versionCode="16"
-    android:versionName="0.1.10">
+    android:versionCode="18"
+    android:versionName="0.1.11-dev">
 
     <uses-feature android:name="android.hardware.usb.host" />
-
-    <uses-sdk android:minSdkVersion="12" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_LOGS" />
@@ -27,16 +26,18 @@
     <application
         android:name=".Nightscout"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/title_activity_main" >
+        android:label="@string/title_activity_main"
+        android:allowBackup="true">
+        <!-- Hard code this version for now. Robolectric has troubles starting when this is
+             a variable. See: https://github.com/robolectric/robolectric/issues/1025 -->
         <meta-data android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-        <meta-data
-            android:name="com.google.android.gms.analytics.globalConfigResource"
-            android:resource="@xml/analytics_global_config" />
+            tools:replace="android:value"
+            android:value="6587000" />
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"
-            android:launchMode="singleTask" >
+            android:launchMode="singleTask">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -54,7 +55,9 @@
         <receiver android:name=".OnUpgradeReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
-                <data android:scheme="package" android:path="com.nightscout.android" />
+                <data
+                    android:scheme="package"
+                    android:path="com.nightscout.android" />
             </intent-filter>
         </receiver>
 
@@ -66,12 +69,12 @@
             android:launchMode="singleInstance"
             android:theme="@android:style/Theme.Dialog" />
 
-        <service android:name=".dexcom.SyncingService" />
+        <service android:name=".SyncingService" />
 
         <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nightscout.android.MainActivity" />
