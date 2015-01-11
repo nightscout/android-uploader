@@ -1,9 +1,12 @@
 package com.nightscout.core.drivers.Medtronic.records;
 
-public class TempBasalRate extends DatedRecord {
-    public static final byte bodySize = 1;
+import com.nightscout.core.drivers.Medtronic.PumpModel;
 
-    TempBasalRate(byte[] data) {
-        super(data);
+public class TempBasalRate extends TimeStampedRecord {
+
+    public TempBasalRate(byte[] data, PumpModel model) {
+        super(data, model);
+        bodySize = 1;
+        this.decode(data);
     }
 }

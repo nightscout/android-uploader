@@ -3,6 +3,7 @@ package com.nightscout.core.drivers;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.drivers.Medtronic.MinimedClient;
 import com.nightscout.core.drivers.Medtronic.Page;
+import com.nightscout.core.drivers.Medtronic.PumpModel;
 import com.nightscout.core.drivers.Medtronic.remote_commands.CommandBase;
 import com.nightscout.core.drivers.Medtronic.remote_commands.PowerOnCommand;
 import com.nightscout.core.drivers.Medtronic.remote_commands.ReadHistoryDataCommand;
@@ -72,7 +73,7 @@ public class MiniMed extends AbstractDevice {
             if (r != null) {
                 log.info("Command Response: {}", Utils.bytesToHex(r.getData()));
                 log.info("Command Response size: {}", r.getData().length);
-                Page page = new Page(r.getData());
+                Page page = new Page(r.getData(), PumpModel.MM523);
             } else {
                 log.warn("Command failed");
             }

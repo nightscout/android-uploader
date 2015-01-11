@@ -1,9 +1,11 @@
 package com.nightscout.core.drivers.Medtronic.records;
 
-public class PumpSuspended extends DatedRecord {
-    public static final byte bodySize = 0;
+import com.nightscout.core.drivers.Medtronic.PumpModel;
 
-    PumpSuspended(byte[] data) {
-        super(data);
+public class PumpSuspended extends TimeStampedRecord {
+
+    public PumpSuspended(byte[] data, PumpModel model) {
+        super(data, model);
+        this.decode(data);
     }
 }

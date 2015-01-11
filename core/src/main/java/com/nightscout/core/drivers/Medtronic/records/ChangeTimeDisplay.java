@@ -1,10 +1,12 @@
 package com.nightscout.core.drivers.Medtronic.records;
 
 
-public class ChangeTimeDisplay extends DatedRecord {
-    public static final byte bodySize = 0;
+import com.nightscout.core.drivers.Medtronic.PumpModel;
 
-    ChangeTimeDisplay(byte[] data) {
-        super(data);
+public class ChangeTimeDisplay extends TimeStampedRecord {
+
+    public ChangeTimeDisplay(byte[] data, PumpModel model) {
+        super(data, model);
+        this.decode(data);
     }
 }

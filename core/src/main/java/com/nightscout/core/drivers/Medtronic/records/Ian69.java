@@ -1,7 +1,11 @@
 package com.nightscout.core.drivers.Medtronic.records;
 
-public class Ian69 extends DatedRecord {
-    Ian69(byte[] data) {
-        super(data);
+import com.nightscout.core.drivers.Medtronic.PumpModel;
+
+public class Ian69 extends TimeStampedRecord {
+    public Ian69(byte[] data, PumpModel model) {
+        super(data, model);
+        bodySize = 2;
+        this.decode(data);
     }
 }

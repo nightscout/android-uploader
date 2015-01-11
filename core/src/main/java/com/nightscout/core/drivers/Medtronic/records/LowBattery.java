@@ -1,7 +1,10 @@
 package com.nightscout.core.drivers.Medtronic.records;
 
-public class LowBattery extends DatedRecord {
-    LowBattery(byte[] data) {
-        super(data);
+import com.nightscout.core.drivers.Medtronic.PumpModel;
+
+public class LowBattery extends TimeStampedRecord {
+    public LowBattery(byte[] data, PumpModel model) {
+        super(data, model);
+        this.decode(data);
     }
 }

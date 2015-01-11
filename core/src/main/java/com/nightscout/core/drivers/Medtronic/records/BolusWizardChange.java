@@ -1,10 +1,17 @@
 package com.nightscout.core.drivers.Medtronic.records;
 
 
-public class BolusWizardChange extends DatedRecord {
-    public static final byte bodySize = 0;
+import com.nightscout.core.drivers.Medtronic.PumpModel;
 
-    BolusWizardChange(byte[] data, String model) {
-        super(data);
+public class BolusWizardChange extends TimeStampedRecord {
+
+    public BolusWizardChange(byte[] data, PumpModel model) {
+        super(data, model);
+        if (model == PumpModel.MM508 || model == PumpModel.MM515) {
+            bodySize = 117;
+        } else {
+            bodySize = 143;
+        }
+        this.decode(data);
     }
 }

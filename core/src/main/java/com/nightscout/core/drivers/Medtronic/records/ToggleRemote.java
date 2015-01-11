@@ -1,9 +1,12 @@
 package com.nightscout.core.drivers.Medtronic.records;
 
-public class ToggleRemote extends DatedRecord {
-    public static final byte bodySize = 14;
+import com.nightscout.core.drivers.Medtronic.PumpModel;
 
-    ToggleRemote(byte[] data) {
-        super(data);
+public class ToggleRemote extends TimeStampedRecord {
+
+    public ToggleRemote(byte[] data, PumpModel model) {
+        super(data, model);
+        bodySize = 14;
+        this.decode(data);
     }
 }

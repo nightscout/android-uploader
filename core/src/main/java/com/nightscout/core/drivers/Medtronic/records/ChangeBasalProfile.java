@@ -1,7 +1,11 @@
 package com.nightscout.core.drivers.Medtronic.records;
 
-public class ChangeBasalProfile extends DatedRecord {
-    ChangeBasalProfile(byte[] data) {
-        super(data);
+import com.nightscout.core.drivers.Medtronic.PumpModel;
+
+public class ChangeBasalProfile extends TimeStampedRecord {
+    public ChangeBasalProfile(byte[] data, PumpModel model) {
+        super(data, model);
+        bodySize = 145;
+        this.decode(data);
     }
 }

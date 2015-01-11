@@ -1,9 +1,11 @@
 package com.nightscout.core.drivers.Medtronic.records;
 
-public class BatteryActivity extends DatedRecord {
-    public static final byte bodySize = 0;
+import com.nightscout.core.drivers.Medtronic.PumpModel;
 
-    BatteryActivity(byte[] data) {
-        super(data);
+public class BatteryActivity extends TimeStampedRecord {
+
+    public BatteryActivity(byte[] data, PumpModel model) {
+        super(data, model);
+        this.decode(data);
     }
 }

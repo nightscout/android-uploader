@@ -99,11 +99,12 @@ public class MinimedClient {
             LinkStatusResponse linkStatusResponse = this.execute(linkStatusRequest, LinkStatusResponse.class);
             log.info("Response size: {}", linkStatusResponse.getSize());
             if (linkStatusResponse.getSize() > minSize) {
+                log.info("About to break");
                 log.info("Response: {}", Utils.bytesToHex(linkStatusResponse.getData()));
                 responseSize = linkStatusResponse.getSize();
-                log.info("About to break");
                 break;
             }
+            log.info("About to sleep");
             sleep(2000);
         }
         log.info("getRemoteResponseSize() Returning: {}", responseSize);

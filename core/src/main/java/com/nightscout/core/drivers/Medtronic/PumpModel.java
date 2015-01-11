@@ -1,7 +1,9 @@
 package com.nightscout.core.drivers.Medtronic;
 
-/**
- * Created by klee on 1/10/15.
- */
 public enum PumpModel {
+    UNSET,
+    MM508,
+    MM515,
+    MM522,
+    MM523;
 }
