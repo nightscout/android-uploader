@@ -76,8 +76,8 @@ dependencies {
         exclude group: 'joda-time', module: 'joda-time'
     }
     compile 'ch.acra:acra:4.5.0'
-    compile 'com.android.support:appcompat-v7:20.0.0'
-    compile 'com.android.support:support-v4:20.0.0'
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support:support-v4:21.0.3'
     compile 'com.google.android.gms:play-services-base:6.5.87'
     compile 'org.mongodb:mongo-java-driver:2.10.1'
     compile 'net.danlew:android.joda:2.6.0'

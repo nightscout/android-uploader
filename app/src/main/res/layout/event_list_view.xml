@@ -8,18 +8,14 @@
         android:id="@+id/event_timestamp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="40" />
-
-    <!--<TextView-->
-    <!--android:id="@+id/event_severity"-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_weight="13" />-->
+        android:textIsSelectable="true"
+        android:layout_weight="30" />
 
     <TextView
         android:id="@+id/event_message"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="60" />
+        android:textIsSelectable="true"
+        android:layout_weight="70" />
 
 </LinearLayout>

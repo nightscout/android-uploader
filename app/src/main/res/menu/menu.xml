@@ -25,10 +25,10 @@
         android:id="@+id/usb_log"
         android:orderInCategory="100"
         nightscout:showAsAction="ifRoom"
-        android:title="Device logs" />
+        android:title="@string/device_log_menu" />
     <item
         android:id="@+id/upload_log"
         android:orderInCategory="100"
         nightscout:showAsAction="ifRoom"
-        android:title="Upload Logs" />
+        android:title="@string/upload_log_menu" />
 </menu>

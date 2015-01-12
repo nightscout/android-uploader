@@ -13,7 +13,6 @@
     <string name="feedback_dialog_ok_toast">Thank you!</string>
     <string name="feedback_toast_text" />
     <string name="message_user_not_understand">Reading from device is disabled until you review and accept &#8220;I understand&#8221; in preferences</string>
-    <string name="button_force_sync">Force sync</string>
     <string name="acra_enabled_summary">Crash reporting is enabled</string>
     <string name="acra_disabled_summary">Crash reporting is disabled</string>
     <string name="acra_email_dialog_title">Email</string>
@@ -78,4 +77,6 @@
     <string name="event_success_upload">Successful upload to %s</string>
     <string name="event_fail_upload">Upload to %s has failed</string>
     <string name="event_mongo_invalid_credentials">Please double check your Mongo username and password.</string>
+    <string name="device_log_menu">Device logs</string>
+    <string name="upload_log_menu">Upload Logs</string>
 </resources>
