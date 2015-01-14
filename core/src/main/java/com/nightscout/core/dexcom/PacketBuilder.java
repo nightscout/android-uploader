@@ -18,33 +18,30 @@ public class PacketBuilder {
     public static final int CRC_LEN = 2;
     public static final int HEADER_LEN = 4;
     private ArrayList<Byte> packet;
-    private Command command;
+    private int command;
     private ArrayList<Byte> payload;
 
-    public PacketBuilder(Command command){
+    public PacketBuilder(int command) {
         this.command = command;
     }
 
-    public PacketBuilder(Command command, ArrayList<Byte> payload) {
+    public PacketBuilder(int command, ArrayList<Byte> payload) {
         this.command = command;
         this.payload = payload;
     }
 
     public byte[] build() {
-        packet = new ArrayList<>();
+        packet = new ArrayList<Byte>();
         packet.add(OFFSET_SOF, SOF);
         packet.add(OFFSET_LENGTH, getLength());
         packet.add(OFFSET_NULL, NULL);
-        packet.add(OFFSET_CMD, (byte) command.getValue());
-        if (this.payload != null) {
-            this.packet.addAll(OFFSET_PAYLOAD, this.payload);
-        }
+        packet.add(OFFSET_CMD, (byte) command);
+        if (this.payload != null) { this.packet.addAll(OFFSET_PAYLOAD, this.payload); }
         byte[] crc16 = CRC16.calculate(toBytes(), 0, this.packet.size());
         this.packet.add(crc16[0]);
         this.packet.add(crc16[1]);
         return this.toBytes();
     }
-
     private byte getLength() {
         int packetSize = payload == null ? MIN_LEN : payload.size() + CRC_LEN + HEADER_LEN;
 

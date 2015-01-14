@@ -1,0 +1,82 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceScreen
+        android:key="sms"
+        android:title="SMS Settings"
+        android:summary="Utilize SMS messaging to notify you of changes in the readings">
+    <com.nightscout.android.settings.CustomSwitchPreference
+        android:title="Enable SMS Reply"
+        android:key="SMS_REPLY"
+        android:disableDependentsState="false"
+        android:defaultValue="false"
+        android:summary="The app will reply to SMS messages containing a specified keyword"/>
+
+    <EditTextPreference
+        android:dependency="SMS_REPLY"
+        android:title="SMS Keyword"
+        android:key="SMS_KEYWORD"
+        android:defaultValue="bg"
+        android:persistent="true"/>
+
+    <com.nightscout.android.settings.CustomSwitchPreference
+        android:title="Enable SMS Messaging"
+        android:key="SMS_ENABLE"
+        android:disableDependentsState="false"
+        android:defaultValue="false"
+        android:summaryOn="The app will send SMS messages with data point updates"
+        android:summaryOff="The app won't send SMS messages with data point updates"/>
+
+    <EditTextPreference
+        android:dependency="SMS_ENABLE"
+        android:title="Recipients"
+        android:dialogMessage="One or more recipients separated by commas. e.g.,  12123456789,12129998877"
+        android:key="SMS_RECEIVER"
+        android:inputType="number"
+        android:digits="0123456789,"
+        android:persistent="true"
+        />
+
+    <EditTextPreference
+        android:dependency="SMS_ENABLE"
+        android:title="BG too high threshold"
+        android:key="SMSBgHigh"
+        android:defaultValue="120"
+        android:persistent="true"
+        android:inputType="number"
+        />
+    <EditTextPreference
+        android:dependency="SMS_ENABLE"
+        android:title="BG too low threshold"
+        android:key="SMSBgLow"
+        android:defaultValue="85"
+        android:persistent="true"
+        android:inputType="number"
+        />
+    <EditTextPreference
+        android:dependency="SMS_ENABLE"
+        android:title="Out of range SMS Interval"
+        android:key="DATA_POINT_SMS_INTERVAL"
+        android:defaultValue="3"
+        android:persistent="true"
+        android:inputType="number"
+        android:dialogMessage="Set the interval at which an SMS should be sent when a data point is out of range"
+        />
+    <EditTextPreference
+        android:dependency="SMS_ENABLE"
+        android:title="Within Range SMS Interval"
+        android:key="IN_RANGE_INTERVAL"
+        android:defaultValue="3"
+        android:persistent="true"
+        android:inputType="number"
+        android:dialogMessage="Set the interval at which an SMS should be sent when a data point is within range"
+        />
+    <EditTextPreference
+        android:dependency="SMS_ENABLE"
+        android:title="No Data SMS Interval"
+        android:key="NO_DATA_INTERVAL"
+        android:defaultValue="3"
+        android:persistent="true"
+        android:inputType="number"
+        android:dialogMessage="Set the interval at which an SMS should be sent when not data is received"
+        />
+ </PreferenceScreen>
+</PreferenceScreen>

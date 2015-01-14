@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">G4 Connector</string>
+    <string name="self_destruct">Chiudi</string>
     <string name="title_activity_main">Nightscout</string>
 
     <string name="action_settings">Configurazione</string>
 
     <string name="unknown_values">---</string>
 
-    <string name="crash_toast_text">Oops! È crashato il software. Sto mandando un rapporto a Nightscout così magari lo possono sistemare!</string>
+    <string name="crash_toast_text">Oops! É crashato il software. Sto mandando un rapporto a Nightscout così magari lo possono sistemare!</string>
     <string name="feedback_dialog_title">Feedback a Nightscout</string>
     <string name="feebback_dialog_text">Per favore facci sapere cosa ne pensi</string>
     <string name="feedback_dialog_comment_prompt">Aggiungi i tuoi commenti qui sotto:</string>
     <string name="feedback_dialog_ok_toast">Grazie!</string>
     <string name="feedback_toast_text"/>
-    <string name="message_user_not_understand">La lettura dal device è disabilitata finchè non leggi e accetti \"HO CAPITO\" nelle preferenze</string>
+    <string name="message_user_not_understand">Reading from device is disabled until you review and accept \"I understand\" in preferences</string>
     <string name="button_force_sync">Forza invio dati ultimi 2 giorni</string>
     <string name="acra_enabled_summary">Crash reporting is enabled</string>
     <string name="acra_disabled_summary">Crash reporting is disabled</string>
@@ -23,29 +25,10 @@
 
     <string name="close_menu_text">Esci</string>
     <string name="feedback_menu_text">Feedback</string>
-    <string name="gap_sync_menu_text">Forza sincronizzazione</string>
+    <string name="gap_sync_menu_text">Gap sync</string>
     <string name="preferences_menu_text">Preferenze</string>
     <string name="USBLabelText">USB</string>
     <string name="UploadLabelText">Upload</string>
-
-    <string name="donate_dialog_title">Donate dati?</string>
-    <string name="donate_dialog_summary">Vuoi anonimo donare i vostri dati CGM per la ricerca , al fine di accelerare l\'innovazione del diabete ?</string>
-    <string name="donate_dialog_yes">Sì</string>
-    <string name="donate_dialog_no">No</string>
-
-    <string name="unknown_mongo_host">Error resolving Mongo host. Double check mongo url.</string>
-    <string name="illegal_rest_url">Could not create API uploader. Check your settings.</string>
-    <string name="auto_configure_title">Auto configure</string>
-    
-    <string name="DexBatteryLabelText">Batteria Dex</string>
-    <string name="TimeSyncLabelText">Ora</string>
-    <string name="TimeChangeDetected">Trovata modifica temporale</string>
-    <string name="illegal_mongo_uri">Mongo uri ha sintassi non valida. Si prega di doppio controllo.</string>
-    <string name="invalid_input_title">Invalid Input</string>
-    <string name="invalid_rest_uri">Invalid rest url %s, si prega di controllare due volte la formattazione.</string>
-    <string name="ok">Ok</string>
-    <string name="rest_uri_missing_token">Missing token for rest uri %s.</string>
-    <string name="unknown_rest_host">Impossibile connettersi a %s, si prega di verificare che si è connessi a Internet, e che l\'URL sia corretto.</string>
-    <string name="version_unknown">Versione sconosciuta</string>
-    <string name="default_pwd_name">Camping</string>
+    <string name="DexBatteryLabelText">Dex Battery</string>
+    <string name="TimeSyncLabelText">Time</string>
 </resources>
