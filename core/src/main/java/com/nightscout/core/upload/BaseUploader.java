@@ -1,10 +1,10 @@
 package com.nightscout.core.upload;
 
+import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
-import com.nightscout.core.drivers.AbstractUploaderDevice;
-import com.nightscout.core.model.CalibrationEntry;
-import com.nightscout.core.model.MeterEntry;
+import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.records.DeviceStatus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,17 +21,17 @@ public abstract class BaseUploader {
 
     protected abstract boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException;
 
-    protected boolean doUpload(MeterEntry meterRecord) throws IOException {
+    protected boolean doUpload(MeterRecord meterRecord) throws IOException {
         log.info("Meter record upload not supported.");
         return true;
     }
 
-    protected boolean doUpload(CalibrationEntry calRecord) throws IOException {
+    protected boolean doUpload(CalRecord calRecord) throws IOException {
         log.info("Cal record upload not supported.");
         return true;
     }
 
-    protected boolean doUpload(AbstractUploaderDevice deviceStatus) throws IOException {
+    protected boolean doUpload(DeviceStatus deviceStatus) throws IOException {
         log.info("Device status upload not supported.");
         return true;
     }
@@ -64,12 +64,12 @@ public abstract class BaseUploader {
      * @param meterRecords
      * @return True if the upload was successful, false if the upload was unsuccessful
      */
-    public final boolean uploadMeterRecords(List<MeterEntry> meterRecords) {
+    public final boolean uploadMeterRecords(List<MeterRecord> meterRecords) {
         if (meterRecords == null) {
             return true;
         }
         boolean output = true;
-        for (MeterEntry meterRecord : meterRecords) {
+        for (MeterRecord meterRecord : meterRecords) {
             try {
                 output &= doUpload(meterRecord);
             } catch (IOException e) {
@@ -86,13 +86,13 @@ public abstract class BaseUploader {
      * @param calRecords
      * @return True if the upload was successful, false if the upload was unsuccessful
      */
-    public final boolean uploadCalRecords(List<CalibrationEntry> calRecords) {
+    public final boolean uploadCalRecords(List<CalRecord> calRecords) {
         if (calRecords == null) {
             return true;
         }
         boolean output = true;
         if (getPreferences().isCalibrationUploadEnabled()) {
-            for (CalibrationEntry calRecord : calRecords) {
+            for (CalRecord calRecord : calRecords) {
                 try {
                     output &= doUpload(calRecord);
                 } catch (IOException e) {
@@ -110,7 +110,7 @@ public abstract class BaseUploader {
      * @param deviceStatus
      * @return True if the upload was successful or False if the upload was unsuccessful
      */
-    public final boolean uploadDeviceStatus(AbstractUploaderDevice deviceStatus) {
+    public final boolean uploadDeviceStatus(DeviceStatus deviceStatus) {
         if (deviceStatus == null) {
             return true;
         }
@@ -124,21 +124,5 @@ public abstract class BaseUploader {
 
     protected NightscoutPreferences getPreferences() {
         return this.preferences;
-    }
-
-    /**
-     * Upload records, can be overridden to send all data in one batch.
-     * @param glucoseDataSets
-     * @param meterRecords
-     * @param calRecords
-     * @param deviceStatus
-     * @return True if the (all) uploads was successful or False if at least one upload was unsuccessful.
-     */
-    public boolean uploadRecords(List<GlucoseDataSet> glucoseDataSets, List<MeterEntry> meterRecords, List<CalibrationEntry> calRecords, AbstractUploaderDevice deviceStatus) {
-        boolean allSuccessful = uploadGlucoseDataSets(glucoseDataSets);
-        allSuccessful &= uploadMeterRecords(meterRecords);
-        allSuccessful &= uploadCalRecords(calRecords);
-        allSuccessful &= uploadDeviceStatus(deviceStatus);
-        return allSuccessful;
     }
 }

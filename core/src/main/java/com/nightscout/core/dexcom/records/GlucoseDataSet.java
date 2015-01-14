@@ -1,11 +1,6 @@
 package com.nightscout.core.dexcom.records;
 
-import com.nightscout.core.dexcom.TrendArrow;
-import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.model.GlucoseUnit;
-import com.nightscout.core.model.SensorEntry;
-import com.nightscout.core.model.SensorGlucoseValueEntry;
-import com.nightscout.core.utils.GlucoseReading;
+import com.nightscout.core.dexcom.Constants;
 
 import java.util.Date;
 
@@ -13,46 +8,21 @@ public class GlucoseDataSet {
 
     private Date systemTime;
     private Date displayTime;
-    private GlucoseReading reading;
-    private TrendArrow trend;
-    private int noise;
+    private int bGValue;
+    private Constants.TREND_ARROW_VALUES trend;
     private long unfiltered;
     private long filtered;
     private int rssi;
 
-    public GlucoseDataSet(SensorGlucoseValueEntry egvRecord) {
-        systemTime = Utils.receiverTimeToDate(egvRecord.sys_timestamp_sec);
-        displayTime = Utils.receiverTimeToDate(egvRecord.disp_timestamp_sec);
-        reading = new GlucoseReading(egvRecord.sgv_mgdl, GlucoseUnit.MGDL);
-        trend = TrendArrow.values()[egvRecord.trend.ordinal()];
-        noise = egvRecord.noise.ordinal();
-    }
-
-    public GlucoseDataSet(EGVRecord egvRecord) {
+    public GlucoseDataSet(EGVRecord egvRecord, SensorRecord sensorRecord) {
+        // TODO check times match between record
         systemTime = egvRecord.getSystemTime();
         displayTime = egvRecord.getDisplayTime();
-        reading = egvRecord.getReading();
+        bGValue = egvRecord.getBGValue();
         trend = egvRecord.getTrend();
-        noise = egvRecord.getNoiseMode().ordinal();
-    }
-
-    public GlucoseDataSet(EGVRecord egvRecord, SensorRecord sensorRecord) {
-        this(egvRecord);
-        // TODO check times match between record
         unfiltered = sensorRecord.getUnfiltered();
         filtered = sensorRecord.getFiltered();
         rssi = sensorRecord.getRssi();
-    }
-
-    public GlucoseDataSet(SensorGlucoseValueEntry egvRecord, SensorEntry sensorRecord) {
-        this.systemTime = Utils.receiverTimeToDate(egvRecord.sys_timestamp_sec);
-        this.displayTime = Utils.receiverTimeToDate(egvRecord.disp_timestamp_sec);
-        this.reading = new GlucoseReading(egvRecord.sgv_mgdl, GlucoseUnit.MGDL);
-        this.trend = TrendArrow.values()[egvRecord.trend.ordinal()];
-        this.noise = egvRecord.noise.ordinal();
-        this.unfiltered = sensorRecord.unfiltered;
-        this.filtered = sensorRecord.filtered;
-        this.rssi = sensorRecord.rssi;
     }
 
     public Date getSystemTime() {
@@ -63,24 +33,16 @@ public class GlucoseDataSet {
         return displayTime;
     }
 
-    public int getBgMgdl() {
-        return reading.asMgdl();
+    public int getBGValue() {
+        return bGValue;
     }
 
-    public GlucoseReading getReading() {
-        return reading;
-    }
-
-    public TrendArrow getTrend() {
+    public Constants.TREND_ARROW_VALUES getTrend() {
         return trend;
     }
 
     public String getTrendSymbol() {
-        return trend.symbol();
-    }
-
-    public int getNoise() {
-        return noise;
+        return trend.Symbol();
     }
 
     public long getUnfiltered() {

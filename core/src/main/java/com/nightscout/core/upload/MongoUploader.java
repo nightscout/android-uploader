@@ -8,12 +8,11 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
-import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.dexcom.records.GlucoseDataSet;
-import com.nightscout.core.drivers.AbstractUploaderDevice;
-import com.nightscout.core.model.CalibrationEntry;
-import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.records.DeviceStatus;
+import com.nightscout.core.dexcom.records.CalRecord;
+import com.nightscout.core.dexcom.records.GlucoseDataSet;
+import com.nightscout.core.dexcom.records.MeterRecord;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -94,48 +93,45 @@ public class MongoUploader extends BaseUploader {
         deviceStatusCollection = dbCollection;
     }
 
-    private BasicDBObject toBasicDBObject(GlucoseDataSet glucoseDataSet) {
+    private BasicDBObject toBasicDBObject(GlucoseDataSet glucoseDataSet)  {
         BasicDBObject output = new BasicDBObject();
         output.put("device", "dexcom");
         output.put("date", glucoseDataSet.getDisplayTime().getTime());
         output.put("dateString", glucoseDataSet.getDisplayTime().toString());
-        output.put("sgv", glucoseDataSet.getBgMgdl());
+        output.put("sgv", glucoseDataSet.getBGValue());
         output.put("direction", glucoseDataSet.getTrend().friendlyTrendName());
         output.put("type", "sgv");
         if (getPreferences().isSensorUploadEnabled()) {
             output.put("filtered", glucoseDataSet.getFiltered());
             output.put("unfiltered", glucoseDataSet.getUnfiltered());
             output.put("rssi", glucoseDataSet.getRssi());
-            output.put("noise", glucoseDataSet.getNoise());
         }
         return output;
     }
 
-    private BasicDBObject toBasicDBObject(MeterEntry meterRecord) {
+    private BasicDBObject toBasicDBObject(MeterRecord meterRecord) {
         BasicDBObject output = new BasicDBObject();
-        Date timestamp = Utils.receiverTimeToDate(meterRecord.disp_timestamp_sec);
         output.put("device", "dexcom");
         output.put("type", "mbg");
-        output.put("date", timestamp.getTime());
-        output.put("dateString", timestamp.toString());
-        output.put("mbg", meterRecord.meter_bg_mgdl);
+        output.put("date", meterRecord.getDisplayTime().getTime());
+        output.put("dateString", meterRecord.getDisplayTime().toString());
+        output.put("mbg", meterRecord.getMeterBG());
         return output;
     }
 
-    private BasicDBObject toBasicDBObject(CalibrationEntry calRecord) {
+    private BasicDBObject toBasicDBObject(CalRecord calRecord) {
         BasicDBObject output = new BasicDBObject();
-        Date timestamp = Utils.receiverTimeToDate(calRecord.disp_timestamp_sec);
         output.put("device", "dexcom");
-        output.put("date", timestamp.getTime());
-        output.put("dateString", timestamp.toString());
-        output.put("slope", calRecord.slope);
-        output.put("intercept", calRecord.intercept);
-        output.put("scale", calRecord.scale);
+        output.put("date", calRecord.getDisplayTime().getTime());
+        output.put("dateString", calRecord.getDisplayTime().toString());
+        output.put("slope", calRecord.getSlope());
+        output.put("intercept", calRecord.getIntercept());
+        output.put("scale", calRecord.getScale());
         output.put("type", "cal");
         return output;
     }
 
-    private BasicDBObject toBasicDBObject(AbstractUploaderDevice deviceStatus) {
+    private BasicDBObject toBasicDBObject(DeviceStatus deviceStatus) {
         BasicDBObject output = new BasicDBObject();
         output.put("uploaderBattery", deviceStatus.getBatteryLevel());
         output.put("created_at", new Date());
@@ -158,17 +154,17 @@ public class MongoUploader extends BaseUploader {
     }
 
     @Override
-    protected boolean doUpload(MeterEntry meterRecord) throws IOException {
+    protected boolean doUpload(MeterRecord meterRecord) throws IOException {
         return upsert(toBasicDBObject(meterRecord));
     }
 
     @Override
-    protected boolean doUpload(CalibrationEntry calRecord) throws IOException {
+    protected boolean doUpload(CalRecord calRecord) throws IOException {
         return upsert(toBasicDBObject(calRecord));
     }
 
     @Override
-    protected boolean doUpload(AbstractUploaderDevice deviceStatus) throws IOException {
+    protected boolean doUpload(DeviceStatus deviceStatus) throws IOException {
         return upsert(getDeviceStatusCollection(), toBasicDBObject(deviceStatus));
     }
 

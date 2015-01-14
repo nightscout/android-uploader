@@ -2,15 +2,14 @@ package com.nightscout.core.upload;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
-import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.preferences.TestPreferences;
+import com.nightscout.core.records.DeviceStatus;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
 import org.json.JSONException;
@@ -60,7 +59,6 @@ public class RestLegacyUploaderTest {
         captor = ArgumentCaptor.forClass(HttpUriRequest.class);
         HttpResponse response = new BasicHttpResponse(
                 new BasicStatusLine(new ProtocolVersion("mock", 1, 2), status, ""));
-        response.setEntity(new StringEntity(""));
         when(mockHttpClient.execute(captor.capture())).thenReturn(response);
     }
 
@@ -73,7 +71,7 @@ public class RestLegacyUploaderTest {
         assertThat(jsonObject.get("direction"), is(not(nullValue())));
     }
 
-    public static void verifyDeviceStatus(JSONObject jsonObject, AbstractUploaderDevice deviceStatus)
+    public static void verifyDeviceStatus(JSONObject jsonObject, DeviceStatus deviceStatus)
             throws JSONException {
         assertThat(jsonObject.getInt("uploaderBattery"), is(deviceStatus.getBatteryLevel()));
     }
@@ -115,7 +113,7 @@ public class RestLegacyUploaderTest {
 
     @Test
     public void testDeviceStatus_Entity() throws Exception {
-        AbstractUploaderDevice deviceStatus = mockDeviceStatus();
+        DeviceStatus deviceStatus = mockDeviceStatus();
         restUploader.uploadDeviceStatus(deviceStatus);
         HttpPost post = (HttpPost) captor.getValue();
         String entity = CharStreams.toString(new InputStreamReader(post.getEntity().getContent()));
