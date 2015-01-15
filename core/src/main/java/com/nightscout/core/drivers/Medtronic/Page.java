@@ -14,6 +14,7 @@ import com.nightscout.core.drivers.Medtronic.records.ChangeTimeDisplay;
 import com.nightscout.core.drivers.Medtronic.records.ChangeUtility;
 import com.nightscout.core.drivers.Medtronic.records.ClearAlarm;
 import com.nightscout.core.drivers.Medtronic.records.EndResultsTotals;
+import com.nightscout.core.drivers.Medtronic.records.Ian3F;
 import com.nightscout.core.drivers.Medtronic.records.LowBattery;
 import com.nightscout.core.drivers.Medtronic.records.LowReservoir;
 import com.nightscout.core.drivers.Medtronic.records.NewTimeSet;
@@ -43,7 +44,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.io.*;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 
@@ -54,6 +55,52 @@ public class Page {
     private byte[] data;
     protected Map<Byte, Class> recordMap;
     protected PumpModel model;
+
+    /* Parse a file from the command line. Requires a few extra .jar files. 
+    java -cp joda-time-2.7;guava-18.0;slf4j-simple-1.7.10.jar;slf4j-api-1.7.10-jar;. com.nightscout.core.drivers.Medtronic.Page <\path\to\file.data> <PumpModel>
+    e.g. when run from android-uploader\core\build\classes\main
+    java -cp joda-time-2.7.jar;guava-18.0.jar;slf4j-simple-1.7.10.jar;slf4j-api-1.7.10.jar;. com.nightscout.core.drivers.Medtronic.Page C:\testData\Page0.data MM523
+    */
+    public static void main(String[] args) {
+        PumpModel model;
+        RandomAccessFile f;
+        byte[] data;
+        Page page;
+        if (args.length < 2) {
+            System.out.println("Not enough arguments. Expected <path> <model>\n");
+            return;
+        }
+ 
+        System.out.println("Got file path: " + args[0] + "\n");
+ 
+        try {
+            f = new RandomAccessFile(args[0], "r");
+            long longlength = f.length();
+            int length = (int) longlength;
+            if (length != longlength) {
+                throw new IOException("File size >= 2GB");
+            }
+ 
+            data = new byte[length];
+            f.readFully(data);
+            f.close();
+        } catch (IOException e) {
+            System.out.println("IOException");
+            return;
+        }
+ 
+        try {
+            model = PumpModel.valueOf(args[1]);
+            System.out.println("Got pump model: " + args[1] + "\n");
+        } catch (Exception e) {
+            System.out.println("Could not get pump model " + args[1]);
+            System.out.println("Valid models: UNSET, MM508, MM515, MM522, MM523");
+            return;
+        }
+ 
+        page = new Page(data, model);
+ 
+    }
 
     public Page(byte[] rawPage, PumpModel model) {
         if (rawPage.length != 1024) {
@@ -94,6 +141,7 @@ public class Page {
         recordMap.put((byte) 0x27, ChangeRemoteId.class);
         recordMap.put((byte) 0x33, TempBasalRate.class);
         recordMap.put((byte) 0x34, LowReservoir.class);
+        recordMap.put((byte) 0x3f, Ian3F.class);
         recordMap.put((byte) 0x5a, BolusWizardChange.class);
         recordMap.put((byte) 0x5b, BolusWizard.class);
         recordMap.put((byte) 0x5c, UnabsorbedInsulin.class);
@@ -109,7 +157,9 @@ public class Page {
         recordList.add(record);
         log.info("Record size: {}", record.getSize());
         byte[] remainingData = Arrays.copyOfRange(data, record.getSize(), 1022);
+        int recordCount = 0;
         while (remainingData[0] != 0x00) {
+            log.info("Record number: {}", recordCount++);
             log.info("Remaining data: {}", Utils.bytesToHex(remainingData));
             record = parseRecord(remainingData, 0, recordMap.get(remainingData[0]));
             log.info("Record size: {}", record.getSize());
