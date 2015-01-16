@@ -22,6 +22,15 @@ dependencies {
     compile 'com.squareup.wire:wire-runtime:1.6.0'
 }
 
+apply plugin:'application'
+
+mainClassName = "com.nightscout.core.drivers.Medtronic.PumpReaderMain"
+run {
+    if(project.hasProperty('args')){
+        args project.args.split('\\s')
+    }
+}
+
 apply plugin: 'jacoco'
 
 jacoco {

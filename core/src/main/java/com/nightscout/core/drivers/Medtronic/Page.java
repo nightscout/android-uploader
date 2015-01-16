@@ -14,6 +14,7 @@ import com.nightscout.core.drivers.Medtronic.records.ChangeTimeDisplay;
 import com.nightscout.core.drivers.Medtronic.records.ChangeUtility;
 import com.nightscout.core.drivers.Medtronic.records.ClearAlarm;
 import com.nightscout.core.drivers.Medtronic.records.EndResultsTotals;
+import com.nightscout.core.drivers.Medtronic.records.Ian3F;
 import com.nightscout.core.drivers.Medtronic.records.LowBattery;
 import com.nightscout.core.drivers.Medtronic.records.LowReservoir;
 import com.nightscout.core.drivers.Medtronic.records.NewTimeSet;
@@ -94,6 +95,7 @@ public class Page {
         recordMap.put((byte) 0x27, ChangeRemoteId.class);
         recordMap.put((byte) 0x33, TempBasalRate.class);
         recordMap.put((byte) 0x34, LowReservoir.class);
+        recordMap.put((byte) 0x3f, Ian3F.class);
         recordMap.put((byte) 0x5a, BolusWizardChange.class);
         recordMap.put((byte) 0x5b, BolusWizard.class);
         recordMap.put((byte) 0x5c, UnabsorbedInsulin.class);
@@ -119,7 +121,7 @@ public class Page {
         log.info("Number of records: {}", recordList.size());
         int index = 1;
         for (Record r : recordList) {
-//            log.info("Record #{}", index);
+            log.info("Record #{}", index);
             r.logRecord();
             index += 1;
         }
