@@ -110,6 +110,15 @@
     <string name="pref_title_root">Root support</string>
     <string name="pref_summary_root">Select if phone is rooted. This is a highly experimental feature - use at your own risk. Thar be dragons ahead</string>
 
+    <string name="pref_medtronic_data_title_flux">Use Medtronic Data</string>
+    <string name="pref_medtronic_data_summary_flux_enabled">Enable Medtronic Data</string>
+    <string name="pref_medtronic_data_title_flux_enabled">Enable</string>
+
+    <string name="pref_medtronic_title_flux_enabled">Medtronic Serial Enabled</string>
+    <string name="pref_medtronic_dialog_serial">Enable Medtronic</string>
+    <string name="pref_medtronic_serial">Pump Serial</string>
+    <string name="pref_medtronic_data_default_serial">208850</string>
+
     <!-- Privacy -->
     <string name="pref_header_privacy">Privacy</string>
     <string name="pref_enable_acra">Enable crash reporting</string>

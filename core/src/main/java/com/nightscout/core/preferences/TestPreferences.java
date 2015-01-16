@@ -19,6 +19,8 @@ public class TestPreferences implements NightscoutPreferences {
     private String pwdName;
     private boolean understand;
     private boolean askedForData;
+    private boolean medtronicEnabled = false    ;
+    private String medtronicSerial = "123456";
 
     @Override
     public boolean isRestApiEnabled() {
@@ -143,6 +145,32 @@ public class TestPreferences implements NightscoutPreferences {
     @Override
     public void setAskedForData(boolean askedForData) {
         this.askedForData = askedForData;
+    }
+
+    @Override
+    public boolean isMedtronicEnabled() {
+        return medtronicEnabled;
+    }
+
+    @Override
+    public String getMedtronicSerial() {
+        return medtronicSerial;
+    }
+
+    public void setUnits(GlucoseUnit units) {
+        this.units = units;
+    }
+
+    public void setUnderstand(boolean understand) {
+        this.understand = understand;
+    }
+
+    public void setMedtronicEnabled(boolean medtronicEnabled) {
+        this.medtronicEnabled = medtronicEnabled;
+    }
+
+    public void setMedtronicSerial(String medtronicSerial) {
+        this.medtronicSerial = medtronicSerial;
     }
 
     @Override

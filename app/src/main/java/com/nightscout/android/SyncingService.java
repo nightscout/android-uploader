@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.drivers.AndroidUploaderDevice;
+import com.nightscout.android.drivers.USB.CareLinkUsb;
 import com.nightscout.android.drivers.USB.CdcAcmSerialDriver;
 import com.nightscout.android.drivers.USB.UsbSerialProber;
 import com.nightscout.android.preferences.AndroidPreferences;
@@ -23,6 +24,7 @@ import com.nightscout.core.drivers.AbstractDevice;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DexcomG4;
+import com.nightscout.core.drivers.MiniMed;
 import com.nightscout.core.model.DownloadResults;
 import com.nightscout.core.model.DownloadStatus;
 import com.nightscout.core.model.G4Download;
@@ -122,10 +124,20 @@ public class SyncingService extends IntentService {
         wl.acquire();
         if (serialDriver != null) {
             AbstractUploaderDevice uploaderDevice = AndroidUploaderDevice.getUploaderDevice(context);
-            AbstractDevice device = new DexcomG4(serialDriver, preferences, uploaderDevice);
-
-            ((DexcomG4) device).setNumOfPages(numOfPages);
-            ((CdcAcmSerialDriver) serialDriver).setPowerManagementEnabled(preferences.isRootEnabled());
+            AbstractDevice device = null;
+            Log.d(TAG, "Serial driver: " + serialDriver.getClass().getSimpleName());
+            if (serialDriver.getClass() == CdcAcmSerialDriver.class) {
+                device = new DexcomG4(serialDriver, preferences, uploaderDevice);
+                ((DexcomG4) device).setNumOfPages(numOfPages);
+                ((CdcAcmSerialDriver) serialDriver).setPowerManagementEnabled(preferences.isRootEnabled());
+            } else if (serialDriver.getClass() == CareLinkUsb.class) {
+                device = new MiniMed(serialDriver, preferences, uploaderDevice);
+                return;
+            }
+            if (device == null) {
+                Log.w(TAG, "No supported devices found");
+                return;
+            }
             try {
                 DownloadResults results = device.download();
                 G4Download download = results.getDownload();
@@ -187,7 +199,7 @@ public class SyncingService extends IntentService {
         wl.release();
     }
 
-    static public boolean isG4Connected(Context c) {
+    static public boolean isConnected(Context c) {
         // Iterate through devices and see if the dexcom is connected
         // Allowing us to start to start syncing if the G4 is already connected
         // vendor-id="8867" product-id="71" class="2" subclass="0" protocol="0"
@@ -195,16 +207,17 @@ public class SyncingService extends IntentService {
         if (manager == null) return false;
         HashMap<String, UsbDevice> deviceList = manager.getDeviceList();
         Iterator<UsbDevice> deviceIterator = deviceList.values().iterator();
-        boolean g4Connected = false;
+        boolean connected = false;
         while (deviceIterator.hasNext()) {
             UsbDevice device = deviceIterator.next();
-            if (device.getVendorId() == 8867 && device.getProductId() == 71
-                    && device.getDeviceClass() == 2 && device.getDeviceSubclass() == 0
-                    && device.getDeviceProtocol() == 0) {
-                g4Connected = true;
+            if (device.getVendorId() == DexcomG4.VENDOR_ID && device.getProductId() == DexcomG4.PRODUCT_ID) {
+                connected = true;
+            }
+            if (device.getVendorId() == MiniMed.VENDOR_ID && device.getProductId() == MiniMed.PRODUCT_ID) {
+                connected = true;
             }
         }
-        return g4Connected;
+        return connected;
     }
 
     protected void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus,

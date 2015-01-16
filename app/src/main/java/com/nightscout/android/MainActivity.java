@@ -145,7 +145,7 @@ public class MainActivity extends Activity {
         Intent startIntent = getIntent();
         String action = startIntent.getAction();
         if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) ||
-                SyncingService.isG4Connected(getApplicationContext())) {
+                SyncingService.isConnected(getApplicationContext())) {
             statusBarIcons.setUSB(true);
             Log.d(TAG, "Starting syncing in OnCreate...");
             SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);

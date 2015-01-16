@@ -16,4 +16,6 @@ public final class PreferenceKeys {
     public static final String PREFERRED_UNITS = "display_options_units";
     public static final String PWD_NAME = "pwd_name";
     public static final String DONATE_DATA_QUERY = "donate_data_query";
+    public static final String MEDTRONIC_ENABLED = "medtronic_data_flux_enable";
+    public static final String MEDTRONIC_SERIAL = "medtronic_data_flux_serialnum";
 }

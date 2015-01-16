@@ -56,4 +56,9 @@ public interface NightscoutPreferences {
     boolean hasAskedForData();
 
     void setAskedForData(boolean askedForData);
+
+    // Medtronic
+    boolean isMedtronicEnabled();
+
+    String getMedtronicSerial();
 }

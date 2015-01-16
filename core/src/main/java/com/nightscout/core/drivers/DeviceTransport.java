@@ -48,7 +48,6 @@ public interface DeviceTransport {
      */
     public int write(final byte[] src, final int timeoutMillis) throws IOException;
 
-    public boolean isConnected(int vendorId, int productId, int deviceClass, int subClass,
-                               int protocol);
+    public boolean isConnected(int vendorId, int productId);
 
 }

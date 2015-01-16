@@ -25,6 +25,9 @@ import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
 
+import java.util.Arrays;
+import java.util.Map;
+
 /**
  * Helper class to assist in detecting and building {@link UsbSerialDriver}
  * instances from available hardware.
@@ -40,7 +43,24 @@ public enum UsbSerialProber {
             if (connection == null) {
                 return null;
             }
+            if (!testIfSupported(usbDevice, CdcAcmSerialDriver.getSupportedDevices())) {
+                return null;
+            }
             return new CdcAcmSerialDriver(usbDevice, connection, manager);
+        }
+    },
+
+    OTHER_SERIAL {
+        @Override
+        public UsbSerialDriver getDevice(UsbManager manager, UsbDevice usbDevice) {
+            if (!testIfSupported(usbDevice, CareLinkUsb.getSupportedDevices())) {
+                return null;
+            }
+            final UsbDeviceConnection connection = manager.openDevice(usbDevice);
+            if (connection == null) {
+                return null;
+            }
+            return new CareLinkUsb(usbDevice, connection, manager);
         }
     };
 
@@ -99,5 +119,30 @@ public enum UsbSerialProber {
             }
         }
         return null;
+    }
+
+    /**
+     * Returns {@code true} if the given device is found in the vendor/product map.
+     *
+     * @param usbDevice        the device to test
+     * @param supportedDevices map of vendor ids to product id(s)
+     * @return {@code true} if supported
+     */
+    private static boolean testIfSupported(final UsbDevice usbDevice,
+                                           final Map<Integer, Integer[]> supportedDevices) {
+        final Integer[] supportedProducts = supportedDevices.get(
+                usbDevice.getVendorId());
+        if (supportedProducts == null) {
+            return false;
+        }
+
+        final int productId = usbDevice.getProductId();
+        Arrays.asList(supportedProducts).contains(productId);
+        for (int supportedProductId : supportedProducts) {
+            if (productId == supportedProductId) {
+                return true;
+            }
+        }
+        return false;
     }
 }

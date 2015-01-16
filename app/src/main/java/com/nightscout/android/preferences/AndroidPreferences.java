@@ -184,4 +184,19 @@ public class AndroidPreferences implements NightscoutPreferences {
     public void setRootEnabled(boolean enabled) {
         preferences.edit().putBoolean(PreferenceKeys.ROOT_ENABLED, enabled).apply();
     }
+
+    // Medtronic
+    @Override
+    public boolean isMedtronicEnabled () {
+        return preferences.getBoolean(PreferenceKeys.MEDTRONIC_ENABLED, false);
+    }
+
+    @Override
+    public String getMedtronicSerial ( ) {
+        return preferences.getString(PreferenceKeys.MEDTRONIC_SERIAL, "");
+    }
+
+    public void setMedtronicSerial(String serialnum) {
+        preferences.edit().putString(PreferenceKeys.MEDTRONIC_SERIAL, serialnum).apply();
+    }
 }

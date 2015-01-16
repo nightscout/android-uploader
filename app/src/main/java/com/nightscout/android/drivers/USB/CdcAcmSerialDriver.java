@@ -10,6 +10,8 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 //import com.hoho.android.usbserial.driver.UsbId;
 
@@ -246,5 +248,15 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
     private void setDtrRts() {
         int value = (mRts ? 0x2 : 0) | (mDtr ? 0x1 : 0);
         sendAcmControlMessage(SET_CONTROL_LINE_STATE, value, null);
+    }
+
+
+    public static Map<Integer, Integer[]> getSupportedDevices() {
+        final Map<Integer, Integer[]> supportedDevices = new LinkedHashMap<>();
+        supportedDevices.put(UsbId.VENDOR_DEXCOM,
+                new Integer[]{
+                        UsbId.DEXCOM_G4_PRODUCT
+                });
+        return supportedDevices;
     }
 }
