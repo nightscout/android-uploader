@@ -160,13 +160,11 @@ public class Uploader {
         for (BaseUploader uploader : uploaders) {
             // TODO(klee): capture any exceptions here so that all configured uploaders will attempt
             // to upload
-            allSuccessful &= uploader.uploadGlucoseDataSets(glucoseDataSets);
-            allSuccessful &= uploader.uploadMeterRecords(meterRecords);
-            allSuccessful &= uploader.uploadCalRecords(calRecords);
-            allSuccessful &= uploader.uploadDeviceStatus(deviceStatus);
+            allSuccessful &= uploader.uploadRecords(glucoseDataSets, meterRecords, calRecords, deviceStatus);
             reporter.report(EventType.UPLOADER, EventSeverity.INFO,
                     String.format(context.getString(R.string.event_success_upload),
                             uploader.getIdentifier()));
+
         }
 
         // Quick hack to prevent MQTT only from reporting not uploading to cloud
