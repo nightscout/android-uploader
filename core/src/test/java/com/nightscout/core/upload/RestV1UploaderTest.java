@@ -76,10 +76,12 @@ public class RestV1UploaderTest {
             assertThat(jsonObject.get("filtered"), is(not(nullValue())));
             assertThat(jsonObject.get("unfiltered"), is(not(nullValue())));
             assertThat(jsonObject.get("rssi"), is(not(nullValue())));
+            assertThat(jsonObject.get("noise"), is(not(nullValue())));
         } else {
             assertThat(jsonObject.has("filtered"), is(false));
             assertThat(jsonObject.has("unfiltered"), is(false));
             assertThat(jsonObject.has("rssi"), is(false));
+            assertThat(jsonObject.has("noise"), is(false));
         }
     }
 
