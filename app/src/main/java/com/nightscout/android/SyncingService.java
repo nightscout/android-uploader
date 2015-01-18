@@ -32,9 +32,6 @@ import com.nightscout.core.model.DownloadResults;
 import com.nightscout.core.model.DownloadStatus;
 import com.nightscout.core.model.G4Download;
 import com.nightscout.core.model.G4Noise;
-import com.nightscout.core.model.DownloadStatus;
-import com.nightscout.core.model.G4Download;
-import com.nightscout.core.model.G4Noise;
 import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.model.SensorEntry;
 import com.nightscout.core.model.SensorGlucoseValueEntry;
@@ -79,7 +76,6 @@ public class SyncingService extends IntentService {
     public static final String RESPONSE_LAST_METER_TIME = "lastMeterTimestamp";
     public static final String RESPONSE_LAST_SENSOR_TIME = "lastSensorTimestamp";
     public static final String RESPONSE_LAST_CAL_TIME = "lastCalTimestamp";
-    private EventReporter reporter;
 
     private final String TAG = SyncingService.class.getSimpleName();
 
@@ -135,7 +131,7 @@ public class SyncingService extends IntentService {
      * parameters.
      */
     protected void handleActionSync(int numOfPages, Context context, DeviceTransport serialDriver) {
-        reporter = AndroidEventReporter.getReporter(context);
+        EventReporter reporter = AndroidEventReporter.getReporter(context);
         boolean broadcastSent = false;
         AndroidPreferences preferences = new AndroidPreferences(context);
         Tracker tracker = ((Nightscout) context).getTracker();
