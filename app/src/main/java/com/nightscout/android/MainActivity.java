@@ -1,8 +1,11 @@
 package com.nightscout.android;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,9 +13,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Menu;
@@ -59,6 +62,7 @@ import static org.joda.time.Duration.standardMinutes;
 
 public class MainActivity extends Activity {
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String ACTION_POLL = "com.nightscout.android.dexcom.action.POLL";
 
     // Receivers
     private CGMStatusReceiver mCGMStatusReceiver;
@@ -85,6 +89,9 @@ public class MainActivity extends Activity {
     private Pebble pebble;
     private AndroidUploaderDevice uploaderDevice;
 
+    private AlarmManager alarmManager;
+    private PendingIntent syncManager;
+
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +114,7 @@ public class MainActivity extends Activity {
         IntentFilter deviceStatusFilter = new IntentFilter();
         deviceStatusFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         deviceStatusFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+        deviceStatusFilter.addAction(ACTION_POLL);
         registerReceiver(mDeviceStatusReceiver, deviceStatusFilter);
 
         // Register Broadcast Receiver for response messages from mSyncingServiceIntent service
@@ -187,7 +195,9 @@ public class MainActivity extends Activity {
         pebble.setPwdName(preferences.getPwdName());
 
         uploaderDevice = AndroidUploaderDevice.getUploaderDevice(getApplicationContext());
-
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent syncIntent = new Intent(MainActivity.ACTION_POLL);
+        syncManager = PendingIntent.getBroadcast(getApplicationContext(), 1, syncIntent, 0);
     }
 
     public void reportUploadMethods(Tracker tracker) {
@@ -419,12 +429,7 @@ public class MainActivity extends Activity {
 
             statusBarIcons.setBatteryIndicator(rcvrBat);
 
-            mHandler.removeCallbacks(syncCGM);
-            mHandler.postDelayed(syncCGM, nextUploadTime);
-            // Start updating the timeago only if the screen is on
-            PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-            if (pm.isScreenOn())
-                mHandler.postDelayed(updateTimeAgo, nextUploadTime / 5);
+            setNextPoll(nextUploadTime);
         }
     }
 
@@ -434,13 +439,15 @@ public class MainActivity extends Activity {
             switch (action) {
                 case UsbManager.ACTION_USB_DEVICE_DETACHED:
                     statusBarIcons.setDefaults();
-                    mHandler.removeCallbacks(syncCGM);
+                    cancelPoll();
                     break;
                 case UsbManager.ACTION_USB_DEVICE_ATTACHED:
                     statusBarIcons.setUSB(true);
                     Log.d(TAG, "Starting syncing on USB attached...");
                     SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
                     break;
+                case MainActivity.ACTION_POLL:
+                    SyncingService.startActionSingleSync(getApplicationContext(), SyncingService.MIN_SYNC_PAGES);
             }
         }
     };
@@ -505,7 +512,7 @@ public class MainActivity extends Activity {
         } else if (id == R.id.gap_sync) {
             SyncingService.startActionSingleSync(getApplicationContext(), SyncingService.GAP_SYNC_PAGES);
         } else if (id == R.id.close_settings) {
-            mHandler.removeCallbacks(syncCGM);
+            cancelPoll();
             finish();
         }
 
@@ -610,5 +617,20 @@ public class MainActivity extends Activity {
             }
             return (Integer) mImageRcvrBattery.getTag();
         }
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public void setNextPoll(long millis) {
+        Log.d(TAG, "Setting next poll with Alarm for " + (millis) + " ms from now");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + millis, syncManager);
+        } else {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + millis, syncManager);
+        }
+    }
+
+    public void cancelPoll() {
+        Log.d(TAG, "Canceling next alarm poll");
+        alarmManager.cancel(syncManager);
     }
 }
