@@ -1,10 +1,12 @@
+apply plugin: 'jacoco'
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     repositories {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.+'
+        classpath 'com.android.tools.build:gradle:1.0.0'
     }
 }
 
@@ -12,5 +14,20 @@ allprojects {
     repositories {
         jcenter()
     }
+}
+
+subprojects {
+    tasks.withType(Test) {
+        beforeTest { desc ->
+            print "[${desc.className}] ${desc.name}: "
+        }
+        afterTest { desc, result ->
+            println "${result.resultType}"
+            if (result.resultType == TestResult.ResultType.FAILURE) {
+                println "${result.exception}"
+            }
+        }
+    }
+
 }
 

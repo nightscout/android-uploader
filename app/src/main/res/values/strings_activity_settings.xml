@@ -12,6 +12,11 @@
     <string name="pref_switch_off_i_understand">NO</string>
     <string name="pref_acra_user_email">Email</string>
 
+    <string name="pref_title_data_donate">Donate Data</string>
+    <string name="pref_summary_data_donate">Will you anonymously donate your CGM data for research in order to speed up diabetes innovation?</string>
+    <string name="pref_switch_on_data_donate">YES</string>
+    <string name="pref_switch_off_data_donate">NO</string>
+
     <!-- Settings for Cloud Storage -->
     <string name="pref_header_cloud_storage">Cloud Storage</string>
 
@@ -45,7 +50,7 @@
     <string name="pref_title_api_url">Base URL</string>
     <string name="pref_dialog_api_url">Enter Base API URL</string>
     <string name="pref_message_api_url">This only the base URL, the uploader will automatically append /entries for the POST.  API_SECRET on the server should match yourpassphrase in this setting.</string>
-    <string name="pref_default_api_url">yourpassphrase@https://{YOUR-SITE}.azurewebsites.net/api/v1</string>
+    <string name="pref_default_api_url">https://yourpassphrase@{YOUR-SITE}.azurewebsites.net/api/v1</string>
 
     <!-- Data To Upload Settings -->
     <string name="pref_title_data_to_upload">Data to upload</string>
@@ -108,4 +113,7 @@
     <!-- Privacy -->
     <string name="pref_header_privacy">Privacy</string>
     <string name="pref_enable_acra">Enable crash reporting</string>
+    <string name="prefs_auto_config_summary">Auto configure using a barcode. See http://nightscout.github.io/pages/configure/ for more details</string>
+    <string name="prefs_pwd_display_name_title">PWD Display name</string>
+    <string name="prefs_pwd_display_name_summary">This is the name of the pwd that will be displayed on other monitors e.g. pebble</string>
 </resources>

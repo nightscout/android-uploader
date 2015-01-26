@@ -12,8 +12,13 @@
     <string name="pref_switch_off_i_understand">NO</string>
     <string name="pref_acra_user_email">Email</string>
 
+    <string name="pref_title_data_donate">Donate dati</string>
+    <string name="pref_summary_data_donate">Vuoi anonimo donare i vostri dati CGM per la ricerca , al fine di accelerare l\'innovazione del diabete?</string>
+    <string name="pref_switch_on_data_donate">Sì</string>
+    <string name="pref_switch_off_data_donate">NO</string>
+
     <!-- Settings for Cloud Storage -->
-    <string name="pref_header_cloud_storage">Cloud Storage</string>
+    <string name="pref_header_cloud_storage">Archivio nel Cloud</string>
 
     <!-- MongoDB Settings -->
     <string name="pref_title_mongodb">MongoDB</string>
@@ -28,8 +33,8 @@
 
     <string name="pref_title_mongodb_collection">Nome della collection</string>
     <string name="pref_dialog_mongodb_collection">Inserisci il nome della collection</string>
-    <string name="pref_message_mongodb_collection">Questo è il nome della collection dove i dati CGM saranno archiviati</string>
-    <string name="pref_default_mongodb_collection">dati</string>
+    <string name="pref_message_mongodb_collection">Questo è il nome della collection in cui verranno memorizzati i dati CGM</string>
+    <string name="pref_default_mongodb_collection">voci</string>
 
     <string name="pref_title_mongodb_device_status_collection">Nome della collezione dello Stato Del Trasmettitore</string>
     <string name="pref_dialog_mongodb_device_status_collection">Inserisci il nome della collezione dello Stato Del Trasmettitore</string>
@@ -45,7 +50,7 @@
     <string name="pref_title_api_url">URL di base</string>
     <string name="pref_dialog_api_url">Inserisci la URL API</string>
     <string name="pref_message_api_url">Questa è solo la URL di base, l\'uploader aggiungerà automaticamente /dati for il POST. API_SECRET sul server dovrebbe essere uguale a latuapassword in questa impostazione</string>
-    <string name="pref_default_api_url">latuapassword@http://{IL-TUO-SITO}.azurewebsites.net/api/v1</string>
+    <string name="pref_default_api_url">http://latuapassword@{IL-TUO-SITO}.azurewebsites.net/api/v1</string>
 
     <!-- Data To Upload Settings -->
     <string name="pref_title_data_to_upload">Dati da inviare</string>
@@ -67,14 +72,14 @@
     <string name="pref_summary_cal_data">Dati di calibrazione usati nella conversione dai dati ISI del sensore in valori di glicemia</string>
 
     <!-- Settings for Display Options -->
-    <string name="pref_header_display_options">Display Options</string>
+    <string name="pref_header_display_options">Opzioni di visualizzazione</string>
 
     <!-- Chart Settings -->
-    <string name="pref_title_chart_options">Chart Options</string>
-    <string name="pref_summary_chart_options">Various configurations for chart</string>
+    <string name="pref_title_chart_options">Opzioni del grafico</string>
+    <string name="pref_summary_chart_options">Varie configurazioni per il grafico</string>
 
     <!-- Chart Units Settings -->
-    <string name="pref_title_chart_units_options">Unit Options</string>
+    <string name="pref_title_chart_units_options">Opzioni delle unità di misura</string>
     <string-array name="pref_options_units">
         <item>mg/dL</item>
         <item>mmol/L</item>
@@ -101,10 +106,13 @@
     <!-- Lab settings -->
     <string name="pref_header_labs">Labs</string>
 
-    <string name="pref_title_root">Root support</string>
-    <string name="pref_summary_root">Select if phone is rooted</string>
+    <string name="pref_title_root">Support per il Root</string>
+    <string name="pref_summary_root">Selezionare se il cellulare è Rootato</string>
 
     <!-- Privacy -->
     <string name="pref_header_privacy">Privacy</string>
-    <string name="pref_enable_acra">Enable crash reporting</string>
+    <string name="prefs_auto_config_summary">Auto configure using a barcode. http://nightscout.github.io/pages/configure/ for more details</string>
+    <string name="pref_enable_acra">Abilita il reporting dei crash</string>
+    <string name="prefs_pwd_display_name_title">PWD Display name</string>
+    <string name="prefs_pwd_display_name_summary">This is the name of the pwd that will be displayed on other monitors e.g. pebble</string>
 </resources>

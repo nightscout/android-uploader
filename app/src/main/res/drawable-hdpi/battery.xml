@@ -7,5 +7,5 @@
     <item android:drawable="@drawable/battery50" android:maxLevel="75" android:minLevel="51"/>
     <item android:drawable="@drawable/battery25" android:maxLevel="50" android:minLevel="26"/>
     <item android:drawable="@drawable/battery25" android:maxLevel="25" android:minLevel="16"/>
-    <item android:drawable="@drawable/battery25" android:maxLevel="15" android:minLevel="5"/>
+    <item android:drawable="@drawable/battery15" android:maxLevel="15" android:minLevel="5"/>
 </level-list>
