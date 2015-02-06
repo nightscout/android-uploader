@@ -167,6 +167,12 @@
             android:positiveButtonText="@string/ok"
             android:negativeButtonText="@null" />
 
+        <Preference
+            android:key="about_build_hash"
+            android:title="@string/pref_about_hash"
+            android:positiveButtonText="@string/ok"
+            android:negativeButtonText="@null" />
+
         <com.nightscout.android.settings.SimpleDialogPreference
             android:key="about_gpl"
             android:title="@string/pref_about_osl"

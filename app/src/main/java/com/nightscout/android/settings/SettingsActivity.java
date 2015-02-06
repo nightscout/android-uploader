@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -16,6 +17,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
+import com.nightscout.android.BuildConfig;
 import com.nightscout.android.R;
 import com.nightscout.android.barcode.AndroidBarcode;
 import com.nightscout.android.preferences.AndroidPreferences;
@@ -25,7 +27,12 @@ import com.nightscout.core.barcode.NSBarcodeConfig;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.RestUriUtils;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public class SettingsActivity extends FragmentActivity {
     private MainPreferenceFragment mainPreferenceFragment;
@@ -106,14 +113,8 @@ public class SettingsActivity extends FragmentActivity {
         }
 
         private void setupVersionNumbers() {
-            try {
-                PackageInfo pInfo;
-                pInfo = getActivity().getPackageManager().getPackageInfo(
-                        getActivity().getPackageName(), 0);
-                findPreference("about_version_number").setSummary(pInfo.versionName);
-            } catch (PackageManager.NameNotFoundException e) {
-                // nom
-            }
+            findPreference("about_version_number").setSummary(BuildConfig.VERSION_NAME);
+            findPreference("about_build_hash").setSummary(BuildConfig.GIT_SHA);
         }
 
         private void setupBarcodeScanner() {

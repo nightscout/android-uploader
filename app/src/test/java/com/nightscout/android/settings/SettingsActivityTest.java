@@ -1,6 +1,7 @@
 package com.nightscout.android.settings;
 
 import android.preference.EditTextPreference;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
 import com.nightscout.android.R;
@@ -11,7 +12,9 @@ import org.junit.Test;
 import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.util.FragmentTestUtil;
 
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -109,5 +112,12 @@ public class SettingsActivityTest extends RobolectricTestBase {
         assertThat(alertDialog, is(not(nullValue())));
         assertThat(alertDialog.getMessage().toString(),
                 is(getContext().getString(R.string.illegal_mongo_uri)));
+    }
+
+    @Test
+    public void shouldShowGitHash() {
+        Preference hash = setUpPreferenceFragment(SettingsActivity.MainPreferenceFragment.class)
+                .findPreference("about_build_hash");
+        assertThat(hash.getSummary().toString(), not(isEmptyString()));
     }
 }
