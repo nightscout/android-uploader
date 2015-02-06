@@ -9,7 +9,6 @@ import com.nightscout.core.drivers.AbstractUploaderDevice;
 
 public class AndroidUploaderDevice extends AbstractUploaderDevice {
     private int uploaderBattery;
-    private static AndroidUploaderDevice uploaderDevice;
     private Context context;
 
     private AndroidUploaderDevice(Context context) {
@@ -24,10 +23,7 @@ public class AndroidUploaderDevice extends AbstractUploaderDevice {
     }
 
     public static AndroidUploaderDevice getUploaderDevice(Context context) {
-        if (uploaderDevice == null) {
-            uploaderDevice = new AndroidUploaderDevice(context);
-        }
-        return uploaderDevice;
+        return new AndroidUploaderDevice(context);
     }
 
     public void close() {
