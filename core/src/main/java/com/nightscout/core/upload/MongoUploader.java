@@ -6,6 +6,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import com.mongodb.MongoException;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
 import com.nightscout.core.dexcom.Utils;
@@ -50,6 +51,8 @@ public class MongoUploader extends BaseUploader {
             this.client = new MongoClient(dbUri);
         } catch (UnknownHostException e) {
             throw new IOException("Error connecting to mongo host " + dbUri.getURI(), e);
+        } catch(MongoException e) {
+            throw new IOException("Error establishing connection to mongo host " + dbUri.getURI(), e);
         }
         return this.client;
     }

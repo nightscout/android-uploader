@@ -47,4 +47,6 @@
     <string name="ok">OK</string>
     <string name="version_unknown">Unknown version</string>
     <string name="default_pwd_name">Camping</string>
+    <string name="value_must_not_be_empty">Value must not be empty</string>
+    <string name="general_error_parsing">Error parsing the uri.</string>
 </resources>

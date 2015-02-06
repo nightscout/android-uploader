@@ -48,4 +48,6 @@
     <string name="unknown_rest_host">Impossibile connettersi a %s, si prega di verificare che si è connessi a Internet, e che l\'URL sia corretto.</string>
     <string name="version_unknown">Versione sconosciuta</string>
     <string name="default_pwd_name">Camping</string>
+    <string name="value_must_not_be_empty">Value must not be empty</string>
+    <string name="general_error_parsing">Error parsing the uri.</string>
 </resources>
