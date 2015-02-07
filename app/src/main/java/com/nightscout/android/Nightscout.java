@@ -1,17 +1,21 @@
 package com.nightscout.android;
 
 import android.app.Application;
+import android.content.Context;
 import android.util.Log;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
+import com.nightscout.android.ui.ActivityHierarchyServer;
 
 import net.danlew.android.joda.JodaTimeAndroid;
-
-import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
+
+import javax.inject.Inject;
+
+import dagger.ObjectGraph;
 
 @ReportsCrashes(
         formKey = "",
@@ -34,11 +38,29 @@ public class Nightscout extends Application {
     private final String TAG = MainActivity.class.getSimpleName();
     private Tracker tracker = null;
 
+    private ObjectGraph objectGraph;
+
+    @Inject ActivityHierarchyServer activityHierarchyServer;
+
     @Override
     public void onCreate() {
         super.onCreate();
-        ACRA.init(this);
         JodaTimeAndroid.init(this);
+        buildObjectGraphAndInject();
+        registerActivityLifecycleCallbacks(activityHierarchyServer);
+    }
+
+    public void buildObjectGraphAndInject() {
+        objectGraph = ObjectGraph.create(Modules.list(this));
+        objectGraph.inject(this);
+    }
+
+    public void inject(Object o) {
+        objectGraph.inject(o);
+    }
+
+    public static Nightscout get(Context context) {
+        return (Nightscout) context.getApplicationContext();
     }
 
     synchronized public Tracker getTracker() {
