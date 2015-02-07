@@ -1,5 +1,6 @@
 package com.nightscout.core.dexcom;
 
+
 public class Constants {
     public final static int MAX_COMMAND = 59;
     public final static int MAX_POSSIBLE_COMMAND = 255;

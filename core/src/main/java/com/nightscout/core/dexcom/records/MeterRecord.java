@@ -33,7 +33,7 @@ public class MeterRecord extends GenericTimestampRecord {
         this.meterTime = meterTime;
     }
 
-    public MeterRecord(int meterBgMgdl, int meterTime, long displayTime, int systemTime) {
+    public MeterRecord(int meterBgMgdl, int meterTime, long displayTime, long systemTime) {
         super(displayTime, systemTime);
         this.reading = new GlucoseReading(meterBgMgdl, GlucoseUnit.MGDL);
         this.meterTime = meterTime;
@@ -44,6 +44,13 @@ public class MeterRecord extends GenericTimestampRecord {
         this.reading = new GlucoseReading(meter.meter_bg_mgdl, GlucoseUnit.MGDL);
         this.meterTime = meter.meter_time;
     }
+
+    public MeterRecord(int meterBgMgdl, int meterTime, long systemTime) {
+        super(systemTime);
+        this.reading = new GlucoseReading(meterBgMgdl, GlucoseUnit.MGDL);
+        this.meterTime = meterTime;
+    }
+
 
     public GlucoseReading getMeterBG() {
         return reading;
@@ -92,4 +99,5 @@ public class MeterRecord extends GenericTimestampRecord {
         result = 31 * result + reading.hashCode();
         return result;
     }
+
 }

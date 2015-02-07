@@ -16,6 +16,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Menu;
@@ -32,13 +34,22 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.nightscout.android.drivers.AndroidUploaderDevice;
+import com.nightscout.android.events.AndroidEventReporter;
+import com.nightscout.android.events.UserEventPanelActivity;
+import com.nightscout.android.mqtt.AndroidMqttPinger;
+import com.nightscout.android.mqtt.AndroidMqttTimer;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.preferences.PreferencesValidator;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.android.wearables.Pebble;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
+import com.nightscout.core.events.EventSeverity;
+import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.GlucoseUnit;
+import com.nightscout.core.mqtt.MqttEventMgr;
+import com.nightscout.core.mqtt.MqttPinger;
+import com.nightscout.core.mqtt.MqttTimer;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.GlucoseReading;
 import com.nightscout.core.utils.RestUriUtils;
@@ -47,6 +58,10 @@ import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.acra.ACRAConfigurationException;
 import org.acra.ReportingInteractionMode;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 
@@ -88,6 +103,8 @@ public class MainActivity extends Activity {
     private StatusBarIcons statusBarIcons;
     private Pebble pebble;
     private AndroidUploaderDevice uploaderDevice;
+    private MqttEventMgr mqttManager;
+    private AndroidEventReporter reporter;
 
     private AlarmManager alarmManager;
     private PendingIntent syncManager;
@@ -97,6 +114,10 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "OnCreate called.");
+
+        reporter = AndroidEventReporter.getReporter(getApplicationContext());
+        reporter.report(EventType.APPLICATION, EventSeverity.INFO,
+                getApplicationContext().getString(R.string.app_started));
 
         preferences = new AndroidPreferences(getApplicationContext());
         migrateToNewStyleRestUris();
@@ -154,6 +175,8 @@ public class MainActivity extends Activity {
         String action = startIntent.getAction();
         if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) ||
                 SyncingService.isG4Connected(getApplicationContext())) {
+            reporter.report(EventType.DEVICE, EventSeverity.INFO,
+                    getApplicationContext().getString(R.string.g4_connected));
             statusBarIcons.setUSB(true);
             Log.d(TAG, "Starting syncing in OnCreate...");
             SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
@@ -195,9 +218,37 @@ public class MainActivity extends Activity {
         pebble.setPwdName(preferences.getPwdName());
 
         uploaderDevice = AndroidUploaderDevice.getUploaderDevice(getApplicationContext());
+
+        try {
+            setupMqtt();
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+        
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent syncIntent = new Intent(MainActivity.ACTION_POLL);
         syncManager = PendingIntent.getBroadcast(getApplicationContext(), 1, syncIntent, 0);
+    }
+
+    public void setupMqtt() throws MqttException {
+        if (preferences.isMqttEnabled()) {
+            if (!preferences.getMqttUser().equals("") && !preferences.getMqttPass().equals("") &&
+                    !preferences.getMqttEndpoint().equals("")) {
+                MqttConnectOptions mqttOptions = new MqttConnectOptions();
+                mqttOptions.setCleanSession(false);
+                mqttOptions.setKeepAliveInterval(150000);
+                mqttOptions.setUserName(preferences.getMqttUser());
+                mqttOptions.setPassword(preferences.getMqttPass().toCharArray());
+                String androidId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+                Log.d(TAG, "Directory: " + getApplicationContext().getFilesDir().getAbsolutePath());
+                MqttDefaultFilePersistence dataStore = new MqttDefaultFilePersistence(getApplicationContext().getFilesDir().getAbsolutePath());
+                MqttClient client = new MqttClient(preferences.getMqttEndpoint(), androidId, dataStore);
+                MqttPinger pinger = new AndroidMqttPinger(getApplicationContext(), 0, client, 150000);
+                MqttTimer timer = new AndroidMqttTimer(getApplicationContext(), 0);
+                mqttManager = new MqttEventMgr(client, mqttOptions, pinger, timer, reporter);
+                mqttManager.connect();
+            }
+        }
     }
 
     public void reportUploadMethods(Tracker tracker) {
@@ -240,6 +291,10 @@ public class MainActivity extends Activity {
             }
         }
         preferences.setRestApiBaseUris(filteredRestUris);
+        if (PreferencesValidator.validateMqttEndpointSyntax(getApplicationContext(),
+                preferences.getMqttEndpoint()).isPresent()) {
+            preferences.setMqttEndpoint(null);
+        }
     }
 
     private void ensureIUnderstandDialogDisplayed() {
@@ -303,6 +358,30 @@ public class MainActivity extends Activity {
         if (statusBarIcons != null) {
             statusBarIcons.checkForRootOptionChanged();
         }
+        try {
+            if (mqttManager != null && mqttManager.isConnected()) {
+                MqttClient client = mqttManager.getClient();
+                MqttConnectOptions options = mqttManager.getOptions();
+                boolean mqttOptsChanged = !preferences.getMqttEndpoint().equals(client.getServerURI());
+                mqttOptsChanged &= !preferences.getMqttUser().equals(options.getUserName());
+                mqttOptsChanged &= !preferences.getMqttPass().equals(String.valueOf(options.getPassword()));
+                if (mqttOptsChanged) {
+                    mqttManager.disconnect();
+                    setupMqtt();
+                }
+            }
+
+            if ((mqttManager == null || !mqttManager.isConnected()) && preferences.isMqttEnabled()) {
+                setupMqtt();
+            }
+
+            if (mqttManager != null && mqttManager.isConnected() && !preferences.isMqttEnabled()) {
+                mqttManager.close();
+            }
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private String getSGVStringByUnit(GlucoseReading sgv, TrendArrow trend) {
@@ -319,6 +398,9 @@ public class MainActivity extends Activity {
         unregisterReceiver(mCGMStatusReceiver);
         unregisterReceiver(mDeviceStatusReceiver);
         unregisterReceiver(toastReceiver);
+        if (mqttManager != null) {
+            mqttManager.close();
+        }
         uploaderDevice.close();
     }
 
@@ -374,10 +456,33 @@ public class MainActivity extends Activity {
             boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
             long responseNextUploadTime = intent.getLongExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
             long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME, new Date().getTime());
+            long lastSgvTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_SGV_TIME,
+                    ((AndroidPreferences) preferences).getLastEgvMqttUpload());
+            long lastMeterTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_METER_TIME,
+                    ((AndroidPreferences) preferences).getLastMeterMqttUpload());
+            long lastSensorTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_SENSOR_TIME,
+                    ((AndroidPreferences) preferences).getLastSensorMqttUpload());
+            long lastCalTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_CAL_TIME,
+                    ((AndroidPreferences) preferences).getLastCalMqttUpload());
             lastRecordTime = responseSGVTimestamp;
             receiverOffsetFromUploader = new Date().getTime() - responseDisplayTime;
             int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT, -1);
             String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
+            byte[] proto = intent.getByteArrayExtra(SyncingService.RESPONSE_PROTO);
+            boolean published = false;
+            if (proto != null && proto.length != 0) {
+                Log.d(TAG, "Proto: " + Utils.bytesToHex(proto));
+                if (mqttManager != null) {
+                    mqttManager.publish(proto, "/downloads/protobuf");
+                    ((AndroidPreferences) preferences).setLastEgvMqttUpload(lastSgvTimestamp);
+                    ((AndroidPreferences) preferences).setLastMeterMqttUpload(lastMeterTimestamp);
+                    ((AndroidPreferences) preferences).setLastSensorMqttUpload(lastSensorTimestamp);
+                    ((AndroidPreferences) preferences).setLastCalMqttUpload(lastCalTimestamp);
+                    published = true;
+                } else {
+                    Log.e(TAG, "Not publishing for some reason");
+                }
+            }
 
             if (responseSGV != -1) {
                 pebble.sendDownload(reading, trend, responseSGVTimestamp);
@@ -436,12 +541,17 @@ public class MainActivity extends Activity {
     BroadcastReceiver mDeviceStatusReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+
             switch (action) {
                 case UsbManager.ACTION_USB_DEVICE_DETACHED:
+                    reporter.report(EventType.DEVICE, EventSeverity.INFO,
+                            getApplicationContext().getString(R.string.g4_disconnected));
                     statusBarIcons.setDefaults();
                     cancelPoll();
                     break;
                 case UsbManager.ACTION_USB_DEVICE_ATTACHED:
+                    reporter.report(EventType.DEVICE, EventSeverity.INFO,
+                            getApplicationContext().getString(R.string.g4_connected));
                     statusBarIcons.setUSB(true);
                     Log.d(TAG, "Starting syncing on USB attached...");
                     SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
@@ -510,7 +620,12 @@ public class MainActivity extends Activity {
                 e.printStackTrace();
             }
         } else if (id == R.id.gap_sync) {
-            SyncingService.startActionSingleSync(getApplicationContext(), SyncingService.GAP_SYNC_PAGES);
+            SyncingService.startActionSingleSync(getApplicationContext(),
+                    SyncingService.GAP_SYNC_PAGES);
+        } else if (id == R.id.event_log) {
+            Intent intent = new Intent(getApplicationContext(), UserEventPanelActivity.class);
+            intent.putExtra("Filter", EventType.ALL.ordinal());
+            startActivity(intent);
         } else if (id == R.id.close_settings) {
             cancelPoll();
             finish();
@@ -539,16 +654,35 @@ public class MainActivity extends Activity {
             mImageRcvrBattery.setImageResource(R.drawable.battery);
             mRcvrBatteryLabel = (TextView) findViewById(R.id.rcvrBatteryLabel);
 
+            mImageViewUSB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), UserEventPanelActivity.class);
+                    intent.putExtra("Filter", EventType.DEVICE.ordinal());
+                    startActivity(intent);
+                }
+            });
+
+            mImageViewUpload.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), UserEventPanelActivity.class);
+                    intent.putExtra("Filter", EventType.UPLOADER.ordinal());
+                    startActivity(intent);
+                }
+            });
+
+
             setDefaults();
         }
 
         public void checkForRootOptionChanged() {
             if (((AndroidPreferences) preferences).isRootEnabled()) {
-                mImageRcvrBattery.setVisibility(View.GONE);
-                mRcvrBatteryLabel.setVisibility(View.GONE);
-            } else {
                 mImageRcvrBattery.setVisibility(View.VISIBLE);
                 mRcvrBatteryLabel.setVisibility(View.VISIBLE);
+            } else {
+                mImageRcvrBattery.setVisibility(View.GONE);
+                mRcvrBatteryLabel.setVisibility(View.GONE);
             }
         }
 
@@ -558,6 +692,7 @@ public class MainActivity extends Activity {
             setUpload(false);
             setTimeIndicator(false);
             setBatteryIndicator(0);
+            checkForRootOptionChanged();
         }
 
         public void setUSB(boolean active) {

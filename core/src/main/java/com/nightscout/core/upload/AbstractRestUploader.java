@@ -24,9 +24,11 @@ public abstract class AbstractRestUploader extends BaseUploader {
         super(preferences);
         checkNotNull(baseUri);
         this.uri = baseUri;
+        this.identifier = uri.getHost();
     }
 
-    protected void setExtraHeaders(AbstractHttpMessage httpMessage) { }
+    protected void setExtraHeaders(AbstractHttpMessage httpMessage) {
+    }
 
     public URI getUri() {
         return uri;

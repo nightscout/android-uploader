@@ -14,6 +14,7 @@ import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.drivers.AndroidUploaderDevice;
 import com.nightscout.android.drivers.USB.CdcAcmSerialDriver;
 import com.nightscout.android.drivers.USB.UsbSerialProber;
+import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.upload.Uploader;
 import com.nightscout.core.dexcom.CRCFailError;
@@ -23,17 +24,29 @@ import com.nightscout.core.drivers.AbstractDevice;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DexcomG4;
+import com.nightscout.core.events.EventReporter;
+import com.nightscout.core.events.EventSeverity;
+import com.nightscout.core.events.EventType;
+import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.model.DownloadResults;
 import com.nightscout.core.model.DownloadStatus;
 import com.nightscout.core.model.G4Download;
 import com.nightscout.core.model.G4Noise;
+import com.nightscout.core.model.MeterEntry;
+import com.nightscout.core.model.SensorEntry;
+import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.json.JSONArray;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import static org.joda.time.Duration.standardMinutes;
 
@@ -58,6 +71,11 @@ public class SyncingService extends IntentService {
     public static final String RESPONSE_DISPLAY_TIME = "myDisplayTimeMs";
     public static final String RESPONSE_JSON = "myJSON";
     public static final String RESPONSE_BAT = "myBatLvl";
+    public static final String RESPONSE_PROTO = "myProtoDownload";
+    public static final String RESPONSE_LAST_SGV_TIME = "lastSgvTimestamp";
+    public static final String RESPONSE_LAST_METER_TIME = "lastMeterTimestamp";
+    public static final String RESPONSE_LAST_SENSOR_TIME = "lastSensorTimestamp";
+    public static final String RESPONSE_LAST_CAL_TIME = "lastCalTimestamp";
 
     private final String TAG = SyncingService.class.getSimpleName();
 
@@ -113,6 +131,7 @@ public class SyncingService extends IntentService {
      * parameters.
      */
     protected void handleActionSync(int numOfPages, Context context, DeviceTransport serialDriver) {
+        EventReporter reporter = AndroidEventReporter.getReporter(context);
         boolean broadcastSent = false;
         AndroidPreferences preferences = new AndroidPreferences(context);
         Tracker tracker = ((Nightscout) context).getTracker();
@@ -146,20 +165,81 @@ public class SyncingService extends IntentService {
                             G4Noise.NOISE_NONE);
                 }
 
+                DateTime dt = new DateTime();
+                DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
+                String iso8601Str = fmt.print(dt);
+
+                G4Download.Builder builder = new G4Download.Builder();
+                builder.download_timestamp(iso8601Str)
+                        .download_status(download.download_status)
+                        .receiver_battery(download.receiver_battery)
+                        .uploader_battery(download.uploader_battery)
+                        .receiver_system_time_sec(download.receiver_system_time_sec)
+                        .units(download.units);
+
+                long egvTime = preferences.getLastEgvMqttUpload();
+                long meterTime = preferences.getLastMeterMqttUpload();
+                long sensorTime = preferences.getLastSensorMqttUpload();
+                long calTime = preferences.getLastCalMqttUpload();
+                long lastSgvTimestamp = egvTime;
+                List<SensorGlucoseValueEntry> filteredSgvs = new ArrayList<>();
+                for (SensorGlucoseValueEntry aRecord : download.sgv) {
+                    if (aRecord.sys_timestamp_sec > egvTime || numOfPages == GAP_SYNC_PAGES) {
+                        filteredSgvs.add(aRecord);
+                        lastSgvTimestamp = aRecord.sys_timestamp_sec;
+                    }
+                }
+                builder.sgv(filteredSgvs);
+                long lastMeterTimestamp = meterTime;
+                List<MeterEntry> filteredMeter = new ArrayList<>();
+                for (MeterEntry aRecord : download.meter) {
+                    if (aRecord.sys_timestamp_sec > meterTime || numOfPages == GAP_SYNC_PAGES) {
+                        filteredMeter.add(aRecord);
+                        lastMeterTimestamp = aRecord.sys_timestamp_sec;
+                    }
+                }
+                builder.meter(filteredMeter);
+                long lastSensorTimestamp = sensorTime;
+                List<SensorEntry> filteredSensor = new ArrayList<>();
+                for (SensorEntry aRecord : download.sensor) {
+                    if (aRecord.sys_timestamp_sec > sensorTime || numOfPages == GAP_SYNC_PAGES) {
+                        filteredSensor.add(aRecord);
+                        lastSensorTimestamp = aRecord.sys_timestamp_sec;
+                    }
+                }
+                builder.sensor(filteredSensor);
+                long lastCalTimestamp = calTime;
+                List<CalibrationEntry> filteredCal = new ArrayList<>();
+                for (CalibrationEntry aRecord : download.cal) {
+                    if (aRecord.sys_timestamp_sec > calTime || numOfPages == GAP_SYNC_PAGES) {
+                        filteredCal.add(aRecord);
+                        lastCalTimestamp = aRecord.sys_timestamp_sec;
+                    }
+                }
+                builder.cal(filteredCal);
                 broadcastSGVToUI(recentEGV, uploadStatus, results.getNextUploadTime() + TIME_SYNC_OFFSET,
-                        results.getDisplayTime(), results.getResultArray(), download.receiver_battery);
+                        results.getDisplayTime(), results.getResultArray(), download.receiver_battery,
+                        builder.build().toByteArray(), lastSgvTimestamp, lastMeterTimestamp, lastSensorTimestamp, lastCalTimestamp);
                 broadcastSent = true;
+                reporter.report(EventType.DEVICE, EventSeverity.INFO,
+                        getApplicationContext().getString(R.string.event_sync_log));
             } catch (ArrayIndexOutOfBoundsException e) {
+                reporter.report(EventType.DEVICE, EventSeverity.ERROR,
+                        getApplicationContext().getString(R.string.event_fail_log));
                 Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Array Index out of bounds")
                         .setFatal(false)
                         .build());
             } catch (NegativeArraySizeException e) {
+                reporter.report(EventType.DEVICE, EventSeverity.ERROR,
+                        getApplicationContext().getString(R.string.event_fail_log));
                 Log.wtf("Negative array exception from receiver", e);
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Negative Array size")
                         .setFatal(false)
                         .build());
             } catch (IndexOutOfBoundsException e) {
+                reporter.report(EventType.DEVICE, EventSeverity.ERROR,
+                        getApplicationContext().getString(R.string.event_fail_log));
                 Log.wtf("IndexOutOfBounds exception from receiver", e);
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("IndexOutOfBoundsException")
                         .setFatal(false)
@@ -170,11 +250,15 @@ public class SyncingService extends IntentService {
                 // doesn't fail on other types of records. This means we'd need to broadcast back
                 // partial results to the UI. Adding it to a lower level could make the ReadData class
                 // more difficult to maintain - needs discussion.
+                reporter.report(EventType.DEVICE, EventSeverity.ERROR,
+                        getApplicationContext().getString(R.string.crc_fail_log));
                 Log.wtf("CRC failed", e);
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("CRC Failed")
                         .setFatal(false)
                         .build());
             } catch (Exception e) {
+                reporter.report(EventType.DEVICE, EventSeverity.ERROR,
+                        context.getString(R.string.unknown_fail_log));
                 Log.wtf("Unhandled exception caught", e);
                 tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Catch all exception in handleActionSync")
                         .setFatal(false)
@@ -207,10 +291,11 @@ public class SyncingService extends IntentService {
         return g4Connected;
     }
 
-    protected void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus,
-                                    long nextUploadTime, long displayTime,
-                                    JSONArray json, int batLvl) {
-        Log.d(TAG, "Current EGV: " + egvRecord.getBgMgdl());
+    public void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus,
+                                 long nextUploadTime, long displayTime,
+                                 JSONArray json, int batLvl, byte[] proto,
+                                 long lastSgvTimestamp, long lastMeterTimestamp,
+                                 long lastSensorTimestamp, long lastCalTimestamp) {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -220,6 +305,16 @@ public class SyncingService extends IntentService {
         broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, nextUploadTime);
         broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, uploadStatus);
         broadcastIntent.putExtra(RESPONSE_DISPLAY_TIME, displayTime);
+
+        // FIXME: a quick hack to store timestamps once the data has been published in the
+        // MainActivity
+        broadcastIntent.putExtra(RESPONSE_LAST_SGV_TIME, lastSgvTimestamp);
+        broadcastIntent.putExtra(RESPONSE_LAST_METER_TIME, lastMeterTimestamp);
+        broadcastIntent.putExtra(RESPONSE_LAST_SENSOR_TIME, lastSensorTimestamp);
+        broadcastIntent.putExtra(RESPONSE_LAST_CAL_TIME, lastCalTimestamp);
+        if (proto != null) {
+            broadcastIntent.putExtra(RESPONSE_PROTO, proto);
+        }
         if (json != null)
             broadcastIntent.putExtra(RESPONSE_JSON, json.toString());
         broadcastIntent.putExtra(RESPONSE_BAT, batLvl);
@@ -227,8 +322,10 @@ public class SyncingService extends IntentService {
     }
 
     protected void broadcastSGVToUI() {
-        EGVRecord record = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(), G4Noise.NOISE_NONE);
-        broadcastSGVToUI(record, false, standardMinutes(5).getMillis() + TIME_SYNC_OFFSET, new Date().getTime(), null, 0);
+        EGVRecord record = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(),
+                G4Noise.NOISE_NONE);
+        broadcastSGVToUI(record, false, standardMinutes(5).getMillis() + TIME_SYNC_OFFSET,
+                new Date().getTime(), null, 0, new byte[0], -1, -1, -1, -1);
     }
 
 }

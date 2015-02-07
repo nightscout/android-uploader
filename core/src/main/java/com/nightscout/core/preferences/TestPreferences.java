@@ -19,6 +19,7 @@ public class TestPreferences implements NightscoutPreferences {
     private String pwdName;
     private boolean understand;
     private boolean askedForData;
+    private String mqttEndpoint;
 
     @Override
     public boolean isRestApiEnabled() {
@@ -113,6 +114,31 @@ public class TestPreferences implements NightscoutPreferences {
     @Override
     public String getMongoDeviceStatusCollection() {
         return mongoDeviceStatusCollection;
+    }
+
+    @Override
+    public boolean isMqttEnabled() {
+        return false;
+    }
+
+    @Override
+    public String getMqttEndpoint() {
+        return mqttEndpoint;
+    }
+
+    @Override
+    public void setMqttEndpoint(String endpoint) {
+        mqttEndpoint = endpoint;
+    }
+
+    @Override
+    public String getMqttUser() {
+        return null;
+    }
+
+    @Override
+    public String getMqttPass() {
+        return null;
     }
 
     @Override

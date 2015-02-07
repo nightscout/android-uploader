@@ -37,6 +37,7 @@ public class MongoUploader extends BaseUploader {
         checkNotNull(dbURI);
         checkNotNull(collectionName);
         checkNotNull(dsCollectionName);
+        this.identifier = "MongoDB";
         this.dbUri = dbURI;
         this.collectionName = collectionName.trim();
         this.dsCollectionName = dsCollectionName.trim();

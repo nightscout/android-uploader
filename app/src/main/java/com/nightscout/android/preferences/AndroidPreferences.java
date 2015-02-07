@@ -1,5 +1,6 @@
 package com.nightscout.android.preferences;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -78,9 +79,6 @@ public class AndroidPreferences implements NightscoutPreferences {
 
     @Override
     public String getMongoCollection() {
-//        String result = preferences.getString(PreferenceKeys.MONGO_COLLECTION,
-//                getDefaultMongoCollection());
-//        return result.equals("")?getDefaultMongoCollection():result;
         return preferences.getString(PreferenceKeys.MONGO_COLLECTION,
                 getDefaultMongoCollection());
     }
@@ -90,6 +88,31 @@ public class AndroidPreferences implements NightscoutPreferences {
         String result = preferences.getString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION,
                 getDefaultMongoDeviceStatusCollection());
         return result.equals("") ? getDefaultMongoDeviceStatusCollection() : result;
+    }
+
+    @Override
+    public boolean isMqttEnabled() {
+        return preferences.getBoolean(PreferenceKeys.MQTT_ENABLED, false);
+    }
+
+    @Override
+    public String getMqttEndpoint() {
+        return preferences.getString(PreferenceKeys.MQTT_ENDPOINT, "");
+    }
+
+    @Override
+    public void setMqttEndpoint(String endpoint) {
+        preferences.edit().putString(PreferenceKeys.MQTT_ENDPOINT, endpoint).apply();
+    }
+
+    @Override
+    public String getMqttUser() {
+        return preferences.getString(PreferenceKeys.MQTT_USER, "");
+    }
+
+    @Override
+    public String getMqttPass() {
+        return preferences.getString(PreferenceKeys.MQTT_PASS, "");
     }
 
     /**
@@ -183,5 +206,41 @@ public class AndroidPreferences implements NightscoutPreferences {
 
     public void setRootEnabled(boolean enabled) {
         preferences.edit().putBoolean(PreferenceKeys.ROOT_ENABLED, enabled).apply();
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    public void setLastEgvMqttUpload(long timestamp) {
+        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_EGV_TIME, timestamp).commit();
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    public void setLastSensorMqttUpload(long timestamp) {
+        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_SENSOR_TIME, timestamp).commit();
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    public void setLastCalMqttUpload(long timestamp) {
+        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_CAL_TIME, timestamp).commit();
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    public void setLastMeterMqttUpload(long timestamp) {
+        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_METER_TIME, timestamp).commit();
+    }
+
+    public long getLastEgvMqttUpload() {
+        return preferences.getLong(PreferenceKeys.MQTT_LAST_EGV_TIME, 0);
+    }
+
+    public long getLastSensorMqttUpload() {
+        return preferences.getLong(PreferenceKeys.MQTT_LAST_SENSOR_TIME, 0);
+    }
+
+    public long getLastCalMqttUpload() {
+        return preferences.getLong(PreferenceKeys.MQTT_LAST_CAL_TIME, 0);
+    }
+
+    public long getLastMeterMqttUpload() {
+        return preferences.getLong(PreferenceKeys.MQTT_LAST_METER_TIME, 0);
     }
 }

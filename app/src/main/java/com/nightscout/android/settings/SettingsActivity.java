@@ -158,6 +158,22 @@ public class SettingsActivity extends FragmentActivity {
                             return true;
                         }
                     });
+            findPreference(PreferenceKeys.MQTT_ENDPOINT).setOnPreferenceChangeListener(
+                    new Preference.OnPreferenceChangeListener() {
+                        @Override
+                        public boolean onPreferenceChange(Preference preference, Object newValue) {
+                            String mqttEndpoint = (String) newValue;
+                            Optional<String> error = PreferencesValidator.validateMqttEndpointSyntax(
+                                    getActivity(), mqttEndpoint);
+                            if (error.isPresent()) {
+                                showValidationError(getActivity(), error.get());
+                                return false;
+                            }
+                            return true;
+                        }
+                    });
+
+
         }
     }
 }

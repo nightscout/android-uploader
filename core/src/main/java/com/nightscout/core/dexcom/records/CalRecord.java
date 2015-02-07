@@ -150,6 +150,16 @@ public class CalRecord extends GenericTimestampRecord {
         return true;
     }
 
+    public CalibrationEntry toProtoBuf() {
+        return new CalibrationEntry.Builder()
+                .sys_timestamp_sec(rawSystemTimeSeconds)
+                .disp_timestamp_sec(rawDisplayTimeSeconds)
+                .intercept(intercept)
+                .slope(slope)
+                .scale(scale)
+                .build();
+    }
+
     @Override
     public int hashCode() {
         int result = super.hashCode();
@@ -166,4 +176,5 @@ public class CalRecord extends GenericTimestampRecord {
         result = 31 * result + (calSubrecords != null ? calSubrecords.hashCode() : 0);
         return result;
     }
+
 }
