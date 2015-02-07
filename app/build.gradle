@@ -75,7 +75,7 @@ dependencies {
         exclude group: 'org.apache.httpcomponents'
         exclude group: 'joda-time', module: 'joda-time'
     }
-    compile files('libs/acra-4.5.0.jar')
+    compile 'ch.acra:acra:4.5.0'
     compile 'com.android.support:appcompat-v7:20.0.0'
     compile 'com.android.support:support-v4:20.0.0'
     compile 'com.google.android.gms:play-services-base:6.5.87'
