@@ -80,4 +80,5 @@
     <string name="event_success_upload">Successful upload to %s</string>
     <string name="development_settings">Development Drawer</string>
     <string name="nightscout_icon">Nightscout Icon</string>
+    <string name="pref_about_hash">Git hash</string>
 </resources>
