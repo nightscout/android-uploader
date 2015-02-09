@@ -21,7 +21,7 @@ import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.drivers.AbstractDevice;
-import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.drivers.UploaderDevice;
 import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DexcomG4;
 import com.nightscout.core.events.EventReporter;
@@ -77,7 +77,6 @@ public class SyncingService extends IntentService {
     public static final String RESPONSE_LAST_SENSOR_TIME = "lastSensorTimestamp";
     public static final String RESPONSE_LAST_CAL_TIME = "lastCalTimestamp";
 
-    private final String TAG = SyncingService.class.getSimpleName();
 
     // Constants
     private final int TIME_SYNC_OFFSET = 10000;
@@ -140,7 +139,7 @@ public class SyncingService extends IntentService {
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NSDownload");
         wl.acquire();
         if (serialDriver != null) {
-            AbstractUploaderDevice uploaderDevice = AndroidUploaderDevice.getUploaderDevice(context);
+            UploaderDevice uploaderDevice = AndroidUploaderDevice.getUploaderDevice(context);
             AbstractDevice device = new DexcomG4(serialDriver, preferences, uploaderDevice);
 
             ((DexcomG4) device).setNumOfPages(numOfPages);
@@ -149,7 +148,7 @@ public class SyncingService extends IntentService {
                 DownloadResults results = device.download();
                 G4Download download = results.getDownload();
 
-                Uploader uploader = new Uploader(context, preferences);
+                Uploader uploader = new Uploader(context);
                 boolean uploadStatus;
                 if (numOfPages < 20) {
                     uploadStatus = uploader.upload(results, 1);

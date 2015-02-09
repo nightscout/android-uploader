@@ -2,7 +2,7 @@ package com.nightscout.core.upload;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
-import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.drivers.UploaderDevice;
 import com.nightscout.core.preferences.TestPreferences;
 
 import org.apache.http.HttpResponse;
@@ -73,7 +73,7 @@ public class RestLegacyUploaderTest {
         assertThat(jsonObject.get("direction"), is(not(nullValue())));
     }
 
-    public static void verifyDeviceStatus(JSONObject jsonObject, AbstractUploaderDevice deviceStatus)
+    public static void verifyDeviceStatus(JSONObject jsonObject, UploaderDevice deviceStatus)
             throws JSONException {
         assertThat(jsonObject.getInt("uploaderBattery"), is(deviceStatus.getBatteryLevel()));
     }
@@ -115,7 +115,7 @@ public class RestLegacyUploaderTest {
 
     @Test
     public void testDeviceStatus_Entity() throws Exception {
-        AbstractUploaderDevice deviceStatus = mockDeviceStatus();
+        UploaderDevice deviceStatus = mockDeviceStatus();
         restUploader.uploadDeviceStatus(deviceStatus);
         HttpPost post = (HttpPost) captor.getValue();
         String entity = CharStreams.toString(new InputStreamReader(post.getEntity().getContent()));

@@ -5,11 +5,11 @@ import android.app.Activity;
 import com.google.zxing.client.android.Intents;
 import com.google.zxing.integration.android.IntentIntegrator;
 
-public class AndroidBarcode {
+public class BarcodeScanner {
     public static final String SCAN_INTENT = Intents.Scan.ACTION;
     Activity activity;
 
-    public AndroidBarcode(Activity activity){
+    public BarcodeScanner(Activity activity){
         this.activity = activity;
     }
 

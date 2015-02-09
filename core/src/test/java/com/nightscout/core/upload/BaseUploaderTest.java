@@ -3,7 +3,7 @@ package com.nightscout.core.upload;
 import com.google.common.collect.Lists;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
-import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.drivers.UploaderDevice;
 import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
@@ -87,7 +87,7 @@ public class BaseUploaderTest {
         }
 
         @Override
-        protected boolean doUpload(AbstractUploaderDevice deviceStatus) throws IOException {
+        protected boolean doUpload(UploaderDevice deviceStatus) throws IOException {
             throw new IOException("device");
         }
     }

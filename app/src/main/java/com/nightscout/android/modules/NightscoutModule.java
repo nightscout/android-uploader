@@ -4,10 +4,13 @@ import android.app.Application;
 
 import com.nightscout.android.MainActivity;
 import com.nightscout.android.Nightscout;
+import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.exceptions.AcraFeedbackDialog;
 import com.nightscout.android.exceptions.FeedbackDialog;
-import com.nightscout.android.preferences.PreferencesModule;
+import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.ui.UiModule;
+import com.nightscout.android.upload.Uploader;
+import com.nightscout.core.preferences.NightscoutPreferences;
 
 import org.acra.ACRA;
 
@@ -20,12 +23,12 @@ import dagger.Provides;
 
 @Module(
     includes = {
-        PreferencesModule.class,
         UiModule.class
     },
     injects = {
         Nightscout.class,
-        MainActivity.class
+        MainActivity.class,
+        Uploader.class
     }
 )
 public class NightscoutModule {
@@ -44,9 +47,21 @@ public class NightscoutModule {
 
   @Provides
   @Singleton
-  FeedbackDialog providesReporter(Application app) {
+  public NightscoutPreferences provideNightscoutPreferences(Application app) {
+    return new AndroidPreferences(app.getApplicationContext());
+  }
+
+  @Provides
+  @Singleton
+  FeedbackDialog providesFeedbackDialog(Application app) {
     ACRA.init(app);
     ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
     return new AcraFeedbackDialog();
+  }
+
+  @Provides
+  @Singleton
+  public AndroidEventReporter androidEventReporter(Application app) {
+    return AndroidEventReporter.getReporter(app);
   }
 }

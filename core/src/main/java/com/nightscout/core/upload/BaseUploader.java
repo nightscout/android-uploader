@@ -1,11 +1,10 @@
 package com.nightscout.core.upload;
 
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
-import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.drivers.UploaderDevice;
 import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
-import com.nightscout.core.records.DeviceStatus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,7 @@ public abstract class BaseUploader {
         return true;
     }
 
-    protected boolean doUpload(AbstractUploaderDevice deviceStatus) throws IOException {
+    protected boolean doUpload(UploaderDevice deviceStatus) throws IOException {
         log.info("Device status upload not supported.");
         return true;
     }
@@ -112,7 +111,7 @@ public abstract class BaseUploader {
      * @param deviceStatus
      * @return True if the upload was successful or False if the upload was unsuccessful
      */
-    public final boolean uploadDeviceStatus(AbstractUploaderDevice deviceStatus) {
+    public final boolean uploadDeviceStatus(UploaderDevice deviceStatus) {
         if (deviceStatus == null) {
             return true;
         }
@@ -140,7 +139,7 @@ public abstract class BaseUploader {
      * @param deviceStatus
      * @return True if the (all) uploads was successful or False if at least one upload was unsuccessful.
      */
-    public boolean uploadRecords(List<GlucoseDataSet> glucoseDataSets, List<MeterEntry> meterRecords, List<CalibrationEntry> calRecords, AbstractUploaderDevice deviceStatus) {
+    public boolean uploadRecords(List<GlucoseDataSet> glucoseDataSets, List<MeterEntry> meterRecords, List<CalibrationEntry> calRecords, UploaderDevice deviceStatus) {
         boolean allSuccessful = uploadGlucoseDataSets(glucoseDataSets);
         allSuccessful &= uploadMeterRecords(meterRecords);
         allSuccessful &= uploadCalRecords(calRecords);

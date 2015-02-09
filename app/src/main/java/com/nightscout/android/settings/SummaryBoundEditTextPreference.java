@@ -6,6 +6,10 @@ import android.os.Build;
 import android.preference.EditTextPreference;
 import android.util.AttributeSet;
 
+/**
+ * An edit text preference item that binds the current preference value to the summary of the
+ * preference item, so that it can be viewed without clicking on the preference item.
+ */
 public class SummaryBoundEditTextPreference extends EditTextPreference {
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)

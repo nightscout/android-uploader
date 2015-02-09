@@ -28,7 +28,7 @@ import static org.junit.Assert.assertThat;
 
 @Config(emulateSdk = 16)
 @RunWith(RobolectricTestRunner.class)
-public class AndroidBarcodeTest extends RobolectricTestBase {
+public class BarcodeScannerTest extends RobolectricTestBase {
     Activity activity;
     SharedPreferences sharedPrefs;
     String jsonConfig = null;
@@ -181,7 +181,7 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
 
     @Test
     public void shouldStartScanActivity(){
-        AndroidBarcode barcode = new AndroidBarcode(activity);
+        BarcodeScanner barcode = new BarcodeScanner(activity);
         barcode.scan();
         Intent intent = getShadowApplication().getNextStartedActivity();
         assertThat(intent.getComponent().getClassName(), is(CaptureActivity.class.getName()));
@@ -249,7 +249,7 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
     }
 
     private Intent createFakeScanIntent(String jsonString){
-        Intent intent = new Intent(AndroidBarcode.SCAN_INTENT);
+        Intent intent = new Intent(BarcodeScanner.SCAN_INTENT);
         intent.putExtra("SCAN_RESULT", jsonString);
         intent.putExtra("SCAN_RESULT_FORMAT", "");
         intent.putExtra("SCAN_RESULT_BYTES", new byte[0]);

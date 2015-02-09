@@ -1,7 +1,6 @@
 package com.nightscout.android;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.widget.TextView;
 
 import com.google.common.collect.Lists;
@@ -42,13 +41,6 @@ public class MainActivityTest extends RobolectricTestBase {
         activityController = Robolectric.buildActivity(MainActivity.class);
         preferences = new AndroidPreferences(getContext());
         MockitoAnnotations.initMocks(this);
-    }
-
-    @Test
-    public void testOnCreate_ShouldConnectToastReceiver() {
-        activityController.create().get();
-        Intent toastIntent = ToastReceiver.createIntent(getContext(), R.string.unknown_mongo_host);
-        assertThat(getShadowApplication().hasReceiverForIntent(toastIntent), is(true));
     }
 
     @Test

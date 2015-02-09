@@ -10,7 +10,7 @@ import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
-import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.drivers.UploaderDevice;
 import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
@@ -136,7 +136,7 @@ public class MongoUploader extends BaseUploader {
         return output;
     }
 
-    private BasicDBObject toBasicDBObject(AbstractUploaderDevice deviceStatus) {
+    private BasicDBObject toBasicDBObject(UploaderDevice deviceStatus) {
         BasicDBObject output = new BasicDBObject();
         output.put("uploaderBattery", deviceStatus.getBatteryLevel());
         output.put("created_at", new Date());
@@ -169,7 +169,7 @@ public class MongoUploader extends BaseUploader {
     }
 
     @Override
-    protected boolean doUpload(AbstractUploaderDevice deviceStatus) throws IOException {
+    protected boolean doUpload(UploaderDevice deviceStatus) throws IOException {
         return upsert(getDeviceStatusCollection(), toBasicDBObject(deviceStatus));
     }
 

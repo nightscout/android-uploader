@@ -5,9 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.android.upload.Uploader;
+import com.nightscout.core.drivers.UploaderDevice;
 
-public class AndroidUploaderDevice extends AbstractUploaderDevice {
+public class AndroidUploaderDevice implements UploaderDevice {
     private int uploaderBattery;
     private Context context;
 

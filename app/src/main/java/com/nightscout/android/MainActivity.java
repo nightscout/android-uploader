@@ -92,7 +92,6 @@ public class MainActivity extends Activity {
 
     // Receivers
     private CGMStatusReceiver mCGMStatusReceiver;
-    private ToastReceiver toastReceiver;
 
     // Member components
     private Handler mHandler = new Handler();
@@ -144,7 +143,7 @@ public class MainActivity extends Activity {
         ensureSavedUrisAreValid();
         ensureIUnderstandDialogDisplayed();
 
-        mTracker = ((Nightscout) getApplicationContext()).getTracker();
+        mTracker = app.getTracker();
 
         mContext = getApplicationContext();
 
@@ -160,11 +159,6 @@ public class MainActivity extends Activity {
         IntentFilter filter = new IntentFilter(CGMStatusReceiver.PROCESS_RESPONSE);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(mCGMStatusReceiver, filter);
-
-        toastReceiver = new ToastReceiver();
-        IntentFilter toastFilter = new IntentFilter(ToastReceiver.ACTION_SEND_NOTIFICATION);
-        toastFilter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(toastReceiver, toastFilter);
 
         mTextSGV.setTag(R.string.display_sgv, -1);
         mTextSGV.setTag(R.string.display_trend, 0);
@@ -410,7 +404,6 @@ public class MainActivity extends Activity {
         super.onDestroy();
         unregisterReceiver(mCGMStatusReceiver);
         unregisterReceiver(mDeviceStatusReceiver);
-        unregisterReceiver(toastReceiver);
         if (mqttManager != null) {
             mqttManager.close();
         }

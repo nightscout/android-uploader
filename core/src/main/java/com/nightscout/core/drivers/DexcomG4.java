@@ -35,10 +35,10 @@ public class DexcomG4 extends AbstractDevice {
 
     protected NightscoutPreferences preferences;
     protected int numOfPages;
-    protected AbstractUploaderDevice uploaderDevice;
+    protected UploaderDevice uploaderDevice;
 
     public DexcomG4(DeviceTransport transport, NightscoutPreferences preferences,
-                    AbstractUploaderDevice uploaderDevice) {
+                    UploaderDevice uploaderDevice) {
         super(transport);
         this.preferences = preferences;
         this.uploaderDevice = uploaderDevice;

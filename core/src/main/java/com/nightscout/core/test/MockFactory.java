@@ -7,7 +7,7 @@ import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.SensorRecord;
-import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.drivers.UploaderDevice;
 import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.model.G4Noise;
 import com.nightscout.core.model.MeterEntry;
@@ -42,8 +42,8 @@ public class MockFactory {
         return new CalibrationEntry(0d, 0d, 0d, 0d, 0L, 0L);
     }
 
-    public static AbstractUploaderDevice mockDeviceStatus() {
-        return new AbstractUploaderDevice() {
+    public static UploaderDevice mockDeviceStatus() {
+        return new UploaderDevice() {
             @Override
             public int getBatteryLevel() {
                 return 999;

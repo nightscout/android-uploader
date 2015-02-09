@@ -7,9 +7,6 @@ import com.google.zxing.integration.android.IntentResult;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -19,7 +16,7 @@ import android.view.MenuItem;
 
 import com.nightscout.android.BuildConfig;
 import com.nightscout.android.R;
-import com.nightscout.android.barcode.AndroidBarcode;
+import com.nightscout.android.barcode.BarcodeScanner;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.preferences.PreferencesValidator;
@@ -27,12 +24,7 @@ import com.nightscout.core.barcode.NSBarcodeConfig;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.RestUriUtils;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 public class SettingsActivity extends FragmentActivity {
     private MainPreferenceFragment mainPreferenceFragment;
@@ -121,7 +113,7 @@ public class SettingsActivity extends FragmentActivity {
             findPreference("auto_configure").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    new AndroidBarcode(getActivity()).scan();
+                    new BarcodeScanner(getActivity()).scan();
                     return true;
                 }
             });
