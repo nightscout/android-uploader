@@ -22,6 +22,12 @@ public class PreferencesValidatorTest extends RobolectricTestBase {
     }
 
     @Test
+    public void testValidateMongoUriSyntax_EmptyPassword() {
+        assertThat(PreferencesValidator.validateMongoUriSyntax(getContext(), "mongodb://a@b.com/db").get(),
+               is(getContext().getString(R.string.illegal_mongo_uri, "mongodb://a@b.com/db")));
+    }
+
+    @Test
     public void testValidateMongoUriSyntax_Valid() {
         assertThat(PreferencesValidator.validateMongoUriSyntax(getContext(), "mongodb://test/db")
                         .isPresent(),
