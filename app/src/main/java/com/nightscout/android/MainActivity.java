@@ -411,10 +411,15 @@ public class MainActivity extends Activity {
         unregisterReceiver(mCGMStatusReceiver);
         unregisterReceiver(mDeviceStatusReceiver);
         unregisterReceiver(toastReceiver);
+        if (pebble != null) {
+            pebble.close();
+        }
         if (mqttManager != null) {
             mqttManager.close();
         }
-        uploaderDevice.close();
+        if (uploaderDevice != null) {
+            uploaderDevice.close();
+        }
     }
 
     @Override

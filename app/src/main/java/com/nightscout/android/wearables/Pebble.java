@@ -41,6 +41,15 @@ public class Pebble {
     private TrendArrow lastTrend = TrendArrow.NONE;
     private long lastRecordTime = 0;
 
+    private PebbleKit.PebbleDataReceiver dataReceiver = new PebbleKit.PebbleDataReceiver(PEBBLEAPP_UUID) {
+        @Override
+        public void receiveData(final Context mContext, final int transactionId, final PebbleDictionary data) {
+            Log.d(TAG, "Received query. data: " + data.size());
+            PebbleKit.sendAckToPebble(mContext, transactionId);
+            sendDownload(currentReading);
+        }
+    };
+
     public Pebble(Context context) {
         this.context = context;
         currentReading = null;
@@ -110,15 +119,12 @@ public class Pebble {
         }
     }
 
+    public void close() {
+        context.unregisterReceiver(dataReceiver);
+    }
+
     private void init() {
-        PebbleKit.registerReceivedDataHandler(context, new PebbleKit.PebbleDataReceiver(PEBBLEAPP_UUID) {
-            @Override
-            public void receiveData(final Context mContext, final int transactionId, final PebbleDictionary data) {
-                Log.d(TAG, "Received query. data: " + data.size());
-                PebbleKit.sendAckToPebble(mContext, transactionId);
-                sendDownload(currentReading);
-            }
-        });
+        PebbleKit.registerReceivedDataHandler(context, dataReceiver);
     }
 
     public void config(String pwdName, GlucoseUnit units) {
