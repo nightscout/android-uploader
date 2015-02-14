@@ -80,15 +80,14 @@ public class SyncingService extends IntentService {
     public static final String RESPONSE_LAST_SENSOR_TIME = "lastSensorTimestamp";
     public static final String RESPONSE_LAST_CAL_TIME = "lastCalTimestamp";
 
-    private final String TAG = SyncingService.class.getSimpleName();
-
     // Constants
     private final int TIME_SYNC_OFFSET = 10000;
     public static final int MIN_SYNC_PAGES = 2;
     public static final int GAP_SYNC_PAGES = 20;
 
     @Inject ScopedBus scopedBus;
-
+    @Inject EventReporter reporter;
+    @Inject AndroidPreferences preferences;
 
     /**
      * Starts this service to perform action Single Sync with the given parameters. If
@@ -118,8 +117,8 @@ public class SyncingService extends IntentService {
 
     @Override
     public void onCreate() {
-      Nightscout app = Nightscout.get(this);
-      app.inject(this);
+        Nightscout app = Nightscout.get(this);
+        app.inject(this);
     }
 
     @Override
@@ -142,9 +141,7 @@ public class SyncingService extends IntentService {
      * parameters.
      */
     protected void handleActionSync(int numOfPages, Context context, DeviceTransport serialDriver) {
-        EventReporter reporter = AndroidEventReporter.getReporter(context);
         boolean broadcastSent = false;
-        AndroidPreferences preferences = new AndroidPreferences(context);
         Tracker tracker = ((Nightscout) context).getTracker();
 
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);

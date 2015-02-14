@@ -7,12 +7,14 @@ import com.nightscout.android.drivers.USB.CdcAcmSerialDriver;
 import com.nightscout.android.drivers.USB.UsbSerialDriver;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.test.RobolectricTestBase;
+import com.nightscout.core.bus.ScopedBus;
 import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
 import org.json.JSONArray;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.robolectric.Robolectric;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowToast;
