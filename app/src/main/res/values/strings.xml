@@ -84,5 +84,5 @@
     <string name="upload_log_menu">Upload Logs</string>
     <string name="mqtt_mgr_not_initialized">MQTT connection has not been initialized.</string>
     <string name="no_uploaders">No uploaders have been configured.</string>
-    <string name="unhandled_mqtt_exception">MQTT Exception: %</string>
+    <string name="unhandled_mqtt_exception">MQTT Exception: %s</string>
 </resources>
