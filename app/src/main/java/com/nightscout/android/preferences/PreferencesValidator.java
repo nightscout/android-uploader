@@ -20,7 +20,7 @@ public class PreferencesValidator {
     public static Optional<String> validateMongoUriSyntax(Context context, String mongoUriString) {
         try {
             new MongoClientURI(mongoUriString);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             return Optional.of(context.getString(R.string.illegal_mongo_uri));
         }
         return Optional.absent();
@@ -39,7 +39,7 @@ public class PreferencesValidator {
         URI uri;
         try {
             uri = URI.create(restApiUri);
-        } catch (IllegalArgumentException | NullPointerException e) {
+        } catch (Exception e) {
             return Optional.of(context.getString(R.string.invalid_rest_uri, restApiUri));
         }
         if (RestUriUtils.isV1Uri(uri)) {
@@ -54,10 +54,9 @@ public class PreferencesValidator {
         if (Strings.isNullOrEmpty(mqttUri)) {
             return Optional.of(context.getString(R.string.invalid_mqtt_endpoint, mqttUri));
         }
-        URI uri;
         try {
-            uri = URI.create(mqttUri);
-        } catch (NullPointerException | IllegalArgumentException e) {
+            URI.create(mqttUri);
+        } catch (Exception e) {
             return Optional.of(context.getString(R.string.invalid_mqtt_endpoint, mqttUri));
         }
         return Optional.absent();
