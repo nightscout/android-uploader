@@ -6,8 +6,11 @@ import com.nightscout.android.MainActivity;
 import com.nightscout.android.Nightscout;
 import com.nightscout.android.exceptions.AcraFeedbackDialog;
 import com.nightscout.android.exceptions.FeedbackDialog;
-import com.nightscout.android.preferences.PreferencesModule;
-import com.nightscout.android.ui.UiModule;
+import com.nightscout.android.preferences.AndroidPreferences;
+import com.nightscout.core.bus.ScopedBus;
+import com.nightscout.core.preferences.NightscoutPreferences;
+import com.squareup.otto.Bus;
+import com.squareup.otto.ThreadEnforcer;
 
 import org.acra.ACRA;
 
@@ -20,8 +23,8 @@ import dagger.Provides;
 
 @Module(
     includes = {
-        PreferencesModule.class,
-        UiModule.class
+        UiModule.class,
+        UploaderModule.class
     },
     injects = {
         Nightscout.class,
@@ -48,5 +51,16 @@ public class NightscoutModule {
     ACRA.init(app);
     ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
     return new AcraFeedbackDialog();
+  }
+
+  @Provides
+  @Singleton
+  ScopedBus providesScopedBus() {
+    return new ScopedBus(new Bus(ThreadEnforcer.ANY));
+  }
+
+  @Provides
+  public NightscoutPreferences provideNightscoutPreferences(Application app) {
+    return new AndroidPreferences(app.getApplicationContext());
   }
 }

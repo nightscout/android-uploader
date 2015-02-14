@@ -1,4 +1,4 @@
-package com.nightscout.core.events;
+package com.nightscout.core.bus;
 
 import com.squareup.otto.Bus;
 

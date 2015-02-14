@@ -1,6 +1,8 @@
-package com.nightscout.android.ui;
+package com.nightscout.android.modules;
 
 import com.nightscout.android.MainActivity;
+import com.nightscout.android.ui.ActivityHierarchyServer;
+import com.nightscout.android.ui.AppContainer;
 
 import javax.inject.Singleton;
 

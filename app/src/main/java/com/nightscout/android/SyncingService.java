@@ -27,6 +27,7 @@ import com.nightscout.core.drivers.DexcomG4;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
+import com.nightscout.core.bus.ScopedBus;
 import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.model.DownloadResults;
 import com.nightscout.core.model.DownloadStatus;
@@ -47,6 +48,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import static org.joda.time.Duration.standardMinutes;
 
@@ -84,6 +87,8 @@ public class SyncingService extends IntentService {
     public static final int MIN_SYNC_PAGES = 2;
     public static final int GAP_SYNC_PAGES = 20;
 
+    @Inject ScopedBus scopedBus;
+
 
     /**
      * Starts this service to perform action Single Sync with the given parameters. If
@@ -109,6 +114,12 @@ public class SyncingService extends IntentService {
 
     public SyncingService() {
         super("SyncingService");
+    }
+
+    @Override
+    public void onCreate() {
+      Nightscout app = Nightscout.get(this);
+      app.inject(this);
     }
 
     @Override
@@ -148,6 +159,8 @@ public class SyncingService extends IntentService {
             try {
                 DownloadResults results = device.download();
                 G4Download download = results.getDownload();
+
+                scopedBus.post(download);
 
                 Uploader uploader = new Uploader(context, preferences);
                 boolean uploadStatus;
