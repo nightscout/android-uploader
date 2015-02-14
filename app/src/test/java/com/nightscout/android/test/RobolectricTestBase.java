@@ -7,17 +7,17 @@ import android.content.IntentFilter;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.common.base.Function;
+import com.nightscout.robolectric.RobolectricGradleRunner;
 
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
 import org.robolectric.shadows.ShadowApplication;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-@RunWith(RobolectricTestRunner.class)
+@RunWith(RobolectricGradleRunner.class)
 public class RobolectricTestBase {
     private final boolean[] intentSeen = {false};
 
