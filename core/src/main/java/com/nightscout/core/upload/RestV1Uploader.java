@@ -48,6 +48,7 @@ public class RestV1Uploader extends AbstractRestUploader {
             json.put("filtered", record.getFiltered());
             json.put("unfiltered", record.getUnfiltered());
             json.put("rssi", record.getRssi());
+            json.put("noise", record.getNoise());
         }
         return json;
     }

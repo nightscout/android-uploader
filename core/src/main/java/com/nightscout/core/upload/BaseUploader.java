@@ -5,6 +5,7 @@ import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.records.DeviceStatus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,5 +130,21 @@ public abstract class BaseUploader {
 
     protected NightscoutPreferences getPreferences() {
         return this.preferences;
+    }
+
+    /**
+     * Upload records, can be overridden to send all data in one batch.
+     * @param glucoseDataSets
+     * @param meterRecords
+     * @param calRecords
+     * @param deviceStatus
+     * @return True if the (all) uploads was successful or False if at least one upload was unsuccessful.
+     */
+    public boolean uploadRecords(List<GlucoseDataSet> glucoseDataSets, List<MeterEntry> meterRecords, List<CalibrationEntry> calRecords, AbstractUploaderDevice deviceStatus) {
+        boolean allSuccessful = uploadGlucoseDataSets(glucoseDataSets);
+        allSuccessful &= uploadMeterRecords(meterRecords);
+        allSuccessful &= uploadCalRecords(calRecords);
+        allSuccessful &= uploadDeviceStatus(deviceStatus);
+        return allSuccessful;
     }
 }

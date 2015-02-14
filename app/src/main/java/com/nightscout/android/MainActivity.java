@@ -1,8 +1,12 @@
 package com.nightscout.android;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.Fragment;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,15 +14,19 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageButton;
@@ -35,8 +43,11 @@ import com.nightscout.android.events.UserEventPanelActivity;
 import com.nightscout.android.mqtt.AndroidMqttPinger;
 import com.nightscout.android.mqtt.AndroidMqttTimer;
 import com.nightscout.android.preferences.AndroidPreferences;
+import com.nightscout.android.exceptions.FeedbackDialog;
+import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.preferences.PreferencesValidator;
 import com.nightscout.android.settings.SettingsActivity;
+import com.nightscout.android.ui.AppContainer;
 import com.nightscout.android.wearables.Pebble;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
@@ -65,7 +76,11 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
+
+import javax.inject.Inject;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 
 import static com.nightscout.core.dexcom.SpecialValue.getEGVSpecialValue;
 import static com.nightscout.core.dexcom.SpecialValue.isSpecialValue;
@@ -73,10 +88,10 @@ import static org.joda.time.Duration.standardMinutes;
 
 public class MainActivity extends Activity {
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String ACTION_POLL = "com.nightscout.android.dexcom.action.POLL";
 
     // Receivers
     private CGMStatusReceiver mCGMStatusReceiver;
-
     private ToastReceiver toastReceiver;
 
     // Member components
@@ -86,15 +101,19 @@ public class MainActivity extends Activity {
     private long lastRecordTime = -1;
     private long receiverOffsetFromUploader = 0;
 
-    private NightscoutPreferences preferences;
+    @Inject NightscoutPreferences preferences;
+    @Inject AppContainer appContainer;
+    @Inject FeedbackDialog feedbackDialog;
 
     // Analytics mTracker
     private Tracker mTracker;
 
     // UI components
-    private WebView mWebView;
-    private TextView mTextSGV;
-    private TextView mTextTimestamp;
+    @InjectView(R.id.webView) WebView mWebView;
+    @InjectView(R.id.sgValue) TextView mTextSGV;
+    @InjectView(R.id.timeAgo) TextView mTextTimestamp;
+
+//    private StatusBarIcons statusBarIcons;
     private ImageButton mSyncButton;
     private ImageButton mUsbButton;
     private Pebble pebble;
@@ -102,23 +121,30 @@ public class MainActivity extends Activity {
     private MqttEventMgr mqttManager;
     private AndroidEventReporter reporter;
 
+    private AlarmManager alarmManager;
+    private PendingIntent syncManager;
+
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "OnCreate called.");
 
+        Nightscout app = Nightscout.get(this);
+        app.inject(this);
+
+        ViewGroup group = appContainer.get(this);
+        getLayoutInflater().inflate(R.layout.activity_main, group);
+
+        ButterKnife.inject(this);
+
         reporter = AndroidEventReporter.getReporter(getApplicationContext());
         reporter.report(EventType.APPLICATION, EventSeverity.INFO,
                 getApplicationContext().getString(R.string.app_started));
 
-        preferences = new AndroidPreferences(getApplicationContext());
         migrateToNewStyleRestUris();
         ensureSavedUrisAreValid();
         ensureIUnderstandDialogDisplayed();
-
-        // Add timezone ID to ACRA report
-        ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
 
         mTracker = ((Nightscout) getApplicationContext()).getTracker();
 
@@ -128,6 +154,7 @@ public class MainActivity extends Activity {
         IntentFilter deviceStatusFilter = new IntentFilter();
         deviceStatusFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         deviceStatusFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+        deviceStatusFilter.addAction(ACTION_POLL);
         registerReceiver(mDeviceStatusReceiver, deviceStatusFilter);
 
         // Register Broadcast Receiver for response messages from mSyncingServiceIntent service
@@ -141,13 +168,8 @@ public class MainActivity extends Activity {
         toastFilter.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(toastReceiver, toastFilter);
 
-        // Setup UI components
-        setContentView(R.layout.activity_main);
-        mTextSGV = (TextView) findViewById(R.id.sgValue);
         mTextSGV.setTag(R.string.display_sgv, -1);
         mTextSGV.setTag(R.string.display_trend, 0);
-        mTextTimestamp = (TextView) findViewById(R.id.timeAgo);
-        mWebView = (WebView) findViewById(R.id.webView);
         mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -178,6 +200,8 @@ public class MainActivity extends Activity {
                 startActivity(intent);
             }
         });
+
+//        statusBarIcons = (StatusBarIcons) getFragmentManager().findFragmentById(R.id.iconLayout);
 
 
         // If app started due to android.hardware.usb.action.USB_DEVICE_ATTACHED intent, start syncing
@@ -232,6 +256,10 @@ public class MainActivity extends Activity {
         } catch (MqttException e) {
             mSyncButton.setBackgroundResource(R.drawable.ic_nocloud);
         }
+        
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent syncIntent = new Intent(MainActivity.ACTION_POLL);
+        syncManager = PendingIntent.getBroadcast(getApplicationContext(), 1, syncIntent, 0);
     }
 
     public void setupMqtt() throws MqttException {
@@ -511,13 +539,14 @@ public class MainActivity extends Activity {
             long nextUploadTime = standardMinutes(5).getMillis();
 
             if (responseNextUploadTime > nextUploadTime) {
-                Log.d(TAG, "Receiver's time is less than current record time, possible time change.");
+                Log.d(TAG,
+                      "Receiver's time is less than current record time, possible time change.");
                 mTracker.send(new HitBuilders.EventBuilder("Main", "Time change").build());
             } else if (responseNextUploadTime > 0) {
-                Log.d(TAG, "Setting next upload time to: " + responseNextUploadTime);
+                Log.d(TAG, "Setting next upload time to " + responseNextUploadTime);
                 nextUploadTime = responseNextUploadTime;
             } else {
-                Log.d(TAG, "OUT OF RANGE: Setting next upload time to: " + nextUploadTime + " ms.");
+                Log.d(TAG, "OUT OF RANGE: Setting next upload time to " + nextUploadTime + " ms.");
             }
 
             if (Minutes.minutesBetween(new DateTime(), new DateTime(responseDisplayTime))
@@ -526,12 +555,7 @@ public class MainActivity extends Activity {
                 mTracker.send(new HitBuilders.EventBuilder("Main", "Time difference > 20 minutes").build());
             }
 
-            mHandler.removeCallbacks(syncCGM);
-            mHandler.postDelayed(syncCGM, nextUploadTime);
-            // Start updating the timeago only if the screen is on
-            PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-            if (pm.isScreenOn())
-                mHandler.postDelayed(updateTimeAgo, nextUploadTime / 5);
+            setNextPoll(nextUploadTime);
         }
     }
 
@@ -543,9 +567,8 @@ public class MainActivity extends Activity {
                 case UsbManager.ACTION_USB_DEVICE_DETACHED:
                     reporter.report(EventType.DEVICE, EventSeverity.INFO,
                             getApplicationContext().getString(R.string.g4_disconnected));
-//                    statusBarIcons.setDefaults();
+                    cancelPoll();
                     mUsbButton.setBackgroundResource(R.drawable.ic_nousb);
-                    mHandler.removeCallbacks(syncCGM);
                     break;
                 case UsbManager.ACTION_USB_DEVICE_ATTACHED:
                     reporter.report(EventType.DEVICE, EventSeverity.INFO,
@@ -555,6 +578,8 @@ public class MainActivity extends Activity {
                     Log.d(TAG, "Starting syncing on USB attached...");
                     SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
                     break;
+                case MainActivity.ACTION_POLL:
+                    SyncingService.startActionSingleSync(getApplicationContext(), SyncingService.MIN_SYNC_PAGES);
             }
         }
     };
@@ -572,7 +597,8 @@ public class MainActivity extends Activity {
         public void run() {
             long delta = new Date().getTime() - lastRecordTime + receiverOffsetFromUploader;
             if (lastRecordTime == 0) delta = 0;
-            String timeAgoStr = "";
+
+            String timeAgoStr;
             if (lastRecordTime == -1) {
                 timeAgoStr = "---";
             } else if (delta < 0) {
@@ -588,7 +614,6 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -602,22 +627,7 @@ public class MainActivity extends Activity {
                 startActivity(intent);
                 break;
             case R.id.feedback_settings:
-                ACRAConfiguration acraConfiguration = ACRA.getConfig();
-                // Set to dialog to get user comments
-                try {
-                    acraConfiguration.setMode(ReportingInteractionMode.DIALOG);
-                    acraConfiguration.setResToastText(0);
-                } catch (ACRAConfigurationException e) {
-                    e.printStackTrace();
-                }
-                ACRA.getErrorReporter().handleException(null);
-                // Reset back to toast
-                try {
-                    acraConfiguration.setResToastText(R.string.crash_toast_text);
-                    acraConfiguration.setMode(ReportingInteractionMode.TOAST);
-                } catch (ACRAConfigurationException e) {
-                    e.printStackTrace();
-                }
+                feedbackDialog.show();
                 break;
             case R.id.gap_sync:
                 SyncingService.startActionSingleSync(getApplicationContext(),
@@ -639,10 +649,25 @@ public class MainActivity extends Activity {
                 startActivity(intent);
                 break;
             case R.id.close_settings:
-                mHandler.removeCallbacks(syncCGM);
+                cancelPoll();
                 finish();
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public void setNextPoll(long millis) {
+        Log.d(TAG, "Setting next poll with Alarm for " + millis + " ms from now.");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + millis, syncManager);
+        } else {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + millis, syncManager);
+        }
+    }
+
+    public void cancelPoll() {
+        Log.d(TAG, "Canceling next alarm poll.");
+        alarmManager.cancel(syncManager);
     }
 }

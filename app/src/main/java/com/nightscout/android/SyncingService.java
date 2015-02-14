@@ -76,7 +76,6 @@ public class SyncingService extends IntentService {
     public static final String RESPONSE_LAST_METER_TIME = "lastMeterTimestamp";
     public static final String RESPONSE_LAST_SENSOR_TIME = "lastSensorTimestamp";
     public static final String RESPONSE_LAST_CAL_TIME = "lastCalTimestamp";
-    private EventReporter reporter;
 
     private final String TAG = SyncingService.class.getSimpleName();
 
@@ -132,7 +131,7 @@ public class SyncingService extends IntentService {
      * parameters.
      */
     protected void handleActionSync(int numOfPages, Context context, DeviceTransport serialDriver) {
-        reporter = AndroidEventReporter.getReporter(context);
+        EventReporter reporter = AndroidEventReporter.getReporter(context);
         boolean broadcastSent = false;
         AndroidPreferences preferences = new AndroidPreferences(context);
         Tracker tracker = ((Nightscout) context).getTracker();
@@ -315,7 +314,7 @@ public class SyncingService extends IntentService {
             broadcastIntent.putExtra(RESPONSE_PROTO, proto);
         }
         if (json != null)
-            broadcastIntent.putExtra(RESPONSE_JSON, json.toString());
+          broadcastIntent.putExtra(RESPONSE_JSON, json.toString());
         broadcastIntent.putExtra(RESPONSE_BAT, batLvl);
         sendBroadcast(broadcastIntent);
     }
