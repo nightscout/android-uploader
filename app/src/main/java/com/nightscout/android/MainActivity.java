@@ -5,7 +5,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -17,12 +16,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PowerManager;
 import android.provider.Settings;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,11 +36,10 @@ import com.google.common.base.Splitter;
 import com.nightscout.android.drivers.AndroidUploaderDevice;
 import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.events.UserEventPanelActivity;
+import com.nightscout.android.exceptions.FeedbackDialog;
 import com.nightscout.android.mqtt.AndroidMqttPinger;
 import com.nightscout.android.mqtt.AndroidMqttTimer;
 import com.nightscout.android.preferences.AndroidPreferences;
-import com.nightscout.android.exceptions.FeedbackDialog;
-import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.preferences.PreferencesValidator;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.android.ui.AppContainer;
@@ -61,10 +56,6 @@ import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.GlucoseReading;
 import com.nightscout.core.utils.RestUriUtils;
 
-import org.acra.ACRA;
-import org.acra.ACRAConfiguration;
-import org.acra.ACRAConfigurationException;
-import org.acra.ReportingInteractionMode;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -96,7 +87,7 @@ public class MainActivity extends Activity {
 
     // Member components
     private Handler mHandler = new Handler();
-    private Context mContext;
+    //    private Context mContext;
     private String mJSONData;
     private long lastRecordTime = -1;
     private long receiverOffsetFromUploader = 0;
@@ -112,10 +103,11 @@ public class MainActivity extends Activity {
     @InjectView(R.id.webView) WebView mWebView;
     @InjectView(R.id.sgValue) TextView mTextSGV;
     @InjectView(R.id.timeAgo) TextView mTextTimestamp;
+    @InjectView(R.id.syncButton)
+    ImageButton mSyncButton;
+    @InjectView(R.id.usbButton)
+    ImageButton mUsbButton;
 
-//    private StatusBarIcons statusBarIcons;
-    private ImageButton mSyncButton;
-    private ImageButton mUsbButton;
     private Pebble pebble;
     private AndroidUploaderDevice uploaderDevice;
     private MqttEventMgr mqttManager;
@@ -147,8 +139,6 @@ public class MainActivity extends Activity {
         ensureIUnderstandDialogDisplayed();
 
         mTracker = ((Nightscout) getApplicationContext()).getTracker();
-
-        mContext = getApplicationContext();
 
         // Register USB attached/detached and battery changes intents
         IntentFilter deviceStatusFilter = new IntentFilter();
@@ -182,8 +172,6 @@ public class MainActivity extends Activity {
         mWebView.setHorizontalScrollBarEnabled(false);
         mWebView.setBackgroundColor(0);
         mWebView.loadUrl("file:///android_asset/index.html");
-        mUsbButton = (ImageButton) findViewById(R.id.usbButton);
-        mSyncButton = (ImageButton) findViewById(R.id.syncButton);
         mUsbButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -213,7 +201,7 @@ public class MainActivity extends Activity {
                     getApplicationContext().getString(R.string.g4_connected));
             mUsbButton.setBackgroundResource(R.drawable.ic_usb);
             Log.d(TAG, "Starting syncing in OnCreate...");
-            SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
+            SyncingService.startActionSingleSync(getApplicationContext(), SyncingService.MIN_SYNC_PAGES);
         }
 
         // Check (only once) to see if they have opted in to shared data for research
@@ -490,7 +478,7 @@ public class MainActivity extends Activity {
             String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
             byte[] proto = intent.getByteArrayExtra(SyncingService.RESPONSE_PROTO);
             boolean published = false;
-            if (proto != null && proto.length != 0) {
+            if (preferences.isMqttEnabled() && proto != null && proto.length != 0) {
                 Log.d(TAG, "Proto: " + Utils.bytesToHex(proto));
                 if (mqttManager != null) {
                     Log.d(TAG, "Publishing");
@@ -501,7 +489,8 @@ public class MainActivity extends Activity {
                     ((AndroidPreferences) preferences).setLastCalMqttUpload(lastCalTimestamp);
                     published = true;
                 } else {
-                    Log.e(TAG, "Not publishing for some reason");
+                    reporter.report(EventType.DEVICE, EventSeverity.ERROR,
+                            getApplicationContext().getString(R.string.mqtt_mgr_not_initialized));
                 }
             }
             if (preferences.isMqttEnabled()) {
@@ -576,7 +565,7 @@ public class MainActivity extends Activity {
                     mUsbButton.setBackgroundResource(R.drawable.ic_usb);
 //                    statusBarIcons.setUSB(true);
                     Log.d(TAG, "Starting syncing on USB attached...");
-                    SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
+                    SyncingService.startActionSingleSync(getApplicationContext(), SyncingService.MIN_SYNC_PAGES);
                     break;
                 case MainActivity.ACTION_POLL:
                     SyncingService.startActionSingleSync(getApplicationContext(), SyncingService.MIN_SYNC_PAGES);
@@ -584,14 +573,6 @@ public class MainActivity extends Activity {
         }
     };
 
-    // Runnable to start service as needed to sync with mCGMStatusReceiver and cloud
-    public Runnable syncCGM = new Runnable() {
-        public void run() {
-            SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
-        }
-    };
-
-    //FIXME: Strongly suggest refactoring this
     public Runnable updateTimeAgo = new Runnable() {
         @Override
         public void run() {

@@ -71,12 +71,4 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
-    <!--<fragment-->
-        <!--android:name="com.nightscout.android.MainActivity$StatusBarIcons"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:id="@+id/iconLayout"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--tools:layout="@layout/fragment_icon_status" />-->
-
 </RelativeLayout>

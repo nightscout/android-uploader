@@ -181,6 +181,11 @@ public class Uploader {
 
         // Quick hack to prevent MQTT only from reporting not uploading to cloud
         int otherUploaders = (preferences.isMqttEnabled()) ? 1 : 0;
+
+        if (uploaders.size() + otherUploaders == 0) {
+            reporter.report(EventType.UPLOADER, EventSeverity.WARN, context.getString(R.string.no_uploaders));
+        }
+
         // Force a failure if an uploader was not properly initialized, but only after the other
         // uploaders were executed.
         return allUploadersInitalized && allSuccessful && (uploaders.size() + otherUploaders != 0);

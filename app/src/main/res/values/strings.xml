@@ -82,4 +82,6 @@
     <string name="event_mongo_invalid_credentials">Please double check your Mongo username and password.</string>
     <string name="device_log_menu">Device logs</string>
     <string name="upload_log_menu">Upload Logs</string>
+    <string name="mqtt_mgr_not_initialized">MQTT connection has not been initialized.</string>
+    <string name="no_uploaders">No uploaders have been configured.</string>
 </resources>
