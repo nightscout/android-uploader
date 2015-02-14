@@ -18,10 +18,6 @@
         android:orderInCategory="100"
         android:title="@string/event_log_menu_text" />
     <item
-        android:id="@+id/close_settings"
-        android:orderInCategory="100"
-        android:title="@string/close_menu_text" />
-    <item
         android:id="@+id/usb_log"
         android:orderInCategory="100"
         nightscout:showAsAction="ifRoom"
@@ -31,4 +27,8 @@
         android:orderInCategory="100"
         nightscout:showAsAction="ifRoom"
         android:title="@string/upload_log_menu" />
+    <item
+        android:id="@+id/close_settings"
+        android:orderInCategory="100"
+        android:title="@string/close_menu_text" />
 </menu>

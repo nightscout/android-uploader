@@ -87,7 +87,6 @@ public class MainActivity extends Activity {
 
     // Member components
     private Handler mHandler = new Handler();
-    //    private Context mContext;
     private String mJSONData;
     private long lastRecordTime = -1;
     private long receiverOffsetFromUploader = 0;
@@ -103,10 +102,8 @@ public class MainActivity extends Activity {
     @InjectView(R.id.webView) WebView mWebView;
     @InjectView(R.id.sgValue) TextView mTextSGV;
     @InjectView(R.id.timeAgo) TextView mTextTimestamp;
-    @InjectView(R.id.syncButton)
-    ImageButton mSyncButton;
-    @InjectView(R.id.usbButton)
-    ImageButton mUsbButton;
+    @InjectView(R.id.syncButton) ImageButton mSyncButton;
+    @InjectView(R.id.usbButton) ImageButton mUsbButton;
 
     private Pebble pebble;
     private AndroidUploaderDevice uploaderDevice;
@@ -244,7 +241,7 @@ public class MainActivity extends Activity {
         } catch (MqttException e) {
             mSyncButton.setBackgroundResource(R.drawable.ic_nocloud);
         }
-        
+
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent syncIntent = new Intent(MainActivity.ACTION_POLL);
         syncManager = PendingIntent.getBroadcast(getApplicationContext(), 1, syncIntent, 0);
@@ -395,6 +392,9 @@ public class MainActivity extends Activity {
                 mqttManager.close();
             }
         } catch (MqttException e) {
+            reporter.report(EventType.UPLOADER, EventSeverity.WARN,
+                    getApplicationContext().getString(R.string.unhandled_mqtt_exception,
+                            e.getMessage()));
             mSyncButton.setBackgroundResource(R.drawable.ic_nocloud);
         }
 
@@ -529,7 +529,7 @@ public class MainActivity extends Activity {
 
             if (responseNextUploadTime > nextUploadTime) {
                 Log.d(TAG,
-                      "Receiver's time is less than current record time, possible time change.");
+                        "Receiver's time is less than current record time, possible time change.");
                 mTracker.send(new HitBuilders.EventBuilder("Main", "Time change").build());
             } else if (responseNextUploadTime > 0) {
                 Log.d(TAG, "Setting next upload time to " + responseNextUploadTime);
