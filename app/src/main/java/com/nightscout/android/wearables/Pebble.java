@@ -7,6 +7,7 @@ import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 import com.nightscout.android.drivers.AndroidUploaderDevice;
 import com.nightscout.core.dexcom.TrendArrow;
+import com.nightscout.core.model.G4Trend;
 import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.utils.GlucoseReading;
 
@@ -61,9 +62,13 @@ public class Pebble {
         return dictionary;
     }
 
-    public void sendDownload(GlucoseReading reading, TrendArrow trend, long recordTime) {
-        sendDownload(reading, trend, recordTime, false);
-    }
+  public void sendDownload(GlucoseReading reading, TrendArrow trend, long recordTime) {
+    sendDownload(reading, trend, recordTime, false);
+  }
+
+  public void sendDownload(GlucoseReading reading, G4Trend trend, long recordTime) {
+    sendDownload(reading, TrendArrow.values()[trend.getValue()], recordTime, false);
+  }
 
     public void sendDownload(GlucoseReading reading, TrendArrow trend, long recordTime, boolean resend) {
         GlucoseReading delta = new GlucoseReading(0, GlucoseUnit.MGDL);

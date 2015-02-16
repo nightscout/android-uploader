@@ -1,4 +1,4 @@
-package com.nightscout.core.upload;
+package com.nightscout.core.listeners;
 
 import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
@@ -30,8 +30,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.validateMockitoUsage;
 import static org.mockito.Mockito.when;
 
-public class MongoUploaderTest {
-    MongoUploader mongoUploader;
+public class MongoListenerTest {
+    MongoListener mongoListener;
     DBCollection mockCollection;
     ArgumentCaptor<BasicDBObject> captor;
     private TestPreferences preferences;
@@ -40,13 +40,10 @@ public class MongoUploaderTest {
     public void setUp() throws Exception {
         mockCollection = mock(DBCollection.class);
         preferences = new TestPreferences();
-        mongoUploader = new MongoUploader(
-                preferences,
-                new MongoClientURI("mongodb://localhost"),
-                "collection",
-                "dsCollection");
-        mongoUploader.setCollection(mockCollection);
-        mongoUploader.setDeviceStatusCollection(mockCollection);
+        mongoListener = new MongoListener(
+                preferences);
+        mongoListener.setCollection(mockCollection);
+        mongoListener.setDeviceStatusCollection(mockCollection);
         setUpUpsertCapture();
     }
 
@@ -110,20 +107,20 @@ public class MongoUploaderTest {
 
     @Test
     public void testUploadGlucoseDataSets() {
-        mongoUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
+        mongoListener.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
         verifyGlucoseDataSet(false);
     }
 
     @Test
     public void testUploadGlucoseDataSets_CloudSensorData() {
         preferences.setSensorUploadEnabled(true);
-        mongoUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
+        mongoListener.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
         verifyGlucoseDataSet(true);
     }
 
     @Test
     public void testUploadMeterRecord() throws Exception {
-        mongoUploader.uploadMeterRecords(Lists.newArrayList(mockMeterRecord()));
+        mongoListener.uploadMeterRecords(Lists.newArrayList(mockMeterRecord()));
         verifyMeterRecord();
     }
 
@@ -131,7 +128,7 @@ public class MongoUploaderTest {
     public void testUploadCalRecord() {
         preferences.setCalibrationUploadEnabled(true);
         try {
-            mongoUploader.uploadCalRecords(Lists.newArrayList(mockCalRecord()));
+            mongoListener.uploadCalRecords(Lists.newArrayList(mockCalRecord()));
         } catch (InvalidRecordLengthException e) {
             fail("Shouldn't get an exception");
         }
@@ -141,18 +138,13 @@ public class MongoUploaderTest {
     @Test
     public void testUploadDeviceStatus() {
         AbstractUploaderDevice deviceStatus = mockDeviceStatus();
-        mongoUploader.uploadDeviceStatus(deviceStatus);
+        mongoListener.uploadDeviceStatus(deviceStatus);
         verifyDeviceStatus(deviceStatus);
     }
 
     @Test
     public void testReturnFalseWithInvalidURI() {
-        mongoUploader = new MongoUploader(
-                preferences,
-                new MongoClientURI("mongodb://foobar/db"),
-                "collection",
-                "dsCollection");
         AbstractUploaderDevice deviceStatus = mockDeviceStatus();
-        assertThat(mongoUploader.uploadDeviceStatus(deviceStatus), is(false));
+        assertThat(mongoListener.uploadDeviceStatus(deviceStatus), is(false));
     }
 }

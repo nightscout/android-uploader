@@ -1,8 +1,8 @@
 package com.nightscout.android;
 
 import com.nightscout.android.debug.DebugNightscoutModule;
+import com.nightscout.android.listeners.ListenerModule;
 import com.nightscout.android.modules.NightscoutModule;
-import com.nightscout.android.modules.UploaderModule;
 
 public final class Modules {
 
@@ -13,7 +13,7 @@ public final class Modules {
     return new Object[]{
         new NightscoutModule(app),
         new DebugNightscoutModule(),
-        new UploaderModule()
+        new ListenerModule()
     };
   }
 }

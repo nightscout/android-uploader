@@ -3,9 +3,11 @@ package com.nightscout.android;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -37,6 +39,7 @@ import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.model.SensorEntry;
 import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.preferences.UpdatePreferences;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
@@ -57,7 +60,8 @@ import static org.joda.time.Duration.standardMinutes;
  * An {@link IntentService} subclass for handling asynchronous CGM Receiver downloads and cloud uploads
  * requests in a service on a separate handler thread.
  */
-public class SyncingService extends IntentService {
+public class SyncingService extends IntentService implements
+                                                  SharedPreferences.OnSharedPreferenceChangeListener {
 
     // Action for intent
     private static final String ACTION_SYNC = "com.nightscout.android.dexcom.action.SYNC";
@@ -65,20 +69,6 @@ public class SyncingService extends IntentService {
     // Parameters for intent
     private static final String SYNC_PERIOD = "com.nightscout.android.dexcom.extra.SYNC_PERIOD";
 
-    // Response to broadcast to activity
-    public static final String RESPONSE_SGV = "mySGVMgdl";
-    public static final String RESPONSE_TREND = "myTrend";
-    public static final String RESPONSE_TIMESTAMP = "myTimestampMs";
-    public static final String RESPONSE_NEXT_UPLOAD_TIME = "myUploadTimeMs";
-    public static final String RESPONSE_UPLOAD_STATUS = "myUploadStatus";
-    public static final String RESPONSE_DISPLAY_TIME = "myDisplayTimeMs";
-    public static final String RESPONSE_JSON = "myJSON";
-    public static final String RESPONSE_BAT = "myBatLvl";
-    public static final String RESPONSE_PROTO = "myProtoDownload";
-    public static final String RESPONSE_LAST_SGV_TIME = "lastSgvTimestamp";
-    public static final String RESPONSE_LAST_METER_TIME = "lastMeterTimestamp";
-    public static final String RESPONSE_LAST_SENSOR_TIME = "lastSensorTimestamp";
-    public static final String RESPONSE_LAST_CAL_TIME = "lastCalTimestamp";
 
     // Constants
     private final int TIME_SYNC_OFFSET = 10000;
@@ -119,6 +109,13 @@ public class SyncingService extends IntentService {
     public void onCreate() {
         Nightscout app = Nightscout.get(this);
         app.inject(this);
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onDestroy() {
+      PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(
+          this);
     }
 
     @Override
@@ -159,13 +156,6 @@ public class SyncingService extends IntentService {
 
                 scopedBus.post(download);
 
-                Uploader uploader = new Uploader(context, preferences);
-                boolean uploadStatus;
-                if (numOfPages < 20) {
-                    uploadStatus = uploader.upload(results, 1);
-                } else {
-                    uploadStatus = uploader.upload(results);
-                }
 
                 EGVRecord recentEGV;
                 if (download.download_status == DownloadStatus.SUCCESS) {
@@ -301,41 +291,9 @@ public class SyncingService extends IntentService {
         return g4Connected;
     }
 
-    public void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus,
-                                 long nextUploadTime, long displayTime,
-                                 JSONArray json, int batLvl, byte[] proto,
-                                 long lastSgvTimestamp, long lastMeterTimestamp,
-                                 long lastSensorTimestamp, long lastCalTimestamp) {
-        Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
-        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.putExtra(RESPONSE_SGV, egvRecord.getBgMgdl());
-        broadcastIntent.putExtra(RESPONSE_TREND, egvRecord.getTrend().ordinal());
-        broadcastIntent.putExtra(RESPONSE_TIMESTAMP, egvRecord.getDisplayTime().getTime());
-        broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, nextUploadTime);
-        broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, uploadStatus);
-        broadcastIntent.putExtra(RESPONSE_DISPLAY_TIME, displayTime);
 
-        // FIXME: a quick hack to store timestamps once the data has been published in the
-        // MainActivity
-        broadcastIntent.putExtra(RESPONSE_LAST_SGV_TIME, lastSgvTimestamp);
-        broadcastIntent.putExtra(RESPONSE_LAST_METER_TIME, lastMeterTimestamp);
-        broadcastIntent.putExtra(RESPONSE_LAST_SENSOR_TIME, lastSensorTimestamp);
-        broadcastIntent.putExtra(RESPONSE_LAST_CAL_TIME, lastCalTimestamp);
-        if (proto != null) {
-            broadcastIntent.putExtra(RESPONSE_PROTO, proto);
-        }
-        if (json != null)
-          broadcastIntent.putExtra(RESPONSE_JSON, json.toString());
-        broadcastIntent.putExtra(RESPONSE_BAT, batLvl);
-        sendBroadcast(broadcastIntent);
-    }
-
-    protected void broadcastSGVToUI() {
-        EGVRecord record = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(),
-                G4Noise.NOISE_NONE);
-        broadcastSGVToUI(record, false, standardMinutes(5).getMillis() + TIME_SYNC_OFFSET,
-                new Date().getTime(), null, 0, new byte[0], -1, -1, -1, -1);
-    }
-
+  @Override
+  public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+    scopedBus.post(new UpdatePreferences(s));
+  }
 }

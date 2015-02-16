@@ -53,11 +53,14 @@ import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
+import com.nightscout.core.model.G4Download;
 import com.nightscout.core.model.GlucoseUnit;
+import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.nightscout.core.mqtt.MqttEventMgr;
 import com.nightscout.core.mqtt.MqttPinger;
 import com.nightscout.core.mqtt.MqttTimer;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.utils.G4DownloadUtils;
 import com.nightscout.core.utils.GlucoseReading;
 import com.nightscout.core.utils.RestUriUtils;
 
@@ -456,30 +459,42 @@ public class MainActivity extends Activity {
         statusBarIcons.setBatteryIndicator(savedInstanceState.getInt("saveImageViewBatteryIndicator"));
     }
 
+
+  public static Intent createCGMStatusIntent(G4Download download) {
+    SensorGlucoseValueEntry latestEntry = G4DownloadUtils.getLatest(download.sgv);
+    Intent intent = new Intent();
+    intent.setAction(CGMStatusReceiver.PROCESS_RESPONSE);
+    intent.addCategory(Intent.CATEGORY_DEFAULT);
+    intent.putExtra(CGMStatusReceiver.RESPONSE_SGV, latestEntry.sgv_mgdl);
+    intent.putExtra(CGMStatusReceiver.RESPONSE_TREND, latestEntry.trend.ordinal());
+    intent.putExtra(CGMStatusReceiver.RESPONSE_TIMESTAMP, latestEntry.sys_timestamp_sec);
+    intent.putExtra(CGMStatusReceiver.RESPONSE_DISPLAY_TIME, latestEntry.disp_timestamp_sec);
+    intent.putExtra(CGMStatusReceiver.RESPONSE_BAT, download.uploader_battery);
+    return intent;
+  }
+
     public class CGMStatusReceiver extends BroadcastReceiver {
-        public static final String PROCESS_RESPONSE = "com.mSyncingServiceIntent.action.PROCESS_RESPONSE";
+      private static final String PROCESS_RESPONSE = "com.mSyncingServiceIntent.action.PROCESS_RESPONSE";
+
+      private static final String RESPONSE_SGV = "mySGVMgdl";
+      private static final String RESPONSE_TREND = "myTrend";
+      private static final String RESPONSE_TIMESTAMP = "myTimestampMs";
+      private static final String RESPONSE_NEXT_UPLOAD_TIME = "myUploadTimeMs";
+      private static final String RESPONSE_DISPLAY_TIME = "myDisplayTimeMs";
+      private static final String RESPONSE_BAT = "myBatLvl";
 
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get response messages from broadcast
-            int responseSGV = intent.getIntExtra(SyncingService.RESPONSE_SGV, -1);
+            int responseSGV = intent.getIntExtra(RESPONSE_SGV, -1);
             GlucoseReading reading = new GlucoseReading(responseSGV, GlucoseUnit.MGDL);
-            TrendArrow trend = TrendArrow.values()[intent.getIntExtra(SyncingService.RESPONSE_TREND, 0)];
-            long responseSGVTimestamp = intent.getLongExtra(SyncingService.RESPONSE_TIMESTAMP, -1L);
-            boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
-            long responseNextUploadTime = intent.getLongExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
-            long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME, new Date().getTime());
-            long lastSgvTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_SGV_TIME,
-                    ((AndroidPreferences) preferences).getLastEgvMqttUpload());
-            long lastMeterTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_METER_TIME,
-                    ((AndroidPreferences) preferences).getLastMeterMqttUpload());
-            long lastSensorTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_SENSOR_TIME,
-                    ((AndroidPreferences) preferences).getLastSensorMqttUpload());
-            long lastCalTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_CAL_TIME,
-                    ((AndroidPreferences) preferences).getLastCalMqttUpload());
+            TrendArrow trend = TrendArrow.values()[intent.getIntExtra(RESPONSE_TREND, 0)];
+            long responseSGVTimestamp = intent.getLongExtra(RESPONSE_TIMESTAMP, -1L);
+            long responseNextUploadTime = intent.getLongExtra(RESPONSE_NEXT_UPLOAD_TIME, -1);
+            long responseDisplayTime = intent.getLongExtra(RESPONSE_DISPLAY_TIME, new Date().getTime());
             lastRecordTime = responseSGVTimestamp;
             receiverOffsetFromUploader = new Date().getTime() - responseDisplayTime;
-            int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT, -1);
+            int rcvrBat = intent.getIntExtra(RESPONSE_BAT, -1);
             String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
             byte[] proto = intent.getByteArrayExtra(SyncingService.RESPONSE_PROTO);
             boolean published = false;
@@ -495,10 +510,6 @@ public class MainActivity extends Activity {
                 } else {
                     Log.e(TAG, "Not publishing for some reason");
                 }
-            }
-
-            if (responseSGV != -1) {
-                pebble.sendDownload(reading, trend, responseSGVTimestamp);
             }
             // Reload d3 chart with new data
             if (json != null) {

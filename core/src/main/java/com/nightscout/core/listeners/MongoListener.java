@@ -1,4 +1,4 @@
-package com.nightscout.core.upload;
+package com.nightscout.core.listeners;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -17,6 +17,8 @@ import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.model.G4Download;
 import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.preferences.UpdatePreferences;
+import com.nightscout.core.upload.BaseUploader;
 import com.squareup.otto.Subscribe;
 
 import java.io.IOException;
@@ -26,16 +28,27 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class MongoUploader extends BaseUploader {
+public class MongoListener extends BaseUploader {
 
   private DB db;
   private DBCollection collection;
   private DBCollection deviceStatusCollection;
   private MongoClient client;
 
-  public MongoUploader(NightscoutPreferences preferences) {
+  public MongoListener(NightscoutPreferences preferences) {
     super(checkNotNull(preferences));
     this.identifier = "MongoDB";
+    reset();
+  }
+
+  private void reset() {
+    db = null;
+    if (client != null) {
+      client.close();
+    }
+    client = null;
+    collection = null;
+    deviceStatusCollection = null;
   }
 
   public MongoClient getClient() throws IOException {
@@ -46,7 +59,7 @@ public class MongoUploader extends BaseUploader {
     try {
       this.client = new MongoClient(dbUri);
     } catch (UnknownHostException e) {
-      throw new IOException("Error connecting to mongo host " + dbUri, e);
+      throw new IOException("Error connecting to mongo host " + dbUri.toString(), e);
     }
     return this.client;
   }
@@ -168,6 +181,11 @@ public class MongoUploader extends BaseUploader {
     uploadGlucoseDataSets(glucoseDataSets);
     uploadMeterRecords(download.meter);
     uploadCalRecords(download.cal);
+  }
+
+  @Subscribe
+  public void handlePreferenceUpdate(UpdatePreferences updatePreferences) {
+    reset();
   }
 
   @Override

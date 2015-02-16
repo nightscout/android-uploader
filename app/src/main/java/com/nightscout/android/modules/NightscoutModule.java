@@ -6,6 +6,7 @@ import com.nightscout.android.MainActivity;
 import com.nightscout.android.Nightscout;
 import com.nightscout.android.exceptions.AcraFeedbackDialog;
 import com.nightscout.android.exceptions.FeedbackDialog;
+import com.nightscout.android.listeners.ListenerModule;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.core.bus.ScopedBus;
 import com.nightscout.core.preferences.NightscoutPreferences;
@@ -24,7 +25,7 @@ import dagger.Provides;
 @Module(
     includes = {
         UiModule.class,
-        UploaderModule.class
+        ListenerModule.class
     },
     injects = {
         Nightscout.class,
