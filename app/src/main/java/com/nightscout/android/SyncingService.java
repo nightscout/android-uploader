@@ -221,6 +221,8 @@ public class SyncingService extends IntentService {
                         results.getDisplayTime(), results.getResultArray(), download.receiver_battery,
                         builder.build().toByteArray(), lastSgvTimestamp, lastMeterTimestamp, lastSensorTimestamp, lastCalTimestamp);
                 broadcastSent = true;
+                reporter.report(EventType.DEVICE, EventSeverity.INFO,
+                        getApplicationContext().getString(R.string.event_sync_log));
             } catch (ArrayIndexOutOfBoundsException e) {
                 reporter.report(EventType.DEVICE, EventSeverity.ERROR,
                         getApplicationContext().getString(R.string.event_fail_log));

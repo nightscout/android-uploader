@@ -167,6 +167,7 @@ public class Uploader {
                         String.format(context.getString(R.string.event_success_upload),
                                 uploader.getIdentifier()));
             } catch (MongoException e) {
+                // Credentials error - user name or password is incorrect.
                 if (e.getCode() == 18) {
                     reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
                             context.getString(R.string.event_mongo_invalid_credentials));

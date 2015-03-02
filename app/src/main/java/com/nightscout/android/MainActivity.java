@@ -186,9 +186,6 @@ public class MainActivity extends Activity {
             }
         });
 
-//        statusBarIcons = (StatusBarIcons) getFragmentManager().findFragmentById(R.id.iconLayout);
-
-
         // If app started due to android.hardware.usb.action.USB_DEVICE_ATTACHED intent, start syncing
         Intent startIntent = getIntent();
         String action = startIntent.getAction();
@@ -252,7 +249,7 @@ public class MainActivity extends Activity {
             if (!preferences.getMqttUser().equals("") && !preferences.getMqttPass().equals("") &&
                     !preferences.getMqttEndpoint().equals("")) {
                 MqttConnectOptions mqttOptions = new MqttConnectOptions();
-                mqttOptions.setCleanSession(true);
+                mqttOptions.setCleanSession(false);
                 mqttOptions.setKeepAliveInterval(150000);
                 mqttOptions.setUserName(preferences.getMqttUser());
                 mqttOptions.setPassword(preferences.getMqttPass().toCharArray());
@@ -563,7 +560,6 @@ public class MainActivity extends Activity {
                     reporter.report(EventType.DEVICE, EventSeverity.INFO,
                             getApplicationContext().getString(R.string.g4_connected));
                     mUsbButton.setBackgroundResource(R.drawable.ic_usb);
-//                    statusBarIcons.setUSB(true);
                     Log.d(TAG, "Starting syncing on USB attached...");
                     SyncingService.startActionSingleSync(getApplicationContext(), SyncingService.MIN_SYNC_PAGES);
                     break;
