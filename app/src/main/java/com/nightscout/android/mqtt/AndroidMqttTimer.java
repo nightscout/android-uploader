@@ -33,7 +33,6 @@ public class AndroidMqttTimer implements MqttTimer {
         this.Id = Id;
         this.timerReceiver = new MqttTimerReceiver(observers);
         alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Log.d(TAG, "Creating timer ID#" + Id);
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -44,18 +43,14 @@ public class AndroidMqttTimer implements MqttTimer {
         alarmIntent.putExtra("device", Id);
         pendingAlarmIntent = PendingIntent.getBroadcast(context, 61 + Id, alarmIntent, 0);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Log.d(TAG, "Setting KitKat alarm");
             alarmMgr.setExact(AlarmManager.RTC_WAKEUP, new Date().getTime() + delayMs, pendingAlarmIntent);
         } else {
-            Log.d(TAG, "Setting pre-KitKat alarm");
             alarmMgr.set(AlarmManager.RTC_WAKEUP, new Date().getTime() + delayMs, pendingAlarmIntent);
         }
-        Log.d(TAG, "Created a timer with a delay of " + delayMs + " ms");
     }
 
     @Override
     public void cancel() {
-        Log.d(TAG, "Canceling timer");
         alarmMgr.cancel(pendingAlarmIntent);
     }
 
@@ -64,7 +59,6 @@ public class AndroidMqttTimer implements MqttTimer {
         if (!active) {
             context.registerReceiver(timerReceiver, new IntentFilter(Constants.RECONNECT_INTENT_FILTER));
             active = true;
-            Log.i(TAG, "Reconnect timer activiated");
         } else {
             Log.w(TAG, "Timer already activiated");
         }
@@ -75,7 +69,6 @@ public class AndroidMqttTimer implements MqttTimer {
         if (active) {
             context.unregisterReceiver(timerReceiver);
             active = false;
-            Log.i(TAG, "Reconnect timer deactiviated");
         } else {
             Log.w(TAG, "Timer already deactiviated");
         }
@@ -90,7 +83,6 @@ public class AndroidMqttTimer implements MqttTimer {
     public void registerObserver(MqttTimerObserver observer) {
         if (!observers.contains(observer)) {
             observers.add(observer);
-            Log.w(TAG, "Observer registered");
         } else {
             Log.w(TAG, "Observer already registered");
         }
@@ -100,7 +92,6 @@ public class AndroidMqttTimer implements MqttTimer {
     public void unregisterObserver(MqttTimerObserver observer) {
         if (observers.contains(observer)) {
             observers.remove(observer);
-            Log.w(TAG, "Observer unregistered");
         } else {
             Log.w(TAG, "Observer not registered");
         }

@@ -70,6 +70,7 @@ public class SensorRecord extends GenericTimestampRecord {
         return toProtobufList(list, SensorEntry.class);
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

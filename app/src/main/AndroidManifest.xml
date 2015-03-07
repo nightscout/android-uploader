@@ -20,6 +20,7 @@
         android:name=".Nightscout"
         android:icon="@drawable/ic_launcher"
         android:label="@string/title_activity_main"
+        android:theme="@style/Nightscout"
         android:allowBackup="true">
         <!-- Hard code this version for now. Robolectric has troubles starting when this is
              a variable. See: https://github.com/robolectric/robolectric/issues/1025 -->

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Nightscout.statusbar" parent="Nightscout">
+        <item name="android:itemBackground">@color/cyan</item>
+        <item name="android:textSize">72sp</item>
+    </style>
+
+    <style name="Nightscout" parent="android:Theme.Holo">
+        <item name="android:windowBackground">@color/black</item>
+    </style>
+
+    <style name="Nightscout.Light" parent="android:Theme.Holo">
+        <item name="android:windowBackground">@color/white</item>
+    </style>
+</resources>

@@ -115,7 +115,7 @@ public class SyncingServiceTest extends RobolectricTestBase {
 
         doCallRealMethod().when(mockSyncingService).handleActionSync(anyInt(),
                 (Context) anyObject(), (UsbSerialDriver) anyObject());
-        mockSyncingService.handleActionSync(2, shadowActivity.getApplicationContext(), serialDriver);
+        mockSyncingService.handleActionSync(2, activity.getApplicationContext(), serialDriver);
         verify(mockSyncingService).broadcastSGVToUI((EGVRecord) anyObject(), anyBoolean(),
                 anyLong(), anyLong(), (JSONArray) anyObject(), anyInt(), (byte[]) anyObject(),
                 anyLong(), anyLong(), anyLong(), anyLong());

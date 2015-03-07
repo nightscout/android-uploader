@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.mongodb.MongoClientURI;
+import com.mongodb.MongoException;
 import com.nightscout.android.R;
 import com.nightscout.android.ToastReceiver;
 import com.nightscout.android.drivers.AndroidUploaderDevice;
@@ -160,15 +161,32 @@ public class Uploader {
         for (BaseUploader uploader : uploaders) {
             // TODO(klee): capture any exceptions here so that all configured uploaders will attempt
             // to upload
-            allSuccessful &= uploader.uploadRecords(glucoseDataSets, meterRecords, calRecords, deviceStatus);
-            reporter.report(EventType.UPLOADER, EventSeverity.INFO,
-                    String.format(context.getString(R.string.event_success_upload),
-                            uploader.getIdentifier()));
-
+            try {
+                allSuccessful &= uploader.uploadRecords(glucoseDataSets, meterRecords, calRecords, deviceStatus);
+                reporter.report(EventType.UPLOADER, EventSeverity.INFO,
+                        String.format(context.getString(R.string.event_success_upload),
+                                uploader.getIdentifier()));
+            } catch (MongoException e) {
+                // Credentials error - user name or password is incorrect.
+                if (e.getCode() == 18) {
+                    reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
+                            context.getString(R.string.event_mongo_invalid_credentials));
+                } else {
+                    reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
+                            String.format(context.getString(R.string.event_fail_upload),
+                                    uploader.getIdentifier()));
+                }
+                allSuccessful &= false;
+            }
         }
 
         // Quick hack to prevent MQTT only from reporting not uploading to cloud
         int otherUploaders = (preferences.isMqttEnabled()) ? 1 : 0;
+
+        if (uploaders.size() + otherUploaders == 0) {
+            reporter.report(EventType.UPLOADER, EventSeverity.WARN, context.getString(R.string.no_uploaders));
+        }
+
         // Force a failure if an uploader was not properly initialized, but only after the other
         // uploaders were executed.
         return allUploadersInitalized && allSuccessful && (uploaders.size() + otherUploaders != 0);

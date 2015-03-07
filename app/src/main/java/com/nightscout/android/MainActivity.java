@@ -5,7 +5,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -17,19 +16,16 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PowerManager;
 import android.provider.Settings;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
@@ -40,11 +36,10 @@ import com.google.common.base.Splitter;
 import com.nightscout.android.drivers.AndroidUploaderDevice;
 import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.events.UserEventPanelActivity;
+import com.nightscout.android.exceptions.FeedbackDialog;
 import com.nightscout.android.mqtt.AndroidMqttPinger;
 import com.nightscout.android.mqtt.AndroidMqttTimer;
 import com.nightscout.android.preferences.AndroidPreferences;
-import com.nightscout.android.exceptions.FeedbackDialog;
-import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.preferences.PreferencesValidator;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.android.ui.AppContainer;
@@ -61,14 +56,10 @@ import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.GlucoseReading;
 import com.nightscout.core.utils.RestUriUtils;
 
-import org.acra.ACRA;
-import org.acra.ACRAConfiguration;
-import org.acra.ACRAConfigurationException;
-import org.acra.ReportingInteractionMode;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 
@@ -96,7 +87,6 @@ public class MainActivity extends Activity {
 
     // Member components
     private Handler mHandler = new Handler();
-    private Context mContext;
     private String mJSONData;
     private long lastRecordTime = -1;
     private long receiverOffsetFromUploader = 0;
@@ -112,8 +102,9 @@ public class MainActivity extends Activity {
     @InjectView(R.id.webView) WebView mWebView;
     @InjectView(R.id.sgValue) TextView mTextSGV;
     @InjectView(R.id.timeAgo) TextView mTextTimestamp;
+    @InjectView(R.id.syncButton) ImageButton mSyncButton;
+    @InjectView(R.id.usbButton) ImageButton mUsbButton;
 
-    private StatusBarIcons statusBarIcons;
     private Pebble pebble;
     private AndroidUploaderDevice uploaderDevice;
     private MqttEventMgr mqttManager;
@@ -145,8 +136,6 @@ public class MainActivity extends Activity {
         ensureIUnderstandDialogDisplayed();
 
         mTracker = ((Nightscout) getApplicationContext()).getTracker();
-
-        mContext = getApplicationContext();
 
         // Register USB attached/detached and battery changes intents
         IntentFilter deviceStatusFilter = new IntentFilter();
@@ -180,8 +169,22 @@ public class MainActivity extends Activity {
         mWebView.setHorizontalScrollBarEnabled(false);
         mWebView.setBackgroundColor(0);
         mWebView.loadUrl("file:///android_asset/index.html");
-
-        statusBarIcons = (StatusBarIcons) getFragmentManager().findFragmentById(R.id.iconLayout);
+        mUsbButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), UserEventPanelActivity.class);
+                intent.putExtra("Filter", EventType.DEVICE.ordinal());
+                startActivity(intent);
+            }
+        });
+        mSyncButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), UserEventPanelActivity.class);
+                intent.putExtra("Filter", EventType.UPLOADER.ordinal());
+                startActivity(intent);
+            }
+        });
 
         // If app started due to android.hardware.usb.action.USB_DEVICE_ATTACHED intent, start syncing
         Intent startIntent = getIntent();
@@ -190,12 +193,9 @@ public class MainActivity extends Activity {
                 SyncingService.isG4Connected(getApplicationContext())) {
             reporter.report(EventType.DEVICE, EventSeverity.INFO,
                     getApplicationContext().getString(R.string.g4_connected));
-            statusBarIcons.setUSB(true);
+            mUsbButton.setBackgroundResource(R.drawable.ic_usb);
             Log.d(TAG, "Starting syncing in OnCreate...");
-            SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
-        } else {
-            // reset the top icons to their default state
-            statusBarIcons.setDefaults();
+            SyncingService.startActionSingleSync(getApplicationContext(), SyncingService.MIN_SYNC_PAGES);
         }
 
         // Check (only once) to see if they have opted in to shared data for research
@@ -234,10 +234,11 @@ public class MainActivity extends Activity {
 
         try {
             setupMqtt();
+            mSyncButton.setBackgroundResource(R.drawable.ic_cloud);
         } catch (MqttException e) {
-            e.printStackTrace();
+            mSyncButton.setBackgroundResource(R.drawable.ic_nocloud);
         }
-        
+
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent syncIntent = new Intent(MainActivity.ACTION_POLL);
         syncManager = PendingIntent.getBroadcast(getApplicationContext(), 1, syncIntent, 0);
@@ -253,13 +254,13 @@ public class MainActivity extends Activity {
                 mqttOptions.setUserName(preferences.getMqttUser());
                 mqttOptions.setPassword(preferences.getMqttPass().toCharArray());
                 String androidId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-                Log.d(TAG, "Directory: " + getApplicationContext().getFilesDir().getAbsolutePath());
-                MqttDefaultFilePersistence dataStore = new MqttDefaultFilePersistence(getApplicationContext().getFilesDir().getAbsolutePath());
+                MemoryPersistence dataStore = new MemoryPersistence();
                 MqttClient client = new MqttClient(preferences.getMqttEndpoint(), androidId, dataStore);
                 MqttPinger pinger = new AndroidMqttPinger(getApplicationContext(), 0, client, 150000);
                 MqttTimer timer = new AndroidMqttTimer(getApplicationContext(), 0);
                 mqttManager = new MqttEventMgr(client, mqttOptions, pinger, timer, reporter);
                 mqttManager.connect();
+                mSyncButton.setBackgroundResource(R.drawable.ic_cloud);
             }
         }
     }
@@ -367,10 +368,6 @@ public class MainActivity extends Activity {
         mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(preferences.getPreferredUnits() == GlucoseUnit.MMOL) + ")");
 
         mHandler.post(updateTimeAgo);
-        // FIXME: (klee) need to find a better way to do this. Too many things are hooking in here.
-        if (statusBarIcons != null) {
-            statusBarIcons.checkForRootOptionChanged();
-        }
         try {
             if (mqttManager != null && mqttManager.isConnected()) {
                 MqttClient client = mqttManager.getClient();
@@ -392,7 +389,10 @@ public class MainActivity extends Activity {
                 mqttManager.close();
             }
         } catch (MqttException e) {
-            e.printStackTrace();
+            reporter.report(EventType.UPLOADER, EventSeverity.WARN,
+                    getApplicationContext().getString(R.string.unhandled_mqtt_exception,
+                            e.getMessage()));
+            mSyncButton.setBackgroundResource(R.drawable.ic_nocloud);
         }
 
     }
@@ -441,10 +441,6 @@ public class MainActivity extends Activity {
         outState.putString("saveJSONData", mJSONData);
         outState.putString("saveTextSGV", mTextSGV.getText().toString());
         outState.putString("saveTextTimestamp", mTextTimestamp.getText().toString());
-        outState.putBoolean("saveImageViewUSB", statusBarIcons.getUSB());
-        outState.putBoolean("saveImageViewUpload", statusBarIcons.getUpload());
-        outState.putBoolean("saveImageViewTimeIndicator", statusBarIcons.getTimeIndicator());
-        outState.putInt("saveImageViewBatteryIndicator", statusBarIcons.getBatteryIndicator());
     }
 
     @Override
@@ -455,10 +451,6 @@ public class MainActivity extends Activity {
         mJSONData = savedInstanceState.getString("mJSONData");
         mTextSGV.setText(savedInstanceState.getString("saveTextSGV"));
         mTextTimestamp.setText(savedInstanceState.getString("saveTextTimestamp"));
-        statusBarIcons.setUSB(savedInstanceState.getBoolean("saveImageViewUSB"));
-        statusBarIcons.setUpload(savedInstanceState.getBoolean("saveImageViewUpload"));
-        statusBarIcons.setTimeIndicator(savedInstanceState.getBoolean("saveImageViewTimeIndicator"));
-        statusBarIcons.setBatteryIndicator(savedInstanceState.getInt("saveImageViewBatteryIndicator"));
     }
 
     public class CGMStatusReceiver extends BroadcastReceiver {
@@ -488,9 +480,10 @@ public class MainActivity extends Activity {
             String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
             byte[] proto = intent.getByteArrayExtra(SyncingService.RESPONSE_PROTO);
             boolean published = false;
-            if (proto != null && proto.length != 0) {
+            if (preferences.isMqttEnabled() && proto != null && proto.length != 0) {
                 Log.d(TAG, "Proto: " + Utils.bytesToHex(proto));
                 if (mqttManager != null) {
+                    Log.d(TAG, "Publishing");
                     mqttManager.publish(proto, "/downloads/protobuf");
                     ((AndroidPreferences) preferences).setLastEgvMqttUpload(lastSgvTimestamp);
                     ((AndroidPreferences) preferences).setLastMeterMqttUpload(lastMeterTimestamp);
@@ -498,10 +491,18 @@ public class MainActivity extends Activity {
                     ((AndroidPreferences) preferences).setLastCalMqttUpload(lastCalTimestamp);
                     published = true;
                 } else {
-                    Log.e(TAG, "Not publishing for some reason");
+                    reporter.report(EventType.DEVICE, EventSeverity.ERROR,
+                            getApplicationContext().getString(R.string.mqtt_mgr_not_initialized));
                 }
             }
-
+            if (preferences.isMqttEnabled()) {
+                responseUploadStatus &= published;
+            }
+            if (responseUploadStatus) {
+                mSyncButton.setBackgroundResource(R.drawable.ic_cloud);
+            } else {
+                mSyncButton.setBackgroundResource(R.drawable.ic_nocloud);
+            }
             if (responseSGV != -1) {
                 pebble.sendDownload(reading, trend, responseSGVTimestamp);
             }
@@ -510,9 +511,6 @@ public class MainActivity extends Activity {
                 mJSONData = json;
                 mWebView.loadUrl("javascript:updateData(" + mJSONData + ")");
             }
-
-            // Update icons
-            statusBarIcons.setUpload(responseUploadStatus);
 
             // Update UI with latest record information
             mTextSGV.setText(getSGVStringByUnit(reading, trend));
@@ -533,7 +531,7 @@ public class MainActivity extends Activity {
 
             if (responseNextUploadTime > nextUploadTime) {
                 Log.d(TAG,
-                      "Receiver's time is less than current record time, possible time change.");
+                        "Receiver's time is less than current record time, possible time change.");
                 mTracker.send(new HitBuilders.EventBuilder("Main", "Time change").build());
             } else if (responseNextUploadTime > 0) {
                 Log.d(TAG, "Setting next upload time to " + responseNextUploadTime);
@@ -546,12 +544,7 @@ public class MainActivity extends Activity {
                     .isGreaterThan(Minutes.minutes(20))) {
                 Log.w(TAG, "Receiver time is off by 20 minutes or more.");
                 mTracker.send(new HitBuilders.EventBuilder("Main", "Time difference > 20 minutes").build());
-                statusBarIcons.setTimeIndicator(false);
-            } else {
-                statusBarIcons.setTimeIndicator(true);
             }
-
-            statusBarIcons.setBatteryIndicator(rcvrBat);
 
             setNextPoll(nextUploadTime);
         }
@@ -565,15 +558,15 @@ public class MainActivity extends Activity {
                 case UsbManager.ACTION_USB_DEVICE_DETACHED:
                     reporter.report(EventType.DEVICE, EventSeverity.INFO,
                             getApplicationContext().getString(R.string.g4_disconnected));
-                    statusBarIcons.setDefaults();
                     cancelPoll();
+                    mUsbButton.setBackgroundResource(R.drawable.ic_nousb);
                     break;
                 case UsbManager.ACTION_USB_DEVICE_ATTACHED:
                     reporter.report(EventType.DEVICE, EventSeverity.INFO,
                             getApplicationContext().getString(R.string.g4_connected));
-                    statusBarIcons.setUSB(true);
+                    mUsbButton.setBackgroundResource(R.drawable.ic_usb);
                     Log.d(TAG, "Starting syncing on USB attached...");
-                    SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
+                    SyncingService.startActionSingleSync(getApplicationContext(), SyncingService.MIN_SYNC_PAGES);
                     break;
                 case MainActivity.ACTION_POLL:
                     SyncingService.startActionSingleSync(getApplicationContext(), SyncingService.MIN_SYNC_PAGES);
@@ -581,14 +574,6 @@ public class MainActivity extends Activity {
         }
     };
 
-    // Runnable to start service as needed to sync with mCGMStatusReceiver and cloud
-    public Runnable syncCGM = new Runnable() {
-        public void run() {
-            SyncingService.startActionSingleSync(mContext, SyncingService.MIN_SYNC_PAGES);
-        }
-    };
-
-    //FIXME: Strongly suggest refactoring this
     public Runnable updateTimeAgo = new Runnable() {
         @Override
         public void run() {
@@ -612,147 +597,45 @@ public class MainActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.menu_settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.feedback_settings) {
-            feedbackDialog.show();
-        } else if (id == R.id.gap_sync) {
-            SyncingService.startActionSingleSync(getApplicationContext(),
-                    SyncingService.GAP_SYNC_PAGES);
-        } else if (id == R.id.event_log) {
-            Intent intent = new Intent(getApplicationContext(), UserEventPanelActivity.class);
-            intent.putExtra("Filter", EventType.ALL.ordinal());
-            startActivity(intent);
-        } else if (id == R.id.close_settings) {
-            cancelPoll();
-            finish();
+        Intent intent;
+        switch (item.getItemId()) {
+            case R.id.menu_settings:
+                intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.feedback_settings:
+                feedbackDialog.show();
+                break;
+            case R.id.gap_sync:
+                SyncingService.startActionSingleSync(getApplicationContext(),
+                        SyncingService.GAP_SYNC_PAGES);
+                break;
+            case R.id.event_log:
+                intent = new Intent(getApplicationContext(), UserEventPanelActivity.class);
+                intent.putExtra("Filter", EventType.ALL.ordinal());
+                startActivity(intent);
+                break;
+            case R.id.usb_log:
+                intent = new Intent(getApplicationContext(), UserEventPanelActivity.class);
+                intent.putExtra("Filter", EventType.DEVICE.ordinal());
+                startActivity(intent);
+                break;
+            case R.id.upload_log:
+                intent = new Intent(getApplicationContext(), UserEventPanelActivity.class);
+                intent.putExtra("Filter", EventType.UPLOADER.ordinal());
+                startActivity(intent);
+                break;
+            case R.id.close_settings:
+                cancelPoll();
+                finish();
+                break;
         }
-
         return super.onOptionsItemSelected(item);
-    }
-
-    public static class StatusBarIcons extends Fragment {
-        @InjectView(R.id.imageViewUSB) ImageView mImageViewUSB;
-        @InjectView(R.id.imageViewUploadStatus) ImageView mImageViewUpload;
-        @InjectView(R.id.imageViewTimeIndicator) ImageView mImageViewTimeIndicator;
-        @InjectView(R.id.imageViewRcvrBattery) ImageView mImageRcvrBattery;
-        @InjectView(R.id.rcvrBatteryLabel) TextView mRcvrBatteryLabel;
-
-        private boolean usbActive;
-        private boolean uploadActive;
-        private boolean displayTimeSync;
-        private int batteryLevel;
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View view = inflater.inflate(R.layout.fragment_icon_status, container, false);
-            ButterKnife.inject(this, view);
-            setDefaults();
-
-            mImageViewUSB.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                  Intent intent = new Intent(v.getContext(), UserEventPanelActivity.class);
-                  intent.putExtra("Filter", EventType.DEVICE.ordinal());
-                  startActivity(intent);
-                }
-            });
-
-            mImageViewUpload.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                  Intent intent = new Intent(v.getContext(), UserEventPanelActivity.class);
-                  intent.putExtra("Filter", EventType.UPLOADER.ordinal());
-                  startActivity(intent);
-                }
-            });
-
-            return view;
-        }
-
-        public void checkForRootOptionChanged() {
-            if (PreferenceManager.getDefaultSharedPreferences(
-                getActivity()).getBoolean(PreferenceKeys.ROOT_ENABLED, false)) {
-                mImageRcvrBattery.setVisibility(View.GONE);
-                mRcvrBatteryLabel.setVisibility(View.GONE);
-            } else {
-                mImageRcvrBattery.setVisibility(View.VISIBLE);
-                mRcvrBatteryLabel.setVisibility(View.VISIBLE);
-            }
-        }
-
-        public void setDefaults() {
-            setUSB(false);
-            setUpload(false);
-            setTimeIndicator(false);
-            setBatteryIndicator(0);
-            checkForRootOptionChanged();
-        }
-
-        public void setUSB(boolean active) {
-            usbActive = active;
-            if (active) {
-                mImageViewUSB.setImageResource(R.drawable.ic_usb_connected);
-                mImageViewUSB.setTag(R.drawable.ic_usb_connected);
-            } else {
-                mImageViewUSB.setImageResource(R.drawable.ic_usb_disconnected);
-                mImageViewUSB.setTag(R.drawable.ic_usb_disconnected);
-            }
-        }
-
-        public void setUpload(boolean active) {
-            uploadActive = active;
-            if (active) {
-                mImageViewUpload.setImageResource(R.drawable.ic_upload_success);
-                mImageViewUpload.setTag(R.drawable.ic_upload_success);
-            } else {
-                mImageViewUpload.setImageResource(R.drawable.ic_upload_fail);
-                mImageViewUpload.setTag(R.drawable.ic_upload_fail);
-            }
-        }
-
-        public void setTimeIndicator(boolean active) {
-            displayTimeSync = active;
-            if (active) {
-                mImageViewTimeIndicator.setImageResource(R.drawable.ic_clock_good);
-                mImageViewTimeIndicator.setTag(R.drawable.ic_clock_good);
-            } else {
-                mImageViewTimeIndicator.setImageResource(R.drawable.ic_clock_bad);
-                mImageViewTimeIndicator.setTag(R.drawable.ic_clock_bad);
-            }
-        }
-
-        public void setBatteryIndicator(int batLvl) {
-            batteryLevel = batLvl;
-            mImageRcvrBattery.setImageLevel(batteryLevel);
-            mImageRcvrBattery.setTag(batteryLevel);
-        }
-
-        public boolean getUSB() {
-            return usbActive;
-        }
-
-        public boolean getUpload() {
-            return uploadActive;
-        }
-
-        public boolean getTimeIndicator() {
-            return displayTimeSync;
-        }
-
-        public int getBatteryIndicator() {
-            if (mImageRcvrBattery == null) {
-                return 0;
-            }
-            return (Integer) mImageRcvrBattery.getTag();
-        }
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)

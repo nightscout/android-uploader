@@ -75,8 +75,7 @@ public class EventFragment extends ListFragment {
                     ((TextView) view).setTextColor(Color.RED);
                 }
                 if (cursor.getColumnIndex(EventsContract.EventEntry.COLUMN_NAME_TIME_STAMP) == columnIndex) {
-                    ((TextView) view).setText(new DateTime(cursor.getLong(columnIndex)).toString(DateTimeFormat.forPattern("MM-dd HH:mm:ss Z")));
-//                    ((TextView) view).setText(cursor.getString(columnIndex));
+                    ((TextView) view).setText(new DateTime(cursor.getLong(columnIndex)).toString(DateTimeFormat.forPattern("MM-dd HH:mm")));
                 } else {
                     ((TextView) view).setText(cursor.getString(columnIndex));
 
