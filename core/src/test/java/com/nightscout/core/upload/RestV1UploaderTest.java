@@ -109,13 +109,6 @@ public class RestV1UploaderTest {
     }
 
     @Test
-    public void testInitialize_StripUserInfo() {
-        RestV1Uploader uploader = new RestV1Uploader(preferences,
-                URI.create("http://testingtesting@test.com/v1"));
-        assertThat(uploader.getUri().toString(), is("http://test.com/v1"));
-    }
-
-    @Test
     public void testInitialize_GenerateToken() {
         RestV1Uploader uploader = new RestV1Uploader(preferences,
                 URI.create("http://testingtesting@test.com/v1"));
