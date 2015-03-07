@@ -10,6 +10,7 @@ import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.ui.ActivityHierarchyServer;
 
 import net.danlew.android.joda.JodaTimeAndroid;
+
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 
@@ -18,12 +19,7 @@ import javax.inject.Inject;
 import dagger.ObjectGraph;
 
 @ReportsCrashes(
-        formKey = "",
-        formUri = "http://nightscout.cloudant.com/acra-nightscout/_design/acra-storage/_update/report",
-        reportType = org.acra.sender.HttpSender.Type.JSON,
-        httpMethod = org.acra.sender.HttpSender.Method.PUT,
-        formUriBasicAuthLogin = "whisphisheiringliketfurg",
-        formUriBasicAuthPassword = "8CgjF6r2u4i8EhPHoPJjnk8f",
+        formUri = "https://collector.tracepot.com/a64e4a51",
         resToastText = R.string.crash_toast_text,
         resDialogText = R.string.feebback_dialog_text,
         resDialogIcon = R.drawable.ic_launcher,
