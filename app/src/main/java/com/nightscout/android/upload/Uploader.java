@@ -26,6 +26,7 @@ import com.nightscout.core.upload.BaseUploader;
 import com.nightscout.core.upload.MongoUploader;
 import com.nightscout.core.upload.RestLegacyUploader;
 import com.nightscout.core.upload.RestV1Uploader;
+import com.nightscout.core.utils.RestUriUtils;
 import com.squareup.wire.Message;
 
 import java.net.URI;
@@ -94,9 +95,10 @@ public class Uploader {
         List<URI> baseUris = new ArrayList<>();
         boolean allInitialized = true;
         for (String baseURLSetting : baseUrisSetting) {
-            String baseUriString = baseURLSetting.trim();
+            String baseUriString = RestUriUtils.percentEncodeSecret(baseURLSetting.trim());
             if (baseUriString.isEmpty()) continue;
             try {
+                URI uri = URI.create(baseUriString);
                 baseUris.add(URI.create(baseUriString));
             } catch (IllegalArgumentException e) {
                 reporter.report(EventType.UPLOADER, EventSeverity.ERROR,

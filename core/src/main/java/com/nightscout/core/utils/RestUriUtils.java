@@ -5,7 +5,9 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.hash.Hashing;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,10 +28,28 @@ public class RestUriUtils {
      * @param uri Non-null uri to strip the token from.
      * @return uri without token.
      */
+    // TODO: KSL - Consider removing
     public static URI removeToken(URI uri) {
         checkNotNull(uri);
         // This is gross, but I don't know a better way to do it.
         return URI.create(uri.toString().replaceFirst("//[^@]+@", "//"));
+    }
+
+    public static String percentEncodeSecret(String uriString) {
+        // Find the secret (if it exists) and replace it with a percent encoded version
+        if (uriString.contains("@") && !uriString.contains("%")) {
+            int protoLocation = uriString.indexOf("://");
+            int authLocation = uriString.indexOf("@");
+            String secret = uriString.substring(protoLocation + 3, authLocation);
+            try {
+                String encodedSecret = URLEncoder.encode(secret, "UTF-8");
+                uriString = uriString.replaceAll(secret, encodedSecret);
+            } catch (UnsupportedEncodingException e) {
+                //TODO: Throw an exception here to be caught and captured for user feedback
+                // using the reporter later? Or bring reporter into this class?
+            }
+        }
+        return uriString;
     }
 
     /**
