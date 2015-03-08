@@ -25,6 +25,10 @@ overflow: hidden;
   shape-rendering: crispEdges;
 }
 
+#chartContainer { position: absolute; left: 0; right: 0; bottom: 0; top: 0; }
+
+svg { width: 100%; height: 100%; }
+
 .grid path, .axis line {
   stroke: #808080;
   stroke-opacity: 1;
