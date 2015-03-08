@@ -287,7 +287,7 @@ public class MainActivity extends Activity {
 
         // Set and deal with mmol/L<->mg/dL conversions
         Log.d(TAG, "display_options_units: " + preferences.getPreferredUnits().name());
-        pebble.config(preferences.getPwdName(), preferences.getPreferredUnits());
+        pebble.config(preferences.getPwdName(), preferences.getPreferredUnits(), getApplicationContext());
         int sgv = (Integer) mTextSGV.getTag(R.string.display_sgv);
 
         int direction = (Integer) mTextSGV.getTag(R.string.display_trend);
@@ -319,7 +319,12 @@ public class MainActivity extends Activity {
         unregisterReceiver(mCGMStatusReceiver);
         unregisterReceiver(mDeviceStatusReceiver);
         unregisterReceiver(toastReceiver);
-        uploaderDevice.close();
+        if (pebble != null) {
+            pebble.close();
+        }
+        if (uploaderDevice != null) {
+            uploaderDevice.close();
+        }
     }
 
     @Override
@@ -380,7 +385,7 @@ public class MainActivity extends Activity {
             String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
 
             if (responseSGV != -1) {
-                pebble.sendDownload(reading, trend, responseSGVTimestamp);
+                pebble.sendDownload(reading, trend, responseSGVTimestamp, getApplicationContext());
             }
             // Reload d3 chart with new data
             if (json != null) {
