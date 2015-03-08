@@ -22,7 +22,7 @@ public class RestV1Uploader extends AbstractRestUploader {
     private final String secret;
 
     public RestV1Uploader(NightscoutPreferences preferences, URI uri) {
-        super(preferences, RestUriUtils.removeToken(uri));
+        super(preferences, uri);
         checkArgument(RestUriUtils.hasToken(uri), "Rest API v1 requires a token.");
         secret = RestUriUtils.generateSecret(uri.getUserInfo());
     }

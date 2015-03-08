@@ -38,8 +38,10 @@ public class RestLegacyUploader extends AbstractRestUploader {
             return doPost("entries", toJSONObject(glucoseDataSet));
         } catch (JSONException e) {
             log.error("Could not create JSON object for legacy rest glucose data set.", e);
-            return false;
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid endpoint");
         }
+        return false;
     }
 
     // TODO(trhodeos): is devicestatus supported in legacy apis?
