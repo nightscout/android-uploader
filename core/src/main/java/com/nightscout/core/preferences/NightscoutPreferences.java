@@ -41,6 +41,8 @@ public interface NightscoutPreferences {
 
     boolean isMqttEnabled();
 
+    void setMqttUploadEnabled(boolean mqttEnabled);
+
     String getMqttEndpoint();
 
     void setMqttEndpoint(String endpoint);

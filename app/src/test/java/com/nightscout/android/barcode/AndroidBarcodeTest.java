@@ -48,6 +48,16 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
         fakeActivityResult();
     }
 
+    private void setValidMqttOnlyWithIntentResult() {
+        jsonConfig = "{'mqtt':{'uri':'ssl://test:test@m11.cloudmqtt.com:12345'}}";
+        fakeActivityResult();
+    }
+
+    private void setMqttNoUserPassOnlyWithIntentResult() {
+        jsonConfig = "{'mqtt':{'uri':'ssl://m11.cloudmqtt.com:12345'}}";
+        fakeActivityResult();
+    }
+
     private void setSingleValidApiAndMongoWithIntentResult(){
         jsonConfig = "{'mongo':{'uri':'mongodb://user:pass@test.com/cgm_data'}, 'rest':{'endpoint':['http://abc@test.com/']}}";
         fakeActivityResult();
@@ -89,6 +99,36 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
     }
 
     @Test
+    public void mqttConfigShouldMqttEnablePrefsOnScanResult() throws Exception {
+        setValidMqttOnlyWithIntentResult();
+        assertThat(prefs.isMqttEnabled(), is(true));
+    }
+
+    @Test
+    public void mqttConfigShouldSetMqttUriPrefsOnScanResult() throws Exception {
+        setValidMqttOnlyWithIntentResult();
+        assertThat(prefs.getMqttEndpoint(), is("ssl://m11.cloudmqtt.com:12345"));
+    }
+
+    @Test
+    public void mqttConfigShouldSetMqttUserPrefsOnScanResult() throws Exception {
+        setValidMqttOnlyWithIntentResult();
+        assertThat(prefs.getMqttUser(), is("test"));
+    }
+
+    @Test
+    public void mqttConfigShouldSetMqttPassPrefsOnScanResult() throws Exception {
+        setValidMqttOnlyWithIntentResult();
+        assertThat(prefs.getMqttUser(), is("test"));
+    }
+
+    @Test
+    public void invalidMqttConfigShouldNotEnableMqttOnScanResult() throws Exception {
+        setMqttNoUserPassOnlyWithIntentResult();
+        assertThat(prefs.isMqttEnabled(), is(false));
+    }
+
+    @Test
     public void mongoConfigShouldMongoEnablePrefsOnScanResult() throws Exception {
         setValidMongoOnlyWithIntentResult();
         assertThat(prefs.isMongoUploadEnabled(), is(true));
@@ -107,6 +147,13 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
     }
 
     @Test
+    public void mongoConfigShouldNotEnableMqttPrefsOnScanResult() throws Exception {
+        setValidMongoOnlyWithIntentResult();
+        assertThat(prefs.isMqttEnabled(), is(false));
+    }
+
+
+    @Test
     public void apiConfigShouldEnableApiPrefsOnScanResult() throws Exception{
         setSingleValidApiOnlyWithIntentResult();
         assertThat(prefs.isRestApiEnabled(), is(true));
@@ -123,6 +170,12 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
     public void apiConfigShouldNotSetMongoPrefsOnScanResult() throws Exception{
         setSingleValidApiOnlyWithIntentResult();
         assertThat(prefs.isMongoUploadEnabled(), is(false));
+    }
+
+    @Test
+    public void apiConfigShouldNotSetMqttPrefsOnScanResult() throws Exception {
+        setSingleValidApiOnlyWithIntentResult();
+        assertThat(prefs.isMqttEnabled(), is(false));
     }
 
     @Test
