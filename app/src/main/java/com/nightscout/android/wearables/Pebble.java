@@ -40,11 +40,23 @@ public class Pebble {
     private GlucoseReading lastDelta;
     private TrendArrow lastTrend = TrendArrow.NONE;
     private long lastRecordTime = 0;
+    private PebbleKit.PebbleDataReceiver dataReceiver = new PebbleKit.PebbleDataReceiver(PEBBLEAPP_UUID) {
+        @Override
+        public void receiveData(final Context mContext, final int transactionId, final PebbleDictionary data) {
+            Log.d(TAG, "Received query. data: " + data.size());
+            PebbleKit.sendAckToPebble(mContext, transactionId);
+            sendDownload(currentReading);
+        }
+    };
 
     public Pebble(Context context) {
         this.context = context;
         currentReading = null;
         init();
+    }
+
+    public void close() {
+        context.unregisterReceiver(dataReceiver);
     }
 
     public PebbleDictionary buildDictionary(TrendArrow trend, String bgValue, int recordTime, int uploaderTimeSec,
@@ -61,11 +73,11 @@ public class Pebble {
         return dictionary;
     }
 
-    public void sendDownload(GlucoseReading reading, TrendArrow trend, long recordTime) {
-        sendDownload(reading, trend, recordTime, false);
+    public void sendDownload(GlucoseReading reading, TrendArrow trend, long recordTime, Context cntx) {
+        sendDownload(reading, trend, recordTime, cntx, false);
     }
 
-    public void sendDownload(GlucoseReading reading, TrendArrow trend, long recordTime, boolean resend) {
+    public void sendDownload(GlucoseReading reading, TrendArrow trend, long recordTime, Context cntx, boolean resend) {
         GlucoseReading delta = new GlucoseReading(0, GlucoseUnit.MGDL);
 
         if (currentReading != null) {
@@ -87,7 +99,7 @@ public class Pebble {
         lastTrend = trend;
         lastDelta = delta;
         recordTime = DateTimeZone.getDefault().convertUTCToLocal(recordTime);
-        int batLevel = AndroidUploaderDevice.getUploaderDevice(context).getBatteryLevel();
+        int batLevel = AndroidUploaderDevice.getUploaderDevice(cntx).getBatteryLevel();
         PebbleDictionary dictionary = buildDictionary(trend, bgStr, (int) (recordTime / 1000),
                 (int) (DateTimeZone.getDefault().convertUTCToLocal(new DateTime().getMillis()) / 1000), deltaStr,
                 String.valueOf(batLevel), pwdName);
@@ -95,9 +107,9 @@ public class Pebble {
         sendDownload(dictionary);
     }
 
-    public void resendDownload() {
+    public void resendDownload(Context cntx) {
         if (currentReading != null) {
-            sendDownload(lastReading, lastTrend, lastRecordTime, true);
+            sendDownload(lastReading, lastTrend, lastRecordTime, cntx, true);
         }
     }
 
@@ -111,22 +123,15 @@ public class Pebble {
     }
 
     private void init() {
-        PebbleKit.registerReceivedDataHandler(context, new PebbleKit.PebbleDataReceiver(PEBBLEAPP_UUID) {
-            @Override
-            public void receiveData(final Context mContext, final int transactionId, final PebbleDictionary data) {
-                Log.d(TAG, "Received query. data: " + data.size());
-                PebbleKit.sendAckToPebble(mContext, transactionId);
-                sendDownload(currentReading);
-            }
-        });
+        PebbleKit.registerReceivedDataHandler(context, dataReceiver);
     }
 
-    public void config(String pwdName, GlucoseUnit units) {
+    public void config(String pwdName, GlucoseUnit units, Context cntx) {
         boolean changed = !this.pwdName.equals(pwdName) || this.units != units;
         if (changed) {
             setPwdName(pwdName);
             setUnits(units);
-            resendDownload();
+            resendDownload(cntx);
         }
     }
 

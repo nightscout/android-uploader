@@ -1,21 +1,20 @@
 package com.nightscout.android.settings;
 
-import com.google.common.base.Optional;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
+import com.google.common.base.Optional;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+import com.nightscout.android.BuildConfig;
 import com.nightscout.android.R;
 import com.nightscout.android.barcode.AndroidBarcode;
 import com.nightscout.android.preferences.AndroidPreferences;
@@ -39,9 +38,9 @@ public class SettingsActivity extends FragmentActivity {
     }
 
     private void refreshFragments() {
-      mainPreferenceFragment = new MainPreferenceFragment();
-      getFragmentManager().beginTransaction().replace(android.R.id.content,
-                                                      mainPreferenceFragment).commit();
+        mainPreferenceFragment = new MainPreferenceFragment();
+        getFragmentManager().beginTransaction().replace(android.R.id.content,
+                mainPreferenceFragment).commit();
     }
 
     private void setupActionBar() {
@@ -80,7 +79,7 @@ public class SettingsActivity extends FragmentActivity {
                     prefs.setMongoClientUri(barcode.getMongoUri().get());
                     prefs.setMongoCollection(barcode.getMongoCollection().orNull());
                     prefs.setMongoDeviceStatusCollection(
-                        barcode.getMongoDeviceStatusCollection().orNull());
+                            barcode.getMongoDeviceStatusCollection().orNull());
                 }
             } else {
                 prefs.setMongoUploadEnabled(false);
@@ -106,14 +105,11 @@ public class SettingsActivity extends FragmentActivity {
         }
 
         private void setupVersionNumbers() {
-            try {
-                PackageInfo pInfo;
-                pInfo = getActivity().getPackageManager().getPackageInfo(
-                        getActivity().getPackageName(), 0);
-                findPreference("about_version_number").setSummary(pInfo.versionName);
-            } catch (PackageManager.NameNotFoundException e) {
-                // nom
-            }
+            findPreference("about_version_number").setSummary(BuildConfig.VERSION_CODENAME);
+            findPreference("about_version_number").setSummary(BuildConfig.VERSION_NAME);
+            findPreference("about_build_hash").setSummary(BuildConfig.GIT_SHA);
+            findPreference("about_device_id").setSummary(Settings.Secure.getString(getActivity().getContentResolver(),
+                    Settings.Secure.ANDROID_ID));
         }
 
         private void setupBarcodeScanner() {

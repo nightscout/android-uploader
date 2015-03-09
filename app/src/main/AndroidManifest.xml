@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.nightscout.android"
-    android:versionCode="20"
-    android:versionName="0.1.11">
+    package="com.nightscout.android">
 
     <uses-feature android:name="android.hardware.usb.host" />
 
@@ -25,7 +23,8 @@
         android:allowBackup="true">
         <!-- Hard code this version for now. Robolectric has troubles starting when this is
              a variable. See: https://github.com/robolectric/robolectric/issues/1025 -->
-        <meta-data android:name="com.google.android.gms.version"
+        <meta-data
+            android:name="com.google.android.gms.version"
             tools:replace="android:value"
             android:value="6587000" />
         <activity

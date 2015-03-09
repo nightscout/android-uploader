@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory
-        android:title="@string/pref_header_general">
+    <PreferenceCategory android:title="@string/pref_header_general">
         <com.nightscout.android.settings.CustomSwitchPreference
             android:title="@string/pref_title_data_donate"
             android:key="data_donate"
@@ -110,8 +109,7 @@
             android:defaultValue="false" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="@string/pref_header_display_options">
+    <PreferenceCategory android:title="@string/pref_header_display_options">
         <ListPreference
             android:title="@string/pref_title_chart_units_options"
             android:key="display_options_units"
@@ -119,12 +117,10 @@
             android:entryValues="@array/pref_options_units_values"
             android:defaultValue="0"
             android:negativeButtonText="@null"
-            android:positiveButtonText="@null">
-        </ListPreference>
+            android:positiveButtonText="@null"></ListPreference>
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="@string/pref_header_about">
+    <PreferenceCategory android:title="@string/pref_header_about">
         <Preference
             android:key="about_version_name"
             android:title="@string/pref_title_about_release_name"
@@ -138,6 +134,18 @@
             android:positiveButtonText="@string/ok"
             android:negativeButtonText="@null" />
 
+        <Preference
+            android:key="about_build_hash"
+            android:title="@string/pref_about_hash"
+            android:positiveButtonText="@string/ok"
+            android:negativeButtonText="@null" />
+        <Preference
+            android:key="about_device_id"
+            android:title="@string/pref_about_deviceid"
+            android:selectable="true"
+            android:positiveButtonText="@string/ok"
+            android:negativeButtonText="@null" />
+
         <com.nightscout.android.settings.SimpleDialogPreference
             android:key="about_gpl"
             android:title="@string/pref_about_osl"
@@ -148,28 +156,26 @@
             android:negativeButtonText="@null" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="@string/pref_header_privacy">
-        <CheckBoxPreference android:key="acra.enable"
+    <PreferenceCategory android:title="@string/pref_header_privacy">
+        <CheckBoxPreference
+            android:key="acra.enable"
             android:title="@string/pref_enable_acra"
             android:summaryOn="@string/acra_enabled_summary"
             android:summaryOff="@string/acra_disabled_summary"
-            android:defaultValue="true"/>
+            android:defaultValue="true" />
         <com.nightscout.android.settings.SummaryBoundEditTextPreference
             android:key="acra.user.email"
             android:dependency="acra.enable"
             android:title="@string/pref_acra_user_email"
             android:dialogTitle="@string/acra_email_dialog_title"
-            android:dialogMessage="@string/acra_user_email_dialog_message"/>
+            android:dialogMessage="@string/acra_user_email_dialog_message" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="@string/pref_header_labs">
+    <PreferenceCategory android:title="@string/pref_header_labs">
         <com.nightscout.android.settings.CustomSwitchPreference
             android:title="@string/pref_title_root"
             android:key="root_support_enabled"
             android:defaultValue="false"
-            android:summary="@string/pref_summary_root">
-        </com.nightscout.android.settings.CustomSwitchPreference>
+            android:summary="@string/pref_summary_root"></com.nightscout.android.settings.CustomSwitchPreference>
     </PreferenceCategory>
 </PreferenceScreen>

@@ -15,21 +15,21 @@ public class UtilsTest {
     @Test
     public void testReceiverTimeToDateTime_epoch() {
         assertThat(Utils.receiverTimeToDateTime(0),
-                is(Utils.DEXCOM_EPOCH.withZone(DateTimeZone.getDefault())));
+                is(Utils.DEXCOM_EPOCH.withZone(DateTimeZone.UTC)));
     }
 
     @Test
     public void testReceiverTimeToDateTime_positiveDelta() {
         int secondsDelta = 10;
         assertThat(Utils.receiverTimeToDateTime(secondsDelta),
-                is(Utils.DEXCOM_EPOCH.plusSeconds(secondsDelta).withZone(DateTimeZone.getDefault())));
+                is(Utils.DEXCOM_EPOCH.plusSeconds(secondsDelta).withZone(DateTimeZone.UTC)));
     }
 
     @Test
     public void testReceiverTimeToDateTime_negativeDelta() {
         int secondsDelta = -10;
         assertThat(Utils.receiverTimeToDateTime(secondsDelta),
-                is(Utils.DEXCOM_EPOCH.minusSeconds(10).withZone(DateTimeZone.getDefault())));
+                is(Utils.DEXCOM_EPOCH.minusSeconds(10).withZone(DateTimeZone.UTC)));
     }
 
     @Test

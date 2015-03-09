@@ -102,12 +102,6 @@ public class Uploader {
         return allInitialized;
     }
 
-//    public boolean upload(GlucoseDataSet glucoseDataSet, MeterRecord meterRecord,
-//                          CalRecord calRecord) {
-//        return upload(Lists.newArrayList(glucoseDataSet), Lists.newArrayList(meterRecord),
-//                Lists.newArrayList(calRecord));
-//    }
-
     public boolean upload(DownloadResults downloadResults, int numRecords) {
         G4Download download = downloadResults.getDownload();
         List<SensorGlucoseValueEntry> sgvList = filterRecords(numRecords, download.sgv);

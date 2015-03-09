@@ -11,15 +11,15 @@
     <string name="feebback_dialog_text">Per favore facci sapere cosa ne pensi</string>
     <string name="feedback_dialog_comment_prompt">Aggiungi i tuoi commenti qui sotto:</string>
     <string name="feedback_dialog_ok_toast">Grazie!</string>
-    <string name="feedback_toast_text"/>
+    <string name="feedback_toast_text" />
     <string name="message_user_not_understand">La lettura dal device è disabilitata finchè non leggi e accetti \"HO CAPITO\" nelle preferenze</string>
     <string name="button_force_sync">Forza invio dati ultimi 2 giorni</string>
     <string name="acra_enabled_summary">Crash reporting is enabled</string>
     <string name="acra_disabled_summary">Crash reporting is disabled</string>
     <string name="acra_email_dialog_title">Email</string>
     <string name="acra_user_email_dialog_message">This is the email address included in bug reports and automatic crash reports. This field is optional</string>
-    <string name="display_sgv"/>
-    <string name="display_trend"/>
+    <string name="display_sgv" />
+    <string name="display_trend" />
 
     <string name="close_menu_text">Esci</string>
     <string name="feedback_menu_text">Feedback</string>
@@ -36,7 +36,7 @@
     <string name="unknown_mongo_host">Error resolving Mongo host. Double check mongo url.</string>
     <string name="illegal_rest_url">Could not create API uploader. Check your settings.</string>
     <string name="auto_configure_title">Auto configure</string>
-    
+
     <string name="DexBatteryLabelText">Batteria Dex</string>
     <string name="TimeSyncLabelText">Ora</string>
     <string name="TimeChangeDetected">Trovata modifica temporale</string>
@@ -48,4 +48,5 @@
     <string name="unknown_rest_host">Impossibile connettersi a %s, si prega di verificare che si è connessi a Internet, e che l\'URL sia corretto.</string>
     <string name="version_unknown">Versione sconosciuta</string>
     <string name="default_pwd_name">Camping</string>
+    <string name="pref_about_hash">Git hash</string>
 </resources>

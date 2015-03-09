@@ -11,15 +11,15 @@
     <string name="feebback_dialog_text">Please let us know what you think.</string>
     <string name="feedback_dialog_comment_prompt">Please add your comments below:</string>
     <string name="feedback_dialog_ok_toast">Thank you!</string>
-    <string name="feedback_toast_text"/>
+    <string name="feedback_toast_text" />
     <string name="message_user_not_understand">Reading from device is disabled until you review and accept &#8220;I understand&#8221; in preferences</string>
     <string name="button_force_sync">Force sync</string>
     <string name="acra_enabled_summary">Crash reporting is enabled</string>
     <string name="acra_disabled_summary">Crash reporting is disabled</string>
     <string name="acra_email_dialog_title">Email</string>
     <string name="acra_user_email_dialog_message">This is the email address included in bug reports and automatic crash reports. This field is optional</string>
-    <string name="display_sgv"/>
-    <string name="display_trend"/>
+    <string name="display_sgv" />
+    <string name="display_trend" />
 
     <string name="close_menu_text">Close</string>
     <string name="feedback_menu_text">Feedback</string>
@@ -47,4 +47,5 @@
     <string name="ok">OK</string>
     <string name="version_unknown">Unknown version</string>
     <string name="default_pwd_name">Camping</string>
+    <string name="pref_about_hash">Git hash</string>
 </resources>
