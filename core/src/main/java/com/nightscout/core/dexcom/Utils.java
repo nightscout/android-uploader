@@ -25,7 +25,7 @@ import static org.joda.time.Duration.standardSeconds;
 public final class Utils {
     protected static final Logger log = LoggerFactory.getLogger(Utils.class);
 
-    public static final DateTime DEXCOM_EPOCH = new DateTime(2009, 1, 1, 0, 0, 0, 0);
+    public static final DateTime DEXCOM_EPOCH = new DateTime(2009, 1, 1, 0, 0, 0, 0).withZone(DateTimeZone.UTC);
 
     private static final String PRIMARY_SEPARATOR = ", ";
     private static final String SECONDARY_SEPARATOR = ", and ";
