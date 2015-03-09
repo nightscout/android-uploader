@@ -1,6 +1,7 @@
 package com.nightscout.android;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.widget.TextView;
 
@@ -122,7 +123,7 @@ public class MainActivityTest extends RobolectricTestBase {
         Pebble pebble = mock(Pebble.class);
         ((MainActivity) activity).setPebble(pebble);
         activityController.stop().resume();
-        verify(pebble, times(1)).config(anyString(), (GlucoseUnit) anyObject());
+        verify(pebble, times(1)).config(anyString(), (GlucoseUnit) anyObject(), (Context) anyObject());
     }
 
     @Test
