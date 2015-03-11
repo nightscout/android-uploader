@@ -8,9 +8,12 @@ import com.nightscout.core.model.SensorGlucoseValueEntry;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,7 +23,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.joda.time.Duration.standardSeconds;
 
 public final class Utils {
-    public static final DateTime DEXCOM_EPOCH = new DateTime(2009, 1, 1, 0, 0, 0, 0);
+    protected static final Logger log = LoggerFactory.getLogger(Utils.class);
+
+    public static final DateTime DEXCOM_EPOCH = new DateTime(2009, 1, 1, 0, 0, 0, 0).withZone(DateTimeZone.UTC);
 
     private static final String PRIMARY_SEPARATOR = ", ";
     private static final String SECONDARY_SEPARATOR = ", and ";
@@ -35,8 +40,10 @@ public final class Utils {
             .printZeroNever()
             .toFormatter();
 
+    // TODO: probably not the right way to do this but it seems to do the trick. Need to revisit this to fully understand what is going on during DST change
     public static DateTime receiverTimeToDateTime(long deltaInSeconds) {
-        return DEXCOM_EPOCH.plus(standardSeconds(deltaInSeconds)).withZone(DateTimeZone.getDefault());
+        int offset = DateTimeZone.getDefault().getOffset(DEXCOM_EPOCH) - DateTimeZone.getDefault().getOffset(Instant.now());
+        return DEXCOM_EPOCH.plus(offset).plus(standardSeconds(deltaInSeconds)).withZone(DateTimeZone.UTC);
     }
 
     public static Date receiverTimeToDate(long delta) {
