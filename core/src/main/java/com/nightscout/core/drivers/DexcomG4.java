@@ -6,7 +6,6 @@ import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.SensorRecord;
 import com.nightscout.core.model.CalibrationEntry;
-import com.nightscout.core.model.DownloadResults;
 import com.nightscout.core.model.DownloadStatus;
 import com.nightscout.core.model.G4Download;
 import com.nightscout.core.model.GlucoseUnit;
@@ -15,12 +14,12 @@ import com.nightscout.core.model.SensorEntry;
 import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
+import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static org.joda.time.Duration.standardMinutes;
@@ -55,7 +54,7 @@ public class DexcomG4 extends AbstractDevice {
     }
 
     @Override
-    protected DownloadResults doDownload() {
+    protected G4Download doDownload() {
         DownloadStatus status = DownloadStatus.SUCCESS;
         try {
             transport.open();
@@ -69,6 +68,7 @@ public class DexcomG4 extends AbstractDevice {
         List<MeterRecord> meterRecords = new ArrayList<>();
         List<SensorRecord> sensorRecords = new ArrayList<>();
         List<CalRecord> calRecords = new ArrayList<>();
+        DateTime dateTime = new DateTime();
         long displayTime = 0;
         long timeSinceLastRecord = 0;
         int batLevel = 100;
@@ -88,12 +88,13 @@ public class DexcomG4 extends AbstractDevice {
                     status = DownloadStatus.NO_DATA;
                 }
 
-                displayTime = readData.readDisplayTime().getTime();
+                displayTime = readData.readDisplayTime().getMillis();
                 if (status == DownloadStatus.SUCCESS && recentRecords.size() > 0) {
                     timeSinceLastRecord = readData.getTimeSinceEGVRecord(
                             recentRecords.get(recentRecords.size() - 1));
                 }
                 systemTime = readData.readSystemTime();
+                dateTime = new DateTime();
                 // FIXME: readData.readBatteryLevel() seems to flake out on battery level reads.
                 // Removing for now.
                 batLevel = 100;
@@ -125,7 +126,8 @@ public class DexcomG4 extends AbstractDevice {
                 .sensor(cookieMonsterG4Sensors)
                 .meter(cookieMonsterG4Meters)
                 .receiver_system_time_sec(systemTime)
-                .download_timestamp(new Date().toString())
+//                .download_timestamp(new Date().toString())
+                .download_timestamp(dateTime.toString())
                 .download_status(status)
                 .uploader_battery(uploaderDevice.getBatteryLevel())
                 .receiver_battery(batLevel)
@@ -149,7 +151,8 @@ public class DexcomG4 extends AbstractDevice {
                 e.printStackTrace();
             }
         }
-        return new DownloadResults(downloadBuilder.build(), nextUploadTime, array, displayTime);
+        return downloadBuilder.build();
+//        return new DownloadResults(downloadBuilder.build(), nextUploadTime, array, displayTime);
     }
 
     public void setNumOfPages(int numOfPages) {

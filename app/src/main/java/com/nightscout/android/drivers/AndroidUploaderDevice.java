@@ -22,6 +22,7 @@ public class AndroidUploaderDevice extends AbstractUploaderDevice {
         return uploaderBattery;
     }
 
+    // TODO: This registers everytime. Need to fix
     public static AndroidUploaderDevice getUploaderDevice(Context context) {
         return new AndroidUploaderDevice(context);
     }

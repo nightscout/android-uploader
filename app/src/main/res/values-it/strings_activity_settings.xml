@@ -115,4 +115,5 @@
     <string name="pref_enable_acra">Abilita il reporting dei crash</string>
     <string name="prefs_pwd_display_name_title">PWD Display name</string>
     <string name="prefs_pwd_display_name_summary">This is the name of the pwd that will be displayed on other monitors e.g. pebble</string>
+    <string name="pref_about_deviceid">Device ID</string>
 </resources>

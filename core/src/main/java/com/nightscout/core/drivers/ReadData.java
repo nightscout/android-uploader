@@ -13,6 +13,7 @@ import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.PageHeader;
 import com.nightscout.core.dexcom.records.SensorRecord;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -26,7 +27,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -147,7 +147,7 @@ public class ReadData {
         return Optional.fromNullable(result);
     }
 
-    public Date readDisplayTime() throws IOException {
+    public DateTime readDisplayTime() throws IOException {
         return Utils.receiverTimeToDate(readSystemTime() + readDisplayTimeOffset());
     }
 
