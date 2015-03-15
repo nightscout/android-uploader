@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory android:title="@string/pref_header_general">
-    <com.nightscout.android.settings.CustomSwitchPreference
+        <com.nightscout.android.settings.CustomSwitchPreference
             android:title="@string/pref_title_data_donate"
             android:key="data_donate"
             android:defaultValue="false"
@@ -154,7 +154,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_header_about">
-    <Preference
+        <Preference
             android:key="about_version_name"
             android:title="@string/pref_title_about_release_name"
             android:summary="@string/pref_summary_about_release_name"
@@ -170,6 +170,12 @@
         <Preference
             android:key="about_build_hash"
             android:title="@string/pref_about_hash"
+            android:positiveButtonText="@string/ok"
+            android:negativeButtonText="@null" />
+        <Preference
+            android:key="about_device_id"
+            android:title="@string/pref_about_deviceid"
+            android:selectable="true"
             android:positiveButtonText="@string/ok"
             android:negativeButtonText="@null" />
 
@@ -189,7 +195,7 @@
             android:title="@string/pref_enable_acra"
             android:summaryOn="@string/acra_enabled_summary"
             android:summaryOff="@string/acra_disabled_summary"
-            android:defaultValue="true"/>
+            android:defaultValue="true" />
         <com.nightscout.android.settings.SummaryBoundEditTextPreference
             android:key="acra.user.email"
             android:dependency="acra.enable"

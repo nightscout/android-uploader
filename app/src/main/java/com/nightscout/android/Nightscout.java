@@ -28,7 +28,7 @@ import dagger.ObjectGraph;
         resDialogOkToast = R.string.feedback_dialog_ok_toast,
         excludeMatchingSharedPreferencesKeys = {"cloud_storage_mongodb_uri", "cloud_storage_api_base"},
         mode = ReportingInteractionMode.TOAST,
-        logcatArguments = {"-t", "250", "-v", "time"}
+        logcatArguments = {"-t", "500", "-v", "time"}
 )
 public class Nightscout extends Application {
     private final String TAG = MainActivity.class.getSimpleName();
@@ -67,7 +67,7 @@ public class Nightscout extends Application {
             analytics.setDryRun(false);
             analytics.getLogger().setLogLevel(Logger.LogLevel.WARNING);
             analytics.setLocalDispatchPeriod(7200);
-            tracker =  analytics.newTracker(R.xml.app_tracker);
+            tracker = analytics.newTracker(R.xml.app_tracker);
             return tracker;
         }
         return tracker;

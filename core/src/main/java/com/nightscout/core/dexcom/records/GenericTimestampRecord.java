@@ -3,6 +3,9 @@ package com.nightscout.core.dexcom.records;
 import com.nightscout.core.dexcom.Utils;
 import com.squareup.wire.Message;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -10,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 abstract public class GenericTimestampRecord {
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
     protected final int OFFSET_SYS_TIME = 0;
     protected final int OFFSET_DISPLAY_TIME = 4;
     protected Date systemTime;
