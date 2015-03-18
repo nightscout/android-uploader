@@ -12,8 +12,7 @@ import android.widget.Toast;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.drivers.AndroidUploaderDevice;
-import com.nightscout.android.drivers.USB.CdcAcmSerialDriver;
-import com.nightscout.android.drivers.USB.UsbSerialProber;
+import com.nightscout.android.drivers.BluetoothTransport;
 import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.upload.Uploader;
@@ -117,11 +116,15 @@ public class SyncingService extends IntentService {
             final String action = intent.getAction();
             if (ACTION_SYNC.equals(action)) {
                 final int param1 = intent.getIntExtra(SYNC_PERIOD, 1);
-                DeviceTransport driver = UsbSerialProber.acquire(
-                        (UsbManager) getSystemService(USB_SERVICE));
-                if (driver != null) {
-                    handleActionSync(param1, getApplicationContext(), driver);
-                }
+//                DeviceTransport driver = UsbSerialProber.acquire(
+//                        (UsbManager) getSystemService(USB_SERVICE));
+
+
+                DeviceTransport driver = new BluetoothTransport(getApplicationContext());
+                handleActionSync(param1, getApplicationContext(), driver);
+//                if (driver != null) {
+//                    handleActionSync(param1, getApplicationContext(), driver);
+//                }
             }
         }
     }
@@ -139,12 +142,13 @@ public class SyncingService extends IntentService {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NSDownload");
         wl.acquire();
+
         if (serialDriver != null) {
             AbstractUploaderDevice uploaderDevice = AndroidUploaderDevice.getUploaderDevice(context);
             AbstractDevice device = new DexcomG4(serialDriver, preferences, uploaderDevice);
 
             ((DexcomG4) device).setNumOfPages(numOfPages);
-            ((CdcAcmSerialDriver) serialDriver).setPowerManagementEnabled(preferences.isRootEnabled());
+//            ((CdcAcmSerialDriver) serialDriver).setPowerManagementEnabled(preferences.isRootEnabled());
             try {
                 DownloadResults results = device.download();
                 G4Download download = results.getDownload();
@@ -316,7 +320,7 @@ public class SyncingService extends IntentService {
             broadcastIntent.putExtra(RESPONSE_PROTO, proto);
         }
         if (json != null)
-          broadcastIntent.putExtra(RESPONSE_JSON, json.toString());
+            broadcastIntent.putExtra(RESPONSE_JSON, json.toString());
         broadcastIntent.putExtra(RESPONSE_BAT, batLvl);
         sendBroadcast(broadcastIntent);
     }

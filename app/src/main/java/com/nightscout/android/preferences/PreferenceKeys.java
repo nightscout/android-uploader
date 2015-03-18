@@ -24,4 +24,6 @@ public final class PreferenceKeys {
     public static final String MQTT_LAST_SENSOR_TIME = "last_mqtt_sensor_time";
     public static final String MQTT_LAST_CAL_TIME = "last_mqtt_cal_time";
     public static final String MQTT_LAST_METER_TIME = "last_mqtt_meter_time";
+    public static final String BLUETOOTH_DEVICE = "share_bluetooth_device";
+    public static final String BLUETOOTH_ADDRESS = "share_bluetooth_address";
 }

@@ -85,4 +85,12 @@
     <string name="mqtt_mgr_not_initialized">MQTT connection has not been initialized.</string>
     <string name="no_uploaders">No uploaders have been configured.</string>
     <string name="unhandled_mqtt_exception">MQTT Exception: %s</string>
+    <string name="error_bluetooth_not_supported">Bluetooth not supported</string>
+    <string name="unknown_device">Unknown device</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_scan">Scan</string>
+    <string name="menu_stop">Stop</string>
+    <string name="connecting_to_device">Connecting</string>
+    <string name="bluetooth_scan_text">BT Scan</string>
+    <string name="title_activity_bluetooth_scan">Bluetooth</string>
 </resources>

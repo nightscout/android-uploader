@@ -243,4 +243,16 @@ public class AndroidPreferences implements NightscoutPreferences {
     public long getLastMeterMqttUpload() {
         return preferences.getLong(PreferenceKeys.MQTT_LAST_METER_TIME, 0);
     }
+
+    public void setBluetoothDevice(String btDeviceName, String btAddress) {
+        preferences.edit().putString(PreferenceKeys.BLUETOOTH_DEVICE, btDeviceName).apply();
+        preferences.edit().putString(PreferenceKeys.BLUETOOTH_ADDRESS, btAddress).apply();
+
+    }
+
+    public String getBtAddress() {
+        return preferences.getString(PreferenceKeys.BLUETOOTH_ADDRESS, "");
+    }
+
+
 }
