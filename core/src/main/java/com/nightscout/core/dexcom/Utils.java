@@ -113,6 +113,9 @@ public final class Utils {
 
 
     public static String bytesToHex(byte[] bytes) {
+        if (bytes == null || bytes.length == 0) {
+            return "";
+        }
         return HashCode.fromBytes(bytes).toString().toUpperCase();
     }
 }

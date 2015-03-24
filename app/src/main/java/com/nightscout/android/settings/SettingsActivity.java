@@ -3,18 +3,15 @@ package com.nightscout.android.settings;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.MenuItem;
 
-import com.nightscout.android.BuildConfig;
 import com.google.common.base.Optional;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -28,12 +25,7 @@ import com.nightscout.core.barcode.NSBarcodeConfig;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.RestUriUtils;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 public class SettingsActivity extends FragmentActivity {
     private MainPreferenceFragment mainPreferenceFragment;
@@ -80,25 +72,33 @@ public class SettingsActivity extends FragmentActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         NightscoutPreferences prefs = new AndroidPreferences(this);
-        if (scanResult != null && scanResult.getContents() != null) {
-            NSBarcodeConfig barcode = new NSBarcodeConfig(scanResult.getContents());
-            if (barcode.hasMongoConfig()) {
-                prefs.setMongoUploadEnabled(true);
-                if (barcode.getMongoUri().isPresent()) {
-                    prefs.setMongoClientUri(barcode.getMongoUri().get());
-                    prefs.setMongoCollection(barcode.getMongoCollection().orNull());
-                    prefs.setMongoDeviceStatusCollection(
-                            barcode.getMongoDeviceStatusCollection().orNull());
+        if (scanResult.getFormatName().equals("QR_CODE")) {
+            if (scanResult != null && scanResult.getContents() != null) {
+                NSBarcodeConfig barcode = new NSBarcodeConfig(scanResult.getContents());
+                if (barcode.hasMongoConfig()) {
+                    prefs.setMongoUploadEnabled(true);
+                    if (barcode.getMongoUri().isPresent()) {
+                        prefs.setMongoClientUri(barcode.getMongoUri().get());
+                        prefs.setMongoCollection(barcode.getMongoCollection().orNull());
+                        prefs.setMongoDeviceStatusCollection(
+                                barcode.getMongoDeviceStatusCollection().orNull());
+                    }
+                } else {
+                    prefs.setMongoUploadEnabled(false);
                 }
-            } else {
-                prefs.setMongoUploadEnabled(false);
+                if (barcode.hasApiConfig()) {
+                    prefs.setRestApiEnabled(true);
+                    prefs.setRestApiBaseUris(barcode.getApiUris());
+                } else {
+                    prefs.setRestApiEnabled(false);
+                }
+                refreshFragments();
             }
-            if (barcode.hasApiConfig()) {
-                prefs.setRestApiEnabled(true);
-                prefs.setRestApiBaseUris(barcode.getApiUris());
-            } else {
-                prefs.setRestApiEnabled(false);
-            }
+        } else if (scanResult.getFormatName().equals("CODE_128")) {
+            // TODO Assuming this is a share receiver. May get messy when medtronic devices are added
+            // consider refactoring
+            Log.d("XXX", "Setting serial number to: " + scanResult.getContents());
+            prefs.setShareSerial(scanResult.getContents());
             refreshFragments();
         }
     }
@@ -108,9 +108,11 @@ public class SettingsActivity extends FragmentActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_main);
-            setupBarcodeScanner();
+            setupBarcodeConfigScanner();
+            setupBarcodeShareScanner();
             setupValidation();
             setupVersionNumbers();
+            setupBtScanner();
         }
 
         private void setupVersionNumbers() {
@@ -121,7 +123,7 @@ public class SettingsActivity extends FragmentActivity {
                     Settings.Secure.ANDROID_ID));
         }
 
-        private void setupBarcodeScanner() {
+        private void setupBarcodeConfigScanner() {
             findPreference("auto_configure").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
@@ -130,6 +132,29 @@ public class SettingsActivity extends FragmentActivity {
                 }
             });
         }
+
+        private void setupBtScanner() {
+            findPreference("bt_scan_share2").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    Intent intent = new Intent(getActivity().getApplicationContext(), BluetoothScanActivity.class);
+                    startActivity(intent);
+                    return true;
+                }
+            });
+
+        }
+
+        private void setupBarcodeShareScanner() {
+            findPreference("scan_share2_barcode").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    new AndroidBarcode(getActivity()).scan();
+                    return true;
+                }
+            });
+        }
+
 
         private void setupValidation() {
             findPreference(PreferenceKeys.API_URIS).setOnPreferenceChangeListener(

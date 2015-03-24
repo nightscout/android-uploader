@@ -91,7 +91,11 @@
 
         <activity
             android:name=".settings.BluetoothScanActivity"
-            android:label="@string/title_activity_bluetooth_scan"></activity>
+            android:label="@string/title_activity_bluetooth_scan">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".settings.SettingsActivity" />
+        </activity>
 
 
     </application>

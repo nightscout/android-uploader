@@ -26,4 +26,6 @@ public final class PreferenceKeys {
     public static final String MQTT_LAST_METER_TIME = "last_mqtt_meter_time";
     public static final String BLUETOOTH_DEVICE = "share_bluetooth_device";
     public static final String BLUETOOTH_ADDRESS = "share_bluetooth_address";
+    public static final String DEXCOM_DEVICE_TYPE = "dexcom_device_type";
+    public static final String SHARE_SERIAL = "share2_serial";
 }

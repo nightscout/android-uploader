@@ -165,4 +165,9 @@ abstract class CommonUsbSerialDriver implements UsbSerialDriver {
         return false;
     }
 
+    // TODO Fix this so that it work as as expected
+    @Override
+    public boolean isConnected() {
+        return false;
+    }
 }

@@ -36,7 +36,7 @@ import javax.xml.parsers.ParserConfigurationException;
 public class ReadData {
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
-    private static final int IO_TIMEOUT = 1000;
+    private static final int IO_TIMEOUT = 5000;
     private static final int MIN_LEN = 256;
     private DeviceTransport mSerialDevice;
 

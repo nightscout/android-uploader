@@ -28,11 +28,11 @@
         android:orderInCategory="100"
         nightscout:showAsAction="ifRoom"
         android:title="@string/upload_log_menu" />
-    <item
-        android:id="@+id/bluetooth_scan"
-        android:orderInCategory="100"
-        nightscout:showAsAction="ifRoom"
-        android:title="@string/bluetooth_scan_text" />
+    <!--<item-->
+    <!--android:id="@+id/bluetooth_scan"-->
+    <!--android:orderInCategory="100"-->
+    <!--nightscout:showAsAction="ifRoom"-->
+    <!--android:title="@string/bluetooth_scan_text" />-->
     <item
         android:id="@+id/close_settings"
         android:orderInCategory="100"

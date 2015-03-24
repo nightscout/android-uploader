@@ -13,6 +13,8 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.drivers.AndroidUploaderDevice;
 import com.nightscout.android.drivers.BluetoothTransport;
+import com.nightscout.android.drivers.USB.CdcAcmSerialDriver;
+import com.nightscout.android.drivers.USB.UsbSerialProber;
 import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.upload.Uploader;
@@ -23,6 +25,7 @@ import com.nightscout.core.drivers.AbstractDevice;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DexcomG4;
+import com.nightscout.core.drivers.SupportedDevices;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
@@ -80,7 +83,7 @@ public class SyncingService extends IntentService {
 
     // Constants
     private final int TIME_SYNC_OFFSET = 10000;
-    public static final int MIN_SYNC_PAGES = 2;
+    public static final int MIN_SYNC_PAGES = 1;
     public static final int GAP_SYNC_PAGES = 20;
 
 
@@ -116,15 +119,22 @@ public class SyncingService extends IntentService {
             final String action = intent.getAction();
             if (ACTION_SYNC.equals(action)) {
                 final int param1 = intent.getIntExtra(SYNC_PERIOD, 1);
-//                DeviceTransport driver = UsbSerialProber.acquire(
-//                        (UsbManager) getSystemService(USB_SERVICE));
+                AndroidPreferences preferences = new AndroidPreferences(this);
+                DeviceTransport driver = null;
+                if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4) {
+                    driver = UsbSerialProber.acquire(
+                            (UsbManager) getSystemService(USB_SERVICE));
+                } else if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE) {
+                    driver = new BluetoothTransport(getApplicationContext());
+                }
 
 
-                DeviceTransport driver = new BluetoothTransport(getApplicationContext());
-                handleActionSync(param1, getApplicationContext(), driver);
-//                if (driver != null) {
-//                    handleActionSync(param1, getApplicationContext(), driver);
-//                }
+//                handleActionSync(param1, getApplicationContext(), driver);
+                if (driver != null) {
+                    handleActionSync(param1, getApplicationContext(), driver);
+                } else {
+
+                }
             }
         }
     }
@@ -145,10 +155,14 @@ public class SyncingService extends IntentService {
 
         if (serialDriver != null) {
             AbstractUploaderDevice uploaderDevice = AndroidUploaderDevice.getUploaderDevice(context);
-            AbstractDevice device = new DexcomG4(serialDriver, preferences, uploaderDevice);
-
-            ((DexcomG4) device).setNumOfPages(numOfPages);
-//            ((CdcAcmSerialDriver) serialDriver).setPowerManagementEnabled(preferences.isRootEnabled());
+            AbstractDevice device = null;
+            if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4 || preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE) {
+                device = new DexcomG4(serialDriver, preferences, uploaderDevice);
+                ((DexcomG4) device).setNumOfPages(numOfPages);
+                if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4) {
+                    ((CdcAcmSerialDriver) serialDriver).setPowerManagementEnabled(preferences.isRootEnabled());
+                }
+            }
             try {
                 DownloadResults results = device.download();
                 G4Download download = results.getDownload();

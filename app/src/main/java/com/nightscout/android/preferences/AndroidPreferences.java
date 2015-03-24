@@ -1,12 +1,12 @@
 package com.nightscout.android.preferences;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.google.common.base.Joiner;
 import com.nightscout.android.R;
+import com.nightscout.core.drivers.SupportedDevices;
 import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.RestUriUtils;
@@ -208,24 +208,20 @@ public class AndroidPreferences implements NightscoutPreferences {
         preferences.edit().putBoolean(PreferenceKeys.ROOT_ENABLED, enabled).apply();
     }
 
-    @SuppressLint("CommitPrefEdits")
     public void setLastEgvMqttUpload(long timestamp) {
-        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_EGV_TIME, timestamp).commit();
+        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_EGV_TIME, timestamp).apply();
     }
 
-    @SuppressLint("CommitPrefEdits")
     public void setLastSensorMqttUpload(long timestamp) {
-        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_SENSOR_TIME, timestamp).commit();
+        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_SENSOR_TIME, timestamp).apply();
     }
 
-    @SuppressLint("CommitPrefEdits")
     public void setLastCalMqttUpload(long timestamp) {
-        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_CAL_TIME, timestamp).commit();
+        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_CAL_TIME, timestamp).apply();
     }
 
-    @SuppressLint("CommitPrefEdits")
     public void setLastMeterMqttUpload(long timestamp) {
-        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_METER_TIME, timestamp).commit();
+        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_METER_TIME, timestamp).apply();
     }
 
     public long getLastEgvMqttUpload() {
@@ -244,14 +240,31 @@ public class AndroidPreferences implements NightscoutPreferences {
         return preferences.getLong(PreferenceKeys.MQTT_LAST_METER_TIME, 0);
     }
 
+    @Override
     public void setBluetoothDevice(String btDeviceName, String btAddress) {
         preferences.edit().putString(PreferenceKeys.BLUETOOTH_DEVICE, btDeviceName).apply();
         preferences.edit().putString(PreferenceKeys.BLUETOOTH_ADDRESS, btAddress).apply();
-
     }
 
+    @Override
     public String getBtAddress() {
         return preferences.getString(PreferenceKeys.BLUETOOTH_ADDRESS, "");
+    }
+
+    @Override
+    public SupportedDevices getDeviceType() {
+        return preferences.getString(PreferenceKeys.DEXCOM_DEVICE_TYPE, "0").equals("0") ?
+                SupportedDevices.DEXCOM_G4 : SupportedDevices.DEXCOM_G4_SHARE;
+    }
+
+    @Override
+    public String getShareSerial() {
+        return preferences.getString(PreferenceKeys.SHARE_SERIAL, "");
+    }
+
+    @Override
+    public void setShareSerial(String serialNumber) {
+        preferences.edit().putString(PreferenceKeys.SHARE_SERIAL, serialNumber).apply();
     }
 
 

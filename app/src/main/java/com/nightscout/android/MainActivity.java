@@ -42,7 +42,6 @@ import com.nightscout.android.mqtt.AndroidMqttPinger;
 import com.nightscout.android.mqtt.AndroidMqttTimer;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.preferences.PreferencesValidator;
-import com.nightscout.android.settings.BluetoothScanActivity;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.android.ui.AppContainer;
 import com.nightscout.android.wearables.Pebble;
@@ -251,7 +250,6 @@ public class MainActivity extends Activity {
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent syncIntent = new Intent(MainActivity.ACTION_POLL);
         syncManager = PendingIntent.getBroadcast(getApplicationContext(), 1, syncIntent, 0);
-        Log.w("XXX", "Made it here");
 
         SyncingService.startActionSingleSync(getApplicationContext(), SyncingService.MIN_SYNC_PAGES);
     }
@@ -489,6 +487,7 @@ public class MainActivity extends Activity {
             lastRecordTime = responseSGVTimestamp;
             receiverOffsetFromUploader = new Date().getTime() - responseDisplayTime;
             int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT, -1);
+            Log.d(TAG, "Receiver battery level: " + rcvrBat);
             String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
             byte[] proto = intent.getByteArrayExtra(SyncingService.RESPONSE_PROTO);
             boolean published = false;
@@ -644,11 +643,7 @@ public class MainActivity extends Activity {
                 break;
             case R.id.close_settings:
                 cancelPoll();
-//                finish();
-                break;
-            case R.id.bluetooth_scan:
-                intent = new Intent(getApplicationContext(), BluetoothScanActivity.class);
-                startActivity(intent);
+                finish();
                 break;
         }
         return super.onOptionsItemSelected(item);

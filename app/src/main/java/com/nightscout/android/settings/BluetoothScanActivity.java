@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.NavUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,6 +40,10 @@ public class BluetoothScanActivity extends ListActivity {
         setContentView(R.layout.activity_bluetooth_scan);
 
 //        ListView lv = (ListView)findViewById(android.R.id.list);
+
+        if (getActionBar() != null) {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         final BluetoothManager bluetooth_manager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 
@@ -98,6 +103,9 @@ public class BluetoothScanActivity extends ListActivity {
                     }
                 }
                 return true;
+            case R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -131,6 +139,8 @@ public class BluetoothScanActivity extends ListActivity {
         Toast.makeText(this, R.string.connecting_to_device, Toast.LENGTH_LONG).show();
         AndroidPreferences prefs = new AndroidPreferences(getApplicationContext());
         prefs.setBluetoothDevice(device.getName(), device.getAddress());
+        NavUtils.navigateUpFromSameTask(this);
+
 
         if (is_scanning) {
             bluetooth_adapter.stopLeScan(mLeScanCallback);

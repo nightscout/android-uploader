@@ -84,8 +84,15 @@
         <item>mg/dL</item>
         <item>mmol/L</item>
     </string-array>
-
+    <string-array name="pref_options_type">
+        <item>G4</item>
+        <item>G4 with Share</item>
+    </string-array>
     <string-array name="pref_options_units_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    <string-array name="pref_options_type_values">
         <item>0</item>
         <item>1</item>
     </string-array>
