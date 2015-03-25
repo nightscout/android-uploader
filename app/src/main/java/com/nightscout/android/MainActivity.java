@@ -476,197 +476,6 @@ public class MainActivity extends Activity {
         mTextTimestamp.setText(savedInstanceState.getString("saveTextTimestamp"));
     }
 
-//    public class CGMStatusReceiver extends BroadcastReceiver {
-//        public static final String PROCESS_RESPONSE = "com.mSyncingServiceIntent.action.PROCESS_RESPONSE";
-//
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            // Get response messages from broadcast
-//            int responseSGV = intent.getIntExtra(SyncingService.RESPONSE_SGV, -1);
-//            GlucoseReading reading = new GlucoseReading(responseSGV, GlucoseUnit.MGDL);
-//            TrendArrow trend = TrendArrow.values()[intent.getIntExtra(SyncingService.RESPONSE_TREND, 0)];
-//            long responseSGVTimestamp = intent.getLongExtra(SyncingService.RESPONSE_TIMESTAMP, -1L);
-//            boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
-//            long responseNextUploadTime = intent.getLongExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
-//            long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME, new Date().getTime());
-//            long lastSgvTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_SGV_TIME,
-//                    ((AndroidPreferences) preferences).getLastEgvMqttUpload());
-//            long lastMeterTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_METER_TIME,
-//                    ((AndroidPreferences) preferences).getLastMeterMqttUpload());
-//            long lastSensorTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_SENSOR_TIME,
-//                    ((AndroidPreferences) preferences).getLastSensorMqttUpload());
-//            long lastCalTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_CAL_TIME,
-//                    ((AndroidPreferences) preferences).getLastCalMqttUpload());
-//            lastRecordTime = responseSGVTimestamp;
-//            receiverOffsetFromUploader = new Date().getTime() - responseDisplayTime;
-//            int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT, -1);
-//            String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
-//            byte[] proto = intent.getByteArrayExtra(SyncingService.RESPONSE_PROTO);
-//            boolean published = false;
-//            if (preferences.isMqttEnabled() && proto != null && proto.length != 0) {
-//                Log.d(TAG, "Proto: " + Utils.bytesToHex(proto));
-//                if (mqttManager != null) {
-//                    Log.d(TAG, "Publishing");
-//                    mqttManager.publish(proto, "/downloads/protobuf");
-//                    ((AndroidPreferences) preferences).setLastEgvMqttUpload(lastSgvTimestamp);
-//                    ((AndroidPreferences) preferences).setLastMeterMqttUpload(lastMeterTimestamp);
-//                    ((AndroidPreferences) preferences).setLastSensorMqttUpload(lastSensorTimestamp);
-//                    ((AndroidPreferences) preferences).setLastCalMqttUpload(lastCalTimestamp);
-//                    published = true;
-//                } else {
-//                    reporter.report(EventType.DEVICE, EventSeverity.ERROR,
-//                            getApplicationContext().getString(R.string.mqtt_mgr_not_initialized));
-//                }
-//            }
-//            if (preferences.isMqttEnabled()) {
-//                responseUploadStatus &= published;
-//            }
-//            if (responseUploadStatus) {
-//                mSyncButton.setBackgroundResource(R.drawable.ic_cloud);
-//            } else {
-//                mSyncButton.setBackgroundResource(R.drawable.ic_nocloud);
-//            }
-//            if (responseSGV != -1) {
-//                pebble.sendDownload(reading, trend, responseSGVTimestamp, getApplicationContext());
-//            }
-//            // Reload d3 chart with new data
-//            if (json != null) {
-//                mJSONData = json;
-//                mWebView.loadUrl("javascript:updateData(" + mJSONData + ")");
-//            }
-//
-//            // Update UI with latest record information
-//            mTextSGV.setText(getSGVStringByUnit(reading, trend));
-//            mTextSGV.setTag(R.string.display_sgv, reading.asMgdl());
-//            mTextSGV.setTag(R.string.display_trend, trend.ordinal());
-//
-//            String timeAgoStr = "---";
-//            Log.d(TAG, "Date: " + new Date().getTime());
-//            Log.d(TAG, "Response SGV Timestamp: " + responseSGVTimestamp);
-//            if (responseSGVTimestamp > 0) {
-//                timeAgoStr = Utils.getTimeString(new Date().getTime() - responseSGVTimestamp);
-//            }
-//
-//            mTextTimestamp.setText(timeAgoStr);
-//            mTextTimestamp.setTag(timeAgoStr);
-//
-//            long nextUploadTime = standardMinutes(5).getMillis();
-//
-//            if (responseNextUploadTime > nextUploadTime) {
-//                Log.d(TAG,
-//                        "Receiver's time is less than current record time, possible time change.");
-//                mTracker.send(new HitBuilders.EventBuilder("Main", "Time change").build());
-//            } else if (responseNextUploadTime > 0) {
-//                Log.d(TAG, "Setting next upload time to " + responseNextUploadTime);
-//                nextUploadTime = responseNextUploadTime;
-//            } else {
-//                Log.d(TAG, "OUT OF RANGE: Setting next upload time to " + nextUploadTime + " ms.");
-//            }
-//
-//            if (Minutes.minutesBetween(new DateTime(), new DateTime(responseDisplayTime))
-//                    .isGreaterThan(Minutes.minutes(20))) {
-//                Log.w(TAG, "Receiver time is off by 20 minutes or more.");
-//                mTracker.send(new HitBuilders.EventBuilder("Main", "Time difference > 20 minutes").build());
-//            }
-//
-//            setNextPoll(nextUploadTime);
-//        }
-//    }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // Get response messages from broadcast
-            int responseSGV = intent.getIntExtra(SyncingService.RESPONSE_SGV, -1);
-            GlucoseReading reading = new GlucoseReading(responseSGV, GlucoseUnit.MGDL);
-            TrendArrow trend = TrendArrow.values()[intent.getIntExtra(SyncingService.RESPONSE_TREND, 0)];
-            long responseSGVTimestamp = intent.getLongExtra(SyncingService.RESPONSE_TIMESTAMP, -1L);
-            boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
-            long responseNextUploadTime = intent.getLongExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
-            long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME, new Date().getTime());
-            long lastSgvTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_SGV_TIME,
-                    ((AndroidPreferences) preferences).getLastEgvMqttUpload());
-            long lastMeterTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_METER_TIME,
-                    ((AndroidPreferences) preferences).getLastMeterMqttUpload());
-            long lastSensorTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_SENSOR_TIME,
-                    ((AndroidPreferences) preferences).getLastSensorMqttUpload());
-            long lastCalTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_CAL_TIME,
-                    ((AndroidPreferences) preferences).getLastCalMqttUpload());
-            lastRecordTime = responseSGVTimestamp;
-            receiverOffsetFromUploader = new Date().getTime() - responseDisplayTime;
-            int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT, -1);
-            String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
-            byte[] proto = intent.getByteArrayExtra(SyncingService.RESPONSE_PROTO);
-            boolean published = false;
-            if (preferences.isMqttEnabled() && proto != null && proto.length != 0) {
-                Log.d(TAG, "Proto: " + Utils.bytesToHex(proto));
-                if (mqttManager != null) {
-                    Log.d(TAG, "Publishing");
-                    mqttManager.publish(proto, "/downloads/protobuf");
-                    ((AndroidPreferences) preferences).setLastEgvMqttUpload(lastSgvTimestamp);
-                    ((AndroidPreferences) preferences).setLastMeterMqttUpload(lastMeterTimestamp);
-                    ((AndroidPreferences) preferences).setLastSensorMqttUpload(lastSensorTimestamp);
-                    ((AndroidPreferences) preferences).setLastCalMqttUpload(lastCalTimestamp);
-                    published = true;
-                } else {
-                    reporter.report(EventType.DEVICE, EventSeverity.ERROR,
-                            getApplicationContext().getString(R.string.mqtt_mgr_not_initialized));
-                }
-            }
-            if (preferences.isMqttEnabled()) {
-                responseUploadStatus &= published;
-            }
-            if (responseUploadStatus) {
-                mSyncButton.setBackgroundResource(R.drawable.ic_cloud);
-            } else {
-                mSyncButton.setBackgroundResource(R.drawable.ic_nocloud);
-            }
-            if (responseSGV != -1) {
-                pebble.sendDownload(reading, trend, responseSGVTimestamp, getApplicationContext());
-            }
-            // Reload d3 chart with new data
-            if (json != null) {
-                mJSONData = json;
-                mWebView.loadUrl("javascript:updateData(" + mJSONData + ")");
-            }
-
-            // Update UI with latest record information
-            mTextSGV.setText(getSGVStringByUnit(reading, trend));
-            mTextSGV.setTag(R.string.display_sgv, reading.asMgdl());
-            mTextSGV.setTag(R.string.display_trend, trend.ordinal());
-
-            String timeAgoStr = "---";
-            Log.d(TAG, "Date: " + new Date().getTime());
-            Log.d(TAG, "Response SGV Timestamp: " + responseSGVTimestamp);
-            if (responseSGVTimestamp > 0) {
-                timeAgoStr = Utils.getTimeString(new Date().getTime() - responseSGVTimestamp);
-            }
-
-            mTextTimestamp.setText(timeAgoStr);
-            mTextTimestamp.setTag(timeAgoStr);
-
-            long nextUploadTime = standardMinutes(5).getMillis();
-
-            if (responseNextUploadTime > nextUploadTime) {
-                Log.d(TAG,
-                        "Receiver's time is less than current record time, possible time change.");
-                mTracker.send(new HitBuilders.EventBuilder("Main", "Time change").build());
-            } else if (responseNextUploadTime > 0) {
-                Log.d(TAG, "Setting next upload time to " + responseNextUploadTime);
-                nextUploadTime = responseNextUploadTime;
-            } else {
-                Log.d(TAG, "OUT OF RANGE: Setting next upload time to " + nextUploadTime + " ms.");
-            }
-
-            if (Minutes.minutesBetween(new DateTime(), new DateTime(responseDisplayTime))
-                    .isGreaterThan(Minutes.minutes(20))) {
-                Log.w(TAG, "Receiver time is off by 20 minutes or more.");
-                mTracker.send(new HitBuilders.EventBuilder("Main", "Time difference > 20 minutes").build());
-            }
-
-            setNextPoll(nextUploadTime);
-        }
-    }
-
     BroadcastReceiver mDeviceStatusReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -694,7 +503,6 @@ public class MainActivity extends Activity {
     public Runnable updateTimeAgo = new Runnable() {
         @Override
         public void run() {
-//            long delta = new Date().getTime() - lastRecordTime + receiverOffsetFromUploader;
             // FIXME: doesn't calculate timeago properly.
             long delta = new Date().getTime() - lastRecordTime;
             if (lastRecordTime == 0) delta = 0;
@@ -791,6 +599,33 @@ public class MainActivity extends Activity {
                     }
                 }
                 lastRecordTime = new DateTime().getMillis() - Duration.standardSeconds(download.receiver_system_time_sec - download.sgv.get(download.sgv.size() - 1).sys_timestamp_sec).getMillis();
+                EGVRecord recentRecord = null;
+                if (download.sgv.size() > 0) {
+                    recentRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), download.receiver_system_time_sec, refTime);
+                    pebble.sendDownload(recentRecord.getReading(), recentRecord.getTrend(), recentRecord.getWallTime().getMillis(), getApplicationContext());
+                    // Reload d3 chart with new data
+                    JSONArray array = new JSONArray();
+                    for (SensorGlucoseValueEntry sgve : download.sgv) {
+                        try {
+                            EGVRecord record = new EGVRecord(sgve, sgve.sys_timestamp_sec, refTime);
+                            array.put(record.toJSON());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    mWebView.loadUrl("javascript:updateData(" + array + ")");
+                    mTextSGV.setText(getSGVStringByUnit(recentRecord.getReading(), recentRecord.getTrend()));
+                    mTextSGV.setTag(R.string.display_sgv, recentRecord.getReading().asMgdl());
+                    mTextSGV.setTag(R.string.display_trend, recentRecord.getTrend().ordinal());
+                }
+
+                if (download.sgv.get(download.sgv.size() - 1).sgv_mgdl != -1) {
+                    GlucoseReading reading = new GlucoseReading(download.sgv.get(download.sgv.size() - 1).sgv_mgdl, GlucoseUnit.MGDL);
+                    pebble.sendDownload(reading, TrendArrow.values()[download.sgv.get(download.sgv.size() - 1).trend.ordinal()], Utils.systemTimeToWallTime(download.sgv.get(download.sgv.size() - 1).sys_timestamp_sec, download.receiver_system_time_sec, refTime).getMillis(), getApplicationContext());
+                }
+
+                // Update UI with latest record information
+
 //        if (preferences.isMqttEnabled()) {
 //            responseUploadStatus &= published;
 //        }
@@ -799,30 +634,7 @@ public class MainActivity extends Activity {
 //        } else {
 //            mSyncButton.setBackgroundResource(R.drawable.ic_nocloud);
 //        }
-                if (download.sgv.get(download.sgv.size() - 1).sgv_mgdl != -1) {
-                    GlucoseReading reading = new GlucoseReading(download.sgv.get(download.sgv.size() - 1).sgv_mgdl, GlucoseUnit.MGDL);
-                    pebble.sendDownload(reading, TrendArrow.values()[download.sgv.get(download.sgv.size() - 1).trend.ordinal()], Utils.systemTimeToWallTime(download.sgv.get(download.sgv.size() - 1).sys_timestamp_sec, download.receiver_system_time_sec, refTime).getMillis(), getApplicationContext());
-                }
-                // Reload d3 chart with new data
-                JSONArray array = new JSONArray();
-                for (SensorGlucoseValueEntry recentRecord : download.sgv) {
-                    try {
-                        array.put(new EGVRecord(recentRecord, download.receiver_system_time_sec, refTime).toJSON());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                if (array != null) {
-                    mWebView.loadUrl("javascript:updateData(" + array + ")");
-                }
-
-                // Update UI with latest record information
                 EGVRecord lastEgvRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), download.receiver_system_time_sec, refTime);
-                mTextSGV.setText(getSGVStringByUnit(lastEgvRecord.getReading(), lastEgvRecord.getTrend()));
-                mTextSGV.setTag(R.string.display_sgv, lastEgvRecord.getReading().asMgdl());
-                mTextSGV.setTag(R.string.display_trend, lastEgvRecord.getTrend().ordinal());
-
                 String timeAgoStr = "---";
                 if (lastEgvRecord.getRawSystemTimeSeconds() > 0) {
                     timeAgoStr = Utils.getTimeString(download.receiver_system_time_sec - lastEgvRecord.getRawSystemTimeSeconds());
@@ -831,8 +643,7 @@ public class MainActivity extends Activity {
                 mTextTimestamp.setText(timeAgoStr);
                 mTextTimestamp.setTag(timeAgoStr);
 
-                long nextUploadTime = standardMinutes(5).getMillis();
-                nextUploadTime = Duration.standardSeconds(Minutes.minutes(5).toStandardSeconds().getSeconds() - ((download.receiver_system_time_sec - lastEgvRecord.getRawSystemTimeSeconds()) % Minutes.minutes(5).toStandardSeconds().getSeconds())).getMillis();
+                long nextUploadTime = Duration.standardSeconds(Minutes.minutes(5).toStandardSeconds().getSeconds() - ((download.receiver_system_time_sec - lastEgvRecord.getRawSystemTimeSeconds()) % Minutes.minutes(5).toStandardSeconds().getSeconds())).getMillis();
                 setNextPoll(nextUploadTime);
             }
         });

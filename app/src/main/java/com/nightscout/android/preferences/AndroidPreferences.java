@@ -267,5 +267,13 @@ public class AndroidPreferences implements NightscoutPreferences {
         preferences.edit().putString(PreferenceKeys.SHARE_SERIAL, serialNumber).apply();
     }
 
+    @Override
+    public boolean isMeterUploadEnabled() {
+        return preferences.getBoolean(PreferenceKeys.METER_UPLOAD_ENABLED, false);
+    }
 
+    @Override
+    public void setMeterUploadEnabled(boolean enabled) {
+        preferences.edit().putBoolean(PreferenceKeys.METER_UPLOAD_ENABLED, enabled).apply();
+    }
 }

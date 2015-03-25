@@ -161,67 +161,8 @@ public class SyncingService extends IntentService {
                     uploadStatus = uploader.upload(download);
                 }
 
-//                EGVRecord recentEGV;
-//                if (download.download_status == DownloadStatus.SUCCESS) {
-//                    recentEGV = new EGVRecord(download.sgv.get(download.sgv.size() - 1));
-//                } else {
-//                    recentEGV = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(),
-//                            G4Noise.NOISE_NONE);
-//                }
-//
-//                DateTime dt = new DateTime();
-//                DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
-//                String iso8601Str = fmt.print(dt);
-//
-//                G4Download.Builder builder = new G4Download.Builder();
-//                builder.download_timestamp(iso8601Str)
-//                        .download_status(download.download_status)
-//                        .receiver_battery(download.receiver_battery)
-//                        .uploader_battery(download.uploader_battery)
-//                        .receiver_system_time_sec(download.receiver_system_time_sec)
-//                        .units(download.units);
-//
-//                long egvTime = preferences.getLastEgvMqttUpload();
-//                long meterTime = preferences.getLastMeterMqttUpload();
-//                long sensorTime = preferences.getLastSensorMqttUpload();
-//                long calTime = preferences.getLastCalMqttUpload();
-//                long lastSgvTimestamp = egvTime;
-//                List<SensorGlucoseValueEntry> filteredSgvs = new ArrayList<>();
-//                for (SensorGlucoseValueEntry aRecord : download.sgv) {
-//                    if (aRecord.sys_timestamp_sec > egvTime || numOfPages == GAP_SYNC_PAGES) {
-//                        filteredSgvs.add(aRecord);
-//                        lastSgvTimestamp = aRecord.sys_timestamp_sec;
-//                    }
-//                }
-//                builder.sgv(filteredSgvs);
-//                long lastMeterTimestamp = meterTime;
-//                List<MeterEntry> filteredMeter = new ArrayList<>();
-//                for (MeterEntry aRecord : download.meter) {
-//                    if (aRecord.sys_timestamp_sec > meterTime || numOfPages == GAP_SYNC_PAGES) {
-//                        filteredMeter.add(aRecord);
-//                        lastMeterTimestamp = aRecord.sys_timestamp_sec;
-//                    }
-//                }
-//                builder.meter(filteredMeter);
-//                long lastSensorTimestamp = sensorTime;
-//                List<SensorEntry> filteredSensor = new ArrayList<>();
-//                for (SensorEntry aRecord : download.sensor) {
-//                    if (aRecord.sys_timestamp_sec > sensorTime || numOfPages == GAP_SYNC_PAGES) {
-//                        filteredSensor.add(aRecord);
-//                        lastSensorTimestamp = aRecord.sys_timestamp_sec;
-//                    }
-//                }
-//                builder.sensor(filteredSensor);
-//                long lastCalTimestamp = calTime;
-//                List<CalibrationEntry> filteredCal = new ArrayList<>();
-//                for (CalibrationEntry aRecord : download.cal) {
-//                    if (aRecord.sys_timestamp_sec > calTime || numOfPages == GAP_SYNC_PAGES) {
-//                        filteredCal.add(aRecord);
-//                        lastCalTimestamp = aRecord.sys_timestamp_sec;
-//                    }
-//                }
-//                builder.cal(filteredCal);
                 bus.post(download);
+                bus.post(uploadStatus);
                 reporter.report(EventType.DEVICE, EventSeverity.INFO,
                         getApplicationContext().getString(R.string.event_sync_log));
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -290,43 +231,6 @@ public class SyncingService extends IntentService {
             }
         }
         return g4Connected;
-    }
-
-    public void broadcastSGVToUI(EGVRecord egvRecord, boolean uploadStatus,
-                                 long nextUploadTime, long displayTime,
-                                 JSONArray json, int batLvl, byte[] proto,
-                                 long lastSgvTimestamp, long lastMeterTimestamp,
-                                 long lastSensorTimestamp, long lastCalTimestamp) {
-        Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction(MainActivity.CGMStatusReceiver.PROCESS_RESPONSE);
-        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.putExtra(RESPONSE_SGV, egvRecord.getBgMgdl());
-        broadcastIntent.putExtra(RESPONSE_TREND, egvRecord.getTrend().ordinal());
-        broadcastIntent.putExtra(RESPONSE_TIMESTAMP, egvRecord.getDisplayTime().getTime());
-        broadcastIntent.putExtra(RESPONSE_NEXT_UPLOAD_TIME, nextUploadTime);
-        broadcastIntent.putExtra(RESPONSE_UPLOAD_STATUS, uploadStatus);
-        broadcastIntent.putExtra(RESPONSE_DISPLAY_TIME, displayTime);
-
-        // FIXME: a quick hack to store timestamps once the data has been published in the
-        // MainActivity
-        broadcastIntent.putExtra(RESPONSE_LAST_SGV_TIME, lastSgvTimestamp);
-        broadcastIntent.putExtra(RESPONSE_LAST_METER_TIME, lastMeterTimestamp);
-        broadcastIntent.putExtra(RESPONSE_LAST_SENSOR_TIME, lastSensorTimestamp);
-        broadcastIntent.putExtra(RESPONSE_LAST_CAL_TIME, lastCalTimestamp);
-        if (proto != null) {
-            broadcastIntent.putExtra(RESPONSE_PROTO, proto);
-        }
-        if (json != null)
-          broadcastIntent.putExtra(RESPONSE_JSON, json.toString());
-        broadcastIntent.putExtra(RESPONSE_BAT, batLvl);
-        sendBroadcast(broadcastIntent);
-    }
-
-    protected void broadcastSGVToUI() {
-        EGVRecord record = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(),
-                G4Noise.NOISE_NONE);
-        broadcastSGVToUI(record, false, standardMinutes(5).getMillis() + TIME_SYNC_OFFSET,
-                new Date().getTime(), null, 0, new byte[0], -1, -1, -1, -1);
     }
 
 }

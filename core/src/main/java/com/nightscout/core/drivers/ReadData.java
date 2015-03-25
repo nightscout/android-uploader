@@ -47,13 +47,13 @@ public class ReadData {
         mSerialDevice = device;
     }
 
-    public List<EGVRecord> getRecentEGVs() throws IOException {
+    public List<EGVRecord> getRecentEGVs(long rcvrTime, long refTime) throws IOException {
         int endPage = readDataBasePageRange(RecordType.EGV_DATA);
         byte[] data = readDataBasePage(RecordType.EGV_DATA, endPage);
-        return parsePage(data, EGVRecord.class);
+        return parsePage(data, EGVRecord.class, rcvrTime, refTime);
     }
 
-    public List<EGVRecord> getRecentEGVsPages(int numOfRecentPages) throws IOException {
+    public List<EGVRecord> getRecentEGVsPages(int numOfRecentPages, long rcvrTime, long refTime) throws IOException {
         if (numOfRecentPages < 1) {
             throw new IllegalArgumentException("Number of pages must be greater than 1.");
         }
@@ -66,7 +66,7 @@ public class ReadData {
             int nextPage = endPage - i;
             log.debug("Reading #{} EGV pages (page number {})", i, nextPage);
             byte[] data = readDataBasePage(RecordType.EGV_DATA, nextPage);
-            allPages.addAll(parsePage(data, EGVRecord.class));
+            allPages.addAll(parsePage(data, EGVRecord.class, rcvrTime, refTime));
         }
         log.debug("Read complete of EGV pages.");
         return allPages;
@@ -76,14 +76,14 @@ public class ReadData {
         return readSystemTime() - egvRecord.getRawSystemTimeSeconds();
     }
 
-    public List<MeterRecord> getRecentMeterRecords() throws IOException {
+    public List<MeterRecord> getRecentMeterRecords(long rcvrTime, long refTime) throws IOException {
         log.debug("Reading Meter page...");
         int endPage = readDataBasePageRange(RecordType.METER_DATA);
         byte[] data = readDataBasePage(RecordType.METER_DATA, endPage);
-        return parsePage(data, MeterRecord.class);
+        return parsePage(data, MeterRecord.class, rcvrTime, refTime);
     }
 
-    public List<SensorRecord> getRecentSensorRecords(int numOfRecentPages) throws IOException {
+    public List<SensorRecord> getRecentSensorRecords(int numOfRecentPages, long rcvrTime, long refTime) throws IOException {
         if (numOfRecentPages < 1) {
             throw new IllegalArgumentException("Number of pages must be greater than 1.");
         }
@@ -96,18 +96,18 @@ public class ReadData {
             int nextPage = endPage - i;
             log.debug("Reading #{} Sensor pages (page number {})", i, nextPage);
             byte[] data = readDataBasePage(RecordType.SENSOR_DATA, nextPage);
-            allPages.addAll(parsePage(data, SensorRecord.class));
+            allPages.addAll(parsePage(data, SensorRecord.class, rcvrTime, refTime));
         }
         log.debug("Read complete of Sensor pages.");
         return allPages;
     }
 
-    public List<CalRecord> getRecentCalRecords() throws IOException {
+    public List<CalRecord> getRecentCalRecords(long rcvrTime, long refTime) throws IOException {
         log.debug("Reading Cal Records page range...");
         int endPage = readDataBasePageRange(RecordType.CAL_SET);
         log.debug("Reading Cal Records page...");
         byte[] data = readDataBasePage(RecordType.CAL_SET, endPage);
-        return parsePage(data, CalRecord.class);
+        return parsePage(data, CalRecord.class, rcvrTime, refTime);
     }
 
     public boolean ping() throws IOException {
@@ -228,7 +228,7 @@ public class ReadData {
         return new ReadPacket(response);
     }
 
-    private <T extends GenericTimestampRecord> List<T> parsePage(byte[] data, Class<T> clazz) {
+    private <T extends GenericTimestampRecord> List<T> parsePage(byte[] data, Class<T> clazz, long rcvrTime, long refTime) {
         PageHeader pageHeader = new PageHeader(data);
         List<T> records = new ArrayList<>();
         try {
@@ -237,20 +237,20 @@ public class ReadData {
                 switch (pageHeader.getRecordType()) {
                     case EGV_DATA:
                         startIdx = PageHeader.HEADER_SIZE + (EGVRecord.RECORD_SIZE + 1) * i;
-                        records.add(clazz.cast(new EGVRecord(Arrays.copyOfRange(data, startIdx, startIdx + EGVRecord.RECORD_SIZE))));
+                        records.add(clazz.cast(new EGVRecord(Arrays.copyOfRange(data, startIdx, startIdx + EGVRecord.RECORD_SIZE), rcvrTime, refTime)));
                         break;
                     case CAL_SET:
                         int recordLength = (pageHeader.getRevision() <= 2) ? CalRecord.RECORD_SIZE : CalRecord.RECORD_V2_SIZE;
                         startIdx = PageHeader.HEADER_SIZE + (recordLength + 1) * i;
-                        records.add(clazz.cast(new CalRecord(Arrays.copyOfRange(data, startIdx, startIdx + recordLength))));
+                        records.add(clazz.cast(new CalRecord(Arrays.copyOfRange(data, startIdx, startIdx + recordLength), rcvrTime, refTime)));
                         break;
                     case METER_DATA:
                         startIdx = PageHeader.HEADER_SIZE + (MeterRecord.RECORD_SIZE + 1) * i;
-                        records.add(clazz.cast(new MeterRecord(Arrays.copyOfRange(data, startIdx, startIdx + MeterRecord.RECORD_SIZE))));
+                        records.add(clazz.cast(new MeterRecord(Arrays.copyOfRange(data, startIdx, startIdx + MeterRecord.RECORD_SIZE), rcvrTime, refTime)));
                         break;
                     case SENSOR_DATA:
                         startIdx = PageHeader.HEADER_SIZE + (SensorRecord.RECORD_SIZE + 1) * i;
-                        records.add(clazz.cast(new SensorRecord(Arrays.copyOfRange(data, startIdx, startIdx + SensorRecord.RECORD_SIZE))));
+                        records.add(clazz.cast(new SensorRecord(Arrays.copyOfRange(data, startIdx, startIdx + SensorRecord.RECORD_SIZE), rcvrTime, refTime)));
                         break;
                     default:
                         throw new IllegalArgumentException(String.format("Unknown record type: %s", pageHeader.getRecordType().name()));

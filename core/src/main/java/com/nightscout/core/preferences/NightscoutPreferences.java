@@ -79,5 +79,9 @@ public interface NightscoutPreferences {
 
     void setShareSerial(String serialNumber);
 
+    boolean isMeterUploadEnabled();
+
+    void setMeterUploadEnabled(boolean enabled);
+
 
 }

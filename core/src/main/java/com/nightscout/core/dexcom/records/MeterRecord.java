@@ -17,8 +17,8 @@ public class MeterRecord extends GenericTimestampRecord {
     private int meterTime;
     private GlucoseReading reading;
 
-    public MeterRecord(byte[] packet) {
-        super(packet);
+    public MeterRecord(byte[] packet, long rcvrTime, long refTime) {
+        super(packet, rcvrTime, refTime);
         if (packet.length != RECORD_SIZE) {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
                     ". Expected size: " + RECORD_SIZE + " record: " + Utils.bytesToHex(packet));

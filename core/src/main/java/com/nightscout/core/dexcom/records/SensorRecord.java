@@ -17,8 +17,8 @@ public class SensorRecord extends GenericTimestampRecord {
     private int OFFSET_FILTERED = 12;
     private int OFFSET_RSSI = 16;
 
-    public SensorRecord(byte[] packet) {
-        super(packet);
+    public SensorRecord(byte[] packet, long rcvrTime, long refTime) {
+        super(packet, rcvrTime, refTime);
         if (packet.length != RECORD_SIZE) {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
                     ". Expected size: " + RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));

@@ -69,32 +69,38 @@ public class DexcomG4 extends AbstractDevice {
         List<SensorRecord> sensorRecords = new ArrayList<>();
         List<CalRecord> calRecords = new ArrayList<>();
         DateTime dateTime = new DateTime();
-        long displayTime = 0;
+//        long displayTime = 0;
         long timeSinceLastRecord = 0;
         int batLevel = 100;
         long systemTime = 0;
         if (status == DownloadStatus.SUCCESS) {
             try {
-                recentRecords = readData.getRecentEGVsPages(numOfPages);
-                meterRecords = readData.getRecentMeterRecords();
+                systemTime = readData.readSystemTime();
+                dateTime = new DateTime();
+                recentRecords = readData.getRecentEGVsPages(numOfPages, systemTime, dateTime.getMillis());
+//                if (recentRecords.size()>0){
+//                    Bus bus = BusProvider.getInstance();
+//                    bus.post(recentRecords.get(recentRecords.size() - 1));
+//                }
+                if (preferences.isMeterUploadEnabled()) {
+                    meterRecords = readData.getRecentMeterRecords(systemTime, dateTime.getMillis());
+                }
                 if (preferences.isSensorUploadEnabled()) {
-                    sensorRecords = readData.getRecentSensorRecords(numOfPages);
+                    sensorRecords = readData.getRecentSensorRecords(numOfPages, systemTime, dateTime.getMillis());
                 }
 
                 if (preferences.isCalibrationUploadEnabled()) {
-                    calRecords = readData.getRecentCalRecords();
+                    calRecords = readData.getRecentCalRecords(systemTime, dateTime.getMillis());
                 }
                 if (recentRecords.size() == 0) {
                     status = DownloadStatus.NO_DATA;
                 }
 
-                displayTime = readData.readDisplayTime().getMillis();
+//                displayTime = readData.readDisplayTime().getMillis();
                 if (status == DownloadStatus.SUCCESS && recentRecords.size() > 0) {
                     timeSinceLastRecord = readData.getTimeSinceEGVRecord(
                             recentRecords.get(recentRecords.size() - 1));
                 }
-                systemTime = readData.readSystemTime();
-                dateTime = new DateTime();
                 // FIXME: readData.readBatteryLevel() seems to flake out on battery level reads.
                 // Removing for now.
                 if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4) {

@@ -29,7 +29,7 @@ public class MockFactory {
                 new DateTime(0),
                 new DateTime(5),
                 G4Noise.CLEAN, new DateTime(5));
-        SensorRecord sensorRecord = new SensorRecord(new byte[SensorRecord.RECORD_SIZE]);
+        SensorRecord sensorRecord = new SensorRecord(new byte[SensorRecord.RECORD_SIZE], 0, 0);
         return new GlucoseDataSet(egvRecord, sensorRecord);
     }
 

@@ -97,7 +97,6 @@
                 android:value=".settings.SettingsActivity" />
         </activity>
 
-
     </application>
 
 </manifest>

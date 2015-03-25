@@ -25,7 +25,10 @@ public class EventFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Bundle bundle = getArguments();
-        EventType type = EventType.values()[bundle.getInt("Filter")];
+        EventType type = EventType.ALL;
+        if (bundle != null && bundle.containsKey("Filter")) {
+            type = EventType.values()[bundle.getInt("Filter")];
+        }
         setListAdapter(getMessages(type));
         return super.onCreateView(inflater, container, savedInstanceState);
     }

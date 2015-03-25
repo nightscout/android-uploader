@@ -137,17 +137,17 @@
         android:title="@string/pref_title_data_to_upload"
         android:summary="@string/pref_summary_data_to_upload">
 
-        <CheckBoxPreference
-            android:key="cloud_android_battery"
-            android:title="@string/pref_title_android_battery"
-            android:summary="@string/pref_summary_android_battery"
-            android:defaultValue="true" />
+        <!--<CheckBoxPreference-->
+        <!--android:key="cloud_android_battery"-->
+        <!--android:title="@string/pref_title_android_battery"-->
+        <!--android:summary="@string/pref_summary_android_battery"-->
+        <!--android:defaultValue="true" />-->
 
-        <CheckBoxPreference
-            android:key="cloud_egv"
-            android:title="@string/pref_title_egv"
-            android:summary="@string/pref_summary_egv"
-            android:defaultValue="true" />
+        <!--<CheckBoxPreference-->
+        <!--android:key="cloud_egv"-->
+        <!--android:title="@string/pref_title_egv"-->
+        <!--android:summary="@string/pref_summary_egv"-->
+        <!--android:defaultValue="true" />-->
 
         <CheckBoxPreference
             android:key="cloud_mbg"

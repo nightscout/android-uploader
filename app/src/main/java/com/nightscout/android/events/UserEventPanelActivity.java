@@ -30,7 +30,7 @@ public class UserEventPanelActivity extends Activity {
         fragment.setArguments(bundle);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.fragment, fragment);
+        fragmentTransaction.add(R.id.eventlogfragment, fragment);
         fragmentTransaction.commit();
 
     }
