@@ -35,8 +35,28 @@ public class NSBarcodeConfigTest {
         setBarcode();
     }
 
+    private void setValidMqttUriOnly() {
+        jsonConfig = "{'mqtt':{'uri':'ssl://test:test@m11.cloudmqtt.com:12345'}}";
+        setBarcode();
+    }
+
     private void setSingleValidApiAndMongo() {
         jsonConfig = "{'mongo':{'uri':'mongodb://user:pass@test.com/cgm_data'}, 'rest':{'endpoint':['http://abc@test.com/v1']}}";
+        setBarcode();
+    }
+
+    private void setSingleValidApiAndMqtt() {
+        jsonConfig = "{'mqtt':{'uri':'ssl://test:test@m11.cloudmqtt.com:12345'}, 'rest':{'endpoint':['http://abc@test.com/v1']}}";
+        setBarcode();
+    }
+
+    private void setMongoAndMqtt() {
+        jsonConfig = "{'mqtt':{'uri':'ssl://test:test@m11.cloudmqtt.com:12345'}, 'mongo':{'uri':'mongodb://user:pass@test.com/cgm_data'}}";
+        setBarcode();
+    }
+
+    private void setMongoMqttAndSingleApi() {
+        jsonConfig = "{'mqtt':{'uri':'ssl://test:test@m11.cloudmqtt.com:12345'}, 'mongo':{'uri':'mongodb://user:pass@test.com/cgm_data'},'rest':{'endpoint':['http://abc@test.com/v1']}}";
         setBarcode();
     }
 
@@ -79,6 +99,10 @@ public class NSBarcodeConfigTest {
         assertThat(barcode.getMongoUri().get(), is("mongodb://user:pass@test.com/cgm_data"));
     }
 
+    private void verifySingleMqttUri() {
+        assertThat(barcode.getMqttUri().get(), is("ssl://test:test@m11.cloudmqtt.com:12345"));
+    }
+
     @Test
     public void testMongoEnabledWithMongoConfig() {
         setValidMongoOnlyNoCollections();
@@ -89,6 +113,12 @@ public class NSBarcodeConfigTest {
     public void testApiNotEnabledWithMongoConfig() {
         setValidMongoOnlyNoCollections();
         assertThat(barcode.hasApiConfig(), is(false));
+    }
+
+    @Test
+    public void testMqttNotEnabledWithMongoConfig() {
+        setValidMongoOnlyNoCollections();
+        assertThat(barcode.hasMqttConfig(), is(false));
     }
 
     @Test
@@ -110,9 +140,39 @@ public class NSBarcodeConfigTest {
     }
 
     @Test
+    public void testApiIsNotEnabledWithMqttConfig() {
+        setValidMqttUriOnly();
+        assertThat(barcode.hasApiConfig(), is(false));
+    }
+
+    @Test
+    public void testMqttEnabledWithMqttConfig() {
+        setValidMqttUriOnly();
+        assertThat(barcode.hasMqttConfig(), is(true));
+    }
+
+    @Test
+    public void testMongoIsNotEnabledWithMqttConfig() {
+        setValidMqttUriOnly();
+        assertThat(barcode.hasMongoConfig(), is(false));
+    }
+
+    @Test
+    public void testMqttIsNotEnabledWithApiConfig() {
+        setSingleValidApiOnly();
+        assertThat(barcode.hasMqttConfig(), is(false));
+    }
+
+    @Test
     public void testApiUriIsSetWithApiConfig() {
         setSingleValidApiOnly();
         verifySingleApiUri();
+    }
+
+    @Test
+    public void testMqttUriIsSetWithMqttConfig() {
+        setValidMqttUriOnly();
+        verifySingleMqttUri();
     }
 
     @Test

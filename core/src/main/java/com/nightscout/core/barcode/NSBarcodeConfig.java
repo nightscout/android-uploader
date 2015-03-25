@@ -69,6 +69,18 @@ public class NSBarcodeConfig {
         return apiUris;
     }
 
+    public Optional<String> getMqttUri() {
+        String mqttUri = null;
+        try {
+            if (hasMqttConfig()) {
+                mqttUri = config.getJSONObject(NSBarcodeConfigKeys.MQTT_CONFIG).getString(NSBarcodeConfigKeys.MQTT_URI);
+            }
+        } catch (JSONException e) {
+            return Optional.fromNullable(mqttUri);
+        }
+        return Optional.of(mqttUri);
+    }
+
     public Optional<String> getMongoCollection() {
         if (!hasMongoConfig()) {
             return Optional.absent();
@@ -118,6 +130,16 @@ public class NSBarcodeConfig {
             return config.has(NSBarcodeConfigKeys.API_CONFIG) &&
                     config.getJSONObject(NSBarcodeConfigKeys.API_CONFIG)
                             .getJSONArray(NSBarcodeConfigKeys.API_URI).length() > 0;
+        } catch (JSONException e) {
+            return false;
+        }
+    }
+
+    public boolean hasMqttConfig() {
+        try {
+            return config.has(NSBarcodeConfigKeys.MQTT_CONFIG) &&
+                    config.getJSONObject(NSBarcodeConfigKeys.MQTT_CONFIG)
+                            .getString(NSBarcodeConfigKeys.MQTT_URI).length() > 0;
         } catch (JSONException e) {
             return false;
         }
