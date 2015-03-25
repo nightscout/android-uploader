@@ -28,15 +28,15 @@ public class SensorRecord extends GenericTimestampRecord {
         rssi = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(OFFSET_RSSI);
     }
 
-    public SensorRecord(int filtered, int unfiltered, int rssi, long displayTime, int systemTime) {
-        super(displayTime, systemTime);
+    public SensorRecord(int filtered, int unfiltered, int rssi, long displayTime, long systemTime, long rcvrTime, long refTime) {
+        super(displayTime, systemTime, rcvrTime, refTime);
         this.filtered = filtered;
         this.unfiltered = unfiltered;
         this.rssi = rssi;
     }
 
-    public SensorRecord(SensorEntry sensor) {
-        super(sensor.disp_timestamp_sec, sensor.sys_timestamp_sec);
+    public SensorRecord(SensorEntry sensor, long rcvrTime, long refTime) {
+        super(sensor.disp_timestamp_sec, sensor.sys_timestamp_sec, rcvrTime, refTime);
         this.filtered = sensor.filtered;
         this.unfiltered = sensor.unfiltered;
         this.rssi = sensor.rssi;

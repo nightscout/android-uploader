@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class CalRecord extends GenericTimestampRecord {
@@ -57,8 +56,8 @@ public class CalRecord extends GenericTimestampRecord {
         }
     }
 
-    public CalRecord(double intercept, double slope, double scale, double decay, Date displayTime, Date systemTime, List<CalSubrecord> subrecord) {
-        super(displayTime, systemTime);
+    public CalRecord(double intercept, double slope, double scale, double decay, DateTime displayTime, DateTime systemTime, List<CalSubrecord> subrecord, DateTime wallTime) {
+        super(displayTime, systemTime, wallTime);
         this.intercept = intercept;
         this.slope = slope;
         this.scale = scale;
@@ -67,8 +66,8 @@ public class CalRecord extends GenericTimestampRecord {
         this.calSubrecords = subrecord;
     }
 
-    public CalRecord(double intercept, double slope, double scale, double decay, long displayTime, int systemTime, List<CalSubrecord> subrecord) {
-        super(displayTime, systemTime);
+    public CalRecord(double intercept, double slope, double scale, double decay, long displayTime, int systemTime, List<CalSubrecord> subrecord, long rcvrTime, long refTime) {
+        super(displayTime, systemTime, rcvrTime, refTime);
         this.intercept = intercept;
         this.slope = slope;
         this.scale = scale;
@@ -77,8 +76,8 @@ public class CalRecord extends GenericTimestampRecord {
         this.calSubrecords = subrecord;
     }
 
-    public CalRecord(CalibrationEntry cal) {
-        super(cal.disp_timestamp_sec, cal.sys_timestamp_sec);
+    public CalRecord(CalibrationEntry cal, long rcvrTime, long refTime) {
+        super(cal.disp_timestamp_sec, cal.sys_timestamp_sec, rcvrTime, refTime);
         this.intercept = cal.intercept;
         this.slope = cal.slope;
         this.scale = cal.scale;
@@ -95,6 +94,7 @@ public class CalRecord extends GenericTimestampRecord {
                 .intercept(intercept)
                 .scale(scale)
                 .slope(slope)
+                .decay(decay)
                 .build();
     }
 

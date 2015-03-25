@@ -10,17 +10,16 @@ import com.nightscout.android.ToastReceiver;
 import com.nightscout.android.drivers.AndroidUploaderDevice;
 import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.core.dexcom.Utils;
+import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
+import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.CalibrationEntry;
-import com.nightscout.core.model.DownloadResults;
 import com.nightscout.core.model.G4Download;
 import com.nightscout.core.model.MeterEntry;
-import com.nightscout.core.model.SensorEntry;
-import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.upload.BaseUploader;
 import com.nightscout.core.upload.MongoUploader;
@@ -28,6 +27,9 @@ import com.nightscout.core.upload.RestLegacyUploader;
 import com.nightscout.core.upload.RestV1Uploader;
 import com.squareup.wire.Message;
 
+import org.joda.time.DateTime;
+
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -124,36 +126,42 @@ public class Uploader {
         return allInitialized;
     }
 
-    public boolean upload(DownloadResults downloadResults, int numRecords) {
-        G4Download download = downloadResults.getDownload();
-        List<SensorGlucoseValueEntry> sgvList = filterRecords(numRecords, download.sgv);
-        List<CalibrationEntry> calList = filterRecords(numRecords, download.cal);
-        List<MeterEntry> meterList = filterRecords(numRecords, download.meter);
-        List<SensorEntry> sensorList = filterRecords(numRecords, download.sensor);
+    public boolean upload(G4Download download, int numRecords) {
+        long refTime = DateTime.parse(download.download_timestamp).getMillis();
+        List<CalibrationEntry> calList = Utils.filterRecords(numRecords, download.cal);
+        List<MeterEntry> meterList = Utils.filterRecords(numRecords, download.meter);
+        List<CalRecord> calRecords = asRecordList(download.cal, CalRecord.class, download.receiver_system_time_sec, refTime);
+        List<MeterRecord> meterRecords = asRecordList(download.meter, MeterRecord.class, download.receiver_system_time_sec, refTime);
 
-        List<GlucoseDataSet> glucoseDataSets = Utils.mergeGlucoseDataRecords(sgvList, sensorList);
+        List<GlucoseDataSet> glucoseDataSets = Utils.mergeGlucoseDataRecords(download, numRecords);
 
-        return upload(glucoseDataSets, meterList, calList);
+
+        return upload(glucoseDataSets, meterRecords, calRecords);
     }
 
-    private <T extends Message> List<T> filterRecords(int numRecords, List<T> records) {
-        int recordIndexToStop = Math.max(records.size() - numRecords, 0);
-        List<T> results = new ArrayList<>();
-        for (int i = records.size(); i > recordIndexToStop; i--) {
-            results.add(records.get(i - 1));
+    public <T, U extends Message> List<T> asRecordList(List<U> entryList, Class<T> clazz, long rcvrTime, long refTime) {
+        List<T> result = new ArrayList<>();
+        for (U entry : entryList) {
+            try {
+                result.add(clazz.getConstructor(entry.getClass(), long.class, long.class).newInstance(entry, rcvrTime, refTime));
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                e.printStackTrace();
+            }
         }
-        return results;
+        return result;
     }
 
-    public boolean upload(DownloadResults downloadResults) {
-        G4Download download = downloadResults.getDownload();
-        List<GlucoseDataSet> glucoseDataSets = Utils.mergeGlucoseDataRecords(download.sgv, download.sensor);
-        return upload(glucoseDataSets, download.meter, download.cal);
+    public boolean upload(G4Download download) {
+        long refTime = DateTime.parse(download.download_timestamp).getMillis();
+        List<GlucoseDataSet> glucoseDataSets = Utils.mergeGlucoseDataRecords(download.sgv, download.sensor, download.receiver_system_time_sec, refTime);
+        List<MeterRecord> meterRecords = asRecordList(download.meter, MeterRecord.class, download.receiver_system_time_sec, refTime);
+        List<CalRecord> calRecords = asRecordList(download.cal, CalRecord.class, download.receiver_system_time_sec, refTime);
+        return upload(glucoseDataSets, meterRecords, calRecords);
     }
 
     private boolean upload(List<GlucoseDataSet> glucoseDataSets,
-                           List<MeterEntry> meterRecords,
-                           List<CalibrationEntry> calRecords) {
+                           List<MeterRecord> meterRecords,
+                           List<CalRecord> calRecords) {
 
         AbstractUploaderDevice deviceStatus = AndroidUploaderDevice.getUploaderDevice(context);
 
@@ -166,6 +174,7 @@ public class Uploader {
                 reporter.report(EventType.UPLOADER, EventSeverity.INFO,
                         String.format(context.getString(R.string.event_success_upload),
                                 uploader.getIdentifier()));
+                // TODO Why is this exception handler here?
             } catch (MongoException e) {
                 // Credentials error - user name or password is incorrect.
                 if (e.getCode() == 18) {

@@ -45,24 +45,33 @@ import com.nightscout.android.preferences.PreferencesValidator;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.android.ui.AppContainer;
 import com.nightscout.android.wearables.Pebble;
+import com.nightscout.core.BusProvider;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
+import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
+import com.nightscout.core.model.G4Download;
 import com.nightscout.core.model.GlucoseUnit;
+import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.nightscout.core.mqtt.MqttEventMgr;
 import com.nightscout.core.mqtt.MqttPinger;
 import com.nightscout.core.mqtt.MqttTimer;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.GlucoseReading;
 import com.nightscout.core.utils.RestUriUtils;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.joda.time.Minutes;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -83,14 +92,14 @@ public class MainActivity extends Activity {
     private static final String ACTION_POLL = "com.nightscout.android.dexcom.action.POLL";
 
     // Receivers
-    private CGMStatusReceiver mCGMStatusReceiver;
+//    private CGMStatusReceiver mCGMStatusReceiver;
     private ToastReceiver toastReceiver;
 
     // Member components
     private Handler mHandler = new Handler();
     private String mJSONData;
     private long lastRecordTime = -1;
-    private long receiverOffsetFromUploader = 0;
+//    private long receiverOffsetFromUploader = 0;
 
     @Inject NightscoutPreferences preferences;
     @Inject AppContainer appContainer;
@@ -114,6 +123,8 @@ public class MainActivity extends Activity {
     private AlarmManager alarmManager;
     private PendingIntent syncManager;
 
+    private Bus bus = BusProvider.getInstance();
+
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +133,8 @@ public class MainActivity extends Activity {
 
         Nightscout app = Nightscout.get(this);
         app.inject(this);
+
+        bus.register(this);
 
         ViewGroup group = appContainer.get(this);
         getLayoutInflater().inflate(R.layout.activity_main, group);
@@ -146,10 +159,10 @@ public class MainActivity extends Activity {
         registerReceiver(mDeviceStatusReceiver, deviceStatusFilter);
 
         // Register Broadcast Receiver for response messages from mSyncingServiceIntent service
-        mCGMStatusReceiver = new CGMStatusReceiver();
-        IntentFilter filter = new IntentFilter(CGMStatusReceiver.PROCESS_RESPONSE);
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(mCGMStatusReceiver, filter);
+//        mCGMStatusReceiver = new CGMStatusReceiver();
+//        IntentFilter filter = new IntentFilter(CGMStatusReceiver.PROCESS_RESPONSE);
+//        filter.addCategory(Intent.CATEGORY_DEFAULT);
+//        registerReceiver(mCGMStatusReceiver, filter);
 
         toastReceiver = new ToastReceiver();
         IntentFilter toastFilter = new IntentFilter(ToastReceiver.ACTION_SEND_NOTIFICATION);
@@ -418,7 +431,7 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         Log.d(TAG, "onDestroy called.");
         super.onDestroy();
-        unregisterReceiver(mCGMStatusReceiver);
+//        unregisterReceiver(mCGMStatusReceiver);
         unregisterReceiver(mDeviceStatusReceiver);
         unregisterReceiver(toastReceiver);
         if (pebble != null) {
@@ -463,8 +476,102 @@ public class MainActivity extends Activity {
         mTextTimestamp.setText(savedInstanceState.getString("saveTextTimestamp"));
     }
 
-    public class CGMStatusReceiver extends BroadcastReceiver {
-        public static final String PROCESS_RESPONSE = "com.mSyncingServiceIntent.action.PROCESS_RESPONSE";
+//    public class CGMStatusReceiver extends BroadcastReceiver {
+//        public static final String PROCESS_RESPONSE = "com.mSyncingServiceIntent.action.PROCESS_RESPONSE";
+//
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            // Get response messages from broadcast
+//            int responseSGV = intent.getIntExtra(SyncingService.RESPONSE_SGV, -1);
+//            GlucoseReading reading = new GlucoseReading(responseSGV, GlucoseUnit.MGDL);
+//            TrendArrow trend = TrendArrow.values()[intent.getIntExtra(SyncingService.RESPONSE_TREND, 0)];
+//            long responseSGVTimestamp = intent.getLongExtra(SyncingService.RESPONSE_TIMESTAMP, -1L);
+//            boolean responseUploadStatus = intent.getBooleanExtra(SyncingService.RESPONSE_UPLOAD_STATUS, false);
+//            long responseNextUploadTime = intent.getLongExtra(SyncingService.RESPONSE_NEXT_UPLOAD_TIME, -1);
+//            long responseDisplayTime = intent.getLongExtra(SyncingService.RESPONSE_DISPLAY_TIME, new Date().getTime());
+//            long lastSgvTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_SGV_TIME,
+//                    ((AndroidPreferences) preferences).getLastEgvMqttUpload());
+//            long lastMeterTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_METER_TIME,
+//                    ((AndroidPreferences) preferences).getLastMeterMqttUpload());
+//            long lastSensorTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_SENSOR_TIME,
+//                    ((AndroidPreferences) preferences).getLastSensorMqttUpload());
+//            long lastCalTimestamp = intent.getLongExtra(SyncingService.RESPONSE_LAST_CAL_TIME,
+//                    ((AndroidPreferences) preferences).getLastCalMqttUpload());
+//            lastRecordTime = responseSGVTimestamp;
+//            receiverOffsetFromUploader = new Date().getTime() - responseDisplayTime;
+//            int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT, -1);
+//            String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
+//            byte[] proto = intent.getByteArrayExtra(SyncingService.RESPONSE_PROTO);
+//            boolean published = false;
+//            if (preferences.isMqttEnabled() && proto != null && proto.length != 0) {
+//                Log.d(TAG, "Proto: " + Utils.bytesToHex(proto));
+//                if (mqttManager != null) {
+//                    Log.d(TAG, "Publishing");
+//                    mqttManager.publish(proto, "/downloads/protobuf");
+//                    ((AndroidPreferences) preferences).setLastEgvMqttUpload(lastSgvTimestamp);
+//                    ((AndroidPreferences) preferences).setLastMeterMqttUpload(lastMeterTimestamp);
+//                    ((AndroidPreferences) preferences).setLastSensorMqttUpload(lastSensorTimestamp);
+//                    ((AndroidPreferences) preferences).setLastCalMqttUpload(lastCalTimestamp);
+//                    published = true;
+//                } else {
+//                    reporter.report(EventType.DEVICE, EventSeverity.ERROR,
+//                            getApplicationContext().getString(R.string.mqtt_mgr_not_initialized));
+//                }
+//            }
+//            if (preferences.isMqttEnabled()) {
+//                responseUploadStatus &= published;
+//            }
+//            if (responseUploadStatus) {
+//                mSyncButton.setBackgroundResource(R.drawable.ic_cloud);
+//            } else {
+//                mSyncButton.setBackgroundResource(R.drawable.ic_nocloud);
+//            }
+//            if (responseSGV != -1) {
+//                pebble.sendDownload(reading, trend, responseSGVTimestamp, getApplicationContext());
+//            }
+//            // Reload d3 chart with new data
+//            if (json != null) {
+//                mJSONData = json;
+//                mWebView.loadUrl("javascript:updateData(" + mJSONData + ")");
+//            }
+//
+//            // Update UI with latest record information
+//            mTextSGV.setText(getSGVStringByUnit(reading, trend));
+//            mTextSGV.setTag(R.string.display_sgv, reading.asMgdl());
+//            mTextSGV.setTag(R.string.display_trend, trend.ordinal());
+//
+//            String timeAgoStr = "---";
+//            Log.d(TAG, "Date: " + new Date().getTime());
+//            Log.d(TAG, "Response SGV Timestamp: " + responseSGVTimestamp);
+//            if (responseSGVTimestamp > 0) {
+//                timeAgoStr = Utils.getTimeString(new Date().getTime() - responseSGVTimestamp);
+//            }
+//
+//            mTextTimestamp.setText(timeAgoStr);
+//            mTextTimestamp.setTag(timeAgoStr);
+//
+//            long nextUploadTime = standardMinutes(5).getMillis();
+//
+//            if (responseNextUploadTime > nextUploadTime) {
+//                Log.d(TAG,
+//                        "Receiver's time is less than current record time, possible time change.");
+//                mTracker.send(new HitBuilders.EventBuilder("Main", "Time change").build());
+//            } else if (responseNextUploadTime > 0) {
+//                Log.d(TAG, "Setting next upload time to " + responseNextUploadTime);
+//                nextUploadTime = responseNextUploadTime;
+//            } else {
+//                Log.d(TAG, "OUT OF RANGE: Setting next upload time to " + nextUploadTime + " ms.");
+//            }
+//
+//            if (Minutes.minutesBetween(new DateTime(), new DateTime(responseDisplayTime))
+//                    .isGreaterThan(Minutes.minutes(20))) {
+//                Log.w(TAG, "Receiver time is off by 20 minutes or more.");
+//                mTracker.send(new HitBuilders.EventBuilder("Main", "Time difference > 20 minutes").build());
+//            }
+//
+//            setNextPoll(nextUploadTime);
+//        }
+//    }
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -487,7 +594,6 @@ public class MainActivity extends Activity {
             lastRecordTime = responseSGVTimestamp;
             receiverOffsetFromUploader = new Date().getTime() - responseDisplayTime;
             int rcvrBat = intent.getIntExtra(SyncingService.RESPONSE_BAT, -1);
-            Log.d(TAG, "Receiver battery level: " + rcvrBat);
             String json = intent.getStringExtra(SyncingService.RESPONSE_JSON);
             byte[] proto = intent.getByteArrayExtra(SyncingService.RESPONSE_PROTO);
             boolean published = false;
@@ -588,7 +694,9 @@ public class MainActivity extends Activity {
     public Runnable updateTimeAgo = new Runnable() {
         @Override
         public void run() {
-            long delta = new Date().getTime() - lastRecordTime + receiverOffsetFromUploader;
+//            long delta = new Date().getTime() - lastRecordTime + receiverOffsetFromUploader;
+            // FIXME: doesn't calculate timeago properly.
+            long delta = new Date().getTime() - lastRecordTime;
             if (lastRecordTime == 0) delta = 0;
 
             String timeAgoStr;
@@ -601,7 +709,8 @@ public class MainActivity extends Activity {
             }
             mTextTimestamp.setText(timeAgoStr);
             mHandler.removeCallbacks(updateTimeAgo);
-            mHandler.postDelayed(updateTimeAgo, standardMinutes(1).getMillis());
+            long delay = delta % standardMinutes(1).getMillis();
+            mHandler.postDelayed(updateTimeAgo, delay);
         }
     };
 
@@ -658,6 +767,78 @@ public class MainActivity extends Activity {
             alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + millis, syncManager);
         }
     }
+
+    @Subscribe
+    public void incomingData(final G4Download download) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                boolean published = false;
+                long refTime = DateTime.parse(download.download_timestamp).getMillis();
+                if (preferences.isMqttEnabled() && download.toByteArray() != null && download.toByteArray().length != 0) {
+                    Log.d(TAG, "Proto: " + Utils.bytesToHex(download.toByteArray()));
+                    if (mqttManager != null) {
+                        Log.d(TAG, "Publishing");
+                        mqttManager.publish(download.toByteArray(), "/downloads/protobuf");
+                        ((AndroidPreferences) preferences).setLastEgvMqttUpload(download.sgv.get(download.sgv.size() - 1).sys_timestamp_sec);
+                        ((AndroidPreferences) preferences).setLastMeterMqttUpload(download.meter.get(download.meter.size() - 1).sys_timestamp_sec);
+                        ((AndroidPreferences) preferences).setLastSensorMqttUpload(download.sensor.get(download.sensor.size() - 1).sys_timestamp_sec);
+                        ((AndroidPreferences) preferences).setLastCalMqttUpload(download.cal.get(download.cal.size() - 1).sys_timestamp_sec);
+                        published = true;
+                    } else {
+                        reporter.report(EventType.DEVICE, EventSeverity.ERROR,
+                                getApplicationContext().getString(R.string.mqtt_mgr_not_initialized));
+                    }
+                }
+                lastRecordTime = new DateTime().getMillis() - Duration.standardSeconds(download.receiver_system_time_sec - download.sgv.get(download.sgv.size() - 1).sys_timestamp_sec).getMillis();
+//        if (preferences.isMqttEnabled()) {
+//            responseUploadStatus &= published;
+//        }
+//        if (responseUploadStatus) {
+//            mSyncButton.setBackgroundResource(R.drawable.ic_cloud);
+//        } else {
+//            mSyncButton.setBackgroundResource(R.drawable.ic_nocloud);
+//        }
+                if (download.sgv.get(download.sgv.size() - 1).sgv_mgdl != -1) {
+                    GlucoseReading reading = new GlucoseReading(download.sgv.get(download.sgv.size() - 1).sgv_mgdl, GlucoseUnit.MGDL);
+                    pebble.sendDownload(reading, TrendArrow.values()[download.sgv.get(download.sgv.size() - 1).trend.ordinal()], Utils.systemTimeToWallTime(download.sgv.get(download.sgv.size() - 1).sys_timestamp_sec, download.receiver_system_time_sec, refTime).getMillis(), getApplicationContext());
+                }
+                // Reload d3 chart with new data
+                JSONArray array = new JSONArray();
+                for (SensorGlucoseValueEntry recentRecord : download.sgv) {
+                    try {
+                        array.put(new EGVRecord(recentRecord, download.receiver_system_time_sec, refTime).toJSON());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if (array != null) {
+                    mWebView.loadUrl("javascript:updateData(" + array + ")");
+                }
+
+                // Update UI with latest record information
+                EGVRecord lastEgvRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), download.receiver_system_time_sec, refTime);
+                mTextSGV.setText(getSGVStringByUnit(lastEgvRecord.getReading(), lastEgvRecord.getTrend()));
+                mTextSGV.setTag(R.string.display_sgv, lastEgvRecord.getReading().asMgdl());
+                mTextSGV.setTag(R.string.display_trend, lastEgvRecord.getTrend().ordinal());
+
+                String timeAgoStr = "---";
+                if (lastEgvRecord.getRawSystemTimeSeconds() > 0) {
+                    timeAgoStr = Utils.getTimeString(download.receiver_system_time_sec - lastEgvRecord.getRawSystemTimeSeconds());
+                }
+
+                mTextTimestamp.setText(timeAgoStr);
+                mTextTimestamp.setTag(timeAgoStr);
+
+                long nextUploadTime = standardMinutes(5).getMillis();
+                nextUploadTime = Duration.standardSeconds(Minutes.minutes(5).toStandardSeconds().getSeconds() - ((download.receiver_system_time_sec - lastEgvRecord.getRawSystemTimeSeconds()) % Minutes.minutes(5).toStandardSeconds().getSeconds())).getMillis();
+                setNextPoll(nextUploadTime);
+            }
+        });
+
+    }
+
 
     public void cancelPoll() {
         Log.d(TAG, "Canceling next alarm poll.");

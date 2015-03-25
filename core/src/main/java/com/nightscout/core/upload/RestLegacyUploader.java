@@ -19,7 +19,7 @@ public class RestLegacyUploader extends AbstractRestUploader {
     private JSONObject toJSONObject(GlucoseDataSet record) throws JSONException {
         JSONObject json = new JSONObject();
         json.put("device", "dexcom");
-        json.put("date", record.getDisplayTime().getTime());
+        json.put("date", record.getDisplayTime().getMillis());
         json.put("dateString", record.getDisplayTime().toString());
         json.put("sgv", Integer.parseInt(String.valueOf(record.getBgMgdl())));
         json.put("direction", record.getTrend().friendlyTrendName());

@@ -1,6 +1,6 @@
 package com.nightscout.core.drivers;
 
-import com.nightscout.core.model.DownloadResults;
+import com.squareup.wire.Message;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +24,8 @@ abstract public class AbstractDevice {
     protected void onDownload() {
     }
 
-    public final DownloadResults download() {
-        DownloadResults download = doDownload();
+    public final Message download() {
+        Message download = doDownload();
         onDownload();
         return download;
     }
@@ -34,5 +34,5 @@ abstract public class AbstractDevice {
         return deviceName;
     }
 
-    abstract protected DownloadResults doDownload();
+    abstract protected Message doDownload();
 }

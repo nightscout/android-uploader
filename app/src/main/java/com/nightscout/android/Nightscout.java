@@ -8,6 +8,7 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.ui.ActivityHierarchyServer;
+import com.nightscout.core.BusProvider;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
@@ -36,13 +37,15 @@ public class Nightscout extends Application {
 
     private ObjectGraph objectGraph;
 
-    @Inject ActivityHierarchyServer activityHierarchyServer;
+    @Inject
+    ActivityHierarchyServer activityHierarchyServer;
 
     @Override
     public void onCreate() {
         super.onCreate();
         JodaTimeAndroid.init(this);
         buildObjectGraphAndInject();
+        BusProvider.getInstance();
         registerActivityLifecycleCallbacks(activityHierarchyServer);
     }
 

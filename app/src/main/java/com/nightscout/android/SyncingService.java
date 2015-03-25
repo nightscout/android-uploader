@@ -18,9 +18,8 @@ import com.nightscout.android.drivers.USB.UsbSerialProber;
 import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.upload.Uploader;
+import com.nightscout.core.BusProvider;
 import com.nightscout.core.dexcom.CRCFailError;
-import com.nightscout.core.dexcom.TrendArrow;
-import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.drivers.AbstractDevice;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.drivers.DeviceTransport;
@@ -29,28 +28,12 @@ import com.nightscout.core.drivers.SupportedDevices;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
-import com.nightscout.core.model.CalibrationEntry;
-import com.nightscout.core.model.DownloadResults;
-import com.nightscout.core.model.DownloadStatus;
 import com.nightscout.core.model.G4Download;
-import com.nightscout.core.model.G4Noise;
-import com.nightscout.core.model.MeterEntry;
-import com.nightscout.core.model.SensorEntry;
-import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.squareup.otto.Bus;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
-import org.json.JSONArray;
-
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-
-import static org.joda.time.Duration.standardMinutes;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous CGM Receiver downloads and cloud uploads
@@ -60,6 +43,8 @@ public class SyncingService extends IntentService {
 
     // Action for intent
     private static final String ACTION_SYNC = "com.nightscout.android.dexcom.action.SYNC";
+    private static final String ACTION_POLL = "com.nightscout.android.dexcom.action.POLL";
+
 
     // Parameters for intent
     private static final String SYNC_PERIOD = "com.nightscout.android.dexcom.extra.SYNC_PERIOD";
@@ -78,6 +63,8 @@ public class SyncingService extends IntentService {
     public static final String RESPONSE_LAST_METER_TIME = "lastMeterTimestamp";
     public static final String RESPONSE_LAST_SENSOR_TIME = "lastSensorTimestamp";
     public static final String RESPONSE_LAST_CAL_TIME = "lastCalTimestamp";
+
+    private Bus bus = BusProvider.getInstance();
 
     private final String TAG = SyncingService.class.getSimpleName();
 
@@ -145,7 +132,6 @@ public class SyncingService extends IntentService {
      */
     protected void handleActionSync(int numOfPages, Context context, DeviceTransport serialDriver) {
         EventReporter reporter = AndroidEventReporter.getReporter(context);
-        boolean broadcastSent = false;
         AndroidPreferences preferences = new AndroidPreferences(context);
         Tracker tracker = ((Nightscout) context).getTracker();
 
@@ -164,81 +150,78 @@ public class SyncingService extends IntentService {
                 }
             }
             try {
-                DownloadResults results = device.download();
-                G4Download download = results.getDownload();
+//                DownloadResults results = device.download();
+                G4Download download = (G4Download) device.download();
 
                 Uploader uploader = new Uploader(context, preferences);
                 boolean uploadStatus;
                 if (numOfPages < 20) {
-                    uploadStatus = uploader.upload(results, 1);
+                    uploadStatus = uploader.upload(download, 1);
                 } else {
-                    uploadStatus = uploader.upload(results);
+                    uploadStatus = uploader.upload(download);
                 }
 
-                EGVRecord recentEGV;
-                if (download.download_status == DownloadStatus.SUCCESS) {
-                    recentEGV = new EGVRecord(download.sgv.get(download.sgv.size() - 1));
-                } else {
-                    recentEGV = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(),
-                            G4Noise.NOISE_NONE);
-                }
-
-                DateTime dt = new DateTime();
-                DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
-                String iso8601Str = fmt.print(dt);
-
-                G4Download.Builder builder = new G4Download.Builder();
-                builder.download_timestamp(iso8601Str)
-                        .download_status(download.download_status)
-                        .receiver_battery(download.receiver_battery)
-                        .uploader_battery(download.uploader_battery)
-                        .receiver_system_time_sec(download.receiver_system_time_sec)
-                        .units(download.units);
-
-                long egvTime = preferences.getLastEgvMqttUpload();
-                long meterTime = preferences.getLastMeterMqttUpload();
-                long sensorTime = preferences.getLastSensorMqttUpload();
-                long calTime = preferences.getLastCalMqttUpload();
-                long lastSgvTimestamp = egvTime;
-                List<SensorGlucoseValueEntry> filteredSgvs = new ArrayList<>();
-                for (SensorGlucoseValueEntry aRecord : download.sgv) {
-                    if (aRecord.sys_timestamp_sec > egvTime || numOfPages == GAP_SYNC_PAGES) {
-                        filteredSgvs.add(aRecord);
-                        lastSgvTimestamp = aRecord.sys_timestamp_sec;
-                    }
-                }
-                builder.sgv(filteredSgvs);
-                long lastMeterTimestamp = meterTime;
-                List<MeterEntry> filteredMeter = new ArrayList<>();
-                for (MeterEntry aRecord : download.meter) {
-                    if (aRecord.sys_timestamp_sec > meterTime || numOfPages == GAP_SYNC_PAGES) {
-                        filteredMeter.add(aRecord);
-                        lastMeterTimestamp = aRecord.sys_timestamp_sec;
-                    }
-                }
-                builder.meter(filteredMeter);
-                long lastSensorTimestamp = sensorTime;
-                List<SensorEntry> filteredSensor = new ArrayList<>();
-                for (SensorEntry aRecord : download.sensor) {
-                    if (aRecord.sys_timestamp_sec > sensorTime || numOfPages == GAP_SYNC_PAGES) {
-                        filteredSensor.add(aRecord);
-                        lastSensorTimestamp = aRecord.sys_timestamp_sec;
-                    }
-                }
-                builder.sensor(filteredSensor);
-                long lastCalTimestamp = calTime;
-                List<CalibrationEntry> filteredCal = new ArrayList<>();
-                for (CalibrationEntry aRecord : download.cal) {
-                    if (aRecord.sys_timestamp_sec > calTime || numOfPages == GAP_SYNC_PAGES) {
-                        filteredCal.add(aRecord);
-                        lastCalTimestamp = aRecord.sys_timestamp_sec;
-                    }
-                }
-                builder.cal(filteredCal);
-                broadcastSGVToUI(recentEGV, uploadStatus, results.getNextUploadTime() + TIME_SYNC_OFFSET,
-                        results.getDisplayTime(), results.getResultArray(), download.receiver_battery,
-                        builder.build().toByteArray(), lastSgvTimestamp, lastMeterTimestamp, lastSensorTimestamp, lastCalTimestamp);
-                broadcastSent = true;
+//                EGVRecord recentEGV;
+//                if (download.download_status == DownloadStatus.SUCCESS) {
+//                    recentEGV = new EGVRecord(download.sgv.get(download.sgv.size() - 1));
+//                } else {
+//                    recentEGV = new EGVRecord(-1, TrendArrow.NONE, new Date(), new Date(),
+//                            G4Noise.NOISE_NONE);
+//                }
+//
+//                DateTime dt = new DateTime();
+//                DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
+//                String iso8601Str = fmt.print(dt);
+//
+//                G4Download.Builder builder = new G4Download.Builder();
+//                builder.download_timestamp(iso8601Str)
+//                        .download_status(download.download_status)
+//                        .receiver_battery(download.receiver_battery)
+//                        .uploader_battery(download.uploader_battery)
+//                        .receiver_system_time_sec(download.receiver_system_time_sec)
+//                        .units(download.units);
+//
+//                long egvTime = preferences.getLastEgvMqttUpload();
+//                long meterTime = preferences.getLastMeterMqttUpload();
+//                long sensorTime = preferences.getLastSensorMqttUpload();
+//                long calTime = preferences.getLastCalMqttUpload();
+//                long lastSgvTimestamp = egvTime;
+//                List<SensorGlucoseValueEntry> filteredSgvs = new ArrayList<>();
+//                for (SensorGlucoseValueEntry aRecord : download.sgv) {
+//                    if (aRecord.sys_timestamp_sec > egvTime || numOfPages == GAP_SYNC_PAGES) {
+//                        filteredSgvs.add(aRecord);
+//                        lastSgvTimestamp = aRecord.sys_timestamp_sec;
+//                    }
+//                }
+//                builder.sgv(filteredSgvs);
+//                long lastMeterTimestamp = meterTime;
+//                List<MeterEntry> filteredMeter = new ArrayList<>();
+//                for (MeterEntry aRecord : download.meter) {
+//                    if (aRecord.sys_timestamp_sec > meterTime || numOfPages == GAP_SYNC_PAGES) {
+//                        filteredMeter.add(aRecord);
+//                        lastMeterTimestamp = aRecord.sys_timestamp_sec;
+//                    }
+//                }
+//                builder.meter(filteredMeter);
+//                long lastSensorTimestamp = sensorTime;
+//                List<SensorEntry> filteredSensor = new ArrayList<>();
+//                for (SensorEntry aRecord : download.sensor) {
+//                    if (aRecord.sys_timestamp_sec > sensorTime || numOfPages == GAP_SYNC_PAGES) {
+//                        filteredSensor.add(aRecord);
+//                        lastSensorTimestamp = aRecord.sys_timestamp_sec;
+//                    }
+//                }
+//                builder.sensor(filteredSensor);
+//                long lastCalTimestamp = calTime;
+//                List<CalibrationEntry> filteredCal = new ArrayList<>();
+//                for (CalibrationEntry aRecord : download.cal) {
+//                    if (aRecord.sys_timestamp_sec > calTime || numOfPages == GAP_SYNC_PAGES) {
+//                        filteredCal.add(aRecord);
+//                        lastCalTimestamp = aRecord.sys_timestamp_sec;
+//                    }
+//                }
+//                builder.cal(filteredCal);
+                bus.post(download);
                 reporter.report(EventType.DEVICE, EventSeverity.INFO,
                         getApplicationContext().getString(R.string.event_sync_log));
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -284,7 +267,7 @@ public class SyncingService extends IntentService {
             }
         }
 
-        if (!broadcastSent) broadcastSGVToUI();
+//        if (!broadcastSent) broadcastSGVToUI();
 
         wl.release();
     }
@@ -334,7 +317,7 @@ public class SyncingService extends IntentService {
             broadcastIntent.putExtra(RESPONSE_PROTO, proto);
         }
         if (json != null)
-            broadcastIntent.putExtra(RESPONSE_JSON, json.toString());
+          broadcastIntent.putExtra(RESPONSE_JSON, json.toString());
         broadcastIntent.putExtra(RESPONSE_BAT, batLvl);
         sendBroadcast(broadcastIntent);
     }
