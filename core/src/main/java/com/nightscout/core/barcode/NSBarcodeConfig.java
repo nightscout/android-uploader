@@ -74,11 +74,9 @@ public class NSBarcodeConfig {
         try {
             if (hasMqttConfig()) {
                 mqttUri = config.getJSONObject(NSBarcodeConfigKeys.MQTT_CONFIG).getString(NSBarcodeConfigKeys.MQTT_URI);
-            } else {
-                return Optional.absent();
             }
         } catch (JSONException e) {
-            return Optional.absent();
+            return Optional.fromNullable(mqttUri);
         }
         return Optional.of(mqttUri);
     }
