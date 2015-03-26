@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.nightscout.android">
 
+    <permission
+        android:name="com.nightscout.android.dexcom.action.SYNC"
+        android:protectionLevel="dangerous" />
+
     <uses-feature android:name="android.hardware.usb.host" />
     <uses-feature
         android:name="android.hardware.bluetooth_le"
@@ -19,6 +23,7 @@
     <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="com.nightscout.android.dexcom.action.SYNC" />
 
 
     <application
@@ -33,24 +38,24 @@
             android:name="com.google.android.gms.version"
             tools:replace="android:value"
             android:value="6587000" />
-        <activity
-            android:name=".MainActivity"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTask">
+        <!--<activity-->
+        <!--android:name=".MainActivity"-->
+        <!--android:screenOrientation="portrait"-->
+        <!--android:launchMode="singleTask">-->
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <!--<intent-filter>-->
+        <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.LAUNCHER" />
+        <!--<category android:name="android.intent.category.DEFAULT" />-->
+        <!--<category android:name="android.intent.category.LAUNCHER" />-->
 
-                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
-            </intent-filter>
+        <!--<action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />-->
+        <!--</intent-filter>-->
 
-            <meta-data
-                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
-                android:resource="@xml/device_filter" />
-        </activity>
+        <!--<meta-data-->
+        <!--android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"-->
+        <!--android:resource="@xml/device_filter" />-->
+        <!--</activity>-->
 
         <receiver android:name=".UpgradeReceiver">
             <intent-filter>
@@ -58,6 +63,16 @@
                 <data
                     android:scheme="package"
                     android:path="com.nightscout.android" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".SyncReceiver"
+            android:enabled="true"
+            android:permission="com.nightscout.android.dexcom.action.SYNC">
+            <intent-filter>
+                <action android:name="com.nightscout.android.dexcom.action.SYNC" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
 
@@ -70,6 +85,7 @@
             android:theme="@android:style/Theme.Dialog" />
 
         <service android:name=".SyncingService" />
+        <service android:name=".CollectorService" />
 
         <activity
             android:name=".settings.SettingsActivity"
@@ -95,6 +111,26 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".settings.SettingsActivity" />
+        </activity>
+
+        <activity
+            android:name=".ui.NightscoutNavigationDrawer"
+            android:theme="@style/MyNavigationDrawerTheme"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/device_filter" />
+
         </activity>
 
     </application>

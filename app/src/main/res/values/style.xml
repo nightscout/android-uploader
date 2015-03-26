@@ -6,11 +6,28 @@
         <item name="android:textSize">72sp</item>
     </style>
 
-    <style name="Nightscout" parent="android:Theme.Holo">
-        <item name="android:windowBackground">@color/black</item>
+    <style name="Nightscout.ActionBar" parent="android:Widget.Holo.ActionBar.Solid">
+        <item name="android:background">#3F51B5</item>
+        <!--<item name="android:itemBackground">#3F51B5</item>-->
     </style>
 
-    <style name="Nightscout.Light" parent="android:Theme.Holo">
+    <style name="Nightscout" parent="android:Theme.Holo">
+        <item name="android:windowBackground">@color/black</item>
+        <item name="android:actionBarStyle">@style/Nightscout.ActionBar</item>
+    </style>
+
+    <style name="Nightscout.Light" parent="MaterialNavigationDrawerTheme.TranslucentKitKatStatusBar">
         <item name="android:windowBackground">@color/white</item>
+    </style>
+
+    <style name="MyNavigationDrawerTheme" parent="MaterialNavigationDrawerTheme.TranslucentKitKatStatusBar">
+        <item name="colorPrimary">#3F51B5</item>
+        <item name="android:windowBackground">@color/black</item>
+        <item name="colorPrimaryDark">#3F51B5</item>
+        <item name="colorAccent">#F44336</item>
+        <item name="singleAccount">true</item>
+        <item name="drawerType">@integer/DRAWERTYPE_ACCOUNTS</item>
+        <!--<item name="drawerColor">#424242</item>-->
+        <item name="rippleBackport">true</item>
     </style>
 </resources>

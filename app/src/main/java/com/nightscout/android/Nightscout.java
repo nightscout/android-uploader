@@ -32,7 +32,7 @@ import dagger.ObjectGraph;
         logcatArguments = {"-t", "500", "-v", "time"}
 )
 public class Nightscout extends Application {
-    private final String TAG = MainActivity.class.getSimpleName();
+    private final String TAG = Nightscout.class.getSimpleName();
     private Tracker tracker = null;
 
     private ObjectGraph objectGraph;

@@ -2,15 +2,11 @@ package com.nightscout.android.debug;
 
 import android.app.Application;
 
-import com.nightscout.android.MainActivity;
-import com.nightscout.android.exceptions.AcraFeedbackDialog;
 import com.nightscout.android.exceptions.FeedbackDialog;
+import com.nightscout.android.exceptions.StubbedFeedbackDialog;
 import com.nightscout.android.modules.NightscoutModule;
 import com.nightscout.android.ui.AppContainer;
-
-import org.acra.ACRA;
-
-import java.util.TimeZone;
+import com.nightscout.android.ui.MonitorFragment;
 
 import javax.inject.Singleton;
 
@@ -20,7 +16,7 @@ import dagger.Provides;
 @Module(
         addsTo = NightscoutModule.class,
         injects = {
-                MainActivity.class,
+                MonitorFragment.class,
                 DebugAppContainer.class
         },
         overrides = true
@@ -35,8 +31,9 @@ public final class DebugNightscoutModule {
     @Provides
     @Singleton
     FeedbackDialog providesReporter(Application app) {
-        ACRA.init(app);
-        ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
-        return new AcraFeedbackDialog();
+//        ACRA.init(app);
+//        ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
+//        return new AcraFeedbackDialog();
+        return new StubbedFeedbackDialog(app);
     }
 }

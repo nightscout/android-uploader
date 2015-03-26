@@ -15,15 +15,10 @@ import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
 import org.joda.time.DateTime;
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.joda.time.Duration.standardMinutes;
-import static org.joda.time.Duration.standardSeconds;
 
 public class DexcomG4 extends AbstractDevice {
     public static final int VENDOR_ID = 8867;
@@ -56,12 +51,6 @@ public class DexcomG4 extends AbstractDevice {
     @Override
     protected G4Download doDownload() {
         DownloadStatus status = DownloadStatus.SUCCESS;
-        try {
-            transport.open();
-        } catch (IOException e) {
-            //TODO record this in the event log later
-            status = DownloadStatus.IO_ERROR;
-        }
         ReadData readData = new ReadData(transport);
 
         List<EGVRecord> recentRecords = new ArrayList<>();
@@ -69,8 +58,6 @@ public class DexcomG4 extends AbstractDevice {
         List<SensorRecord> sensorRecords = new ArrayList<>();
         List<CalRecord> calRecords = new ArrayList<>();
         DateTime dateTime = new DateTime();
-//        long displayTime = 0;
-        long timeSinceLastRecord = 0;
         int batLevel = 100;
         long systemTime = 0;
         if (status == DownloadStatus.SUCCESS) {
@@ -78,10 +65,6 @@ public class DexcomG4 extends AbstractDevice {
                 systemTime = readData.readSystemTime();
                 dateTime = new DateTime();
                 recentRecords = readData.getRecentEGVsPages(numOfPages, systemTime, dateTime.getMillis());
-//                if (recentRecords.size()>0){
-//                    Bus bus = BusProvider.getInstance();
-//                    bus.post(recentRecords.get(recentRecords.size() - 1));
-//                }
                 if (preferences.isMeterUploadEnabled()) {
                     meterRecords = readData.getRecentMeterRecords(systemTime, dateTime.getMillis());
                 }
@@ -96,11 +79,6 @@ public class DexcomG4 extends AbstractDevice {
                     status = DownloadStatus.NO_DATA;
                 }
 
-//                displayTime = readData.readDisplayTime().getMillis();
-                if (status == DownloadStatus.SUCCESS && recentRecords.size() > 0) {
-                    timeSinceLastRecord = readData.getTimeSinceEGVRecord(
-                            recentRecords.get(recentRecords.size() - 1));
-                }
                 // FIXME: readData.readBatteryLevel() seems to flake out on battery level reads.
                 // Removing for now.
                 if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4) {
@@ -114,13 +92,6 @@ public class DexcomG4 extends AbstractDevice {
                 status = DownloadStatus.IO_ERROR;
             } catch (InvalidRecordLengthException e) {
                 status = DownloadStatus.APPLICATION_ERROR;
-            } finally {
-                try {
-                    transport.close();
-                } catch (IOException e) {
-                    //TODO record this in the event log later
-                    status = DownloadStatus.IO_ERROR;
-                }
             }
         }
 
@@ -136,33 +107,12 @@ public class DexcomG4 extends AbstractDevice {
                 .sensor(cookieMonsterG4Sensors)
                 .meter(cookieMonsterG4Meters)
                 .receiver_system_time_sec(systemTime)
-//                .download_timestamp(new Date().toString())
                 .download_timestamp(dateTime.toString())
                 .download_status(status)
                 .uploader_battery(uploaderDevice.getBatteryLevel())
                 .receiver_battery(batLevel)
                 .units(GlucoseUnit.MGDL);
-
-
-        // TODO: determine if the logic here is correct. I suspect it assumes the last record was
-        // less than 5
-        // minutes ago. If a reading is skipped and the device is plugged in then nextUploadTime
-        // will be set to a negative number. This situation will eventually correct itself.
-        long nextUploadTime = standardMinutes(5).minus(standardSeconds(timeSinceLastRecord))
-                .getMillis();
-
-
-        // convert into json for d3 plot
-        JSONArray array = new JSONArray();
-        for (EGVRecord recentRecord : recentRecords) {
-            try {
-                array.put(recentRecord.toJSON());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
         return downloadBuilder.build();
-//        return new DownloadResults(downloadBuilder.build(), nextUploadTime, array, displayTime);
     }
 
     public void setNumOfPages(int numOfPages) {

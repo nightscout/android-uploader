@@ -33,6 +33,30 @@ public class EventFragment extends ListFragment {
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
+    public static EventFragment newDeviceLogPanel() {
+        EventFragment fragment = new EventFragment();
+        Bundle args = new Bundle();
+        args.putInt("Filter", EventType.DEVICE.ordinal());
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static EventFragment newUploadLogPanel() {
+        EventFragment fragment = new EventFragment();
+        Bundle args = new Bundle();
+        args.putInt("Filter", EventType.UPLOADER.ordinal());
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static EventFragment newAllLogPanel() {
+        EventFragment fragment = new EventFragment();
+        Bundle args = new Bundle();
+        args.putInt("Filter", EventType.ALL.ordinal());
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     private CursorAdapter getMessages(EventType type) {
         EventsDbHelper dbHelper = EventsDbHelper.getHelper(getActivity().getApplicationContext());
         SQLiteDatabase db = dbHelper.getReadableDatabase();

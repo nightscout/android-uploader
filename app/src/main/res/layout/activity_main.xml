@@ -5,70 +5,71 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:id="@+id/monitor_fragment"
     tools:context="com.nightscout.android.MainActivity">
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/unknown_values"
-        android:id="@+id/sgValue"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentStart="false"
-        android:textSize="@android:dimen/notification_large_icon_width"
-        android:singleLine="true"
-        android:gravity="center|center_vertical|center_horizontal"
-        android:layout_alignParentRight="false"
-        android:layout_alignParentEnd="false"
-        tools:ignore="ContentDescription" />
+    <!--<TextView-->
+    <!--android:layout_width="fill_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:textAppearance="?android:attr/textAppearanceLarge"-->
+    <!--android:text="@string/unknown_values"-->
+    <!--android:id="@+id/sgValue"-->
+    <!--android:layout_alignParentLeft="false"-->
+    <!--android:layout_alignParentStart="false"-->
+    <!--android:textSize="@android:dimen/notification_large_icon_width"-->
+    <!--android:singleLine="true"-->
+    <!--android:gravity="center|center_vertical|center_horizontal"-->
+    <!--android:layout_alignParentRight="false"-->
+    <!--android:layout_alignParentEnd="false"-->
+    <!--tools:ignore="ContentDescription" />-->
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/unknown_values"
-        android:id="@+id/timeAgo"
-        android:layout_alignParentTop="false"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentStart="false"
-        android:gravity="center|center_vertical|center_horizontal"
-        android:singleLine="true"
-        android:layout_alignTop="@+id/sgValue"
-        android:layout_marginTop="70sp"
-        tools:ignore="ContentDescription" />
+    <!--<TextView-->
+    <!--android:layout_width="fill_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
+    <!--android:text="@string/unknown_values"-->
+    <!--android:id="@+id/timeAgo"-->
+    <!--android:layout_alignParentTop="false"-->
+    <!--android:layout_alignParentLeft="false"-->
+    <!--android:layout_alignParentStart="false"-->
+    <!--android:gravity="center|center_vertical|center_horizontal"-->
+    <!--android:singleLine="true"-->
+    <!--android:layout_alignTop="@+id/sgValue"-->
+    <!--android:layout_marginTop="70sp"-->
+    <!--tools:ignore="ContentDescription" />-->
 
-    <WebView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:id="@+id/webView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/timeAgo"
-        android:layout_alignEnd="@+id/timeAgo"
-        android:layout_alignRight="@+id/timeAgo"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="false"
-        android:layout_marginBottom="45dp" />
+    <!--<WebView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:id="@+id/webView"-->
+    <!--android:layout_alignParentLeft="true"-->
+    <!--android:layout_alignParentStart="true"-->
+    <!--android:layout_below="@+id/timeAgo"-->
+    <!--android:layout_alignEnd="@+id/timeAgo"-->
+    <!--android:layout_alignRight="@+id/timeAgo"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:layout_alignParentEnd="true"-->
+    <!--android:layout_alignParentBottom="false"-->
+    <!--android:layout_marginBottom="45dp" />-->
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/syncButton"
-        android:background="@drawable/ic_nocloud"
-        android:adjustViewBounds="false"
-        android:baselineAlignBottom="false"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+    <!--<ImageButton-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:id="@+id/syncButton"-->
+    <!--android:background="@drawable/ic_nocloud"-->
+    <!--android:adjustViewBounds="false"-->
+    <!--android:baselineAlignBottom="false"-->
+    <!--android:layout_alignParentTop="true"-->
+    <!--android:layout_alignParentLeft="true"-->
+    <!--android:layout_alignParentStart="true" />-->
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/usbButton"
-        android:background="@drawable/ic_nousb"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+    <!--<ImageButton-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:id="@+id/usbButton"-->
+    <!--android:background="@drawable/ic_nousb"-->
+    <!--android:layout_alignParentTop="true"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:layout_alignParentEnd="true" />-->
 
 </RelativeLayout>

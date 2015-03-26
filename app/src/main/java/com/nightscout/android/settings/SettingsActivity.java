@@ -116,7 +116,7 @@ public class SettingsActivity extends FragmentActivity {
         }
 
         private void setupVersionNumbers() {
-            findPreference("about_version_number").setSummary(BuildConfig.VERSION_CODENAME);
+            findPreference("about_version_name").setSummary(BuildConfig.VERSION_CODENAME);
             findPreference("about_version_number").setSummary(BuildConfig.VERSION_NAME);
             findPreference("about_build_hash").setSummary(BuildConfig.GIT_SHA);
             findPreference("about_device_id").setSummary(Settings.Secure.getString(getActivity().getContentResolver(),

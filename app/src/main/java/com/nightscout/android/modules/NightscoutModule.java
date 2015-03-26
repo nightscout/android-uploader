@@ -2,11 +2,11 @@ package com.nightscout.android.modules;
 
 import android.app.Application;
 
-import com.nightscout.android.MainActivity;
 import com.nightscout.android.Nightscout;
 import com.nightscout.android.exceptions.AcraFeedbackDialog;
 import com.nightscout.android.exceptions.FeedbackDialog;
 import com.nightscout.android.preferences.PreferencesModule;
+import com.nightscout.android.ui.MonitorFragment;
 import com.nightscout.android.ui.UiModule;
 
 import org.acra.ACRA;
@@ -25,7 +25,7 @@ import dagger.Provides;
     },
     injects = {
         Nightscout.class,
-        MainActivity.class
+            MonitorFragment.class
     }
 )
 public class NightscoutModule {

@@ -36,7 +36,7 @@ import javax.xml.parsers.ParserConfigurationException;
 public class ReadData {
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
-    private static final int IO_TIMEOUT = 5000;
+    private static final int IO_TIMEOUT = 15000;
     private static final int MIN_LEN = 256;
     private DeviceTransport mSerialDevice;
 
@@ -118,7 +118,8 @@ public class ReadData {
     public int readBatteryLevel() throws IOException {
         log.debug("Reading battery level...");
         writeCommand(Command.READ_BATTERY_LEVEL);
-        byte[] readData = read(MIN_LEN).getData();
+//        byte[] readData = read(MIN_LEN).getData();
+        byte[] readData = read(10).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
@@ -154,7 +155,7 @@ public class ReadData {
     public long readSystemTime() throws IOException {
         log.debug("Reading system time...");
         writeCommand(Command.READ_SYSTEM_TIME);
-        byte[] readData = read(MIN_LEN).getData();
+        byte[] readData = read(10).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
@@ -169,7 +170,7 @@ public class ReadData {
         ArrayList<Byte> payload = new ArrayList<>();
         payload.add((byte) recordType.ordinal());
         writeCommand(Command.READ_DATABASE_PAGE_RANGE, payload);
-        byte[] readData = read(MIN_LEN).getData();
+        byte[] readData = read(14).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt(4);
     }
 
@@ -187,7 +188,7 @@ public class ReadData {
         payload.add(pageInt[0]);
         payload.add(numOfPages);
         writeCommand(Command.READ_DATABASE_PAGES, payload);
-        return read(2122).getData();
+        return read(534).getData();
     }
 
     private void writeCommand(Command command, ArrayList<Byte> payload) throws IOException {
@@ -207,13 +208,13 @@ public class ReadData {
     private ReadPacket read(int numOfBytes) throws IOException {
         byte[] response = new byte[numOfBytes];
         int len;
-        try {
+//        try {
             response = mSerialDevice.read(numOfBytes, IO_TIMEOUT);
             len = response.length;
             log.debug("Read {} byte(s) complete.", len);
 
             // Add a 100ms delay for when multiple write/reads are occurring in series
-            Thread.sleep(100);
+//            Thread.sleep(100);
 
             // TODO: this debug code to print data of the read, should be removed after
             // finding the source of the reading issue
@@ -222,9 +223,9 @@ public class ReadData {
             for (int i = 0; i < readAmount; i++) bytes += String.format("%02x", response[i]) + " ";
             log.debug("Read data: {}", bytes);
             ////////////////////////////////////////////////////////////////////////////////////////
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         return new ReadPacket(response);
     }
 
