@@ -187,6 +187,20 @@ public class MonitorFragment extends Fragment {
     }
 
     @Subscribe
+    public void uploadStatus(final Boolean status) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (status) {
+                    mSyncButton.setBackgroundResource(R.drawable.ic_cloud);
+                } else {
+                    mSyncButton.setBackgroundResource(R.drawable.ic_nocloud);
+                }
+            }
+        });
+    }
+
+    @Subscribe
     public void incomingData(final G4Download download) {
         getActivity().runOnUiThread(new Runnable() {
             @Override

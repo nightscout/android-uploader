@@ -49,8 +49,8 @@ public interface DeviceTransport {
     public int write(final byte[] src, final int timeoutMillis) throws IOException;
 
     // TODO - make this not USB specific
-    public boolean isConnected(int vendorId, int productId, int deviceClass, int subClass,
-                               int protocol);
+//    public boolean isConnected(int vendorId, int productId, int deviceClass, int subClass,
+//                               int protocol);
 
     public boolean isConnected();
 

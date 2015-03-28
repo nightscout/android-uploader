@@ -46,6 +46,11 @@ abstract class CommonUsbSerialDriver implements UsbSerialDriver {
     protected UsbManager mManager;
 
     protected boolean mPowerManagementEnabled = false;
+    protected int vendorId;
+    protected int productId;
+    protected int deviceClass;
+    protected int subClass;
+    protected int protocol;
 
     /**
      * Internal read buffer.  Guarded by {@link #mReadBufferLock}.
@@ -149,7 +154,6 @@ abstract class CommonUsbSerialDriver implements UsbSerialDriver {
     @Override
     public abstract void setRTS(boolean value) throws IOException;
 
-    @Override
     public boolean isConnected(int vendorId, int productId, int deviceClass, int subClass,
                                int protocol) {
         if (mManager == null) return false;
@@ -165,9 +169,16 @@ abstract class CommonUsbSerialDriver implements UsbSerialDriver {
         return false;
     }
 
-    // TODO Fix this so that it work as as expected
+    public void setUsbCriteria(int vendorId, int productId, int deviceClass, int subClass, int protocol) {
+        this.vendorId = vendorId;
+        this.productId = productId;
+        this.deviceClass = deviceClass;
+        this.subClass = subClass;
+        this.protocol = protocol;
+    }
+
     @Override
     public boolean isConnected() {
-        return false;
+        return this.isConnected(vendorId, productId, deviceClass, subClass, protocol);
     }
 }

@@ -7,6 +7,7 @@ import com.nightscout.android.exceptions.AcraFeedbackDialog;
 import com.nightscout.android.exceptions.FeedbackDialog;
 import com.nightscout.android.preferences.PreferencesModule;
 import com.nightscout.android.ui.MonitorFragment;
+import com.nightscout.android.ui.NightscoutNavigationDrawer;
 import com.nightscout.android.ui.UiModule;
 
 import org.acra.ACRA;
@@ -19,34 +20,35 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module(
-    includes = {
-        PreferencesModule.class,
-        UiModule.class
-    },
-    injects = {
-        Nightscout.class,
-            MonitorFragment.class
-    }
+        includes = {
+                PreferencesModule.class,
+                UiModule.class
+        },
+        injects = {
+                Nightscout.class,
+                MonitorFragment.class,
+                NightscoutNavigationDrawer.class
+        }
 )
 public class NightscoutModule {
 
-  private Application app;
+    private Application app;
 
-  public NightscoutModule(Application app) {
-    this.app = app;
-  }
+    public NightscoutModule(Application app) {
+        this.app = app;
+    }
 
-  @Provides
-  @Singleton
-  Application providesApplication() {
-    return app;
-  }
+    @Provides
+    @Singleton
+    Application providesApplication() {
+        return app;
+    }
 
-  @Provides
-  @Singleton
-  FeedbackDialog providesReporter(Application app) {
-    ACRA.init(app);
-    ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
-    return new AcraFeedbackDialog();
-  }
+    @Provides
+    @Singleton
+    FeedbackDialog providesReporter(Application app) {
+        ACRA.init(app);
+        ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
+        return new AcraFeedbackDialog();
+    }
 }

@@ -4,7 +4,10 @@
     package="com.nightscout.android">
 
     <permission
-        android:name="com.nightscout.android.dexcom.action.SYNC"
+        android:name="org.nightscout.uploader.ACCESS_NIGHTSCOUT_DATA"
+        android:protectionLevel="dangerous" />
+    <permission
+        android:name="org.nightscout.uploader.UPDATE_NIGHTSCOUT_DATA"
         android:protectionLevel="dangerous" />
 
     <uses-feature android:name="android.hardware.usb.host" />
@@ -69,7 +72,17 @@
         <receiver
             android:name=".SyncReceiver"
             android:enabled="true"
-            android:permission="com.nightscout.android.dexcom.action.SYNC">
+            android:exported="false">
+        <intent-filter>
+                <action android:name="com.nightscout.android.dexcom.action.SYNC" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".UploadReceiver"
+            android:enabled="true"
+            android:permission="org.nightscout.uploader.UPDATE_NIGHTSCOUT_DATA">
             <intent-filter>
                 <action android:name="com.nightscout.android.dexcom.action.SYNC" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -84,25 +97,26 @@
             android:launchMode="singleInstance"
             android:theme="@android:style/Theme.Dialog" />
 
-        <service android:name=".SyncingService" />
+        <!--<service android:name=".SyncingService" />-->
         <service android:name=".CollectorService" />
+        <service android:name=".ProcessorService" />
 
         <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".ui.NightscoutNavigationDrawer">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nightscout.android.MainActivity" />
+                android:value="com.nightscout.android.ui.NightscoutNavigationDrawer" />
         </activity>
 
         <activity
             android:name=".events.UserEventPanelActivity"
             android:label="Events"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".ui.NightscoutNavigationDrawer">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".ui.NightscoutNavigationDrawer" />
         </activity>
 
         <activity

@@ -4,8 +4,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
@@ -34,7 +36,6 @@ public class SettingsActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
-
         refreshFragments();
     }
 
@@ -113,6 +114,18 @@ public class SettingsActivity extends FragmentActivity {
             setupValidation();
             setupVersionNumbers();
             setupBtScanner();
+            setupDeviceOptions();
+//            PreferenceScreen shareOptions = (PreferenceScreen) findPreference("share_options");
+            ListPreference deviceType = (ListPreference) findPreference("dexcom_device_type");
+            setShareOptions(deviceType.getValue(), deviceType.getEntry().toString());
+//            if (deviceType.getValue().equals("0")) {
+//                shareOptions.setEnabled(false);
+//                Log.d("XXX", "Disabling");
+//            } else if (deviceType.getValue().equals("1")) {
+//                shareOptions.setEnabled(true);
+//                Log.d("XXX", "Enabling");
+//            }
+
         }
 
         private void setupVersionNumbers() {
@@ -121,6 +134,38 @@ public class SettingsActivity extends FragmentActivity {
             findPreference("about_build_hash").setSummary(BuildConfig.GIT_SHA);
             findPreference("about_device_id").setSummary(Settings.Secure.getString(getActivity().getContentResolver(),
                     Settings.Secure.ANDROID_ID));
+        }
+
+        private void setShareOptions(String newValue, String summary) {
+            PreferenceScreen shareOptions = (PreferenceScreen) findPreference("share_options");
+            if (newValue.equals("0")) {
+                shareOptions.setEnabled(false);
+            } else if (newValue.equals("1")) {
+                shareOptions.setEnabled(true);
+            }
+            findPreference("dexcom_device_type").setSummary(summary);
+
+        }
+
+        private void setupDeviceOptions() {
+            findPreference("dexcom_device_type").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    String summary = ((ListPreference) preference).getEntry().toString();
+                    setShareOptions((String) newValue, summary);
+
+//                    PreferenceScreen shareOptions = (PreferenceScreen) findPreference("share_options");
+//                    if (newValue.equals("0")) {
+//                        shareOptions.setEnabled(false);
+//                        return true;
+//                    } else if (newValue.equals("1")) {
+//                        shareOptions.setEnabled(true);
+//                        return true;
+//                    }
+//                    return false;
+                    return true;
+                }
+            });
         }
 
         private void setupBarcodeConfigScanner() {
@@ -207,3 +252,5 @@ public class SettingsActivity extends FragmentActivity {
         }
     }
 }
+
+

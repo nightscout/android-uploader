@@ -21,7 +21,6 @@ import com.nightscout.android.drivers.USB.CdcAcmSerialDriver;
 import com.nightscout.android.drivers.USB.UsbSerialProber;
 import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
-import com.nightscout.android.upload.Uploader;
 import com.nightscout.core.BusProvider;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.records.EGVRecord;
@@ -95,6 +94,7 @@ public class CollectorService extends Service {
             device = new DexcomG4(driver, preferences, uploaderDevice);
             if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4) {
                 ((CdcAcmSerialDriver) driver).setPowerManagementEnabled(preferences.isRootEnabled());
+                ((CdcAcmSerialDriver) driver).setUsbCriteria(DexcomG4.VENDOR_ID, DexcomG4.PRODUCT_ID, DexcomG4.DEVICE_CLASS, DexcomG4.DEVICE_SUBCLASS, DexcomG4.PROTOCOL);
             }
         }
         try {
@@ -123,85 +123,7 @@ public class CollectorService extends Service {
         Log.d(TAG, "Starting service");
         int numOfPages = intent.getIntExtra(NUM_PAGES, 2);
         int syncType = intent.getStringExtra(SYNC_TYPE).equals(STD_SYNC) ? 0 : 1;
-//        int syncType = 0;
         new AsyncDownload().execute(numOfPages, syncType);
-//        int numOfPages = intent.getIntExtra(NUM_PAGES, 2);
-
-//        String syncType = intent.getStringExtra(SYNC_TYPE);
-//        ((DexcomG4) device).setNumOfPages(numOfPages);
-//        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NSDownload");
-//        wl.acquire();
-//
-//        G4Download download = null;
-//
-//        try {
-//            download = (G4Download) device.download();
-//
-////            Uploader uploader = new Uploader(getApplicationContext(), preferences);
-////            boolean uploadStatus;
-////            if (numOfPages < 20) {
-////                uploadStatus = uploader.upload(download, 1);
-////            } else {
-////                uploadStatus = uploader.upload(download);
-////            }
-//
-//            bus.post(download);
-//            reporter.report(EventType.DEVICE, EventSeverity.INFO,
-//                    getApplicationContext().getString(R.string.event_sync_log));
-//        } catch (ArrayIndexOutOfBoundsException e) {
-//            reporter.report(EventType.DEVICE, EventSeverity.ERROR,
-//                    getApplicationContext().getString(R.string.event_fail_log));
-//            Log.wtf("Unable to read from the dexcom, maybe it will work next time", e);
-//            tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Array Index out of bounds")
-//                    .setFatal(false)
-//                    .build());
-//        } catch (NegativeArraySizeException e) {
-//            reporter.report(EventType.DEVICE, EventSeverity.ERROR,
-//                    getApplicationContext().getString(R.string.event_fail_log));
-//            Log.wtf("Negative array exception from receiver", e);
-//            tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Negative Array size")
-//                    .setFatal(false)
-//                    .build());
-//        } catch (IndexOutOfBoundsException e) {
-//            reporter.report(EventType.DEVICE, EventSeverity.ERROR,
-//                    getApplicationContext().getString(R.string.event_fail_log));
-//            Log.wtf("IndexOutOfBounds exception from receiver", e);
-//            tracker.send(new HitBuilders.ExceptionBuilder().setDescription("IndexOutOfBoundsException")
-//                    .setFatal(false)
-//                    .build());
-//        } catch (CRCFailError e) {
-//            // FIXME: may consider localizing this catch at a lower level (like ReadData) so that
-//            // if the CRC check fails on one type of record we can capture the values if it
-//            // doesn't fail on other types of records. This means we'd need to broadcast back
-//            // partial results to the UI. Adding it to a lower level could make the ReadData class
-//            // more difficult to maintain - needs discussion.
-//            reporter.report(EventType.DEVICE, EventSeverity.ERROR,
-//                    getApplicationContext().getString(R.string.crc_fail_log));
-//            Log.wtf("CRC failed", e);
-//            tracker.send(new HitBuilders.ExceptionBuilder().setDescription("CRC Failed")
-//                    .setFatal(false)
-//                    .build());
-//        } catch (Exception e) {
-//            reporter.report(EventType.DEVICE, EventSeverity.ERROR,
-//                    getApplicationContext().getString(R.string.unknown_fail_log));
-//            Log.wtf("Unhandled exception caught", e);
-//            tracker.send(new HitBuilders.ExceptionBuilder().setDescription("Catch all exception in handleActionSync")
-//                    .setFatal(false)
-//                    .build());
-//        }
-//        wl.release();
-//
-//        if (syncType.equals(GAP_SYNC)){
-//            return super.onStartCommand(intent, flags, startId);
-//        }
-//        long nextUploadTime = Minutes.minutes(5).toStandardSeconds().getSeconds();
-//        if (download != null) {
-//            long rcvrTime = download.receiver_system_time_sec;
-//            long refTime = DateTime.parse(download.download_timestamp).getMillis();
-//            EGVRecord lastEgvRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), download.receiver_system_time_sec, refTime );
-//            nextUploadTime = Duration.standardSeconds(Minutes.minutes(5).toStandardSeconds().getSeconds() - ((rcvrTime - lastEgvRecord.getRawSystemTimeSeconds()) % Minutes.minutes(5).toStandardSeconds().getSeconds())).getMillis();
-//        }
-//        setNextPoll(nextUploadTime);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -220,15 +142,18 @@ public class CollectorService extends Service {
             try {
                 download = (G4Download) device.download();
 
-                Uploader uploader = new Uploader(getApplicationContext(), preferences);
-                boolean uploadStatus;
-                if (numOfPages < 20) {
-                    uploadStatus = uploader.upload(download, 1);
-                } else {
-                    uploadStatus = uploader.upload(download);
-                }
-
+//                Uploader uploader = new Uploader(getApplicationContext(), preferences);
+//                boolean uploadStatus;
+//                if (numOfPages < 20) {
+//                    uploadStatus = uploader.upload(download, 1);
+//                } else {
+//                    uploadStatus = uploader.upload(download);
+//                }
+//
                 bus.post(download);
+//                Intent uploaderIntent = new Intent(getApplicationContext(), ProcessorService.class);
+//                getApplicationContext().startService(uploaderIntent);
+
                 reporter.report(EventType.DEVICE, EventSeverity.INFO,
                         getApplicationContext().getString(R.string.event_sync_log));
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -277,7 +202,7 @@ public class CollectorService extends Service {
             if (syncType.equals(GAP_SYNC)) {
                 return download;
             }
-            long nextUploadTime = Minutes.minutes(5).toStandardSeconds().getSeconds();
+            long nextUploadTime = Minutes.minutes(2).toStandardDuration().getMillis();
             if (download != null) {
                 long rcvrTime = download.receiver_system_time_sec;
                 long refTime = DateTime.parse(download.download_timestamp).getMillis();

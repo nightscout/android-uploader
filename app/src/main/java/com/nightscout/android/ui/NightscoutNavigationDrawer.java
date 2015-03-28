@@ -6,9 +6,13 @@ import android.util.Log;
 
 import com.nightscout.android.BuildConfig;
 import com.nightscout.android.CollectorService;
+import com.nightscout.android.Nightscout;
 import com.nightscout.android.R;
 import com.nightscout.android.events.EventFragment;
+import com.nightscout.android.exceptions.FeedbackDialog;
 import com.nightscout.android.settings.SettingsActivity;
+
+import javax.inject.Inject;
 
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 import it.neokree.materialnavigationdrawer.elements.MaterialAccount;
@@ -17,10 +21,19 @@ import it.neokree.materialnavigationdrawer.elements.listeners.MaterialSectionLis
 
 public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
 
+    @Inject
+    FeedbackDialog feedbackDialog;
+//    @Inject AppContainer appContainer;
+
+
     @Override
     public void init(Bundle bundle) {
+        Nightscout app = Nightscout.get(this);
+        app.inject(this);
+
         MaterialAccount account = new MaterialAccount(this.getResources(), "Nightscout", BuildConfig.VERSION_CODENAME, R.drawable.ic_launcher, R.drawable.nscafe);
         this.addAccount(account);
+
 
 //        setDrawerHeaderImage(R.drawable.ic_launcher);
         MaterialSection section = newSection("Home", new MonitorFragment());
@@ -61,15 +74,22 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
         addSection(gapSync);
 
 
-        MaterialSection allLog = newSection("All logs", EventFragment.newAllLogPanel());
+        MaterialSection allLog = newSection("Event logs", EventFragment.newAllLogPanel());
         addSection(allLog);
 
-        MaterialSection uploaderLog = newSection("Uploader logs", EventFragment.newUploadLogPanel());
-        addSection(uploaderLog);
+//        MaterialSection uploaderLog = newSection("Uploader logs", EventFragment.newUploadLogPanel());
+//        addSection(uploaderLog);
+//
+//        MaterialSection deviceLog = newSection("Device log", EventFragment.newDeviceLogPanel());
+//        addSection(deviceLog);
 
-        MaterialSection deviceLog = newSection("Device log", EventFragment.newDeviceLogPanel());
-        addSection(deviceLog);
-
+        MaterialSection feedback = newSection("Report an issue", new MaterialSectionListener() {
+            @Override
+            public void onClick(MaterialSection materialSection) {
+                feedbackDialog.show();
+            }
+        });
+        addBottomSection(feedback);
         MaterialSection settings = newSection("Settings", android.R.drawable.ic_menu_preferences, new Intent(getApplicationContext(), SettingsActivity.class));
 //        MaterialSection settings = newSection("Settings", new SettingsActivity.MainPreferenceFragment());
         addBottomSection(settings);

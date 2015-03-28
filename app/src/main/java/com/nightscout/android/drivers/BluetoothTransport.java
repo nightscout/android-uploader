@@ -1,6 +1,8 @@
 package com.nightscout.android.drivers;
 
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -51,6 +53,8 @@ public class BluetoothTransport implements DeviceTransport {
     private static final int STATE_CONNECTING = BluetoothProfile.STATE_CONNECTING;
     private static final int STATE_CONNECTED = BluetoothProfile.STATE_CONNECTED;
 
+    private final String RECONNECT_INTENT = "org.nightscout.uploader.RECONNECT";
+
     // Current Bluetooth connection state
     private int mConnectionState = BluetoothProfile.STATE_DISCONNECTED;
 
@@ -70,16 +74,34 @@ public class BluetoothTransport implements DeviceTransport {
     // Member context variable
     private Context mContext;
 
+    private Boolean shouldBeOpen = false;
+
     public BluetoothTransport(Context context) {
-        final IntentFilter bondIntent = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+//        final IntentFilter bondIntent = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
         this.mContext = context;
-        context.registerReceiver(mPairReceiver, bondIntent);
+//        context.registerReceiver(mPairReceiver, bondIntent);
+        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     }
+
+    private AlarmManager alarmManager;
+    private PendingIntent reconnectPendingIntent;
+
+    private BroadcastReceiver reconnectReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            reconnect();
+        }
+    };
 
     @Override
     public void open() throws IOException {
         AndroidPreferences prefs = new AndroidPreferences(mContext);
         mBluetoothDeviceAddress = prefs.getBtAddress();
+        final IntentFilter bondIntent = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+        mContext.registerReceiver(mPairReceiver, bondIntent);
+        final IntentFilter reconnectIntent = new IntentFilter(RECONNECT_INTENT);
+        mContext.registerReceiver(reconnectReceiver, reconnectIntent);
+
         attemptConnection();
 
         while (System.currentTimeMillis() + 5000 > System.currentTimeMillis()) {
@@ -90,6 +112,7 @@ public class BluetoothTransport implements DeviceTransport {
         if (System.currentTimeMillis() + 5000 < System.currentTimeMillis()) {
             throw new IOException("Timeout while opening BLE connection to receiver");
         }
+        shouldBeOpen = true;
     }
 
     @Override
@@ -97,6 +120,9 @@ public class BluetoothTransport implements DeviceTransport {
         if (mBluetoothGatt == null) {
             return;
         }
+        shouldBeOpen = false;
+        mContext.unregisterReceiver(mPairReceiver);
+        mContext.unregisterReceiver(reconnectReceiver);
         mBluetoothGatt.close();
         mBluetoothGatt = null;
         mConnectionState = STATE_DISCONNECTED;
@@ -109,6 +135,10 @@ public class BluetoothTransport implements DeviceTransport {
     @Override
     public int write(byte[] src, int timeoutMillis) throws IOException {
 
+        if (!isConnected()) {
+            Log.e(TAG, "Unable to write to device. Device not connected");
+            throw new IOException("Unable to write to device. Device not connected");
+        }
         // TODO: The bluetooth protocol has 2 additional bytes, a message index and message count,
         // right now we don't use any messages that have any index or count > 1.  But a function to
         // handle should be introduced.
@@ -135,14 +165,20 @@ public class BluetoothTransport implements DeviceTransport {
 
     @Override
     public byte[] read(int size, int timeoutMillis) throws IOException {
+        if (!isConnected()) {
+            Log.d(TAG, "Unable to read. Disconnected from receiver.");
+            throw new IOException("Disconnected from device. Unable to read");
+        }
+
         long startTime = System.currentTimeMillis();
         while (startTime + timeoutMillis > System.currentTimeMillis()) {
             if (asyncReader.getResponse().length >= size) {
                 break;
             }
         }
-        if (startTime + timeoutMillis > System.currentTimeMillis()) {
-            Log.d(TAG, "Timeout occured while reading");
+        if (startTime + timeoutMillis < System.currentTimeMillis()) {
+            Log.d(TAG, "Timeout occurred while reading");
+            throw new IOException("Timeout while reading from bluetooth address " + device.getAddress());
         }
         Log.d(TAG, "From asyncReader observable: " + Utils.bytesToHex(asyncReader.getResponse()));
         return asyncReader.getResponse();
@@ -150,11 +186,6 @@ public class BluetoothTransport implements DeviceTransport {
 
     public boolean isConnected() {
         return mConnectionState == BluetoothProfile.STATE_CONNECTED;
-    }
-
-    @Override
-    public boolean isConnected(int vendorId, int productId, int deviceClass, int subClass, int protocol) {
-        return isConnected();
     }
 
 
@@ -215,21 +246,20 @@ public class BluetoothTransport implements DeviceTransport {
         for (BluetoothDevice bluetoothDevice : mBluetoothAdapter.getBondedDevices()) {
             if (bluetoothDevice.getAddress().compareTo(address) == 0) {
                 Log.d(TAG, "Bluetooth device found and already bonded, so going to connect...");
-                if (mBluetoothAdapter.getRemoteDevice(bluetoothDevice.getAddress()) != null) {
-                    device = bluetoothDevice;
-                    mBluetoothGatt = device.connectGatt(mContext.getApplicationContext(), false, mGattCallback);
+                device = bluetoothDevice;
+                mBluetoothGatt = device.connectGatt(mContext.getApplicationContext(), true, mGattCallback);
+                if (isConnected()) {
                     Log.d(TAG, "Bluetooth device connected.");
-                    return true;
                 }
+                return isConnected();
+//                    return mBluetoothGatt.getConnectionState(device) == BluetoothProfile.STATE_CONNECTED;
+
+//                    return true;
             }
         }
 
         device = mBluetoothAdapter.getRemoteDevice(address);
-        if (device == null) {
-            Log.w(TAG, "Device not found. Unable to connect.");
-            return false;
-        }
-        Log.w(TAG, "Trying to create a new connection.");
+        Log.w(TAG, "Trying to create a new connection with an unbonded device.");
         mBluetoothGatt = device.connectGatt(mContext.getApplicationContext(), false, mGattCallback);
         mConnectionState = STATE_CONNECTING;
         /////////////////////////////////////////////////////////////////////////////////////////////
@@ -345,8 +375,13 @@ public class BluetoothTransport implements DeviceTransport {
                     Log.w(TAG, "discovering failed");
                 }
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                mConnectionState = STATE_DISCONNECTED;
                 Log.w(TAG, "Disconnected from GATT server.");
+                mConnectionState = STATE_DISCONNECTED;
+                if (shouldBeOpen) {
+                    Log.w(TAG, "Connection was unexpectedly lost. Attempting to reconnect");
+                    delayedReconnect(15000);
+                }
+
             } else {
                 Log.w(TAG, "Gatt callback... strange state.");
             }
@@ -472,4 +507,32 @@ public class BluetoothTransport implements DeviceTransport {
             return response;
         }
     }
+
+    public void reconnect() {
+        try {
+            close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        attemptConnection();
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public void delayedReconnect(long millis) {
+        Log.d(TAG, "Setting next poll with Alarm for " + millis + " ms from now.");
+        Intent reconnectIntent = new Intent(RECONNECT_INTENT);
+        reconnectPendingIntent = PendingIntent.getBroadcast(mContext.getApplicationContext(), 1, reconnectIntent, 0);
+        ;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + millis, reconnectPendingIntent);
+        } else {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + millis, reconnectPendingIntent);
+        }
+    }
+
+    public void cancelReconnect() {
+        Log.d(TAG, "Canceling reconnect.");
+        alarmManager.cancel(reconnectPendingIntent);
+    }
+
 }

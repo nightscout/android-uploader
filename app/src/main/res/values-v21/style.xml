@@ -2,23 +2,35 @@
 <resources>
 
     <style name="Nightscout.statusbar" parent="Nightscout">
-        <item name="android:background">#ff006578</item>
-        <item name="android:textSize">12sp</item>
+        <item name="android:itemBackground">@color/cyan</item>
+        <item name="android:textSize">72sp</item>
+    </style>
+
+    <style name="Nightscout.ActionBar" parent="android:Widget.Material.ActionBar.Solid">
+        <item name="android:background">#3F51B5</item>
+        <!--<item name="android:itemBackground">#3F51B5</item>-->
     </style>
 
     <style name="Nightscout" parent="android:Theme.Material">
         <item name="android:windowBackground">@color/black</item>
+        <item name="android:actionBarStyle">@style/Nightscout.ActionBar</item>
+        <!--<item name="android:windowTranslucentNavigation">true</item>-->
+        <!--<item name="android:windowTranslucentStatus">true</item>-->
     </style>
 
-    <style name="Nightscout.Light" parent="android:Theme.Material">
+    <style name="Nightscout.Light" parent="MaterialNavigationDrawerTheme">
         <item name="android:windowBackground">@color/white</item>
     </style>
 
-    <style name="MyNavigationDrawerTheme" parent="MaterialNavigationDrawerTheme.TranslucentKitKatStatusBar">
-        <item name="colorPrimary">#9E9E9E</item>
-        <item name="colorPrimaryDark">#212121</item>
-        <item name="colorAccent">#FFFFFF</item>
+    <style name="MyNavigationDrawerTheme" parent="MaterialNavigationDrawerTheme">
+        <item name="colorPrimary">#3F51B5</item>
+        <item name="android:windowBackground">@color/black</item>
+        <item name="colorPrimaryDark">#000000</item>
+        <item name="colorAccent">#F44336</item>
         <item name="singleAccount">true</item>
-        <item name="drawerType">@integer/DRAWERTYPE_IMAGE</item>
+        <item name="drawerType">@integer/DRAWERTYPE_ACCOUNTS</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <!--<item name="drawerColor">#424242</item>-->
+        <!--<item name="rippleBackport">true</item>-->
     </style>
 </resources>

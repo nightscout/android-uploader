@@ -39,13 +39,9 @@ public class DexcomG4 extends AbstractDevice {
         this.deviceName = "DexcomG4";
     }
 
-    public static boolean isConnected(DeviceTransport transport) {
-        return transport.isConnected(VENDOR_ID, PRODUCT_ID, DEVICE_CLASS, DEVICE_SUBCLASS, PROTOCOL);
-    }
-
     @Override
     public boolean isConnected() {
-        return transport.isConnected(VENDOR_ID, PRODUCT_ID, DEVICE_CLASS, DEVICE_SUBCLASS, PROTOCOL);
+        return transport.isConnected();
     }
 
     @Override
@@ -60,39 +56,37 @@ public class DexcomG4 extends AbstractDevice {
         DateTime dateTime = new DateTime();
         int batLevel = 100;
         long systemTime = 0;
-        if (status == DownloadStatus.SUCCESS) {
-            try {
-                systemTime = readData.readSystemTime();
-                dateTime = new DateTime();
-                recentRecords = readData.getRecentEGVsPages(numOfPages, systemTime, dateTime.getMillis());
-                if (preferences.isMeterUploadEnabled()) {
-                    meterRecords = readData.getRecentMeterRecords(systemTime, dateTime.getMillis());
-                }
-                if (preferences.isSensorUploadEnabled()) {
-                    sensorRecords = readData.getRecentSensorRecords(numOfPages, systemTime, dateTime.getMillis());
-                }
-
-                if (preferences.isCalibrationUploadEnabled()) {
-                    calRecords = readData.getRecentCalRecords(systemTime, dateTime.getMillis());
-                }
-                if (recentRecords.size() == 0) {
-                    status = DownloadStatus.NO_DATA;
-                }
-
-                // FIXME: readData.readBatteryLevel() seems to flake out on battery level reads.
-                // Removing for now.
-                if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4) {
-                    batLevel = 100;
-                } else if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE) {
-                    batLevel = readData.readBatteryLevel();
-                }
-                // TODO pull in other exceptions once we have the analytics/acra reporters
-            } catch (IOException e) {
-                //TODO record this in the event log later
-                status = DownloadStatus.IO_ERROR;
-            } catch (InvalidRecordLengthException e) {
-                status = DownloadStatus.APPLICATION_ERROR;
+        try {
+            systemTime = readData.readSystemTime();
+            dateTime = new DateTime();
+            recentRecords = readData.getRecentEGVsPages(numOfPages, systemTime, dateTime.getMillis());
+            if (preferences.isMeterUploadEnabled()) {
+                meterRecords = readData.getRecentMeterRecords(systemTime, dateTime.getMillis());
             }
+            if (preferences.isSensorUploadEnabled()) {
+                sensorRecords = readData.getRecentSensorRecords(numOfPages, systemTime, dateTime.getMillis());
+            }
+
+            if (preferences.isCalibrationUploadEnabled()) {
+                calRecords = readData.getRecentCalRecords(systemTime, dateTime.getMillis());
+            }
+            if (recentRecords.size() == 0) {
+                status = DownloadStatus.NO_DATA;
+            }
+
+            // FIXME: readData.readBatteryLevel() seems to flake out on battery level reads via serial.
+            // Removing for now.
+            if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4) {
+                batLevel = 100;
+            } else if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE) {
+                batLevel = readData.readBatteryLevel();
+            }
+            // TODO pull in other exceptions once we have the analytics/acra reporters
+        } catch (IOException e) {
+            //TODO record this in the event log later
+            status = DownloadStatus.IO_ERROR;
+        } catch (InvalidRecordLengthException e) {
+            status = DownloadStatus.APPLICATION_ERROR;
         }
 
         List<SensorGlucoseValueEntry> cookieMonsterG4SGVs = EGVRecord.toProtobufList(recentRecords);
