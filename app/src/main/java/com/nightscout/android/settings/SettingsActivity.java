@@ -31,10 +31,10 @@ import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.preferences.PreferencesValidator;
 import com.nightscout.core.barcode.NSBarcodeConfig;
-import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.RestUriUtils;
 
 import java.lang.reflect.Field;
+import java.net.URI;
 import java.util.List;
 
 public class SettingsActivity extends FragmentActivity {
@@ -106,23 +106,19 @@ public class SettingsActivity extends FragmentActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        AndroidPreferences prefs = new AndroidPreferences(this);
         if (scanResult == null || scanResult.getContents() == null) {
             return;
         }
-        NightscoutPreferences prefs = new AndroidPreferences(this);
         if (scanResult.getFormatName().equals("QR_CODE")) {
-            if (scanResult.getContents() != null) {
-                NSBarcodeConfig barcode = new NSBarcodeConfig(scanResult.getContents());
-                if (barcode.hasMongoConfig()) {
+            NSBarcodeConfig barcode = new NSBarcodeConfig(scanResult.getContents());
+            if (barcode.hasMongoConfig()) {
+                if (barcode.getMongoUri().isPresent()) {
                     prefs.setMongoUploadEnabled(true);
-                    if (barcode.getMongoUri().isPresent()) {
-                        prefs.setMongoClientUri(barcode.getMongoUri().get());
-                        prefs.setMongoCollection(barcode.getMongoCollection().orNull());
-                        prefs.setMongoDeviceStatusCollection(
-                                barcode.getMongoDeviceStatusCollection().orNull());
-                    }
-                } else {
-                    prefs.setMongoUploadEnabled(false);
+                    prefs.setMongoClientUri(barcode.getMongoUri().get());
+                    prefs.setMongoCollection(barcode.getMongoCollection().orNull());
+                    prefs.setMongoDeviceStatusCollection(
+                        barcode.getMongoDeviceStatusCollection().orNull());
                 }
                 if (barcode.hasApiConfig()) {
                     prefs.setRestApiEnabled(true);
@@ -131,6 +127,32 @@ public class SettingsActivity extends FragmentActivity {
                     prefs.setRestApiEnabled(false);
                 }
                 refreshFragments();
+            }
+            if (barcode.hasApiConfig()) {
+                prefs.setRestApiEnabled(true);
+                prefs.setRestApiBaseUris(barcode.getApiUris());
+            } else {
+                prefs.setRestApiEnabled(false);
+            }
+
+            if (barcode.hasMqttConfig()) {
+                if (barcode.getMqttUri().isPresent()) {
+                    URI uri = URI.create(barcode.getMqttUri().or(""));
+                    if (uri.getUserInfo() != null) {
+                        String[] userInfo = uri.getUserInfo().split(":");
+                        if (userInfo.length == 2) {
+                            String endpoint = uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort();
+                            if (userInfo[0].length() > 0 && userInfo[1].length() > 0) {
+                                prefs.setMqttUploadEnabled(true);
+                                prefs.setMqttEndpoint(endpoint);
+                                prefs.setMqttUser(userInfo[0]);
+                                prefs.setMqttPass(userInfo[1]);
+                            }
+                        }
+                    }
+                }
+            } else {
+                prefs.setMqttUploadEnabled(false);
             }
         } else if (scanResult.getFormatName().equals("CODE_128")) {
             // TODO Assuming this is a share receiver. May get messy when medtronic devices are added

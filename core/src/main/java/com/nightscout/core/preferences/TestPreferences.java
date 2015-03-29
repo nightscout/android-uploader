@@ -12,6 +12,7 @@ public class TestPreferences implements NightscoutPreferences {
     private boolean calibrationUploadEnabled = false;
     private boolean sensorUploadEnabled = false;
     private boolean mongoUploadEnabled = false;
+    private boolean mqttUploadEnabled = false;
     private String mongoClientUri = null;
     private String mongoCollection = "entries";
     private String mongoDeviceStatusCollection = "devicestatus";
@@ -123,7 +124,12 @@ public class TestPreferences implements NightscoutPreferences {
 
     @Override
     public boolean isMqttEnabled() {
-        return false;
+        return mqttUploadEnabled;
+    }
+
+    @Override
+    public void setMqttUploadEnabled(boolean mqttUploadEnabled) {
+        this.mqttUploadEnabled = mqttUploadEnabled;
     }
 
     @Override

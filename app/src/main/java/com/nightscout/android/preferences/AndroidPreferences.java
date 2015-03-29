@@ -96,6 +96,11 @@ public class AndroidPreferences implements NightscoutPreferences {
     }
 
     @Override
+    public void setMqttUploadEnabled(boolean mqttUploadEnabled) {
+        preferences.edit().putBoolean(PreferenceKeys.MQTT_ENABLED, mqttUploadEnabled).apply();
+    }
+
+    @Override
     public String getMqttEndpoint() {
         return preferences.getString(PreferenceKeys.MQTT_ENDPOINT, "");
     }
@@ -114,6 +119,16 @@ public class AndroidPreferences implements NightscoutPreferences {
     public String getMqttPass() {
         return preferences.getString(PreferenceKeys.MQTT_PASS, "");
     }
+
+    public void setMqttUser(String mqttUser) {
+        preferences.edit().putString(PreferenceKeys.MQTT_USER, mqttUser).apply();
+    }
+
+    // TODO: (klee) look into how to securely store this information
+    public void setMqttPass(String mqttPass) {
+        preferences.edit().putString(PreferenceKeys.MQTT_PASS, mqttPass).apply();
+    }
+
 
     /**
      * Enable mongo upload in shared preferences
