@@ -34,14 +34,14 @@
                 android:defaultValue="SM00000000" />
 
             <PreferenceScreen
-                android:title="@string/bt_scan_share2"
+                android:title="@string/pref_bt_scan_share2"
                 android:key="bt_scan_share2"
-                android:summary="@string/prefs_bt_scan__summary" />
+                android:summary="@string/pref_bt_scan_summary" />
 
             <PreferenceScreen
                 android:title="@string/scan_share2_barcode"
                 android:key="scan_share2_barcode"
-                android:summary="@string/prefs_share2_scan_barcode_summary" />
+                android:summary="@string/pref_share2_scan_barcode_summary" />
         </PreferenceScreen>
 
     </PreferenceCategory>

@@ -89,9 +89,12 @@ public class SettingsActivity extends FragmentActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if (scanResult == null || scanResult.getContents() == null) {
+            return;
+        }
         NightscoutPreferences prefs = new AndroidPreferences(this);
         if (scanResult.getFormatName().equals("QR_CODE")) {
-            if (scanResult != null && scanResult.getContents() != null) {
+            if (scanResult.getContents() != null) {
                 NSBarcodeConfig barcode = new NSBarcodeConfig(scanResult.getContents());
                 if (barcode.hasMongoConfig()) {
                     prefs.setMongoUploadEnabled(true);

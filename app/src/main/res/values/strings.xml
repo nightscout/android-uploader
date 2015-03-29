@@ -96,8 +96,8 @@
     <string name="pref_title_device_type">Device type</string>
     <string name="pref_share2_serial_number">Share Serial number</string>
     <string name="scan_share2_barcode">Scan Share Barcode</string>
-    <string name="prefs_share2_scan_barcode_summary">Scan the barcode on the share receiver</string>
+    <string name="pref_share2_scan_barcode_summary">Scan the barcode on the share receiver</string>
     <string name="button_force_sync">Force sync</string>
-    <string name="bt_scan_share2">Share scan</string>
-    <string name="prefs_bt_scan__summary">Scan for bluetooth G4 Share receivers</string>
+    <string name="pref_bt_scan_share2">Discover Share device</string>
+    <string name="pref_bt_scan_summary">Scan for bluetooth G4 Share receivers</string>
 </resources>
