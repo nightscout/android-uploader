@@ -3,9 +3,11 @@ package com.nightscout.android.ui;
 import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +25,7 @@ import com.nightscout.android.R;
 import com.nightscout.android.events.UserEventPanelActivity;
 import com.nightscout.android.exceptions.FeedbackDialog;
 import com.nightscout.android.preferences.AndroidPreferences;
+import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.core.BusProvider;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
@@ -67,7 +70,7 @@ public class MonitorFragment extends Fragment {
     @InjectView(R.id.syncButton)
     ImageButton mSyncButton;
     @InjectView(R.id.usbButton)
-    ImageButton mUsbButton;
+    ImageButton receiverButton;
     Bus bus = BusProvider.getInstance();
 
     private String mJSONData;
@@ -118,9 +121,18 @@ public class MonitorFragment extends Fragment {
                 return (event.getAction() == MotionEvent.ACTION_MOVE);
             }
         });
-        mUsbButton.setOnClickListener(new View.OnClickListener() {
+        receiverButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+//                EventFragment fragment = new EventFragment();
+//
+////                ((MaterialNavigationDrawer) getActivity()).setFragmentChild(new ChildFragment(),"Child Title");
+//
+//                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+//                transaction.replace(R.id.frame_container, fragment);
+////                transaction.addToBackStack(null);
+//                transaction.commit();
                 Intent intent = new Intent(getActivity(), UserEventPanelActivity.class);
                 intent.putExtra("Filter", EventType.DEVICE.ordinal());
                 startActivity(intent);
@@ -134,9 +146,20 @@ public class MonitorFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE) {
-            mUsbButton.setBackgroundResource(R.drawable.ic_noble);
+        if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE2) {
+            receiverButton.setBackgroundResource(R.drawable.ic_noble);
         }
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.OnSharedPreferenceChangeListener prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if (key.equals(PreferenceKeys.DEXCOM_DEVICE_TYPE)) {
+                    int res = preferences.getDeviceType() == SupportedDevices.DEXCOM_G4 ? R.drawable.ic_nousb : R.drawable.ic_noble;
+                    receiverButton.setBackgroundResource(res);
+                }
+            }
+        };
+        prefs.registerOnSharedPreferenceChangeListener(prefListener);
 
         return view;
     }
@@ -200,21 +223,21 @@ public class MonitorFragment extends Fragment {
             @Override
             public void run() {
                 if (status.connected) {
-                    if (status.deviceType == SupportedDevices.DEXCOM_G4_SHARE) {
-                        mUsbButton.setBackgroundResource(R.drawable.ic_ble);
+                    if (status.deviceType == SupportedDevices.DEXCOM_G4_SHARE2) {
+                        receiverButton.setBackgroundResource(R.drawable.ic_ble);
                     } else if (status.deviceType == SupportedDevices.DEXCOM_G4) {
-                        mUsbButton.setBackgroundResource(R.drawable.ic_usb);
+                        receiverButton.setBackgroundResource(R.drawable.ic_usb);
                     }
                 } else {
-                    if (status.deviceType == SupportedDevices.DEXCOM_G4_SHARE) {
-                        mUsbButton.setBackgroundResource(R.drawable.ic_noble);
+                    if (status.deviceType == SupportedDevices.DEXCOM_G4_SHARE2) {
+                        receiverButton.setBackgroundResource(R.drawable.ic_noble);
                     } else if (status.deviceType == SupportedDevices.DEXCOM_G4) {
-                        mUsbButton.setBackgroundResource(R.drawable.ic_nousb);
+                        receiverButton.setBackgroundResource(R.drawable.ic_nousb);
                     }
                 }
                 if (status.active) {
-                    mUsbButton.setBackgroundResource(R.drawable.ble_read);
-                    AnimationDrawable frameAnimation = (AnimationDrawable) mUsbButton.getBackground();
+                    receiverButton.setBackgroundResource(R.drawable.ble_read);
+                    AnimationDrawable frameAnimation = (AnimationDrawable) receiverButton.getBackground();
                     frameAnimation.start();
                 }
             }

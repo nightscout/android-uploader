@@ -96,7 +96,7 @@ public class MongoUploader extends BaseUploader {
 
     private BasicDBObject toBasicDBObject(GlucoseDataSet glucoseDataSet) {
         BasicDBObject output = new BasicDBObject();
-        output.put("device", "dexcom");
+        output.put("device", deviceStr);
         output.put("date", glucoseDataSet.getWallTime().getMillis());
         output.put("dateString", glucoseDataSet.getWallTime().toString());
         output.put("sgv", glucoseDataSet.getBgMgdl());
@@ -113,8 +113,7 @@ public class MongoUploader extends BaseUploader {
 
     private BasicDBObject toBasicDBObject(MeterRecord meterRecord) {
         BasicDBObject output = new BasicDBObject();
-//        Date timestamp = Utils.receiverTimeToDate(meterRecord.disp_timestamp_sec);
-        output.put("device", "dexcom");
+        output.put("device", deviceStr);
         output.put("type", "mbg");
         output.put("date", meterRecord.getWallTime().getMillis());
         output.put("dateString", meterRecord.getWallTime());
@@ -124,8 +123,7 @@ public class MongoUploader extends BaseUploader {
 
     private BasicDBObject toBasicDBObject(CalRecord calRecord) {
         BasicDBObject output = new BasicDBObject();
-//        Date timestamp = Utils.receiverTimeToDate(calRecord.disp_timestamp_sec);
-        output.put("device", "dexcom");
+        output.put("device", deviceStr);
         output.put("date", calRecord.getWallTime().getMillis());
         output.put("dateString", calRecord.getWallTime());
         output.put("slope", calRecord.getSlope());
@@ -135,9 +133,11 @@ public class MongoUploader extends BaseUploader {
         return output;
     }
 
-    private BasicDBObject toBasicDBObject(AbstractUploaderDevice deviceStatus) {
+    private BasicDBObject toBasicDBObject(AbstractUploaderDevice deviceStatus, int rcvrBat) {
         BasicDBObject output = new BasicDBObject();
         output.put("uploaderBattery", deviceStatus.getBatteryLevel());
+        output.put("receiverBattery", rcvrBat);
+        output.put("device", deviceStr);
         output.put("created_at", new Date());
         return output;
     }
@@ -168,8 +168,8 @@ public class MongoUploader extends BaseUploader {
     }
 
     @Override
-    protected boolean doUpload(AbstractUploaderDevice deviceStatus) throws IOException {
-        return upsert(getDeviceStatusCollection(), toBasicDBObject(deviceStatus));
+    protected boolean doUpload(AbstractUploaderDevice deviceStatus, int rcvrBat) throws IOException {
+        return upsert(getDeviceStatusCollection(), toBasicDBObject(deviceStatus, rcvrBat));
     }
 
 }

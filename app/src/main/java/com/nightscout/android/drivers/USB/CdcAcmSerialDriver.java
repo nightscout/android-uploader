@@ -1,5 +1,9 @@
 package com.nightscout.android.drivers.USB;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
@@ -10,6 +14,8 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.Arrays;
+
+import rx.Observable;
 
 //import com.hoho.android.usbserial.driver.UsbId;
 
@@ -44,8 +50,31 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
     private static final int SEND_BREAK = 0x23;
     private static final String SET_POWER_ON_COMMAND = "echo 'on' > \"/sys/bus/usb/devices/1-1/power/level\"";
 
-    public CdcAcmSerialDriver(UsbDevice device, UsbDeviceConnection connection, UsbManager manager) {
+    BroadcastReceiver mDeviceStatusReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            switch (action) {
+                case UsbManager.ACTION_USB_DEVICE_DETACHED:
+                    Log.d(TAG, "Stopping syncing on USB attached...");
+                    Observable.just(false).subscribe(connectionStateListener);
+                    break;
+                case UsbManager.ACTION_USB_DEVICE_ATTACHED:
+                    Observable.just(true).subscribe(connectionStateListener);
+                    Log.d(TAG, "Starting syncing on USB attached...");
+                    break;
+            }
+        }
+    };
+
+
+//    protected Context context;
+
+    public CdcAcmSerialDriver(UsbDevice device, UsbDeviceConnection connection, UsbManager manager, Context context) {
         super(device, connection, manager);
+        IntentFilter deviceStatusFilter = new IntentFilter();
+        deviceStatusFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+        deviceStatusFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+        context.registerReceiver(mDeviceStatusReceiver, deviceStatusFilter);
     }
 
     @Override

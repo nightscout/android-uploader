@@ -31,6 +31,7 @@ import dagger.ObjectGraph;
         mode = ReportingInteractionMode.TOAST,
         logcatArguments = {"-t", "500", "-v", "time"}
 )
+
 public class Nightscout extends Application {
     private final String TAG = Nightscout.class.getSimpleName();
     private Tracker tracker = null;
@@ -68,7 +69,7 @@ public class Nightscout extends Application {
             Log.d(TAG, "tracker was null - returning new tracker");
             GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
             analytics.setDryRun(false);
-            analytics.getLogger().setLogLevel(Logger.LogLevel.WARNING);
+            analytics.getLogger().setLogLevel(Logger.LogLevel.VERBOSE);
             analytics.setLocalDispatchPeriod(7200);
             tracker = analytics.newTracker(R.xml.app_tracker);
             return tracker;

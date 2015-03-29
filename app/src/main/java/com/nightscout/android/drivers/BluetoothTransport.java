@@ -217,7 +217,7 @@ public class BluetoothTransport implements DeviceTransport {
             if (mConnectionState == STATE_DISCONNECTED || mConnectionState == STATE_DISCONNECTING) {
 
                 // Check if a previously connected device is range
-                if (mBluetoothDeviceAddress != null && mBluetoothAdapter.getRemoteDevice(mBluetoothDeviceAddress) != null) {
+                if (!mBluetoothDeviceAddress.equals("")) {
                     connect(mBluetoothDeviceAddress);
                 } else {
                     Log.d(TAG, "Bluetooth device of interest can not be found.");

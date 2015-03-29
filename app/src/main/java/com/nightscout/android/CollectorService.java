@@ -6,11 +6,13 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.gms.analytics.HitBuilders;
@@ -21,6 +23,7 @@ import com.nightscout.android.drivers.USB.CdcAcmSerialDriver;
 import com.nightscout.android.drivers.USB.UsbSerialProber;
 import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
+import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.core.BusProvider;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.records.EGVRecord;
@@ -58,6 +61,7 @@ public class CollectorService extends Service {
     private Bus bus = BusProvider.getInstance();
     protected AbstractDevice device = null;
     protected DeviceTransport driver;
+    private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
 
 
     private AlarmManager alarmManager;
@@ -80,30 +84,62 @@ public class CollectorService extends Service {
         syncManager = PendingIntent.getBroadcast(getApplicationContext(), 1, syncIntent, 0);
 
         driver = null;
+        setDriver();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if (key.equals(PreferenceKeys.DEXCOM_DEVICE_TYPE)) {
+                    Log.d(TAG, "Interesting value changed!");
+                    if (driver.isConnected()) {
+                        try {
+                            driver.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    setDriver();
+                } else {
+                    Log.d("XXX", "Meh... something uninteresting changed");
+                }
+            }
+        };
+        prefs.registerOnSharedPreferenceChangeListener(prefListener);
+
+    }
+
+    private void setDriver() {
         if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4) {
             driver = UsbSerialProber.acquire(
-                    (UsbManager) getSystemService(USB_SERVICE));
-        } else if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE) {
+                    (UsbManager) getSystemService(USB_SERVICE), getApplicationContext());
+        } else if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE2) {
             driver = new BluetoothTransport(getApplicationContext());
         } else {
             throw new UnsupportedOperationException("Unsupported device selected");
         }
-
+        SupportedDevices deviceType = preferences.getDeviceType();
         AbstractUploaderDevice uploaderDevice = AndroidUploaderDevice.getUploaderDevice(getApplicationContext());
-        if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4 || preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE) {
+        if (deviceType == SupportedDevices.DEXCOM_G4 || deviceType == SupportedDevices.DEXCOM_G4_SHARE2) {
             device = new DexcomG4(driver, preferences, uploaderDevice);
-            if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4) {
+            device.setReporter(reporter);
+            if (deviceType == SupportedDevices.DEXCOM_G4) {
                 ((CdcAcmSerialDriver) driver).setPowerManagementEnabled(preferences.isRootEnabled());
-                ((CdcAcmSerialDriver) driver).setUsbCriteria(DexcomG4.VENDOR_ID, DexcomG4.PRODUCT_ID, DexcomG4.DEVICE_CLASS, DexcomG4.DEVICE_SUBCLASS, DexcomG4.PROTOCOL);
+                ((CdcAcmSerialDriver) driver).setUsbCriteria(DexcomG4.VENDOR_ID,
+                        DexcomG4.PRODUCT_ID, DexcomG4.DEVICE_CLASS, DexcomG4.DEVICE_SUBCLASS,
+                        DexcomG4.PROTOCOL);
             }
         }
         try {
-            driver.open();
+            if ((deviceType == SupportedDevices.DEXCOM_G4 && driver.isConnected())
+                    || deviceType == SupportedDevices.DEXCOM_G4_SHARE2) {
+                driver.open();
+            }
         } catch (IOException e) {
+            Log.e(TAG, "IOException: " + e.getMessage());
             //TODO record this in the event log later
 //            status = DownloadStatus.IO_ERROR;
         }
-
     }
 
     @Override
@@ -153,8 +189,6 @@ public class CollectorService extends Service {
 //                Intent uploaderIntent = new Intent(getApplicationContext(), ProcessorService.class);
 //                getApplicationContext().startService(uploaderIntent);
 
-                reporter.report(EventType.DEVICE, EventSeverity.INFO,
-                        getApplicationContext().getString(R.string.event_sync_log));
             } catch (ArrayIndexOutOfBoundsException e) {
                 reporter.report(EventType.DEVICE, EventSeverity.ERROR,
                         getApplicationContext().getString(R.string.event_fail_log));

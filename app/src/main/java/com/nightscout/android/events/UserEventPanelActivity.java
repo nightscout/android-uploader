@@ -27,6 +27,7 @@ public class UserEventPanelActivity extends Activity {
 
         Bundle bundle = new Bundle();
         bundle.putInt("Filter", intent.getIntExtra("Filter", 0));
+//        bundle.putBoolean("fromActivity", true);
         fragment.setArguments(bundle);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();

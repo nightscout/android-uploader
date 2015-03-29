@@ -38,4 +38,5 @@ public class AndroidEventReporter implements EventReporter {
         values.put(EventsContract.EventEntry.COLUMN_NAME_MESSAGE, message);
         long result = db.insert(EventsContract.EventEntry.TABLE_NAME, null, values);
     }
+
 }

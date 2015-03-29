@@ -254,7 +254,7 @@ public class AndroidPreferences implements NightscoutPreferences {
     @Override
     public SupportedDevices getDeviceType() {
         return preferences.getString(PreferenceKeys.DEXCOM_DEVICE_TYPE, "0").equals("0") ?
-                SupportedDevices.DEXCOM_G4 : SupportedDevices.DEXCOM_G4_SHARE;
+                SupportedDevices.DEXCOM_G4 : SupportedDevices.DEXCOM_G4_SHARE2;
     }
 
     @Override

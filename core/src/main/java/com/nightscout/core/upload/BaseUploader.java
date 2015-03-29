@@ -17,8 +17,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public abstract class BaseUploader {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private final NightscoutPreferences preferences;
+    protected final NightscoutPreferences preferences;
     protected String identifier;
+    protected String deviceStr;
 
     protected abstract boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException;
 
@@ -32,7 +33,7 @@ public abstract class BaseUploader {
         return true;
     }
 
-    protected boolean doUpload(AbstractUploaderDevice deviceStatus) throws IOException {
+    protected boolean doUpload(AbstractUploaderDevice deviceStatus, int rcvrBat) throws IOException {
         log.info("Device status upload not supported.");
         return true;
     }
@@ -40,6 +41,7 @@ public abstract class BaseUploader {
     public BaseUploader(NightscoutPreferences preferences) {
         checkNotNull(preferences);
         this.preferences = preferences;
+        deviceStr = preferences.getDeviceType().name();
     }
 
     // TODO(trhodeos): implement some sort of retry logic in all of these public functions.
@@ -111,12 +113,12 @@ public abstract class BaseUploader {
      * @param deviceStatus
      * @return True if the upload was successful or False if the upload was unsuccessful
      */
-    public final boolean uploadDeviceStatus(AbstractUploaderDevice deviceStatus) {
+    public final boolean uploadDeviceStatus(AbstractUploaderDevice deviceStatus, int rcvrBat) {
         if (deviceStatus == null) {
             return true;
         }
         try {
-            return doUpload(deviceStatus);
+            return doUpload(deviceStatus, rcvrBat);
         } catch (IOException e) {
             log.error("Error uploading device status", e);
             return false;
@@ -139,18 +141,11 @@ public abstract class BaseUploader {
      * @param deviceStatus
      * @return True if the (all) uploads was successful or False if at least one upload was unsuccessful.
      */
-//    public boolean uploadRecords(List<GlucoseDataSet> glucoseDataSets, List<MeterEntry> meterRecords, List<CalibrationEntry> calRecords, AbstractUploaderDevice deviceStatus) {
-//        boolean allSuccessful = uploadGlucoseDataSets(glucoseDataSets);
-//        allSuccessful &= uploadMeterRecords(meterRecords);
-//        allSuccessful &= uploadCalRecords(calRecords);
-//        allSuccessful &= uploadDeviceStatus(deviceStatus);
-//        return allSuccessful;
-//    }
-    public boolean uploadRecords(List<GlucoseDataSet> glucoseDataSets, List<MeterRecord> meterRecords, List<CalRecord> calRecords, AbstractUploaderDevice deviceStatus) {
+    public boolean uploadRecords(List<GlucoseDataSet> glucoseDataSets, List<MeterRecord> meterRecords, List<CalRecord> calRecords, AbstractUploaderDevice deviceStatus, int rcvrBat) {
         boolean allSuccessful = uploadGlucoseDataSets(glucoseDataSets);
         allSuccessful &= uploadMeterRecords(meterRecords);
         allSuccessful &= uploadCalRecords(calRecords);
-        allSuccessful &= uploadDeviceStatus(deviceStatus);
+        allSuccessful &= uploadDeviceStatus(deviceStatus, rcvrBat);
         return allSuccessful;
     }
 

@@ -18,7 +18,7 @@ public class RestLegacyUploader extends AbstractRestUploader {
 
     private JSONObject toJSONObject(GlucoseDataSet record) throws JSONException {
         JSONObject json = new JSONObject();
-        json.put("device", "dexcom");
+        json.put("device", deviceStr);
         json.put("date", record.getDisplayTime().getMillis());
         json.put("dateString", record.getDisplayTime().toString());
         json.put("sgv", Integer.parseInt(String.valueOf(record.getBgMgdl())));
@@ -26,9 +26,10 @@ public class RestLegacyUploader extends AbstractRestUploader {
         return json;
     }
 
-    private JSONObject toJSONObject(AbstractUploaderDevice deviceStatus) throws JSONException {
+    private JSONObject toJSONObject(AbstractUploaderDevice deviceStatus, int rcvrBat) throws JSONException {
         JSONObject json = new JSONObject();
         json.put("uploaderBattery", deviceStatus.getBatteryLevel());
+        json.put("receiverBattery", rcvrBat);
         return json;
     }
 
@@ -44,9 +45,9 @@ public class RestLegacyUploader extends AbstractRestUploader {
 
     // TODO(trhodeos): is devicestatus supported in legacy apis?
     @Override
-    protected boolean doUpload(AbstractUploaderDevice deviceStatus) throws IOException {
+    protected boolean doUpload(AbstractUploaderDevice deviceStatus, int rcvrBat) throws IOException {
         try {
-            return doPost("devicestatus", toJSONObject(deviceStatus));
+            return doPost("devicestatus", toJSONObject(deviceStatus, rcvrBat));
         } catch (JSONException e) {
             log.error("Could not create JSON object for legacy rest device status.", e);
             return false;

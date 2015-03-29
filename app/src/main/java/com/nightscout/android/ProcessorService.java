@@ -2,14 +2,19 @@ package com.nightscout.android;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.mqtt.AndroidMqttPinger;
 import com.nightscout.android.mqtt.AndroidMqttTimer;
 import com.nightscout.android.preferences.AndroidPreferences;
+import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.upload.Uploader;
 import com.nightscout.android.wearables.Pebble;
 import com.nightscout.core.BusProvider;
@@ -20,6 +25,8 @@ import com.nightscout.core.model.G4Download;
 import com.nightscout.core.mqtt.MqttEventMgr;
 import com.nightscout.core.mqtt.MqttPinger;
 import com.nightscout.core.mqtt.MqttTimer;
+import com.nightscout.core.upload.BaseUploader;
+import com.nightscout.core.utils.RestUriUtils;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -28,6 +35,9 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.joda.time.DateTime;
+
+import java.net.URI;
+import java.util.Arrays;
 
 public class ProcessorService extends Service {
 
@@ -41,6 +51,8 @@ public class ProcessorService extends Service {
     private Bus bus = BusProvider.getInstance();
     private boolean initalized = false;
     private boolean uploadersDefined = false;
+    private Tracker tracker;
+    private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
 
 
     @Override
@@ -54,14 +66,65 @@ public class ProcessorService extends Service {
         pebble.setPwdName(preferences.getPwdName());
         bus.register(this);
         uploader = new Uploader(getApplicationContext(), preferences);
-        if (preferences.isMqttEnabled()) {
-            mqttManager = setupMqtt(preferences.getMqttUser(), preferences.getMqttPass(), preferences.getMqttEndpoint());
-            if (mqttManager != null) {
-                mqttManager.connect();
-                initalized = true;
+        setupMqtt();
+//        if (preferences.isMqttEnabled()) {
+//            mqttManager = setupMqtt(preferences.getMqttUser(), preferences.getMqttPass(), preferences.getMqttEndpoint());
+//            if (mqttManager != null) {
+//                mqttManager.connect();
+//                initalized = true;
+//            }
+//        }
+        tracker = ((Nightscout) getApplicationContext()).getTracker();
+        reportUploadMethods();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                String[] prefKeys = {PreferenceKeys.API_UPLOADER_ENABLED, PreferenceKeys.API_URIS, PreferenceKeys.MONGO_UPLOADER_ENABLED,
+                        PreferenceKeys.MONGO_URI, PreferenceKeys.MONGO_COLLECTION, PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION};
+                if (Arrays.asList(prefKeys).contains(key)) {
+                    Log.d("XXX", "Interesting value changed!");
+                    uploader = new Uploader(getApplicationContext(), preferences);
+                    for (BaseUploader ul : uploader.getUploaders()) {
+                        Log.d("XXX", "defined: " + ul.getIdentifier());
+                    }
+                } else {
+                    Log.d("XXX", "Meh... something uninteresting changed");
+                }
+                // Assume that MQTT already has the information needed and set it up.
+                if (key.equals(PreferenceKeys.MQTT_ENABLED)) {
+                    setupMqtt();
+                }
+
+                // Assume that MQTT is already enabled and the MQTT endpoint and credentials are just changing
+                prefKeys = new String[]{PreferenceKeys.MQTT_ENDPOINT, PreferenceKeys.MQTT_PASS, PreferenceKeys.MQTT_USER};
+                if (Arrays.asList(prefKeys).contains(key)) {
+                    Log.d(TAG, "MQTT change detected. Restarting MQTT");
+                    if (mqttManager.isConnected()) {
+                        mqttManager.disconnect();
+                    }
+                    setupMqtt();
+                }
+            }
+        };
+        prefs.registerOnSharedPreferenceChangeListener(prefListener);
+    }
+
+    public void reportUploadMethods() {
+        if (preferences.isRestApiEnabled()) {
+            for (String url : preferences.getRestApiBaseUris()) {
+                String apiVersion = (RestUriUtils.isV1Uri(URI.create(url))) ? "WebAPIv1" : "Legacy WebAPI";
+                tracker.send(new HitBuilders.EventBuilder("Upload", apiVersion).build());
             }
         }
+        if (preferences.isMongoUploadEnabled()) {
+            tracker.send(new HitBuilders.EventBuilder("Upload", "Mongo").build());
+        }
+        if (preferences.isMqttEnabled()) {
+            tracker.send(new HitBuilders.EventBuilder("Upload", "MQTT").build());
+        }
     }
+
     // TODO setup a preferences listener to reconnect to MQTT after a settings change.
 
     private boolean verifyUploaders() {
@@ -86,7 +149,17 @@ public class ProcessorService extends Service {
         bus.unregister(this);
     }
 
-    public MqttEventMgr setupMqtt(String user, String pass, String endpoint) {
+    public void setupMqtt() {
+        if (preferences.isMqttEnabled()) {
+            mqttManager = setupMqttConnection(preferences.getMqttUser(), preferences.getMqttPass(), preferences.getMqttEndpoint());
+            if (mqttManager != null) {
+                mqttManager.connect();
+                initalized = true;
+            }
+        }
+    }
+
+    public MqttEventMgr setupMqttConnection(String user, String pass, String endpoint) {
         if (user.equals("") || pass.equals("") || endpoint.equals("")) {
             reporter.report(EventType.UPLOADER, EventSeverity.ERROR, "Unable to setup MQTT. Please check settings");
             return null;
@@ -109,6 +182,10 @@ public class ProcessorService extends Service {
         }
     }
 
+    private void reportDeviceTypes() {
+        tracker.send(new HitBuilders.EventBuilder("sync", preferences.getDeviceType().name()).build());
+    }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -117,7 +194,7 @@ public class ProcessorService extends Service {
 
     @Subscribe
     public void incomingData(G4Download download) {
-
+        reportDeviceTypes();
         uploadersDefined = verifyUploaders();
         // TODO - Eventually collapse all of these to a single loop to process the download.
         // Requires a single interface for everything to determine how to process a download.

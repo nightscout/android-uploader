@@ -100,4 +100,5 @@
     <string name="button_force_sync">Force sync</string>
     <string name="pref_bt_scan_share2">Discover Share device</string>
     <string name="pref_bt_scan_summary">Scan for bluetooth G4 Share receivers</string>
+    <string name="menu_clear_log">Clear</string>
 </resources>

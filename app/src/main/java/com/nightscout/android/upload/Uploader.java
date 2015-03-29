@@ -42,7 +42,7 @@ public class Uploader {
     private boolean allUploadersInitalized = true;
     private EventReporter reporter;
     private Context context;
-    private NightscoutPreferences preferences;
+    protected NightscoutPreferences preferences;
 
     public Uploader(Context context, NightscoutPreferences preferences) {
         checkNotNull(context);
@@ -140,7 +140,7 @@ public class Uploader {
         List<GlucoseDataSet> glucoseDataSets = Utils.mergeGlucoseDataRecords(download, numRecords);
 
 
-        return upload(glucoseDataSets, meterRecords, calRecords);
+        return upload(glucoseDataSets, meterRecords, calRecords, download.receiver_battery);
     }
 
     public <T, U extends Message> List<T> asRecordList(List<U> entryList, Class<T> clazz, long rcvrTime, long refTime) {
@@ -160,12 +160,12 @@ public class Uploader {
         List<GlucoseDataSet> glucoseDataSets = Utils.mergeGlucoseDataRecords(download.sgv, download.sensor, download.receiver_system_time_sec, refTime);
         List<MeterRecord> meterRecords = asRecordList(download.meter, MeterRecord.class, download.receiver_system_time_sec, refTime);
         List<CalRecord> calRecords = asRecordList(download.cal, CalRecord.class, download.receiver_system_time_sec, refTime);
-        return upload(glucoseDataSets, meterRecords, calRecords);
+        return upload(glucoseDataSets, meterRecords, calRecords, download.receiver_battery);
     }
 
     private boolean upload(List<GlucoseDataSet> glucoseDataSets,
                            List<MeterRecord> meterRecords,
-                           List<CalRecord> calRecords) {
+                           List<CalRecord> calRecords, int rcvrBat) {
 
         AbstractUploaderDevice deviceStatus = AndroidUploaderDevice.getUploaderDevice(context);
 
@@ -174,7 +174,7 @@ public class Uploader {
             // TODO(klee): capture any exceptions here so that all configured uploaders will attempt
             // to upload
             try {
-                allSuccessful &= uploader.uploadRecords(glucoseDataSets, meterRecords, calRecords, deviceStatus);
+                allSuccessful &= uploader.uploadRecords(glucoseDataSets, meterRecords, calRecords, deviceStatus, rcvrBat);
                 reporter.report(EventType.UPLOADER, EventSeverity.INFO,
                         String.format(context.getString(R.string.event_success_upload),
                                 uploader.getIdentifier()));
@@ -193,20 +193,10 @@ public class Uploader {
             }
         }
 
-        // Quick hack to prevent MQTT only from reporting not uploading to cloud
-//        int otherUploaders = (preferences.isMqttEnabled()) ? 1 : 0;
-
-//        if (uploaders.size() + otherUploaders == 0) {
-//            reporter.report(EventType.UPLOADER, EventSeverity.WARN, context.getString(R.string.no_uploaders));
-//        }
-
-        // Force a failure if an uploader was not properly initialized, but only after the other
-        // uploaders were executed.
-//        return allSuccessful && (uploaders.size() + otherUploaders != 0);
         return allSuccessful;
     }
 
-    protected List<BaseUploader> getUploaders() {
+    public List<BaseUploader> getUploaders() {
         return uploaders;
     }
 

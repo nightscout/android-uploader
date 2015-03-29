@@ -1,6 +1,7 @@
 package com.nightscout.android.settings;
 
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,10 +12,13 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.common.base.Optional;
@@ -30,6 +34,7 @@ import com.nightscout.core.barcode.NSBarcodeConfig;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.RestUriUtils;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 public class SettingsActivity extends FragmentActivity {
@@ -41,7 +46,13 @@ public class SettingsActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setupActionBar();
         setupListener();
-        refreshFragments();
+//        refreshFragments();
+    }
+
+    @Override
+    public View onCreateView(String name, @NonNull Context context, @NonNull AttributeSet attrs) {
+//        refreshFragments();
+        return super.onCreateView(name, context, attrs);
     }
 
     private void refreshFragments() {
@@ -62,6 +73,12 @@ public class SettingsActivity extends FragmentActivity {
                 if (key.equals(PreferenceKeys.LABS_ENABLED) || key.equals(PreferenceKeys.DEXCOM_DEVICE_TYPE)) {
                     refreshFragments();
                 }
+//                Intent collector = new Intent(getApplicationContext(), CollectorService.class);
+//                Intent processor = new Intent(getApplicationContext(), ProcessorService.class);
+//                getApplicationContext().stopService(collector);
+//                getApplicationContext().stopService(processor);
+//                getApplicationContext().startService(collector);
+//                getApplicationContext().startService(processor);
             }
         };
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -189,11 +206,15 @@ public class SettingsActivity extends FragmentActivity {
             }
         }
 
+        // TODO has to be a cleaner way?
         private void setupDeviceOptions() {
             findPreference("dexcom_device_type").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    preference.setSummary(((ListPreference) preference).getEntry());
+//                    preference.setSummary(((ListPreference) preference).getEntry());
+                    ListPreference listPref = (ListPreference) preference;
+                    String summary = listPref.getEntries()[Integer.valueOf((String) newValue)].toString();
+                    preference.setSummary(summary);
                     setShareOptions((String) newValue);
                     return true;
                 }
@@ -235,6 +256,16 @@ public class SettingsActivity extends FragmentActivity {
         @Override
         public void onDetach() {
             super.onDetach();
+            try {
+                Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+                childFragmentManager.setAccessible(true);
+                childFragmentManager.set(this, null);
+
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
 
         private void setupValidation() {

@@ -97,7 +97,7 @@ public class DexcomG4 extends AbstractDevice {
             // Removing for now.
             if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4) {
                 batLevel = 100;
-            } else if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE) {
+            } else if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE2) {
                 batLevel = readData.readBatteryLevel();
             }
             // TODO pull in other exceptions once we have the analytics/acra reporters
