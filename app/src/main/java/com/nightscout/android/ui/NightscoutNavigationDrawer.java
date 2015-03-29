@@ -7,6 +7,7 @@ import android.util.Log;
 import com.nightscout.android.BuildConfig;
 import com.nightscout.android.CollectorService;
 import com.nightscout.android.Nightscout;
+import com.nightscout.android.ProcessorService;
 import com.nightscout.android.R;
 import com.nightscout.android.events.EventFragment;
 import com.nightscout.android.exceptions.FeedbackDialog;
@@ -69,6 +70,8 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
                 syncIntent.putExtra(CollectorService.NUM_PAGES, 20);
                 syncIntent.putExtra(CollectorService.SYNC_TYPE, CollectorService.GAP_SYNC);
                 getApplicationContext().startService(syncIntent);
+
+
             }
         });
         addSection(gapSync);
@@ -98,5 +101,9 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
         disableLearningPattern();
         setBackPattern(MaterialNavigationDrawer.BACKPATTERN_BACK_TO_FIRST);
         enableToolbarElevation();
+        Log.d("XXX", "Attempting to start service");
+        Intent uploadIntent = new Intent(getBaseContext(), ProcessorService.class);
+        getApplicationContext().startService(uploadIntent);
+        Log.d("XXX", "Service should be started");
     }
 }

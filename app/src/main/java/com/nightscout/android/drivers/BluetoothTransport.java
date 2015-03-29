@@ -47,6 +47,8 @@ public class BluetoothTransport implements DeviceTransport {
     private boolean authenticated = false;
     private boolean finalCallback = false;
 
+    private Action1<Boolean> connectionStateListener;
+
     // Bluetooth connection state variables
     private static final int STATE_DISCONNECTED = BluetoothProfile.STATE_DISCONNECTED;
     private static final int STATE_DISCONNECTING = BluetoothProfile.STATE_DISCONNECTING;
@@ -186,6 +188,10 @@ public class BluetoothTransport implements DeviceTransport {
 
     public boolean isConnected() {
         return mConnectionState == BluetoothProfile.STATE_CONNECTED;
+    }
+
+    public void registerConnectionListener(Action1<Boolean> connectionListener) {
+        connectionStateListener = connectionListener;
     }
 
 
@@ -369,13 +375,14 @@ public class BluetoothTransport implements DeviceTransport {
                 device = mBluetoothGatt.getDevice();
                 mConnectionState = STATE_CONNECTED;
                 Log.w(TAG, "Connected to GATT server.");
-
+                Observable.just(true).subscribe(connectionStateListener);
                 Log.w(TAG, "discovering services");
                 if (!mBluetoothGatt.discoverServices()) {
                     Log.w(TAG, "discovering failed");
                 }
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.w(TAG, "Disconnected from GATT server.");
+                Observable.just(false).subscribe(connectionStateListener);
                 mConnectionState = STATE_DISCONNECTED;
                 if (shouldBeOpen) {
                     Log.w(TAG, "Connection was unexpectedly lost. Attempting to reconnect");
@@ -510,10 +517,12 @@ public class BluetoothTransport implements DeviceTransport {
 
     public void reconnect() {
         try {
+            Log.d(TAG, "Attempting to close connection");
             close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Log.d(TAG, "Attempting to re-open connection");
         attemptConnection();
     }
 
@@ -522,7 +531,6 @@ public class BluetoothTransport implements DeviceTransport {
         Log.d(TAG, "Setting next poll with Alarm for " + millis + " ms from now.");
         Intent reconnectIntent = new Intent(RECONNECT_INTENT);
         reconnectPendingIntent = PendingIntent.getBroadcast(mContext.getApplicationContext(), 1, reconnectIntent, 0);
-        ;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + millis, reconnectPendingIntent);
         } else {

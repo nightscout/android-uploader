@@ -40,22 +40,18 @@ public class ProcessorService extends Service {
     private AndroidPreferences preferences;
     private Bus bus = BusProvider.getInstance();
     private boolean initalized = false;
+    private boolean uploadersDefined = false;
 
 
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d("XXX", "Starting processor service");
         preferences = new AndroidPreferences(getApplicationContext());
         reporter = AndroidEventReporter.getReporter(getApplicationContext());
         pebble = new Pebble(getApplicationContext());
         pebble.setUnits(preferences.getPreferredUnits());
         pebble.setPwdName(preferences.getPwdName());
-
-        if (!preferences.isMqttEnabled() && !preferences.isMongoUploadEnabled() && !preferences.isRestApiEnabled()) {
-            reporter.report(EventType.UPLOADER, EventSeverity.WARN, getApplicationContext().getString(R.string.no_uploaders));
-            bus.post(false);
-        }
-
         bus.register(this);
         uploader = new Uploader(getApplicationContext(), preferences);
         if (preferences.isMqttEnabled()) {
@@ -68,6 +64,15 @@ public class ProcessorService extends Service {
     }
     // TODO setup a preferences listener to reconnect to MQTT after a settings change.
 
+    private boolean verifyUploaders() {
+        if (!preferences.isMqttEnabled() && !preferences.isMongoUploadEnabled() && !preferences.isRestApiEnabled()) {
+            reporter.report(EventType.UPLOADER, EventSeverity.WARN, getApplicationContext().getString(R.string.no_uploaders));
+            return false;
+//            bus.post(false);
+        }
+        return true;
+    }
+
 
     @Override
     public void onDestroy() {
@@ -78,6 +83,7 @@ public class ProcessorService extends Service {
         if (mqttManager != null) {
             mqttManager.close();
         }
+        bus.unregister(this);
     }
 
     public MqttEventMgr setupMqtt(String user, String pass, String endpoint) {
@@ -112,6 +118,7 @@ public class ProcessorService extends Service {
     @Subscribe
     public void incomingData(G4Download download) {
 
+        uploadersDefined = verifyUploaders();
         // TODO - Eventually collapse all of these to a single loop to process the download.
         // Requires a single interface for everything to determine how to process a download.
         boolean uploadSuccess = false;
@@ -139,8 +146,17 @@ public class ProcessorService extends Service {
                 reporter.report(EventType.UPLOADER, EventSeverity.ERROR, "Expected MQTT to be connected but it is not");
                 uploadSuccess &= false;
             }
+        } else {
+            initalized = true;
         }
-        bus.post(uploadSuccess && initalized && uploader.areAllUploadersInitalized());
+        ProcessorResponse response = new ProcessorResponse();
+        response.success = uploadSuccess && initalized && uploader.areAllUploadersInitalized() && uploadersDefined;
+        bus.post(response);
+//        bus.post(uploadSuccess && initalized && uploader.areAllUploadersInitalized());
+    }
+
+    public class ProcessorResponse {
+        public boolean success;
     }
 
     @Override

@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import rx.functions.Action1;
+
 public class DexcomG4 extends AbstractDevice {
     public static final int VENDOR_ID = 8867;
     public static final int PRODUCT_ID = 71;
@@ -30,14 +32,31 @@ public class DexcomG4 extends AbstractDevice {
     protected NightscoutPreferences preferences;
     protected int numOfPages;
     protected AbstractUploaderDevice uploaderDevice;
+    protected DeviceTransport transport;
+
+    protected Action1<Boolean> connectionStateListener = new Action1<Boolean>() {
+
+        @Override
+        public void call(Boolean connected) {
+            if (connected) {
+                onConnect();
+            } else {
+                onDisconnect();
+            }
+        }
+    };
 
     public DexcomG4(DeviceTransport transport, NightscoutPreferences preferences,
                     AbstractUploaderDevice uploaderDevice) {
-        super(transport);
+//        super(transport);
+        this.transport = transport;
         this.preferences = preferences;
         this.uploaderDevice = uploaderDevice;
         this.deviceName = "DexcomG4";
+        this.deviceType = preferences.getDeviceType();
+        this.transport.registerConnectionListener(connectionStateListener);
     }
+
 
     @Override
     public boolean isConnected() {

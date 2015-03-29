@@ -276,4 +276,14 @@ public class AndroidPreferences implements NightscoutPreferences {
     public void setMeterUploadEnabled(boolean enabled) {
         preferences.edit().putBoolean(PreferenceKeys.METER_UPLOAD_ENABLED, enabled).apply();
     }
+
+    public void setLabsEnabled(boolean enabled) {
+        preferences.edit().putBoolean(PreferenceKeys.LABS_ENABLED, enabled).apply();
+    }
+
+    public boolean areLabsEnabled() {
+        return preferences.getBoolean(PreferenceKeys.LABS_ENABLED, false);
+
+    }
+
 }

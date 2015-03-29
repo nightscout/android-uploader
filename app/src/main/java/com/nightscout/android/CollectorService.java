@@ -104,7 +104,6 @@ public class CollectorService extends Service {
 //            status = DownloadStatus.IO_ERROR;
         }
 
-
     }
 
     @Override

@@ -3,9 +3,11 @@ package com.nightscout.android.ui;
 import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,6 +18,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.nightscout.android.Nightscout;
+import com.nightscout.android.ProcessorService;
 import com.nightscout.android.R;
 import com.nightscout.android.events.UserEventPanelActivity;
 import com.nightscout.android.exceptions.FeedbackDialog;
@@ -24,6 +27,8 @@ import com.nightscout.core.BusProvider;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.EGVRecord;
+import com.nightscout.core.drivers.AbstractDevice;
+import com.nightscout.core.drivers.SupportedDevices;
 import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.G4Download;
 import com.nightscout.core.model.GlucoseUnit;
@@ -129,6 +134,9 @@ public class MonitorFragment extends Fragment {
                 startActivity(intent);
             }
         });
+        if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE) {
+            mUsbButton.setBackgroundResource(R.drawable.ic_noble);
+        }
 
         return view;
     }
@@ -187,11 +195,39 @@ public class MonitorFragment extends Fragment {
     }
 
     @Subscribe
-    public void uploadStatus(final Boolean status) {
+    public void incomingData(final AbstractDevice.DeviceConnectionStatus status) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (status) {
+                if (status.connected) {
+                    if (status.deviceType == SupportedDevices.DEXCOM_G4_SHARE) {
+                        mUsbButton.setBackgroundResource(R.drawable.ic_ble);
+                    } else if (status.deviceType == SupportedDevices.DEXCOM_G4) {
+                        mUsbButton.setBackgroundResource(R.drawable.ic_usb);
+                    }
+                } else {
+                    if (status.deviceType == SupportedDevices.DEXCOM_G4_SHARE) {
+                        mUsbButton.setBackgroundResource(R.drawable.ic_noble);
+                    } else if (status.deviceType == SupportedDevices.DEXCOM_G4) {
+                        mUsbButton.setBackgroundResource(R.drawable.ic_nousb);
+                    }
+                }
+                if (status.active) {
+                    mUsbButton.setBackgroundResource(R.drawable.ble_read);
+                    AnimationDrawable frameAnimation = (AnimationDrawable) mUsbButton.getBackground();
+                    frameAnimation.start();
+                }
+            }
+        });
+    }
+
+    @Subscribe
+    public void incomingData(final ProcessorService.ProcessorResponse status) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("XXX", "Incoming status: " + status.success);
+                if (status.success) {
                     mSyncButton.setBackgroundResource(R.drawable.ic_cloud);
                 } else {
                     mSyncButton.setBackgroundResource(R.drawable.ic_nocloud);
@@ -202,6 +238,9 @@ public class MonitorFragment extends Fragment {
 
     @Subscribe
     public void incomingData(final G4Download download) {
+        if (download == null) {
+            Log.w("XXX", "Download is NULL");
+        }
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {

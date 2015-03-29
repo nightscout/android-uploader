@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="root">
 
     <PreferenceCategory
         android:title="@string/pref_header_general"
@@ -25,7 +26,7 @@
         <PreferenceScreen
             android:key="share_options"
             android:title="Share settings"
-            android:summary="Share settings">
+            android:summary="Settings specific to the Dexcom Share2 system">
             <com.nightscout.android.settings.SummaryBoundEditTextPreference
                 android:title="@string/pref_share2_serial_number"
                 android:key="share2_serial"
@@ -45,7 +46,9 @@
 
     </PreferenceCategory>
 
-    <PreferenceScreen android:title="Upload options">
+    <PreferenceScreen
+        android:title="Upload options"
+        android:summary="Various methods used to upload your data to the cloud. Please note that Mongo will be deprecated soon. We encourage you to migrate to MQTT and REST.">
         <PreferenceScreen
             android:title="@string/auto_configure_title"
             android:key="auto_configure"
@@ -239,11 +242,14 @@
             android:negativeButtonText="@null" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/pref_header_labs">
+    <PreferenceScreen
+        android:title="@string/pref_header_labs"
+        android:key="labs"
+        android:summary="Experimental labs">
         <com.nightscout.android.settings.CustomSwitchPreference
             android:title="@string/pref_title_root"
             android:key="root_support_enabled"
             android:defaultValue="false"
             android:summary="@string/pref_summary_root" />
-    </PreferenceCategory>
+    </PreferenceScreen>
 </PreferenceScreen>

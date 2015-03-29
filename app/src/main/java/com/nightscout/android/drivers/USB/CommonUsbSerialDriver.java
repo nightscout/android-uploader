@@ -27,6 +27,8 @@ import android.hardware.usb.UsbManager;
 import java.io.IOException;
 import java.util.HashMap;
 
+import rx.functions.Action1;
+
 
 /**
  * A base class shared by several driver implementations.
@@ -51,6 +53,8 @@ abstract class CommonUsbSerialDriver implements UsbSerialDriver {
     protected int deviceClass;
     protected int subClass;
     protected int protocol;
+
+    protected Action1<Boolean> connectionStateListener;
 
     /**
      * Internal read buffer.  Guarded by {@link #mReadBufferLock}.
@@ -180,5 +184,10 @@ abstract class CommonUsbSerialDriver implements UsbSerialDriver {
     @Override
     public boolean isConnected() {
         return this.isConnected(vendorId, productId, deviceClass, subClass, protocol);
+    }
+
+    @Override
+    public void registerConnectionListener(Action1<Boolean> connectionListener) {
+        connectionStateListener = connectionListener;
     }
 }

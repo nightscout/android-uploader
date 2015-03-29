@@ -31,4 +31,5 @@ public final class PreferenceKeys {
     public static final String BLUETOOTH_ADDRESS = "share_bluetooth_address";
     public static final String DEXCOM_DEVICE_TYPE = "dexcom_device_type";
     public static final String SHARE_SERIAL = "share2_serial";
+    public static final String LABS_ENABLED = "enable_labs";
 }

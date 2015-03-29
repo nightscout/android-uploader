@@ -3,16 +3,19 @@ package com.nightscout.android.settings;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.common.base.Optional;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -31,11 +34,13 @@ import java.util.List;
 
 public class SettingsActivity extends FragmentActivity {
     private MainPreferenceFragment mainPreferenceFragment;
+    private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
+        setupListener();
         refreshFragments();
     }
 
@@ -49,6 +54,18 @@ public class SettingsActivity extends FragmentActivity {
         if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    private void setupListener() {
+        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+                if (key.equals(PreferenceKeys.LABS_ENABLED) || key.equals(PreferenceKeys.DEXCOM_DEVICE_TYPE)) {
+                    refreshFragments();
+                }
+            }
+        };
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(listener);
     }
 
     @Override
@@ -105,6 +122,8 @@ public class SettingsActivity extends FragmentActivity {
     }
 
     public static class MainPreferenceFragment extends PreferenceFragment {
+        private int labTapCount = 0;
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -115,54 +134,64 @@ public class SettingsActivity extends FragmentActivity {
             setupVersionNumbers();
             setupBtScanner();
             setupDeviceOptions();
-//            PreferenceScreen shareOptions = (PreferenceScreen) findPreference("share_options");
             ListPreference deviceType = (ListPreference) findPreference("dexcom_device_type");
-            setShareOptions(deviceType.getValue(), deviceType.getEntry().toString());
-//            if (deviceType.getValue().equals("0")) {
-//                shareOptions.setEnabled(false);
-//                Log.d("XXX", "Disabling");
-//            } else if (deviceType.getValue().equals("1")) {
-//                shareOptions.setEnabled(true);
-//                Log.d("XXX", "Enabling");
-//            }
+            deviceType.setSummary(deviceType.getEntry().toString());
+            setShareOptions(deviceType.getValue());
+            setupLabs();
+        }
 
+        private void setupLabs() {
+            AndroidPreferences prefs = new AndroidPreferences(getActivity());
+            if (!prefs.areLabsEnabled()) {
+                PreferenceScreen root = (PreferenceScreen) findPreference("root");
+                PreferenceScreen labs = (PreferenceScreen) findPreference("labs");
+                root.removePreference(labs);
+            }
         }
 
         private void setupVersionNumbers() {
             findPreference("about_version_name").setSummary(BuildConfig.VERSION_CODENAME);
-            findPreference("about_version_number").setSummary(BuildConfig.VERSION_NAME);
+            Preference versionNumber = findPreference("about_version_number");
+            versionNumber.setSummary(BuildConfig.VERSION_NAME);
+            final AndroidPreferences prefs = new AndroidPreferences(getActivity());
+            if (!prefs.areLabsEnabled()) {
+                versionNumber.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        if (labTapCount < 6) {
+                            labTapCount += 1;
+                        }
+                        if (labTapCount >= 2 && labTapCount < 6) {
+                            Toast.makeText(getActivity(), "Tap " + (6 - labTapCount) + " more times to enable labs", Toast.LENGTH_SHORT).show();
+                        }
+                        if (labTapCount == 5) {
+                            Toast.makeText(getActivity(), "Labs are now enabled. Enjoy!", Toast.LENGTH_LONG).show();
+                            prefs.setLabsEnabled(true);
+                        }
+                        return true;
+                    }
+                });
+            }
             findPreference("about_build_hash").setSummary(BuildConfig.GIT_SHA);
             findPreference("about_device_id").setSummary(Settings.Secure.getString(getActivity().getContentResolver(),
                     Settings.Secure.ANDROID_ID));
         }
 
-        private void setShareOptions(String newValue, String summary) {
+        private void setShareOptions(String newValue) {
             PreferenceScreen shareOptions = (PreferenceScreen) findPreference("share_options");
             if (newValue.equals("0")) {
                 shareOptions.setEnabled(false);
             } else if (newValue.equals("1")) {
                 shareOptions.setEnabled(true);
             }
-            findPreference("dexcom_device_type").setSummary(summary);
-
         }
 
         private void setupDeviceOptions() {
             findPreference("dexcom_device_type").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    String summary = ((ListPreference) preference).getEntry().toString();
-                    setShareOptions((String) newValue, summary);
-
-//                    PreferenceScreen shareOptions = (PreferenceScreen) findPreference("share_options");
-//                    if (newValue.equals("0")) {
-//                        shareOptions.setEnabled(false);
-//                        return true;
-//                    } else if (newValue.equals("1")) {
-//                        shareOptions.setEnabled(true);
-//                        return true;
-//                    }
-//                    return false;
+                    preference.setSummary(((ListPreference) preference).getEntry());
+                    setShareOptions((String) newValue);
                     return true;
                 }
             });
@@ -200,6 +229,10 @@ public class SettingsActivity extends FragmentActivity {
             });
         }
 
+        @Override
+        public void onDetach() {
+            super.onDetach();
+        }
 
         private void setupValidation() {
             findPreference(PreferenceKeys.API_URIS).setOnPreferenceChangeListener(

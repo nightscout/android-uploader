@@ -2,6 +2,8 @@ package com.nightscout.core.drivers;
 
 import java.io.IOException;
 
+import rx.functions.Action1;
+
 public interface DeviceTransport {
     /**
      * Opens and initializes the device as a USB serial device. Upon success,
@@ -48,10 +50,7 @@ public interface DeviceTransport {
      */
     public int write(final byte[] src, final int timeoutMillis) throws IOException;
 
-    // TODO - make this not USB specific
-//    public boolean isConnected(int vendorId, int productId, int deviceClass, int subClass,
-//                               int protocol);
-
     public boolean isConnected();
 
+    public void registerConnectionListener(Action1<Boolean> connectionListener);
 }
