@@ -45,6 +45,8 @@ import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
@@ -58,6 +60,7 @@ import static com.nightscout.core.dexcom.SpecialValue.isSpecialValue;
 import static org.joda.time.Duration.standardMinutes;
 
 public class MonitorFragment extends Fragment {
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private Handler mHandler = new Handler();
     // UI components
@@ -137,14 +140,6 @@ public class MonitorFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-//                EventFragment fragment = new EventFragment();
-//
-////                ((MaterialNavigationDrawer) getActivity()).setFragmentChild(new ChildFragment(),"Child Title");
-//
-//                FragmentTransaction transaction = getFragmentManager().beginTransaction();
-//                transaction.replace(R.id.frame_container, fragment);
-////                transaction.addToBackStack(null);
-//                transaction.commit();
                 Intent intent = new Intent(getActivity(), UserEventPanelActivity.class);
                 intent.putExtra("Filter", EventType.DEVICE.ordinal());
                 startActivity(intent);
@@ -179,8 +174,6 @@ public class MonitorFragment extends Fragment {
                 if (key.equals(PreferenceKeys.DEXCOM_DEVICE_TYPE)) {
                     int res = preferences.getDeviceType() == SupportedDevices.DEXCOM_G4 ? R.drawable.ic_nousb : R.drawable.ic_noble;
                     setReceiverButtonRes(res);
-//                    receiverButton.setBackgroundResource(res);
-
                 }
             }
         };
@@ -319,36 +312,41 @@ public class MonitorFragment extends Fragment {
             @Override
             public void run() {
                 long refTime = DateTime.parse(download.download_timestamp).getMillis();
-                lastRecordTime = new DateTime().getMillis() - Duration.standardSeconds(download.receiver_system_time_sec - download.sgv.get(download.sgv.size() - 1).sys_timestamp_sec).getMillis();
-                EGVRecord recentRecord = null;
                 if (download.sgv.size() > 0) {
-                    recentRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), download.receiver_system_time_sec, refTime);
-                    // Reload d3 chart with new data
-                    JSONArray array = new JSONArray();
-                    for (SensorGlucoseValueEntry sgve : download.sgv) {
-                        try {
-                            EGVRecord record = new EGVRecord(sgve, sgve.sys_timestamp_sec, refTime);
-                            array.put(record.toJSON());
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                    lastRecordTime = new DateTime().getMillis() - Duration.standardSeconds(download.receiver_system_time_sec - download.sgv.get(download.sgv.size() - 1).sys_timestamp_sec).getMillis();
+                    EGVRecord recentRecord = null;
+                    if (download.sgv.size() > 0) {
+                        recentRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), download.receiver_system_time_sec, refTime);
+                        // Reload d3 chart with new data
+                        JSONArray array = new JSONArray();
+                        for (SensorGlucoseValueEntry sgve : download.sgv) {
+                            try {
+                                EGVRecord record = new EGVRecord(sgve, sgve.sys_timestamp_sec, refTime);
+                                array.put(record.toJSON());
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
+                        mWebView.loadUrl("javascript:updateData(" + array + ")");
+                        mTextSGV.setText(getSGVStringByUnit(recentRecord.getReading(), recentRecord.getTrend()));
+                        mTextSGV.setTag(R.string.display_sgv, recentRecord.getReading().asMgdl());
+                        mTextSGV.setTag(R.string.display_trend, recentRecord.getTrend().ordinal());
                     }
-                    mWebView.loadUrl("javascript:updateData(" + array + ")");
-                    mTextSGV.setText(getSGVStringByUnit(recentRecord.getReading(), recentRecord.getTrend()));
-                    mTextSGV.setTag(R.string.display_sgv, recentRecord.getReading().asMgdl());
-                    mTextSGV.setTag(R.string.display_trend, recentRecord.getTrend().ordinal());
+
+                    // Update UI with latest record information
+
+                    EGVRecord lastEgvRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), download.receiver_system_time_sec, refTime);
+
+                    String timeAgoStr = "---";
+                    if (lastEgvRecord.getRawSystemTimeSeconds() > 0) {
+                        timeAgoStr = Utils.getTimeString(download.receiver_system_time_sec - lastEgvRecord.getRawSystemTimeSeconds());
+                    }
+
+                    mTextTimestamp.setText(timeAgoStr);
+                    mTextTimestamp.setTag(timeAgoStr);
+                } else {
+                    log.debug("Move along. Nothing to see here. No data that I'm interested in in the download");
                 }
-
-                // Update UI with latest record information
-
-                EGVRecord lastEgvRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), download.receiver_system_time_sec, refTime);
-                String timeAgoStr = "---";
-                if (lastEgvRecord.getRawSystemTimeSeconds() > 0) {
-                    timeAgoStr = Utils.getTimeString(download.receiver_system_time_sec - lastEgvRecord.getRawSystemTimeSeconds());
-                }
-
-                mTextTimestamp.setText(timeAgoStr);
-                mTextTimestamp.setTag(timeAgoStr);
             }
         });
     }

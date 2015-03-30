@@ -38,6 +38,7 @@ import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.G4Download;
 import com.squareup.otto.Bus;
 
+import org.acra.ACRA;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Minutes;
@@ -45,6 +46,8 @@ import org.joda.time.Minutes;
 import java.io.IOException;
 
 public class CollectorService extends Service {
+//    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+
     private final String TAG = CollectorService.class.getSimpleName();
     public static final String ACTION_SYNC = "com.nightscout.android.dexcom.action.SYNC";
     public static final String ACTION_POLL = "com.nightscout.android.dexcom.action.POLL";
@@ -161,7 +164,16 @@ public class CollectorService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "Starting service");
-//        if (! intent.getStringExtra(SYNC_TYPE).equals(NON_SYNC)) {
+        if (device == null) {
+            Log.d(TAG, "Device is null!");
+            ACRA.getErrorReporter().handleException(null);
+            return START_STICKY;
+        }
+        if (intent == null) {
+            Log.d(TAG, "Intent is null!");
+            ACRA.getErrorReporter().handleException(null);
+            return START_STICKY;
+        }
         if (device.isConnected() || intent.getBooleanExtra("requested", false)) {
             int numOfPages = intent.getIntExtra(NUM_PAGES, 2);
             int syncType = intent.getStringExtra(SYNC_TYPE).equals(STD_SYNC) ? 0 : 1;
@@ -254,12 +266,6 @@ public class CollectorService extends Service {
             return download;
         }
     }
-
-//    private void collect(int numOfPages) {
-//        AndroidPreferences preferences = new AndroidPreferences(this);
-//
-//
-//    }
 
     @Override
     public IBinder onBind(Intent intent) {
