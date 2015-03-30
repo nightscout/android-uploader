@@ -4,21 +4,16 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.google.common.base.Optional;
@@ -39,20 +34,17 @@ import java.util.List;
 
 public class SettingsActivity extends FragmentActivity {
     private MainPreferenceFragment mainPreferenceFragment;
-    private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
-        setupListener();
-//        refreshFragments();
+        refreshFragments();
     }
 
     @Override
-    public View onCreateView(String name, @NonNull Context context, @NonNull AttributeSet attrs) {
-//        refreshFragments();
-        return super.onCreateView(name, context, attrs);
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     private void refreshFragments() {
@@ -65,24 +57,6 @@ public class SettingsActivity extends FragmentActivity {
         if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
         }
-    }
-
-    private void setupListener() {
-        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-            public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-                if (key.equals(PreferenceKeys.LABS_ENABLED) || key.equals(PreferenceKeys.DEXCOM_DEVICE_TYPE)) {
-                    refreshFragments();
-                }
-//                Intent collector = new Intent(getApplicationContext(), CollectorService.class);
-//                Intent processor = new Intent(getApplicationContext(), ProcessorService.class);
-//                getApplicationContext().stopService(collector);
-//                getApplicationContext().stopService(processor);
-//                getApplicationContext().startService(collector);
-//                getApplicationContext().startService(processor);
-            }
-        };
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPreferences.registerOnSharedPreferenceChangeListener(listener);
     }
 
     @Override
@@ -105,6 +79,7 @@ public class SettingsActivity extends FragmentActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("XXX", "Scan result in");
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         AndroidPreferences prefs = new AndroidPreferences(this);
         if (scanResult == null || scanResult.getContents() == null) {
@@ -180,6 +155,10 @@ public class SettingsActivity extends FragmentActivity {
             deviceType.setSummary(deviceType.getEntry().toString());
             setShareOptions(deviceType.getValue());
             setupLabs();
+            if (getActivity().getActionBar() != null) {
+                getActivity().getActionBar().show();
+                getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+            }
         }
 
         private void setupLabs() {
@@ -288,6 +267,7 @@ public class SettingsActivity extends FragmentActivity {
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
+
         }
 
         private void setupValidation() {

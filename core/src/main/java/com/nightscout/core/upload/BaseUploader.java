@@ -135,6 +135,7 @@ public abstract class BaseUploader {
 
     /**
      * Upload records, can be overridden to send all data in one batch.
+     *
      * @param glucoseDataSets
      * @param meterRecords
      * @param calRecords
@@ -143,9 +144,13 @@ public abstract class BaseUploader {
      */
     public boolean uploadRecords(List<GlucoseDataSet> glucoseDataSets, List<MeterRecord> meterRecords, List<CalRecord> calRecords, AbstractUploaderDevice deviceStatus, int rcvrBat) {
         boolean allSuccessful = uploadGlucoseDataSets(glucoseDataSets);
+        log.debug("allSuccessful after glucoseDatasets: {}", allSuccessful);
         allSuccessful &= uploadMeterRecords(meterRecords);
+        log.debug("allSuccessful after meterrecords: {}", allSuccessful);
         allSuccessful &= uploadCalRecords(calRecords);
+        log.debug("allSuccessful after cal records: {}", allSuccessful);
         allSuccessful &= uploadDeviceStatus(deviceStatus, rcvrBat);
+        log.debug("allSuccessful after device status: {}", allSuccessful);
         return allSuccessful;
     }
 

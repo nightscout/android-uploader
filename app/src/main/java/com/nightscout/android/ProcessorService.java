@@ -86,22 +86,29 @@ public class ProcessorService extends Service {
                     Log.d("XXX", "Interesting value changed!");
                     uploader = new Uploader(getApplicationContext(), preferences);
                     for (BaseUploader ul : uploader.getUploaders()) {
-                        Log.d("XXX", "defined: " + ul.getIdentifier());
+                        Log.d(TAG, "defined: " + ul.getIdentifier());
                     }
                 } else {
-                    Log.d("XXX", "Meh... something uninteresting changed");
+                    Log.d(TAG, "Meh... something uninteresting changed");
                 }
                 // Assume that MQTT already has the information needed and set it up.
                 if (key.equals(PreferenceKeys.MQTT_ENABLED)) {
+                    if (mqttManager != null && mqttManager.isConnected()) {
+                        mqttManager.setShouldReconnect(false);
+                        mqttManager.close();
+                        mqttManager.setShouldReconnect(true);
+                    }
                     setupMqtt();
                 }
 
                 // Assume that MQTT is already enabled and the MQTT endpoint and credentials are just changing
                 prefKeys = new String[]{PreferenceKeys.MQTT_ENDPOINT, PreferenceKeys.MQTT_PASS, PreferenceKeys.MQTT_USER};
-                if (Arrays.asList(prefKeys).contains(key)) {
+                if (preferences.isMqttEnabled() && Arrays.asList(prefKeys).contains(key)) {
                     Log.d(TAG, "MQTT change detected. Restarting MQTT");
                     if (mqttManager.isConnected()) {
-                        mqttManager.disconnect();
+                        mqttManager.setShouldReconnect(false);
+                        mqttManager.close();
+                        mqttManager.setShouldReconnect(true);
                     }
                     setupMqtt();
                 }
@@ -144,6 +151,7 @@ public class ProcessorService extends Service {
             pebble.close();
         }
         if (mqttManager != null) {
+            mqttManager.setShouldReconnect(false);
             mqttManager.close();
         }
         bus.unregister(this);
@@ -153,6 +161,7 @@ public class ProcessorService extends Service {
         if (preferences.isMqttEnabled()) {
             mqttManager = setupMqttConnection(preferences.getMqttUser(), preferences.getMqttPass(), preferences.getMqttEndpoint());
             if (mqttManager != null) {
+                mqttManager.setShouldReconnect(true);
                 mqttManager.connect();
                 initalized = true;
             }
@@ -227,6 +236,10 @@ public class ProcessorService extends Service {
             initalized = true;
         }
         ProcessorResponse response = new ProcessorResponse();
+        Log.d("XXX", "uploadSuccess: " + uploadSuccess);
+        Log.d("XXX", "initalized: " + initalized);
+        Log.d("XXX", "areAllUploadersInitalized: " + uploader.areAllUploadersInitalized());
+        Log.d("XXX", "uploadersDefined: " + uploadersDefined);
         response.success = uploadSuccess && initalized && uploader.areAllUploadersInitalized() && uploadersDefined;
         bus.post(response);
 //        bus.post(uploadSuccess && initalized && uploader.areAllUploadersInitalized());

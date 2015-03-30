@@ -65,6 +65,7 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
             @Override
             public void onClick(MaterialSection materialSection) {
                 Intent syncIntent = new Intent(getApplicationContext(), CollectorService.class);
+                syncIntent.putExtra("requested", true);
                 syncIntent.setAction(CollectorService.ACTION_POLL);
                 syncIntent.putExtra(CollectorService.NUM_PAGES, 2);
                 syncIntent.putExtra(CollectorService.SYNC_TYPE, CollectorService.STD_SYNC);
@@ -78,6 +79,7 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
             public void onClick(MaterialSection materialSection) {
                 Log.d("XXX", "Sync requested");
                 Intent syncIntent = new Intent(getApplicationContext(), CollectorService.class);
+                syncIntent.putExtra("requested", true);
                 syncIntent.setAction(CollectorService.ACTION_POLL);
                 syncIntent.putExtra(CollectorService.NUM_PAGES, 20);
                 syncIntent.putExtra(CollectorService.SYNC_TYPE, CollectorService.GAP_SYNC);
@@ -99,9 +101,9 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
             }
         });
         addSection(feedback);
-//        MaterialSection settings = newSection("Settings", android.R.drawable.ic_menu_preferences, new Intent(getApplicationContext(), SettingsActivity.class));
+        MaterialSection settings = newSection("Settings", android.R.drawable.ic_menu_preferences, new Intent(getApplicationContext(), SettingsActivity.class));
 //        MaterialSection settings = newSection("Settings", new SettingsActivity.MainPreferenceFragment());
-        MaterialSection settings = newSection("Settings", new SettingsActivity.MainPreferenceFragment());
+//        MaterialSection settings = newSection("Settings", android.R.drawable.ic_menu_preferences, new SettingsActivity.MainPreferenceFragment());
         addBottomSection(settings);
 
         allowArrowAnimation();
@@ -111,6 +113,10 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
         Log.d("XXX", "Attempting to start service");
         Intent uploadIntent = new Intent(getBaseContext(), ProcessorService.class);
         getApplicationContext().startService(uploadIntent);
+        syncIntent = new Intent(getApplicationContext(), CollectorService.class);
+        syncIntent.putExtra(CollectorService.SYNC_TYPE, CollectorService.NON_SYNC);
+        getApplicationContext().startService(syncIntent);
+
         Log.d("XXX", "Service should be started");
 
     }

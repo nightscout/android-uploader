@@ -63,14 +63,14 @@
                 android:key="cloud_storage_mqtt_enable"
                 android:disableDependentsState="false"
                 android:summary="@string/pref_summary_mqtt_enabled" />
-            <EditTextPreference
+            <com.nightscout.android.settings.SummaryBoundEditTextPreference
                 android:dependency="cloud_storage_mqtt_enable"
                 android:title="@string/pref_title_mqtt_endpoint"
                 android:key="cloud_storage_mqtt_endpoint"
                 android:dialogTitle="@string/pref_dialog_mqtt_endpoint"
                 android:dialogMessage="@string/pref_message_mqtt_endpoint"
                 android:defaultValue="@string/pref_default_mqtt_endpoint" />
-            <EditTextPreference
+            <com.nightscout.android.settings.SummaryBoundEditTextPreference
                 android:dependency="cloud_storage_mqtt_enable"
                 android:title="@string/pref_title_mqtt_user"
                 android:key="cloud_storage_mqtt_user"

@@ -106,8 +106,9 @@ public class BluetoothTransport implements DeviceTransport {
 
         attemptConnection();
 
-        while (System.currentTimeMillis() + 5000 > System.currentTimeMillis()) {
-            if (finalCallback && authenticated && readNotifySet && mConnectionState == STATE_CONNECTED) {
+        while (System.currentTimeMillis() + 2500 > System.currentTimeMillis()) {
+            if (finalCallback) {
+//            if (finalCallback && authenticated && readNotifySet && mConnectionState == STATE_CONNECTED) {
                 break;
             }
         }
@@ -265,6 +266,7 @@ public class BluetoothTransport implements DeviceTransport {
         }
 
         device = mBluetoothAdapter.getRemoteDevice(address);
+        bondDevice();
         Log.w(TAG, "Trying to create a new connection with an unbonded device.");
         mBluetoothGatt = device.connectGatt(mContext.getApplicationContext(), false, mGattCallback);
         mConnectionState = STATE_CONNECTING;
@@ -340,6 +342,7 @@ public class BluetoothTransport implements DeviceTransport {
 
     private final BroadcastReceiver mPairReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
+            Log.d("XXX", "Broadcast heard!");
             String action = intent.getAction();
             final BluetoothDevice bondDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
@@ -462,13 +465,14 @@ public class BluetoothTransport implements DeviceTransport {
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             Log.d(TAG, "characteristic wrote " + status);
+
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.d(TAG, "Wrote a characteristic successfully " + characteristic.getUuid());
                 if (mAuthenticationCharacteristic.getUuid().equals(characteristic.getUuid())) {
                     mBluetoothGatt.readCharacteristic(mHeartBeatCharacteristic);
                     authenticated = true;
                 }
-            } else if (status == BluetoothGatt.GATT_INSUFFICIENT_AUTHENTICATION) {
+            } else if ((status & BluetoothGatt.GATT_INSUFFICIENT_AUTHENTICATION) == BluetoothGatt.GATT_INSUFFICIENT_AUTHENTICATION) {
                 if (gatt.getDevice().getBondState() == BluetoothDevice.BOND_NONE) {
                     device = gatt.getDevice();
                     bondDevice();
@@ -483,10 +487,13 @@ public class BluetoothTransport implements DeviceTransport {
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public void bondDevice() {
+        Log.d(TAG, "Attempting to bond with remote device");
         final IntentFilter bondIntent = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
         mContext.registerReceiver(mPairReceiver, bondIntent);
 
-        device.createBond();
+        if (!device.createBond()) {
+            Log.d("XXX", "Problem creating bond");
+        }
     }
 
     private void writeStatusConnectionFailures(int status) {

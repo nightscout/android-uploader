@@ -89,10 +89,10 @@ public class AndroidMqttPinger implements MqttPinger, MqttPingerObservable {
     @Override
     public void stop() {
         Log.i(TAG, "Stopping ping");
+        alarmMgr.cancel(pingerPendingIntent);
         if (isActive()) {
             context.unregisterReceiver(pingerReceiver);
             active = false;
-            alarmMgr.cancel(pingerPendingIntent);
             Log.d(TAG, "Pinger stopped");
         } else {
             Log.d(TAG, "Can't stop pinger because it is not active");

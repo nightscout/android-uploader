@@ -52,6 +52,7 @@ public class CollectorService extends Service {
     public static final String NUM_PAGES = "NUM_PAGES";
     public static final String STD_SYNC = "STD_SYNC";
     public static final String GAP_SYNC = "GAP_SYNC";
+    public static final String NON_SYNC = "NON_SYNC";
     public static final String SYNC_TYPE = "SYNC_TYPE";
 
     private EventReporter reporter;
@@ -101,7 +102,7 @@ public class CollectorService extends Service {
                     }
                     setDriver();
                 } else {
-                    Log.d("XXX", "Meh... something uninteresting changed");
+                    Log.d(TAG, "Meh... something uninteresting changed");
                 }
             }
         };
@@ -117,6 +118,9 @@ public class CollectorService extends Service {
             driver = new BluetoothTransport(getApplicationContext());
         } else {
             throw new UnsupportedOperationException("Unsupported device selected");
+        }
+        if (driver == null) {
+            return;
         }
         SupportedDevices deviceType = preferences.getDeviceType();
         AbstractUploaderDevice uploaderDevice = AndroidUploaderDevice.getUploaderDevice(getApplicationContext());
@@ -151,14 +155,18 @@ public class CollectorService extends Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        cancelPoll();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "Starting service");
-        int numOfPages = intent.getIntExtra(NUM_PAGES, 2);
-        int syncType = intent.getStringExtra(SYNC_TYPE).equals(STD_SYNC) ? 0 : 1;
-        new AsyncDownload().execute(numOfPages, syncType);
+//        if (! intent.getStringExtra(SYNC_TYPE).equals(NON_SYNC)) {
+        if (device.isConnected() || intent.getBooleanExtra("requested", false)) {
+            int numOfPages = intent.getIntExtra(NUM_PAGES, 2);
+            int syncType = intent.getStringExtra(SYNC_TYPE).equals(STD_SYNC) ? 0 : 1;
+            new AsyncDownload().execute(numOfPages, syncType);
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 

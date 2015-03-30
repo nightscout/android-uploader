@@ -175,9 +175,15 @@ public class Uploader {
             // to upload
             try {
                 allSuccessful &= uploader.uploadRecords(glucoseDataSets, meterRecords, calRecords, deviceStatus, rcvrBat);
-                reporter.report(EventType.UPLOADER, EventSeverity.INFO,
-                        String.format(context.getString(R.string.event_success_upload),
-                                uploader.getIdentifier()));
+                if (allSuccessful) {
+                    reporter.report(EventType.UPLOADER, EventSeverity.INFO,
+                            String.format(context.getString(R.string.event_success_upload),
+                                    uploader.getIdentifier()));
+                } else {
+                    reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
+                            String.format(context.getString(R.string.event_fail_upload),
+                                    uploader.getIdentifier()));
+                }
                 // TODO Why is this exception handler here?
             } catch (MongoException e) {
                 // Credentials error - user name or password is incorrect.

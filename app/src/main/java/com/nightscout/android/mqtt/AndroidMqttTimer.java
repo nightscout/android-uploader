@@ -66,7 +66,9 @@ public class AndroidMqttTimer implements MqttTimer {
 
     @Override
     public void deactivate() {
+        cancel();
         if (active) {
+            Log.d(TAG, "Deactivating timer");
             context.unregisterReceiver(timerReceiver);
             active = false;
         } else {

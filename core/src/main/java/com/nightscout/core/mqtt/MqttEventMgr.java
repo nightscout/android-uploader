@@ -37,6 +37,7 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
     private MqttConnectionState state = MqttConnectionState.DISCONNECTED;
     private ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle",
             Locale.getDefault());
+    private boolean shouldReconnect = false;
 
     public MqttEventMgr(MqttClient client, MqttConnectOptions options, MqttPinger pinger,
                         MqttTimer timer, EventReporter reporter) {
@@ -48,9 +49,15 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
         this.reporter = reporter;
     }
 
+    public void setShouldReconnect(boolean shouldReconnect) {
+        this.shouldReconnect = shouldReconnect;
+    }
+
     public void connect() {
         try {
             log.info("MQTT connect issued");
+            timer.deactivate();
+            pinger.stop();
             client.connect(options);
             reporter.report(EventType.UPLOADER, EventSeverity.INFO,
                     messages.getString("mqtt_connected"));
@@ -83,6 +90,11 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
         if (state == MqttConnectionState.RECONNECTING) {
             return;
         }
+        // FIXME - reconnect flags are ugly. Seems to be a problem somewhere in the reconnect logic
+        if (!shouldReconnect) {
+            log.warn("Should not attempt to reconnect. Ignoring");
+            return;
+        }
         log.info("MQTT delayed reconnect");
         if (!timer.isActive()) {
             timer.registerObserver(this);
@@ -98,7 +110,7 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
     public void reconnect() {
         if (pinger.isNetworkActive()) {
             log.info("MQTT issuing reconnect");
-            disconnect();
+            close();
             connect();
         } else {
             // TODO: Figure out what to do here
@@ -134,7 +146,7 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
             reporter.report(EventType.UPLOADER, EventSeverity.INFO,
                     messages.getString("mqtt_close"));
         } catch (MqttException e) {
-            // TODO: determine how to handle this
+            // TODO: determine how to handle this. Cruton maybe?
             log.info(messages.getString("mqtt_close_fail"));
             reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
                     messages.getString("mqtt_close_fail"));

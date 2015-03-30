@@ -84,11 +84,23 @@ public class MonitorFragment extends Fragment {
     @Inject
     FeedbackDialog feedbackDialog;
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d("XXX", "onCreate called");
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d("XXX", "onActivityCreate called");
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d("XXX", "onCreateView called");
 //        return super.onCreateView(inflater, container, savedInstanceState);
 //        final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), R.style.Nightscout);
 //        LayoutInflater localInflater = inflater.cloneInContext(contextThemeWrapper);
@@ -149,13 +161,26 @@ public class MonitorFragment extends Fragment {
         if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE2) {
             receiverButton.setBackgroundResource(R.drawable.ic_noble);
         }
+        if (savedInstanceState != null) {
+            Log.d("XXX", "Saved state exists!");
+            if (savedInstanceState.containsKey("deviceState")) {
+                Log.d("XXX", "Saved state for device exists!");
+                setReceiverButtonRes(savedInstanceState.getInt("deviceState"));
+            }
+            if (savedInstanceState.containsKey("syncState")) {
+                Log.d("XXX", "Saved state for sync exists!");
+                setSyncButtonRes(savedInstanceState.getInt("syncState"));
+            }
+        }
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.OnSharedPreferenceChangeListener prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (key.equals(PreferenceKeys.DEXCOM_DEVICE_TYPE)) {
                     int res = preferences.getDeviceType() == SupportedDevices.DEXCOM_G4 ? R.drawable.ic_nousb : R.drawable.ic_noble;
-                    receiverButton.setBackgroundResource(res);
+                    setReceiverButtonRes(res);
+//                    receiverButton.setBackgroundResource(res);
+
                 }
             }
         };
@@ -174,6 +199,7 @@ public class MonitorFragment extends Fragment {
 
     @Override
     public void onResume() {
+        Log.d("XXX", "onResume called");
         mWebView.onResume();
         mWebView.resumeTimers();
         int sgv = (Integer) mTextSGV.getTag(R.string.display_sgv);
@@ -205,6 +231,14 @@ public class MonitorFragment extends Fragment {
         outState.putString("saveJSONData", mJSONData);
         outState.putString("saveTextSGV", mTextSGV.getText().toString());
         outState.putString("saveTextTimestamp", mTextTimestamp.getText().toString());
+        if (receiverButton.getTag() != null) {
+            Log.d("XXX", "Saving device state");
+            outState.putInt("deviceState", (int) receiverButton.getTag());
+        }
+        if (mSyncButton.getTag() != null) {
+            Log.d("XXX", "Saving sync state");
+            outState.putInt("syncState", (int) mSyncButton.getTag());
+        }
     }
 
     @Override
@@ -222,27 +256,42 @@ public class MonitorFragment extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (status.connected) {
-                    if (status.deviceType == SupportedDevices.DEXCOM_G4_SHARE2) {
-                        receiverButton.setBackgroundResource(R.drawable.ic_ble);
-                    } else if (status.deviceType == SupportedDevices.DEXCOM_G4) {
-                        receiverButton.setBackgroundResource(R.drawable.ic_usb);
-                    }
-                } else {
-                    if (status.deviceType == SupportedDevices.DEXCOM_G4_SHARE2) {
-                        receiverButton.setBackgroundResource(R.drawable.ic_noble);
-                    } else if (status.deviceType == SupportedDevices.DEXCOM_G4) {
-                        receiverButton.setBackgroundResource(R.drawable.ic_nousb);
-                    }
+                int res = 0;
+                switch (status.deviceState) {
+                    case CONNECTED:
+                        res = (status.deviceType == SupportedDevices.DEXCOM_G4) ? R.drawable.ic_usb : R.drawable.ic_ble;
+                        break;
+                    case DISCONNECTED:
+                        res = (status.deviceType == SupportedDevices.DEXCOM_G4) ? R.drawable.ic_nousb : R.drawable.ic_noble;
+                        break;
+                    case ACTIVE:
+                        res = (status.deviceType == SupportedDevices.DEXCOM_G4) ? R.drawable.ic_usb : R.drawable.ble_read;
+                        break;
                 }
-                if (status.active) {
-                    receiverButton.setBackgroundResource(R.drawable.ble_read);
-                    AnimationDrawable frameAnimation = (AnimationDrawable) receiverButton.getBackground();
-                    frameAnimation.start();
-                }
+                setReceiverButtonRes(res);
             }
         });
+
     }
+
+    private void setReceiverButtonRes(int res) {
+        receiverButton.setBackgroundResource(res);
+        receiverButton.setTag(res);
+        if (res == R.drawable.ble_read) {
+            AnimationDrawable frameAnimation = (AnimationDrawable) receiverButton.getBackground();
+            frameAnimation.start();
+        }
+    }
+
+    private void setSyncButtonRes(int res) {
+        mSyncButton.setBackgroundResource(res);
+        mSyncButton.setTag(res);
+        if (res == R.drawable.ble_read) {
+            AnimationDrawable frameAnimation = (AnimationDrawable) receiverButton.getBackground();
+            frameAnimation.start();
+        }
+    }
+
 
     @Subscribe
     public void incomingData(final ProcessorService.ProcessorResponse status) {
@@ -252,8 +301,10 @@ public class MonitorFragment extends Fragment {
                 Log.d("XXX", "Incoming status: " + status.success);
                 if (status.success) {
                     mSyncButton.setBackgroundResource(R.drawable.ic_cloud);
+                    mSyncButton.setTag(R.drawable.ic_cloud);
                 } else {
                     mSyncButton.setBackgroundResource(R.drawable.ic_nocloud);
+                    mSyncButton.setTag(R.drawable.ic_nocloud);
                 }
             }
         });

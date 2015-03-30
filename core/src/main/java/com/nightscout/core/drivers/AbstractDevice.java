@@ -52,31 +52,35 @@ abstract public class AbstractDevice {
         log.debug("Connection detected in abstract class");
         reporter.report(EventType.DEVICE, EventSeverity.INFO,
                 messages.getString("g4_connected"));
-        bus.post(new DeviceConnectionStatus(deviceType, true, false));
+        bus.post(new DeviceConnectionStatus(deviceType, DeviceState.CONNECTED));
     }
 
     public void onDisconnect() {
         log.debug("Disconnection detected in abstract class");
         reporter.report(EventType.DEVICE, EventSeverity.INFO,
                 messages.getString("g4_disconnected"));
-        bus.post(new DeviceConnectionStatus(deviceType, false, false));
+        bus.post(new DeviceConnectionStatus(deviceType, DeviceState.DISCONNECTED));
     }
 
     public void onActivity(boolean enabled) {
         log.debug("Activity change detected for device: {}", enabled);
-        bus.post(new DeviceConnectionStatus(deviceType, isConnected(), enabled));
+        bus.post(new DeviceConnectionStatus(deviceType, DeviceState.ACTIVE));
     }
 
     public class DeviceConnectionStatus {
         public SupportedDevices deviceType;
-        public boolean connected;
-        public boolean active;
+        public DeviceState deviceState;
 
-        DeviceConnectionStatus(SupportedDevices deviceType, boolean connected, boolean active) {
+        DeviceConnectionStatus(SupportedDevices deviceType, DeviceState deviceState) {
             this.deviceType = deviceType;
-            this.connected = connected;
-            this.active = active;
+            this.deviceState = deviceState;
         }
+    }
+
+    public enum DeviceState {
+        CONNECTED,
+        DISCONNECTED,
+        ACTIVE
     }
 
     public void setReporter(EventReporter reporter) {

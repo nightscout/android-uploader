@@ -89,6 +89,19 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".G4UsbReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED" />
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+            </intent-filter>
+
+        </receiver>
 
         <activity
             android:name="org.acra.CrashReportDialog"
