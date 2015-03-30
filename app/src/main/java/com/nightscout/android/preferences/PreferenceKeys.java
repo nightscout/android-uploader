@@ -6,7 +6,7 @@ public final class PreferenceKeys {
     public static final String API_URIS = "cloud_storage_api_base";
     public static final String CAL_UPLOAD_ENABLED = "cloud_cal_data";
     public static final String SENSOR_UPLOAD_ENABLED = "cloud_sensor_data";
-    public static final String METER_UPLOAD_ENABLED = "cloud_mgb";
+    public static final String METER_UPLOAD_ENABLED = "cloud_mbg";
     public static final String EGV_UPLOAD_ENABLED = "cloud_egv";
     public static final String UPLOADERBATTERY_UPLOAD_ENABLED = "cloud_android_battery";
     public static final String MONGO_UPLOADER_ENABLED = "cloud_storage_mongodb_enable";
