@@ -7,10 +7,9 @@ import android.util.Log;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
+import com.nightscout.android.exceptions.FeedbackDialog;
 import com.nightscout.android.ui.ActivityHierarchyServer;
 import com.nightscout.core.BusProvider;
-
-import net.danlew.android.joda.JodaTimeAndroid;
 
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
@@ -18,6 +17,9 @@ import org.acra.annotation.ReportsCrashes;
 import javax.inject.Inject;
 
 import dagger.ObjectGraph;
+
+//import com.nightscout.android.exceptions.AcraFeedbackDialog;
+//import net.danlew.android.joda.JodaTimeAndroid;
 
 @ReportsCrashes(
         formUri = "https://collector.tracepot.com/a64e4a51",
@@ -41,10 +43,13 @@ public class Nightscout extends Application {
     @Inject
     ActivityHierarchyServer activityHierarchyServer;
 
+    @Inject
+    FeedbackDialog feedbackDialog;
+
     @Override
     public void onCreate() {
         super.onCreate();
-        JodaTimeAndroid.init(this);
+//        JodaTimeAndroid.init(this);
         buildObjectGraphAndInject();
         BusProvider.getInstance();
         registerActivityLifecycleCallbacks(activityHierarchyServer);

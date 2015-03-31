@@ -112,6 +112,9 @@ public class ProcessorService extends Service {
                     }
                     setupMqtt();
                 }
+                if (key.equals(PreferenceKeys.PREFERRED_UNITS)) {
+                    pebble.config(preferences.getPwdName(), preferences.getPreferredUnits(), getApplicationContext());
+                }
             }
         };
         prefs.registerOnSharedPreferenceChangeListener(prefListener);

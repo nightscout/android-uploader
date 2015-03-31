@@ -31,7 +31,7 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
 
     @Inject
     FeedbackDialog feedbackDialog;
-    private Tracker mTracker;
+    Tracker mTracker;
     private AndroidPreferences preferences;
     private AndroidEventReporter reporter;
 //    @Inject AppContainer appContainer;

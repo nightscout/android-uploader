@@ -7,9 +7,9 @@
     <string name="unknown_values">---</string>
 
     <string name="crash_toast_text">Oops! È crashato il software. Sto mandando un rapporto a Nightscout così magari lo possono sistemare!</string>
-    <string name="feedback_dialog_title">Feedback a Nightscout</string>
-    <string name="feebback_dialog_text">Per favore facci sapere cosa ne pensi</string>
-    <string name="feedback_dialog_comment_prompt">Aggiungi i tuoi commenti qui sotto:</string>
+    <string name="feedback_dialog_title">Report an issue</string>
+    <string name="feebback_dialog_text">Report an issue</string>
+    <string name="feedback_dialog_comment_prompt">Please include brief description of the issue you encountered</string>
     <string name="feedback_dialog_ok_toast">Grazie!</string>
     <string name="feedback_toast_text" />
     <string name="message_user_not_understand">La lettura dal device è disabilitata finchè non leggi e accetti \"HO CAPITO\" nelle preferenze</string>
@@ -22,7 +22,7 @@
     <string name="display_trend" />
 
     <string name="close_menu_text">Esci</string>
-    <string name="feedback_menu_text">Feedback</string>
+    <string name="feedback_menu_text">Report an issue</string>
     <string name="gap_sync_menu_text">Forza sincronizzazione</string>
     <string name="preferences_menu_text">Preferenze</string>
     <string name="USBLabelText">USB</string>

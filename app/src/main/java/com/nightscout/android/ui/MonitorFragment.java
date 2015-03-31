@@ -104,9 +104,6 @@ public class MonitorFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d("XXX", "onCreateView called");
-//        return super.onCreateView(inflater, container, savedInstanceState);
-//        final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), R.style.Nightscout);
-//        LayoutInflater localInflater = inflater.cloneInContext(contextThemeWrapper);
         View view = inflater.inflate(R.layout.monitor_fragment, container, false);
         Nightscout app = Nightscout.get(getActivity());
         app.inject(this);
@@ -116,7 +113,7 @@ public class MonitorFragment extends Fragment {
 
         preferences = new AndroidPreferences(getActivity());
         mTextSGV.setTag(R.string.display_sgv, -1);
-        mTextSGV.setTag(R.string.display_trend, 0);
+        mTextSGV.setTag(R.string.display_trend, preferences.getPreferredUnits().ordinal());
         mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -175,6 +172,10 @@ public class MonitorFragment extends Fragment {
                     int res = preferences.getDeviceType() == SupportedDevices.DEXCOM_G4 ? R.drawable.ic_nousb : R.drawable.ic_noble;
                     setReceiverButtonRes(res);
                 }
+                if (key.equals(PreferenceKeys.PREFERRED_UNITS)) {
+                    mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(preferences.getPreferredUnits() == GlucoseUnit.MMOL) + ")");
+                    restoreSgvText();
+                }
             }
         };
         prefs.registerOnSharedPreferenceChangeListener(prefListener);
@@ -195,19 +196,27 @@ public class MonitorFragment extends Fragment {
         Log.d("XXX", "onResume called");
         mWebView.onResume();
         mWebView.resumeTimers();
-        int sgv = (Integer) mTextSGV.getTag(R.string.display_sgv);
-
-        int direction = (Integer) mTextSGV.getTag(R.string.display_trend);
-        if (sgv != -1) {
-            GlucoseReading sgvReading = new GlucoseReading(sgv, GlucoseUnit.MGDL);
-            mTextSGV.setText(getSGVStringByUnit(sgvReading, TrendArrow.values()[direction]));
-        }
 
         mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(preferences.getPreferredUnits() == GlucoseUnit.MMOL) + ")");
 
         mHandler.post(updateTimeAgo);
-
+        restoreSgvText();
         super.onResume();
+    }
+
+    private void setSgvText(GlucoseReading sgv, TrendArrow trend) {
+        String text = "---";
+        if (sgv.asMgdl() != -1) {
+            text = isSpecialValue(sgv) ? getEGVSpecialValue(sgv).get().toString() : sgv.asStr(preferences.getPreferredUnits()) + trend.symbol();
+        }
+        mTextSGV.setText(text);
+        mTextSGV.setTag(R.string.display_sgv, sgv.asMgdl());
+        mTextSGV.setTag(R.string.display_trend, trend.ordinal());
+    }
+
+    private void restoreSgvText() {
+        GlucoseReading reading = new GlucoseReading((int) mTextSGV.getTag(R.string.display_sgv), GlucoseUnit.MGDL);
+        setSgvText(reading, TrendArrow.values()[(int) mTextSGV.getTag(R.string.display_trend)]);
     }
 
     private String getSGVStringByUnit(GlucoseReading sgv, TrendArrow trend) {
@@ -328,22 +337,18 @@ public class MonitorFragment extends Fragment {
                             }
                         }
                         mWebView.loadUrl("javascript:updateData(" + array + ")");
-                        mTextSGV.setText(getSGVStringByUnit(recentRecord.getReading(), recentRecord.getTrend()));
-                        mTextSGV.setTag(R.string.display_sgv, recentRecord.getReading().asMgdl());
-                        mTextSGV.setTag(R.string.display_trend, recentRecord.getTrend().ordinal());
+                        setSgvText(recentRecord.getReading(), recentRecord.getTrend());
+                        // Update UI with latest record information
+
+                        String timeAgoStr = "---";
+                        if (recentRecord.getRawSystemTimeSeconds() > 0) {
+                            timeAgoStr = Utils.getTimeString(download.receiver_system_time_sec - recentRecord.getRawSystemTimeSeconds());
+                        }
+
+                        mTextTimestamp.setText(timeAgoStr);
+                        mTextTimestamp.setTag(timeAgoStr);
                     }
 
-                    // Update UI with latest record information
-
-                    EGVRecord lastEgvRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), download.receiver_system_time_sec, refTime);
-
-                    String timeAgoStr = "---";
-                    if (lastEgvRecord.getRawSystemTimeSeconds() > 0) {
-                        timeAgoStr = Utils.getTimeString(download.receiver_system_time_sec - lastEgvRecord.getRawSystemTimeSeconds());
-                    }
-
-                    mTextTimestamp.setText(timeAgoStr);
-                    mTextTimestamp.setTag(timeAgoStr);
                 } else {
                     log.debug("Move along. Nothing to see here. No data that I'm interested in in the download");
                 }

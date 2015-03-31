@@ -24,6 +24,7 @@ abstract public class AbstractDevice {
     protected EventReporter reporter;
     private ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle",
             Locale.getDefault());
+    private DeviceState connectionStatus = DeviceState.DISCONNECTED;
 
     public abstract boolean isConnected();
 
@@ -52,20 +53,36 @@ abstract public class AbstractDevice {
         log.debug("Connection detected in abstract class");
         reporter.report(EventType.DEVICE, EventSeverity.INFO,
                 messages.getString("g4_connected"));
-        bus.post(new DeviceConnectionStatus(deviceType, DeviceState.CONNECTED));
+        connectionStatus = DeviceState.CONNECTED;
+        postConnectionStatus();
     }
 
     public void onDisconnect() {
         log.debug("Disconnection detected in abstract class");
         reporter.report(EventType.DEVICE, EventSeverity.INFO,
                 messages.getString("g4_disconnected"));
-        bus.post(new DeviceConnectionStatus(deviceType, DeviceState.DISCONNECTED));
+        connectionStatus = DeviceState.DISCONNECTED;
+        postConnectionStatus();
     }
 
     public void onActivity(boolean enabled) {
         log.debug("Activity change detected for device: {}", enabled);
-        bus.post(new DeviceConnectionStatus(deviceType, DeviceState.ACTIVE));
+        if (enabled) {
+            connectionStatus = DeviceState.ACTIVE;
+        } else {
+            connectionStatus = (isConnected()) ? DeviceState.CONNECTED : DeviceState.DISCONNECTED;
+        }
+        postConnectionStatus();
     }
+
+    public DeviceConnectionStatus getDeviceConnectionStatus() {
+        return new DeviceConnectionStatus(deviceType, connectionStatus);
+    }
+
+    private void postConnectionStatus() {
+        bus.post(new DeviceConnectionStatus(deviceType, connectionStatus));
+    }
+
 
     public class DeviceConnectionStatus {
         public SupportedDevices deviceType;

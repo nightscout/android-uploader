@@ -6,10 +6,10 @@
 
     <string name="unknown_values">---</string>
 
-    <string name="crash_toast_text">Oops! A crash has occurred and is being reported to nightscout so it can be fixed!</string>
-    <string name="feedback_dialog_title">Nightscout feedback</string>
-    <string name="feebback_dialog_text">Please let us know what you think.</string>
-    <string name="feedback_dialog_comment_prompt">Please add your comments below:</string>
+    <string name="crash_toast_text">Oops! A crash has occurred and is being reported to Nightscout so it can be fixed!</string>
+    <string name="feedback_dialog_title">Report an issue</string>
+    <string name="feebback_dialog_text">Report an issue</string>
+    <string name="feedback_dialog_comment_prompt">Please include brief description of the issue you encountered</string>
     <string name="feedback_dialog_ok_toast">Thank you!</string>
     <string name="feedback_toast_text" />
     <string name="message_user_not_understand">Reading from device is disabled until you review and accept &#8220;I understand&#8221; in preferences</string>
@@ -21,7 +21,7 @@
     <string name="display_trend" />
 
     <string name="close_menu_text">Close</string>
-    <string name="feedback_menu_text">Feedback</string>
+    <string name="feedback_menu_text">Report an issue</string>
     <string name="gap_sync_menu_text">Gap sync</string>
     <string name="preferences_menu_text">Preferences</string>
     <string name="USBLabelText">USB</string>

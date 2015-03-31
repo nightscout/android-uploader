@@ -10,10 +10,6 @@ import com.nightscout.android.ui.MonitorFragment;
 import com.nightscout.android.ui.NightscoutNavigationDrawer;
 import com.nightscout.android.ui.UiModule;
 
-import org.acra.ACRA;
-
-import java.util.TimeZone;
-
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -47,8 +43,9 @@ public class NightscoutModule {
     @Provides
     @Singleton
     FeedbackDialog providesReporter(Application app) {
-        ACRA.init(app);
-        ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
+        // TODO figure out why calls to ACRA crash when not in the main fragment?
+//        ACRA.init(app);
+//        ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
         return new AcraFeedbackDialog();
     }
 }

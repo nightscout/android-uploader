@@ -38,7 +38,6 @@ import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.G4Download;
 import com.squareup.otto.Bus;
 
-import org.acra.ACRA;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Minutes;
@@ -96,7 +95,7 @@ public class CollectorService extends Service {
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (key.equals(PreferenceKeys.DEXCOM_DEVICE_TYPE)) {
                     Log.d(TAG, "Interesting value changed!");
-                    if (driver.isConnected()) {
+                    if (driver != null && driver.isConnected()) {
                         try {
                             driver.close();
                         } catch (IOException e) {
@@ -154,7 +153,12 @@ public class CollectorService extends Service {
         super.onDestroy();
         try {
             Log.d(TAG, this.getClass().getSimpleName() + " onDestory called");
-            driver.close();
+            if (driver != null) {
+                driver.close();
+            } else {
+                // TODO - find out why onDestory is being called on startup?
+                Log.w(TAG, "Driver null. Why?");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -166,12 +170,12 @@ public class CollectorService extends Service {
         Log.d(TAG, "Starting service");
         if (device == null) {
             Log.d(TAG, "Device is null!");
-            ACRA.getErrorReporter().handleException(null);
+//            ACRA.getErrorReporter().handleException(null);
             return START_STICKY;
         }
         if (intent == null) {
             Log.d(TAG, "Intent is null!");
-            ACRA.getErrorReporter().handleException(null);
+//            ACRA.getErrorReporter().handleException(null);
             return START_STICKY;
         }
         if (device.isConnected() || intent.getBooleanExtra("requested", false)) {

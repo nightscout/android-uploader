@@ -9,10 +9,6 @@ import com.nightscout.android.ui.AppContainer;
 import com.nightscout.android.ui.MonitorFragment;
 import com.nightscout.android.ui.NightscoutNavigationDrawer;
 
-import org.acra.ACRA;
-
-import java.util.TimeZone;
-
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -37,8 +33,6 @@ public final class DebugNightscoutModule {
     @Provides
     @Singleton
     FeedbackDialog providesReporter(Application app) {
-        ACRA.init(app);
-        ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
         return new AcraFeedbackDialog();
 //        return new StubbedFeedbackDialog(app);
     }
