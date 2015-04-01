@@ -79,7 +79,6 @@ public class SettingsActivity extends FragmentActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("XXX", "Scan result in");
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         AndroidPreferences prefs = new AndroidPreferences(this);
         if (scanResult == null || scanResult.getContents() == null) {
@@ -101,7 +100,6 @@ public class SettingsActivity extends FragmentActivity {
                 } else {
                     prefs.setRestApiEnabled(false);
                 }
-                refreshFragments();
             }
             if (barcode.hasApiConfig()) {
                 prefs.setRestApiEnabled(true);
@@ -129,9 +127,8 @@ public class SettingsActivity extends FragmentActivity {
             } else {
                 prefs.setMqttUploadEnabled(false);
             }
+            refreshFragments();
         } else if (scanResult.getFormatName().equals("CODE_128")) {
-            // TODO Assuming this is a share receiver. May get messy when medtronic devices are added
-            // consider refactoring
             Log.d("XXX", "Setting serial number to: " + scanResult.getContents());
             prefs.setShareSerial(scanResult.getContents());
             refreshFragments();
@@ -261,10 +258,7 @@ public class SettingsActivity extends FragmentActivity {
                 Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
                 childFragmentManager.setAccessible(true);
                 childFragmentManager.set(this, null);
-
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
+            } catch (NoSuchFieldException | IllegalAccessException e) {
                 e.printStackTrace();
             }
 

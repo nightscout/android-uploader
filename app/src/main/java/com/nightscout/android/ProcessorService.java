@@ -58,7 +58,7 @@ public class ProcessorService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d("XXX", "Starting processor service");
+        Log.d(TAG, "Starting processor service");
         preferences = new AndroidPreferences(getApplicationContext());
         reporter = AndroidEventReporter.getReporter(getApplicationContext());
         pebble = new Pebble(getApplicationContext());
@@ -83,7 +83,6 @@ public class ProcessorService extends Service {
                 String[] prefKeys = {PreferenceKeys.API_UPLOADER_ENABLED, PreferenceKeys.API_URIS, PreferenceKeys.MONGO_UPLOADER_ENABLED,
                         PreferenceKeys.MONGO_URI, PreferenceKeys.MONGO_COLLECTION, PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION};
                 if (Arrays.asList(prefKeys).contains(key)) {
-                    Log.d("XXX", "Interesting value changed!");
                     uploader = new Uploader(getApplicationContext(), preferences);
                     for (BaseUploader ul : uploader.getUploaders()) {
                         Log.d(TAG, "defined: " + ul.getIdentifier());
@@ -212,7 +211,7 @@ public class ProcessorService extends Service {
         // Requires a single interface for everything to determine how to process a download.
         boolean uploadSuccess = false;
         if (uploader != null) {
-            uploadSuccess = uploader.upload(download);
+            uploadSuccess = uploader.upload(download, 1);
         }
         if (download.sgv.size() <= 0) {
             return;
@@ -239,10 +238,10 @@ public class ProcessorService extends Service {
             initalized = true;
         }
         ProcessorResponse response = new ProcessorResponse();
-        Log.d("XXX", "uploadSuccess: " + uploadSuccess);
-        Log.d("XXX", "initalized: " + initalized);
-        Log.d("XXX", "areAllUploadersInitalized: " + uploader.areAllUploadersInitalized());
-        Log.d("XXX", "uploadersDefined: " + uploadersDefined);
+        Log.d(TAG, "uploadSuccess: " + uploadSuccess);
+        Log.d(TAG, "initalized: " + initalized);
+        Log.d(TAG, "areAllUploadersInitalized: " + uploader.areAllUploadersInitalized());
+        Log.d(TAG, "uploadersDefined: " + uploadersDefined);
         response.success = uploadSuccess && initalized && uploader.areAllUploadersInitalized() && uploadersDefined;
         bus.post(response);
 //        bus.post(uploadSuccess && initalized && uploader.areAllUploadersInitalized());

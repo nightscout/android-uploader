@@ -27,11 +27,18 @@ import org.joda.time.format.DateTimeFormat;
 public class EventFragment extends ListFragment {
     private EventType currentFilter = EventType.ALL;
     private boolean menuInflated = false;
+    private EventFragment mainFragment;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
+    }
+
+    private void refreshFragments() {
+        mainFragment = new EventFragment();
+        getFragmentManager().beginTransaction().replace(android.R.id.content,
+                mainFragment).commit();
     }
 
     @Override
@@ -47,7 +54,6 @@ public class EventFragment extends ListFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case (R.id.clear_log):
-                Log.d("XXX", "Clear log selected for " + currentFilter.name() + ". Now make it do stuff...");
                 clear(currentFilter);
                 break;
         }
@@ -66,7 +72,6 @@ public class EventFragment extends ListFragment {
                              Bundle savedInstanceState) {
         Bundle bundle = getArguments();
         if (savedInstanceState != null && savedInstanceState.containsKey("menu_inflated")) {
-            Log.d("XXX", "Appears to be coming back to life!");
             menuInflated = savedInstanceState.getBoolean("menu_inflated");
         }
 

@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.nightscout.core.dexcom.Command;
 import com.nightscout.core.dexcom.PacketBuilder;
 import com.nightscout.core.dexcom.ReadPacket;
+import com.nightscout.core.dexcom.ReceiverPowerLevel;
 import com.nightscout.core.dexcom.RecordType;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.CalRecord;
@@ -115,6 +116,20 @@ public class ReadData {
         return read(MIN_LEN).getCommand() == Command.ACK;
     }
 
+    public ReceiverPowerLevel getPowerLevel() throws IOException {
+        writeCommand(Command.READ_CHARGER_CURRENT_SETTING);
+        byte[] readData = read(MIN_LEN).getData();
+        return ReceiverPowerLevel.values()[ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt()];
+    }
+
+    public boolean setPowerLevel(ReceiverPowerLevel powerLevel) throws IOException {
+        List<Byte> payload = new ArrayList<>();
+        payload.add((byte) powerLevel.ordinal());
+        writeCommand(Command.WRITE_CHARGER_CURRENT_SETTING, payload);
+        return read(MIN_LEN).getCommand() == Command.ACK;
+    }
+
+
     public int readBatteryLevel() throws IOException {
         log.debug("Reading battery level...");
         writeCommand(Command.READ_BATTERY_LEVEL);
@@ -191,7 +206,7 @@ public class ReadData {
         return read(534).getData();
     }
 
-    private void writeCommand(Command command, ArrayList<Byte> payload) throws IOException {
+    private void writeCommand(Command command, List<Byte> payload) throws IOException {
         byte[] packet = new PacketBuilder(command, payload).build();
         if (mSerialDevice != null) {
             mSerialDevice.write(packet, IO_TIMEOUT);

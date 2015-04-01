@@ -2,11 +2,15 @@ package com.nightscout.android.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Fragment;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -19,6 +23,7 @@ import android.webkit.WebView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.nightscout.android.CollectorService;
 import com.nightscout.android.Nightscout;
 import com.nightscout.android.ProcessorService;
 import com.nightscout.android.R;
@@ -30,7 +35,7 @@ import com.nightscout.core.BusProvider;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.EGVRecord;
-import com.nightscout.core.drivers.AbstractDevice;
+import com.nightscout.core.drivers.DeviceConnectionStatus;
 import com.nightscout.core.drivers.SupportedDevices;
 import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.G4Download;
@@ -87,23 +92,44 @@ public class MonitorFragment extends Fragment {
     @Inject
     FeedbackDialog feedbackDialog;
 
+    private CollectorService mCollectorService;
+    private boolean mBound = false;
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            CollectorService.LocalBinder binder = (CollectorService.LocalBinder) service;
+            mCollectorService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("XXX", "onCreate called");
+        log.debug("onCreate called");
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d("XXX", "onActivityCreate called");
+        log.debug("onActivityCreate called");
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d("XXX", "onCreateView called");
+        log.info("onCreateView called");
         View view = inflater.inflate(R.layout.monitor_fragment, container, false);
         Nightscout app = Nightscout.get(getActivity());
         app.inject(this);
@@ -154,13 +180,13 @@ public class MonitorFragment extends Fragment {
             receiverButton.setBackgroundResource(R.drawable.ic_noble);
         }
         if (savedInstanceState != null) {
-            Log.d("XXX", "Saved state exists!");
+            log.info("Saved state exists!");
             if (savedInstanceState.containsKey("deviceState")) {
-                Log.d("XXX", "Saved state for device exists!");
+                log.info("Saved state for device exists!");
                 setReceiverButtonRes(savedInstanceState.getInt("deviceState"));
             }
             if (savedInstanceState.containsKey("syncState")) {
-                Log.d("XXX", "Saved state for sync exists!");
+                log.info("Saved state for sync exists!");
                 setSyncButtonRes(savedInstanceState.getInt("syncState"));
             }
         }
@@ -169,16 +195,19 @@ public class MonitorFragment extends Fragment {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (key.equals(PreferenceKeys.DEXCOM_DEVICE_TYPE)) {
+                    log.debug("Receiver type was changed...");
                     int res = preferences.getDeviceType() == SupportedDevices.DEXCOM_G4 ? R.drawable.ic_nousb : R.drawable.ic_noble;
                     setReceiverButtonRes(res);
                 }
                 if (key.equals(PreferenceKeys.PREFERRED_UNITS)) {
+                    log.debug("Preferred units type was changed...");
                     mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(preferences.getPreferredUnits() == GlucoseUnit.MMOL) + ")");
                     restoreSgvText();
                 }
             }
         };
         prefs.registerOnSharedPreferenceChangeListener(prefListener);
+
 
         return view;
     }
@@ -193,9 +222,16 @@ public class MonitorFragment extends Fragment {
 
     @Override
     public void onResume() {
-        Log.d("XXX", "onResume called");
+        log.info("onResume called");
         mWebView.onResume();
         mWebView.resumeTimers();
+        Intent intent = new Intent(this.getActivity(), CollectorService.class);
+        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        if (mBound) {
+            setReceiverButtonRes(getReceiverRes(mCollectorService.getDeviceConnectionStatus()));
+            log.warn("From monitor fragment: {}", mCollectorService.getDeviceConnectionStatus().deviceType);
+            getActivity().unbindService(mConnection);
+        }
 
         mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(preferences.getPreferredUnits() == GlucoseUnit.MMOL) + ")");
 
@@ -234,13 +270,23 @@ public class MonitorFragment extends Fragment {
         outState.putString("saveTextSGV", mTextSGV.getText().toString());
         outState.putString("saveTextTimestamp", mTextTimestamp.getText().toString());
         if (receiverButton.getTag() != null) {
-            Log.d("XXX", "Saving device state");
+            log.info("Saving device state");
             outState.putInt("deviceState", (int) receiverButton.getTag());
         }
         if (mSyncButton.getTag() != null) {
-            Log.d("XXX", "Saving sync state");
+            log.info("Saving sync state");
             outState.putInt("syncState", (int) mSyncButton.getTag());
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
     }
 
     @Override
@@ -248,32 +294,34 @@ public class MonitorFragment extends Fragment {
         super.onViewStateRestored(savedInstanceState);
         // Restore the state of the WebView
         mWebView.restoreState(savedInstanceState);
-//        mJSONData = savedInstanceState.getString("mJSONData");
-//        mTextSGV.setText(savedInstanceState.getString("saveTextSGV"));
-//        mTextTimestamp.setText(savedInstanceState.getString("saveTextTimestamp"));
     }
 
     @Subscribe
-    public void incomingData(final AbstractDevice.DeviceConnectionStatus status) {
+    public void incomingData(final DeviceConnectionStatus status) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                int res = 0;
-                switch (status.deviceState) {
-                    case CONNECTED:
-                        res = (status.deviceType == SupportedDevices.DEXCOM_G4) ? R.drawable.ic_usb : R.drawable.ic_ble;
-                        break;
-                    case DISCONNECTED:
-                        res = (status.deviceType == SupportedDevices.DEXCOM_G4) ? R.drawable.ic_nousb : R.drawable.ic_noble;
-                        break;
-                    case ACTIVE:
-                        res = (status.deviceType == SupportedDevices.DEXCOM_G4) ? R.drawable.ic_usb : R.drawable.ble_read;
-                        break;
-                }
-                setReceiverButtonRes(res);
+                setReceiverButtonRes(getReceiverRes(status));
             }
         });
 
+    }
+
+    private int getReceiverRes(DeviceConnectionStatus status){
+        int res = 0;
+        log.info("Device Type: "+status.deviceType+ " Device State: "+status.deviceState.name());
+        switch (status.deviceState) {
+            case CONNECTED:
+                res = (status.deviceType == SupportedDevices.DEXCOM_G4) ? R.drawable.ic_usb : R.drawable.ic_ble;
+                break;
+            case DISCONNECTED:
+                res = (status.deviceType == SupportedDevices.DEXCOM_G4) ? R.drawable.ic_nousb : R.drawable.ic_noble;
+                break;
+            case ACTIVE:
+                res = (status.deviceType == SupportedDevices.DEXCOM_G4) ? R.drawable.ic_usb : R.drawable.ble_read;
+                break;
+        }
+        return res;
     }
 
     private void setReceiverButtonRes(int res) {
@@ -300,7 +348,7 @@ public class MonitorFragment extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Log.d("XXX", "Incoming status: " + status.success);
+                log.info("Incoming status: " + status.success);
                 if (status.success) {
                     mSyncButton.setBackgroundResource(R.drawable.ic_cloud);
                     mSyncButton.setTag(R.drawable.ic_cloud);
@@ -315,7 +363,8 @@ public class MonitorFragment extends Fragment {
     @Subscribe
     public void incomingData(final G4Download download) {
         if (download == null) {
-            Log.w("XXX", "Download is NULL");
+            log.info("Download is NULL");
+            return;
         }
         getActivity().runOnUiThread(new Runnable() {
             @Override

@@ -76,6 +76,7 @@ abstract public class AbstractDevice {
     }
 
     public DeviceConnectionStatus getDeviceConnectionStatus() {
+        log.warn("Device type from device: {}", deviceType);
         return new DeviceConnectionStatus(deviceType, connectionStatus);
     }
 
@@ -83,22 +84,6 @@ abstract public class AbstractDevice {
         bus.post(new DeviceConnectionStatus(deviceType, connectionStatus));
     }
 
-
-    public class DeviceConnectionStatus {
-        public SupportedDevices deviceType;
-        public DeviceState deviceState;
-
-        DeviceConnectionStatus(SupportedDevices deviceType, DeviceState deviceState) {
-            this.deviceType = deviceType;
-            this.deviceState = deviceState;
-        }
-    }
-
-    public enum DeviceState {
-        CONNECTED,
-        DISCONNECTED,
-        ACTIVE
-    }
 
     public void setReporter(EventReporter reporter) {
         this.reporter = reporter;

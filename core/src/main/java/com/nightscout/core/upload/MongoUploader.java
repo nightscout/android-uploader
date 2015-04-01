@@ -97,6 +97,7 @@ public class MongoUploader extends BaseUploader {
     private BasicDBObject toBasicDBObject(GlucoseDataSet glucoseDataSet) {
         BasicDBObject output = new BasicDBObject();
         output.put("device", deviceStr);
+        output.put("sysTime",glucoseDataSet.getRawDisplayTimeEgv());
         output.put("date", glucoseDataSet.getWallTime().getMillis());
         output.put("dateString", glucoseDataSet.getWallTime().toString());
         output.put("sgv", glucoseDataSet.getBgMgdl());
@@ -115,8 +116,9 @@ public class MongoUploader extends BaseUploader {
         BasicDBObject output = new BasicDBObject();
         output.put("device", deviceStr);
         output.put("type", "mbg");
+        output.put("sysTime", meterRecord.getRawSystemTimeSeconds());
         output.put("date", meterRecord.getWallTime().getMillis());
-        output.put("dateString", meterRecord.getWallTime());
+        output.put("dateString", meterRecord.getWallTime().toString());
         output.put("mbg", meterRecord.getBgMgdl());
         return output;
     }
@@ -125,7 +127,8 @@ public class MongoUploader extends BaseUploader {
         BasicDBObject output = new BasicDBObject();
         output.put("device", deviceStr);
         output.put("date", calRecord.getWallTime().getMillis());
-        output.put("dateString", calRecord.getWallTime());
+        output.put("sysTime", calRecord.getRawSystemTimeSeconds());
+        output.put("dateString", calRecord.getWallTime().toString());
         output.put("slope", calRecord.getSlope());
         output.put("intercept", calRecord.getIntercept());
         output.put("scale", calRecord.getScale());
@@ -142,34 +145,80 @@ public class MongoUploader extends BaseUploader {
         return output;
     }
 
-    private boolean upsert(BasicDBObject dbObject) throws IOException {
-        return upsert(getCollection(), dbObject);
+    private boolean upsert(BasicDBObject query, BasicDBObject dbObject) throws IOException {
+        return upsert(getCollection(), query, dbObject);
     }
 
-    private boolean upsert(DBCollection collection, DBObject dbObject) {
-        WriteResult result = collection.update(dbObject, dbObject, true, false,
+    private boolean upsert(DBCollection collection, DBObject query, DBObject dbObject) {
+        log.warn("XXX Query: "+query.toString());
+        log.warn("XXX Data: "+dbObject.toString());
+        log.error("Collection: {}", collection.toString());
+        WriteResult result = collection.update(query, dbObject, true, false,
                 WriteConcern.UNACKNOWLEDGED);
         return result.getError() == null;
     }
 
+    private BasicDBObject toBasicDBObjectQuery(String recordType, long systemTime){
+        BasicDBObject output = new BasicDBObject();
+        output.put("type", recordType);
+        output.put("sysTime", systemTime);
+        return output;
+    }
+
+    protected BasicDBObject toBasicDBObjectSgv(GlucoseDataSet glucoseDataSet) {
+        BasicDBObject output = new BasicDBObject();
+        output.put("device", deviceStr);
+        output.put("sysTime",glucoseDataSet.getRawSysemTimeEgv());
+        output.put("date", glucoseDataSet.getWallTime().getMillis());
+        output.put("dateString", glucoseDataSet.getWallTime().toString());
+        output.put("sgv", glucoseDataSet.getBgMgdl());
+        output.put("direction", glucoseDataSet.getTrend().friendlyTrendName());
+        output.put("type", "sgv");
+        return output;
+    }
+
+    protected BasicDBObject toBasicDBObjectSensor(GlucoseDataSet glucoseDataSet, BasicDBObject output){
+        output.put("filtered", glucoseDataSet.getFiltered());
+        output.put("unfiltered", glucoseDataSet.getUnfiltered());
+        output.put("rssi", glucoseDataSet.getRssi());
+        output.put("noise", glucoseDataSet.getNoise());
+        return output;
+    }
+
     @Override
     protected boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException {
-        return upsert(toBasicDBObject(glucoseDataSet));
+        BasicDBObject query = toBasicDBObjectQuery("sgv", glucoseDataSet.getRawSysemTimeEgv());
+        BasicDBObject data = toBasicDBObjectSgv(glucoseDataSet);
+        if (preferences.isSensorUploadEnabled()){
+            if (glucoseDataSet.areRecordsMatched()){
+                return upsert(query, toBasicDBObjectSensor(glucoseDataSet, data));
+            } else {
+                boolean results;
+                results = upsert(query, data);
+                data.put("type", "sgv");
+                return results & upsert(query, toBasicDBObjectSensor(glucoseDataSet, data));
+            }
+        } else {
+            return upsert(query, data);
+        }
     }
 
     @Override
     protected boolean doUpload(MeterRecord meterRecord) throws IOException {
-        return upsert(toBasicDBObject(meterRecord));
+        BasicDBObject query = toBasicDBObjectQuery("mbg", meterRecord.getRawSystemTimeSeconds());
+        return upsert(query, toBasicDBObject(meterRecord));
     }
 
     @Override
     protected boolean doUpload(CalRecord calRecord) throws IOException {
-        return upsert(toBasicDBObject(calRecord));
+        BasicDBObject query = toBasicDBObjectQuery("cal", calRecord.getRawSystemTimeSeconds());
+        return upsert(query, toBasicDBObject(calRecord));
     }
 
     @Override
     protected boolean doUpload(AbstractUploaderDevice deviceStatus, int rcvrBat) throws IOException {
-        return upsert(getDeviceStatusCollection(), toBasicDBObject(deviceStatus, rcvrBat));
+        BasicDBObject dbObject = toBasicDBObject(deviceStatus, rcvrBat);
+        return upsert(getDeviceStatusCollection(), dbObject, dbObject);
     }
 
 }

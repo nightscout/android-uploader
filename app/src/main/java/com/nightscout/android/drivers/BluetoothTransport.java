@@ -47,6 +47,10 @@ public class BluetoothTransport implements DeviceTransport {
     private boolean authenticated = false;
     private boolean finalCallback = false;
 
+    public final static int CONNECT_TIMEOUT = 2500;
+    public final static int READ_TIMEOUT = 5000;
+    public final static int WRITE_TIMEOUT = 5000;
+
     private Action1<Boolean> connectionStateListener;
 
     // Bluetooth connection state variables
@@ -99,6 +103,9 @@ public class BluetoothTransport implements DeviceTransport {
     public void open() throws IOException {
         AndroidPreferences prefs = new AndroidPreferences(mContext);
         mBluetoothDeviceAddress = prefs.getBtAddress();
+        if (mBluetoothDeviceAddress.equals("")){
+            return;
+        }
         final IntentFilter bondIntent = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
         mContext.registerReceiver(mPairReceiver, bondIntent);
         final IntentFilter reconnectIntent = new IntentFilter(RECONNECT_INTENT);
@@ -106,13 +113,13 @@ public class BluetoothTransport implements DeviceTransport {
 
         attemptConnection();
 
-        while (System.currentTimeMillis() + 2500 > System.currentTimeMillis()) {
+        while (System.currentTimeMillis() + CONNECT_TIMEOUT > System.currentTimeMillis()) {
             if (finalCallback) {
 //            if (finalCallback && authenticated && readNotifySet && mConnectionState == STATE_CONNECTED) {
                 break;
             }
         }
-        if (System.currentTimeMillis() + 5000 < System.currentTimeMillis()) {
+        if (System.currentTimeMillis() + CONNECT_TIMEOUT < System.currentTimeMillis()) {
             throw new IOException("Timeout while opening BLE connection to receiver");
         }
         shouldBeOpen = true;
@@ -342,7 +349,6 @@ public class BluetoothTransport implements DeviceTransport {
 
     private final BroadcastReceiver mPairReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
-            Log.d("XXX", "Broadcast heard!");
             String action = intent.getAction();
             final BluetoothDevice bondDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 

@@ -3,6 +3,7 @@ package com.nightscout.android.preferences;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.google.common.base.Joiner;
 import com.nightscout.android.R;
@@ -268,8 +269,16 @@ public class AndroidPreferences implements NightscoutPreferences {
 
     @Override
     public SupportedDevices getDeviceType() {
-        return preferences.getString(PreferenceKeys.DEXCOM_DEVICE_TYPE, "0").equals("0") ?
-                SupportedDevices.DEXCOM_G4 : SupportedDevices.DEXCOM_G4_SHARE2;
+        String value = preferences.getString(PreferenceKeys.DEXCOM_DEVICE_TYPE, "0");
+        if (value.equals("0")){
+            return SupportedDevices.DEXCOM_G4;
+        }
+        if (value.equals("1")){
+            return SupportedDevices.DEXCOM_G4_SHARE2;
+        }
+        return SupportedDevices.UNKNOWN;
+//        return preferences.getString(PreferenceKeys.DEXCOM_DEVICE_TYPE, "0").equals("0") ?
+//                SupportedDevices.DEXCOM_G4 : SupportedDevices.DEXCOM_G4_SHARE2;
     }
 
     @Override

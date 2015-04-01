@@ -33,6 +33,7 @@ public class DexcomG4 extends AbstractDevice {
     protected int numOfPages;
     protected AbstractUploaderDevice uploaderDevice;
     protected DeviceTransport transport;
+    protected String receiverId = "";
 
     protected Action1<Boolean> connectionStateListener = new Action1<Boolean>() {
 
@@ -49,18 +50,36 @@ public class DexcomG4 extends AbstractDevice {
     public DexcomG4(DeviceTransport transport, NightscoutPreferences preferences,
                     AbstractUploaderDevice uploaderDevice) {
 //        super(transport);
+
         this.transport = transport;
         this.preferences = preferences;
         this.uploaderDevice = uploaderDevice;
         this.deviceName = "DexcomG4";
         this.deviceType = preferences.getDeviceType();
-        this.transport.registerConnectionListener(connectionStateListener);
+        log.debug("New device being created: {}", this.deviceType);
+        if (transport != null) {
+            this.transport.registerConnectionListener(connectionStateListener);
+        }
     }
 
+    public String getReceiverId() {
+        return receiverId;
+    }
+
+    @Override
+    public void onConnect() {
+        super.onConnect();
+//        ReadData readData = new ReadData(transport);
+//        try {
+//            receiverId = readData.readSerialNumber();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+    }
 
     @Override
     public boolean isConnected() {
-        return transport.isConnected();
+        return transport != null && transport.isConnected();
     }
 
     @Override
@@ -77,6 +96,7 @@ public class DexcomG4 extends AbstractDevice {
         long systemTime = 0;
         try {
             systemTime = readData.readSystemTime();
+
             dateTime = new DateTime();
             recentRecords = readData.getRecentEGVsPages(numOfPages, systemTime, dateTime.getMillis());
             if (preferences.isMeterUploadEnabled()) {

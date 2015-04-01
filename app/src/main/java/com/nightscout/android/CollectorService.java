@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
+import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -29,6 +30,8 @@ import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.drivers.AbstractDevice;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.drivers.DeviceConnectionStatus;
+import com.nightscout.core.drivers.DeviceState;
 import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DexcomG4;
 import com.nightscout.core.drivers.SupportedDevices;
@@ -43,6 +46,7 @@ import org.joda.time.Duration;
 import org.joda.time.Minutes;
 
 import java.io.IOException;
+import java.util.Random;
 
 public class CollectorService extends Service {
 //    protected final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -70,6 +74,7 @@ public class CollectorService extends Service {
     private AlarmManager alarmManager;
     private PendingIntent syncManager;
 
+    private final IBinder mBinder = new LocalBinder();
 
     @Override
     public void onCreate() {
@@ -94,7 +99,7 @@ public class CollectorService extends Service {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (key.equals(PreferenceKeys.DEXCOM_DEVICE_TYPE)) {
-                    Log.d(TAG, "Interesting value changed!");
+                    Log.d(TAG, "Interesting value changed! "+key);
                     if (driver != null && driver.isConnected()) {
                         try {
                             driver.close();
@@ -112,7 +117,15 @@ public class CollectorService extends Service {
 
     }
 
+    public class LocalBinder extends Binder {
+        public CollectorService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return CollectorService.this;
+        }
+    }
+
     private void setDriver() {
+        SupportedDevices deviceType = preferences.getDeviceType();
         if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4) {
             driver = UsbSerialProber.acquire(
                     (UsbManager) getSystemService(USB_SERVICE), getApplicationContext());
@@ -121,15 +134,11 @@ public class CollectorService extends Service {
         } else {
             throw new UnsupportedOperationException("Unsupported device selected");
         }
-        if (driver == null) {
-            return;
-        }
-        SupportedDevices deviceType = preferences.getDeviceType();
         AbstractUploaderDevice uploaderDevice = AndroidUploaderDevice.getUploaderDevice(getApplicationContext());
-        if (deviceType == SupportedDevices.DEXCOM_G4 || deviceType == SupportedDevices.DEXCOM_G4_SHARE2) {
+        if ((deviceType == SupportedDevices.DEXCOM_G4) || (deviceType == SupportedDevices.DEXCOM_G4_SHARE2)) {
             device = new DexcomG4(driver, preferences, uploaderDevice);
             device.setReporter(reporter);
-            if (deviceType == SupportedDevices.DEXCOM_G4) {
+            if (deviceType == SupportedDevices.DEXCOM_G4 && driver != null) {
                 ((CdcAcmSerialDriver) driver).setPowerManagementEnabled(preferences.isRootEnabled());
                 ((CdcAcmSerialDriver) driver).setUsbCriteria(DexcomG4.VENDOR_ID,
                         DexcomG4.PRODUCT_ID, DexcomG4.DEVICE_CLASS, DexcomG4.DEVICE_SUBCLASS,
@@ -137,6 +146,10 @@ public class CollectorService extends Service {
             }
         }
         try {
+            if (driver == null) {
+                Log.d("Last hope", "Driver is NULL?!");
+                return;
+            }
             if ((deviceType == SupportedDevices.DEXCOM_G4 && driver.isConnected())
                     || deviceType == SupportedDevices.DEXCOM_G4_SHARE2) {
                 driver.open();
@@ -260,7 +273,7 @@ public class CollectorService extends Service {
                 return download;
             }
             long nextUploadTime = Minutes.minutes(2).toStandardDuration().getMillis();
-            if (download != null) {
+            if (download != null && download.sgv.size() > 0) {
                 long rcvrTime = download.receiver_system_time_sec;
                 long refTime = DateTime.parse(download.download_timestamp).getMillis();
                 EGVRecord lastEgvRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), download.receiver_system_time_sec, refTime);
@@ -273,8 +286,18 @@ public class CollectorService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinder;
     }
+
+    public DeviceConnectionStatus getDeviceConnectionStatus(){
+        if (device == null){
+            return new DeviceConnectionStatus(preferences.getDeviceType(), DeviceState.DISCONNECTED);
+        }
+        Log.d(TAG, "From service: "+device.getDeviceConnectionStatus().deviceType.name());
+        return device.getDeviceConnectionStatus();
+    }
+
+
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public void setNextPoll(long millis) {

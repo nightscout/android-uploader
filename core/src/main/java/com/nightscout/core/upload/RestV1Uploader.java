@@ -34,6 +34,27 @@ public class RestV1Uploader extends AbstractRestUploader {
         post.setHeader("api-secret", secret);
     }
 
+    private JSONObject toJSONObjectEgv(GlucoseDataSet  record) throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("device", deviceStr);
+        json.put("date", record.getWallTime().getMillis());
+        json.put("sysTime", record.getRawSysemTimeEgv());
+        json.put("dateString", record.getWallTime().toString());
+        json.put("sgv", record.getBgMgdl());
+        json.put("direction", record.getTrend().friendlyTrendName());
+        json.put("type", "sgv");
+        return json;
+    }
+
+    private JSONObject toJSONObjectSensor(GlucoseDataSet record, JSONObject json) throws JSONException {
+        json.put("filtered", record.getFiltered());
+        json.put("unfiltered", record.getUnfiltered());
+        json.put("rssi", record.getRssi());
+        json.put("noise", record.getNoise());
+        return json;
+    }
+
+
     private JSONObject toJSONObject(GlucoseDataSet record) throws JSONException {
         JSONObject json = new JSONObject();
         json.put("device", deviceStr);
@@ -87,7 +108,25 @@ public class RestV1Uploader extends AbstractRestUploader {
     @Override
     protected boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException {
         try {
-            return doPost("entries", toJSONObject(glucoseDataSet));
+            JSONObject json = toJSONObjectEgv(glucoseDataSet);
+            log.error("XXX Json: {}", json);
+            if (! preferences.isSensorUploadEnabled()){
+                log.error("Not enabled Json: {}", json);
+                return doPost("entries", json);
+            } else {
+                if (glucoseDataSet.areRecordsMatched()){
+                    log.error("XXX Records matched Json: {}", json);
+                    return doPost("entries", toJSONObjectSensor(glucoseDataSet, json));
+                } else {
+                    log.error("XXX Records not matched Json: {}", json);
+                    boolean result = doPost("entries", json);
+                    json = new JSONObject();
+                    json.put("type", "sgv");
+                    result &= doPost("entries", json);
+                    return result;
+                }
+            }
+//            return doPost("entries", toJSONObject(glucoseDataSet));
         } catch (JSONException e) {
             log.error("Could not create JSON object for rest v1 glucose data set.", e);
             return false;
