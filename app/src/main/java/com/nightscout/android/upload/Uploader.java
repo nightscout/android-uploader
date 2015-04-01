@@ -134,13 +134,21 @@ public class Uploader {
         long refTime = DateTime.parse(download.download_timestamp).getMillis();
         List<CalibrationEntry> calList = Utils.filterRecords(numRecords, download.cal);
         List<MeterEntry> meterList = Utils.filterRecords(numRecords, download.meter);
-        List<CalRecord> calRecords = asRecordList(download.cal, CalRecord.class, download.receiver_system_time_sec, refTime);
-        List<MeterRecord> meterRecords = asRecordList(download.meter, MeterRecord.class, download.receiver_system_time_sec, refTime);
+        List<CalRecord> calRecords = new ArrayList<>();
+        List<MeterRecord> meterRecords = new ArrayList<>();
+        if (download.receiver_system_time_sec != null) {
+            calRecords = asRecordList(download.cal, CalRecord.class, download.receiver_system_time_sec, refTime);
+            meterRecords = asRecordList(download.meter, MeterRecord.class, download.receiver_system_time_sec, refTime);
+        }
 
-        List<GlucoseDataSet> glucoseDataSets = Utils.mergeGlucoseDataRecords(download, numRecords);
+        List<GlucoseDataSet> glucoseDataSets = new ArrayList<>();
+        if (download.sgv.size() > 0) {
+            glucoseDataSets = Utils.mergeGlucoseDataRecords(download, numRecords);
+        }
 
+        int receiverBattery = (download.receiver_battery != null) ? download.receiver_battery : -1;
 
-        return upload(glucoseDataSets, meterRecords, calRecords, download.receiver_battery);
+        return upload(glucoseDataSets, meterRecords, calRecords, receiverBattery);
     }
 
     public <T, U extends Message> List<T> asRecordList(List<U> entryList, Class<T> clazz, long rcvrTime, long refTime) {

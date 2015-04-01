@@ -33,6 +33,8 @@ import java.net.URI;
 import java.util.List;
 
 public class SettingsActivity extends FragmentActivity {
+    private final String TAG = SettingsActivity.class.getSimpleName();
+
     private MainPreferenceFragment mainPreferenceFragment;
 
     @Override
@@ -92,7 +94,7 @@ public class SettingsActivity extends FragmentActivity {
                     prefs.setMongoClientUri(barcode.getMongoUri().get());
                     prefs.setMongoCollection(barcode.getMongoCollection().orNull());
                     prefs.setMongoDeviceStatusCollection(
-                        barcode.getMongoDeviceStatusCollection().orNull());
+                            barcode.getMongoDeviceStatusCollection().orNull());
                 }
                 if (barcode.hasApiConfig()) {
                     prefs.setRestApiEnabled(true);
@@ -129,7 +131,7 @@ public class SettingsActivity extends FragmentActivity {
             }
             refreshFragments();
         } else if (scanResult.getFormatName().equals("CODE_128")) {
-            Log.d("XXX", "Setting serial number to: " + scanResult.getContents());
+            Log.d(TAG, "Setting serial number to: " + scanResult.getContents());
             prefs.setShareSerial(scanResult.getContents());
             refreshFragments();
         }

@@ -4,6 +4,8 @@ import com.nightscout.core.BusProvider;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
+import com.nightscout.core.model.DownloadStatus;
+import com.nightscout.core.model.G4Download;
 import com.squareup.otto.Bus;
 import com.squareup.wire.Message;
 
@@ -22,23 +24,26 @@ abstract public class AbstractDevice {
     protected SupportedDevices deviceType = SupportedDevices.UNKNOWN;
     private Bus bus = BusProvider.getInstance();
     protected EventReporter reporter;
-    private ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle",
+    protected ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle",
             Locale.getDefault());
-    private DeviceState connectionStatus = DeviceState.DISCONNECTED;
+    protected DeviceState connectionStatus = DeviceState.DISCONNECTED;
 
     public abstract boolean isConnected();
 
     // Not sure that I'll need this in the general device. This may be required for only push based
     // devices.
-    protected void onDownload() {
-        reporter.report(EventType.DEVICE, EventSeverity.INFO,
-                messages.getString("event_sync_log"));
+    protected void onDownload(boolean successful) {
+        if (successful) {
+            reporter.report(EventType.DEVICE, EventSeverity.INFO,
+                    messages.getString("event_sync_log"));
+        }
     }
 
     public final Message download() {
         onActivity(true);
         Message download = doDownload();
-        onDownload();
+        // TODO figure out a way to not make this specific to the G4
+        onDownload(((G4Download) download).download_status == DownloadStatus.SUCCESS);
         onActivity(false);
         return download;
     }

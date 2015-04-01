@@ -29,6 +29,8 @@ import it.neokree.materialnavigationdrawer.elements.listeners.MaterialSectionLis
 
 public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
 
+    private final String TAG = NightscoutNavigationDrawer.class.getSimpleName();
+
     @Inject
     FeedbackDialog feedbackDialog;
     Tracker mTracker;
@@ -77,7 +79,7 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
         MaterialSection gapSync = newSection("Gap sync", new MaterialSectionListener() {
             @Override
             public void onClick(MaterialSection materialSection) {
-                Log.d("XXX", "Sync requested");
+                Log.d(TAG, "Sync requested");
                 Intent syncIntent = new Intent(getApplicationContext(), CollectorService.class);
                 syncIntent.putExtra("requested", true);
                 syncIntent.setAction(CollectorService.ACTION_POLL);
@@ -110,14 +112,14 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
         disableLearningPattern();
         setBackPattern(MaterialNavigationDrawer.BACKPATTERN_BACK_TO_FIRST);
         enableToolbarElevation();
-        Log.d("XXX", "Attempting to start service");
+        Log.d(TAG, "Attempting to start service");
         Intent uploadIntent = new Intent(getBaseContext(), ProcessorService.class);
         getApplicationContext().startService(uploadIntent);
         syncIntent = new Intent(getApplicationContext(), CollectorService.class);
         syncIntent.putExtra(CollectorService.SYNC_TYPE, CollectorService.NON_SYNC);
         getApplicationContext().startService(syncIntent);
 
-        Log.d("XXX", "Service should be started");
+        Log.d(TAG, "Service should be started");
 
     }
 
@@ -136,7 +138,7 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-        Log.d("XXX", "Configuration changed");
+        Log.d(TAG, "Configuration changed");
         super.onConfigurationChanged(newConfig);
     }
 }

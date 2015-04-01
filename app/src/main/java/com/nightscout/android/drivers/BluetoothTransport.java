@@ -103,7 +103,7 @@ public class BluetoothTransport implements DeviceTransport {
     public void open() throws IOException {
         AndroidPreferences prefs = new AndroidPreferences(mContext);
         mBluetoothDeviceAddress = prefs.getBtAddress();
-        if (mBluetoothDeviceAddress.equals("")){
+        if (mBluetoothDeviceAddress.equals("")) {
             return;
         }
         final IntentFilter bondIntent = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
@@ -498,7 +498,7 @@ public class BluetoothTransport implements DeviceTransport {
         mContext.registerReceiver(mPairReceiver, bondIntent);
 
         if (!device.createBond()) {
-            Log.d("XXX", "Problem creating bond");
+            Log.d(TAG, "Problem creating bond");
         }
     }
 

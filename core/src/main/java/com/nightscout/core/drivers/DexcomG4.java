@@ -5,6 +5,8 @@ import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.SensorRecord;
+import com.nightscout.core.events.EventSeverity;
+import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.model.DownloadStatus;
 import com.nightscout.core.model.G4Download;
@@ -49,8 +51,6 @@ public class DexcomG4 extends AbstractDevice {
 
     public DexcomG4(DeviceTransport transport, NightscoutPreferences preferences,
                     AbstractUploaderDevice uploaderDevice) {
-//        super(transport);
-
         this.transport = transport;
         this.preferences = preferences;
         this.uploaderDevice = uploaderDevice;
@@ -84,6 +84,13 @@ public class DexcomG4 extends AbstractDevice {
 
     @Override
     protected G4Download doDownload() {
+        G4Download.Builder downloadBuilder = new G4Download.Builder();
+        DateTime dateTime = new DateTime();
+        if (!isConnected()) {
+            reporter.report(EventType.DEVICE, EventSeverity.WARN, messages.getString("event_g4_not_connected"));
+            return downloadBuilder.download_timestamp(dateTime.toString())
+                    .download_status(DownloadStatus.DEVICE_NOT_FOUND).build();
+        }
         DownloadStatus status = DownloadStatus.SUCCESS;
         ReadData readData = new ReadData(transport);
 
@@ -91,7 +98,6 @@ public class DexcomG4 extends AbstractDevice {
         List<MeterRecord> meterRecords = new ArrayList<>();
         List<SensorRecord> sensorRecords = new ArrayList<>();
         List<CalRecord> calRecords = new ArrayList<>();
-        DateTime dateTime = new DateTime();
         int batLevel = 100;
         long systemTime = 0;
         try {
@@ -134,7 +140,6 @@ public class DexcomG4 extends AbstractDevice {
         List<SensorEntry> cookieMonsterG4Sensors =
                 SensorRecord.toProtobufList(sensorRecords);
 
-        G4Download.Builder downloadBuilder = new G4Download.Builder();
         downloadBuilder.sgv(cookieMonsterG4SGVs)
                 .cal(cookieMonsterG4Cals)
                 .sensor(cookieMonsterG4Sensors)

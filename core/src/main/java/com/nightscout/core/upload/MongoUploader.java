@@ -150,8 +150,8 @@ public class MongoUploader extends BaseUploader {
     }
 
     private boolean upsert(DBCollection collection, DBObject query, DBObject dbObject) {
-        log.warn("XXX Query: "+query.toString());
-        log.warn("XXX Data: "+dbObject.toString());
+        log.warn("Query: " + query.toString());
+        log.warn("Data: " + dbObject.toString());
         log.error("Collection: {}", collection.toString());
         WriteResult result = collection.update(query, dbObject, true, false,
                 WriteConcern.UNACKNOWLEDGED);

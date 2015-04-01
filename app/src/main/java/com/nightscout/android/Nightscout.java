@@ -74,7 +74,7 @@ public class Nightscout extends Application {
             Log.d(TAG, "tracker was null - returning new tracker");
             GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
             analytics.setDryRun(false);
-            analytics.getLogger().setLogLevel(Logger.LogLevel.VERBOSE);
+            analytics.getLogger().setLogLevel(Logger.LogLevel.WARNING);
             analytics.setLocalDispatchPeriod(7200);
             tracker = analytics.newTracker(R.xml.app_tracker);
             return tracker;

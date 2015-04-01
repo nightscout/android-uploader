@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -298,6 +297,10 @@ public class MonitorFragment extends Fragment {
 
     @Subscribe
     public void incomingData(final DeviceConnectionStatus status) {
+        if (getActivity() == null) {
+            log.error("Activity is null!");
+            return;
+        }
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {

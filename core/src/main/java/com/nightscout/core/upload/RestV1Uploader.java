@@ -34,7 +34,7 @@ public class RestV1Uploader extends AbstractRestUploader {
         post.setHeader("api-secret", secret);
     }
 
-    private JSONObject toJSONObjectEgv(GlucoseDataSet  record) throws JSONException {
+    private JSONObject toJSONObjectEgv(GlucoseDataSet record) throws JSONException {
         JSONObject json = new JSONObject();
         json.put("device", deviceStr);
         json.put("date", record.getWallTime().getMillis());
@@ -78,6 +78,7 @@ public class RestV1Uploader extends AbstractRestUploader {
         json.put("device", deviceStr);
         json.put("type", "mbg");
         json.put("date", record.getWallTime().getMillis());
+        json.put("sysTime", record.getRawSystemTimeSeconds());
         json.put("dateString", record.getWallTime());
         json.put("mbg", record.getBgMgdl());
         log.error("Json: {}", json);
@@ -89,6 +90,7 @@ public class RestV1Uploader extends AbstractRestUploader {
         json.put("device", deviceStr);
         json.put("type", "cal");
         json.put("date", record.getWallTime().getMillis());
+        json.put("sysTime", record.getRawSystemTimeSeconds());
         json.put("dateString", record.getWallTime());
         json.put("slope", record.getSlope());
         json.put("intercept", record.getIntercept());
@@ -109,16 +111,16 @@ public class RestV1Uploader extends AbstractRestUploader {
     protected boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException {
         try {
             JSONObject json = toJSONObjectEgv(glucoseDataSet);
-            log.error("XXX Json: {}", json);
-            if (! preferences.isSensorUploadEnabled()){
+            log.error("Json: {}", json);
+            if (!preferences.isSensorUploadEnabled()) {
                 log.error("Not enabled Json: {}", json);
                 return doPost("entries", json);
             } else {
-                if (glucoseDataSet.areRecordsMatched()){
-                    log.error("XXX Records matched Json: {}", json);
+                if (glucoseDataSet.areRecordsMatched()) {
+                    log.error("Records matched Json: {}", json);
                     return doPost("entries", toJSONObjectSensor(glucoseDataSet, json));
                 } else {
-                    log.error("XXX Records not matched Json: {}", json);
+                    log.error("Records not matched Json: {}", json);
                     boolean result = doPost("entries", json);
                     json = new JSONObject();
                     json.put("type", "sgv");

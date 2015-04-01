@@ -46,7 +46,6 @@ import org.joda.time.Duration;
 import org.joda.time.Minutes;
 
 import java.io.IOException;
-import java.util.Random;
 
 public class CollectorService extends Service {
 //    protected final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -222,7 +221,9 @@ public class CollectorService extends Service {
 //                    uploadStatus = uploader.upload(download);
 //                }
 //
-                bus.post(download);
+                if (download != null) {
+                    bus.post(download);
+                }
 //                Intent uploaderIntent = new Intent(getApplicationContext(), ProcessorService.class);
 //                getApplicationContext().startService(uploaderIntent);
 
