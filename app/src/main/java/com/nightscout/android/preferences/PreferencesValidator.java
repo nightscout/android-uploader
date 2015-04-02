@@ -1,6 +1,7 @@
 package com.nightscout.android.preferences;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
@@ -9,6 +10,7 @@ import com.nightscout.android.R;
 import com.nightscout.core.utils.RestUriUtils;
 
 import java.net.URI;
+import java.net.URLEncoder;
 
 public class PreferencesValidator {
     /**
@@ -39,7 +41,9 @@ public class PreferencesValidator {
         URI uri;
         try {
             uri = URI.create(restApiUri);
+            URLEncoder.encode(uri.getAuthority(), "UTF-8");
         } catch (Exception e) {
+            Log.e("XXX", "Exception: " + e.getMessage());
             return Optional.of(context.getString(R.string.invalid_rest_uri, restApiUri));
         }
         if (RestUriUtils.isV1Uri(uri)) {

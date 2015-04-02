@@ -131,6 +131,12 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
     }
 
     @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+//        super.onBackPressed();
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         GoogleAnalytics.getInstance(this).reportActivityStart(this);

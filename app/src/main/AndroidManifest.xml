@@ -117,6 +117,7 @@
         <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings"
+            android:launchMode="singleTask"
             android:parentActivityName=".ui.NightscoutNavigationDrawer">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

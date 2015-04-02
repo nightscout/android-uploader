@@ -3,6 +3,7 @@ package com.nightscout.android;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -53,6 +54,8 @@ public class ProcessorService extends Service {
     private boolean uploadersDefined = false;
     private Tracker tracker;
     private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
+    private final IBinder mBinder = new LocalBinder();
+    private boolean lastUploadStatus = false;
 
 
     @Override
@@ -117,6 +120,10 @@ public class ProcessorService extends Service {
             }
         };
         prefs.registerOnSharedPreferenceChangeListener(prefListener);
+    }
+
+    public boolean getLastUploadStatus() {
+        return lastUploadStatus;
     }
 
     public void reportUploadMethods() {
@@ -203,6 +210,13 @@ public class ProcessorService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
+    public class LocalBinder extends Binder {
+        public ProcessorService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return ProcessorService.this;
+        }
+    }
+
     @Subscribe
     public void incomingData(G4Download download) {
         reportDeviceTypes();
@@ -243,6 +257,7 @@ public class ProcessorService extends Service {
         Log.d(TAG, "areAllUploadersInitalized: " + uploader.areAllUploadersInitalized());
         Log.d(TAG, "uploadersDefined: " + uploadersDefined);
         response.success = uploadSuccess && initalized && uploader.areAllUploadersInitalized() && uploadersDefined;
+        lastUploadStatus = response.success;
         bus.post(response);
 //        bus.post(uploadSuccess && initalized && uploader.areAllUploadersInitalized());
     }
@@ -253,6 +268,6 @@ public class ProcessorService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinder;
     }
 }

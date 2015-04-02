@@ -79,7 +79,7 @@ public class RestV1Uploader extends AbstractRestUploader {
         json.put("type", "mbg");
         json.put("date", record.getWallTime().getMillis());
         json.put("sysTime", record.getRawSystemTimeSeconds());
-        json.put("dateString", record.getWallTime());
+        json.put("dateString", record.getWallTime().toString());
         json.put("mbg", record.getBgMgdl());
         log.error("Json: {}", json);
         return json;
@@ -91,7 +91,7 @@ public class RestV1Uploader extends AbstractRestUploader {
         json.put("type", "cal");
         json.put("date", record.getWallTime().getMillis());
         json.put("sysTime", record.getRawSystemTimeSeconds());
-        json.put("dateString", record.getWallTime());
+        json.put("dateString", record.getWallTime().toString());
         json.put("slope", record.getSlope());
         json.put("intercept", record.getIntercept());
         json.put("scale", record.getScale());

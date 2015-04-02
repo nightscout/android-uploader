@@ -75,7 +75,7 @@ public class MonitorFragment extends Fragment {
     @InjectView(R.id.timeAgo)
     TextView mTextTimestamp;
     @InjectView(R.id.syncButton)
-    ImageButton mSyncButton;
+    ImageButton uploadButton;
     @InjectView(R.id.usbButton)
     ImageButton receiverButton;
     Bus bus = BusProvider.getInstance();
@@ -92,9 +92,10 @@ public class MonitorFragment extends Fragment {
     FeedbackDialog feedbackDialog;
 
     private CollectorService mCollectorService;
+    private ProcessorService mProcessorService;
     private boolean mBound = false;
 
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private ServiceConnection mCollectorConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName className,
@@ -111,6 +112,22 @@ public class MonitorFragment extends Fragment {
         }
     };
 
+    private ServiceConnection mProcessorConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            ProcessorService.LocalBinder binder = (ProcessorService.LocalBinder) service;
+            mProcessorService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -167,7 +184,7 @@ public class MonitorFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        mSyncButton.setOnClickListener(new View.OnClickListener() {
+        uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), UserEventPanelActivity.class);
@@ -178,17 +195,17 @@ public class MonitorFragment extends Fragment {
         if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE2) {
             receiverButton.setBackgroundResource(R.drawable.ic_noble);
         }
-        if (savedInstanceState != null) {
-            log.info("Saved state exists!");
-            if (savedInstanceState.containsKey("deviceState")) {
-                log.info("Saved state for device exists!");
-                setReceiverButtonRes(savedInstanceState.getInt("deviceState"));
-            }
-            if (savedInstanceState.containsKey("syncState")) {
-                log.info("Saved state for sync exists!");
-                setSyncButtonRes(savedInstanceState.getInt("syncState"));
-            }
-        }
+//        if (savedInstanceState != null) {
+//            log.info("Saved state exists!");
+//            if (savedInstanceState.containsKey("deviceState")) {
+//                log.info("Saved state for device exists!");
+//                setReceiverButtonRes(savedInstanceState.getInt("deviceState"));
+//            }
+//            if (savedInstanceState.containsKey("syncState")) {
+//                log.info("Saved state for sync exists!");
+//                setSyncButtonRes(savedInstanceState.getInt("syncState"));
+//            }
+//        }
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.OnSharedPreferenceChangeListener prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
@@ -225,11 +242,19 @@ public class MonitorFragment extends Fragment {
         mWebView.onResume();
         mWebView.resumeTimers();
         Intent intent = new Intent(this.getActivity(), CollectorService.class);
-        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        getActivity().bindService(intent, mCollectorConnection, Context.BIND_AUTO_CREATE);
         if (mBound) {
             setReceiverButtonRes(getReceiverRes(mCollectorService.getDeviceConnectionStatus()));
-            log.warn("From monitor fragment: {}", mCollectorService.getDeviceConnectionStatus().deviceType);
-            getActivity().unbindService(mConnection);
+            getActivity().unbindService(mCollectorConnection);
+        }
+        intent = new Intent(this.getActivity(), ProcessorService.class);
+        getActivity().bindService(intent, mProcessorConnection, Context.BIND_AUTO_CREATE);
+        if (mBound) {
+            boolean lastUpload = mProcessorService.getLastUploadStatus();
+            log.warn("Last upload status: {}", (lastUpload) ? "Success" : "Failed");
+            setUploaderButtonRes(getUploaderRes(lastUpload));
+            getActivity().unbindService(mProcessorConnection);
+
         }
 
         mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(preferences.getPreferredUnits() == GlucoseUnit.MMOL) + ")");
@@ -254,12 +279,12 @@ public class MonitorFragment extends Fragment {
         setSgvText(reading, TrendArrow.values()[(int) mTextSGV.getTag(R.string.display_trend)]);
     }
 
-    private String getSGVStringByUnit(GlucoseReading sgv, TrendArrow trend) {
-        String sgvStr = sgv.asStr(preferences.getPreferredUnits());
-        return (sgv.asMgdl() != -1) ?
-                (isSpecialValue(sgv)) ?
-                        getEGVSpecialValue(sgv).get().toString() : sgvStr + " " + trend.symbol() : "---";
-    }
+//    private String getSGVStringByUnit(GlucoseReading sgv, TrendArrow trend) {
+//        String sgvStr = sgv.asStr(preferences.getPreferredUnits());
+//        return (sgv.asMgdl() != -1) ?
+//                (isSpecialValue(sgv)) ?
+//                        getEGVSpecialValue(sgv).get().toString() : sgvStr + " " + trend.symbol() : "---";
+//    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -272,9 +297,9 @@ public class MonitorFragment extends Fragment {
             log.info("Saving device state");
             outState.putInt("deviceState", (int) receiverButton.getTag());
         }
-        if (mSyncButton.getTag() != null) {
+        if (uploadButton.getTag() != null) {
             log.info("Saving sync state");
-            outState.putInt("syncState", (int) mSyncButton.getTag());
+            outState.putInt("syncState", (int) uploadButton.getTag());
         }
     }
 
@@ -336,37 +361,54 @@ public class MonitorFragment extends Fragment {
         }
     }
 
-    private void setSyncButtonRes(int res) {
-        mSyncButton.setBackgroundResource(res);
-        mSyncButton.setTag(res);
-        if (res == R.drawable.ble_read) {
-            AnimationDrawable frameAnimation = (AnimationDrawable) receiverButton.getBackground();
-            frameAnimation.start();
+    private void setUploaderButtonRes(int res) {
+        uploadButton.setBackgroundResource(res);
+        uploadButton.setTag(res);
+    }
+
+    private int getUploaderRes(boolean status) {
+        if (status) {
+            return R.drawable.ic_cloud;
+        } else {
+            return R.drawable.ic_nocloud;
         }
     }
+
+//    private void setSyncButtonRes(int res) {
+//        mSyncButton.setBackgroundResource(res);
+//        mSyncButton.setTag(res);
+//        if (res == R.drawable.ble_read) {
+//            AnimationDrawable frameAnimation = (AnimationDrawable) receiverButton.getBackground();
+//            frameAnimation.start();
+//        }
+//    }
 
 
     @Subscribe
     public void incomingData(final ProcessorService.ProcessorResponse status) {
+        if (getActivity() == null) {
+            log.info("Activity is null for ProcessorResponse");
+            return;
+        }
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 log.info("Incoming status: " + status.success);
-                if (status.success) {
-                    mSyncButton.setBackgroundResource(R.drawable.ic_cloud);
-                    mSyncButton.setTag(R.drawable.ic_cloud);
-                } else {
-                    mSyncButton.setBackgroundResource(R.drawable.ic_nocloud);
-                    mSyncButton.setTag(R.drawable.ic_nocloud);
-                }
+                setUploaderButtonRes(getUploaderRes(status.success));
+
             }
         });
     }
+
 
     @Subscribe
     public void incomingData(final G4Download download) {
         if (download == null) {
             log.info("Download is NULL");
+            return;
+        }
+        if (getActivity() == null) {
+            log.info("Activity is null!");
             return;
         }
         getActivity().runOnUiThread(new Runnable() {
@@ -406,6 +448,12 @@ public class MonitorFragment extends Fragment {
                 }
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        bus.unregister(this);
     }
 
     public Runnable updateTimeAgo = new Runnable() {

@@ -62,7 +62,7 @@
     <string name="TimeChangeDetected">Trovata modifica temporale</string>
     <string name="illegal_mongo_uri">Mongo uri ha sintassi non valida. Si prega di doppio controllo.</string>
     <string name="invalid_input_title">Invalid Input</string>
-    <string name="invalid_rest_uri">Invalid rest url %s, si prega di controllare due volte la formattazione.</string>
+    <string name="invalid_rest_uri">Invalid rest url %s, si prega di controllare due volte la formattazione. Gli URL devono essere codificati per cento</string>
     <string name="ok">Ok</string>
     <string name="rest_uri_missing_token">Missing token for rest uri %s.</string>
     <string name="unknown_rest_host">Impossibile connettersi a %s, si prega di verificare che si è connessi a Internet, e che l\'URL sia corretto.</string>
