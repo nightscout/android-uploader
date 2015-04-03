@@ -172,9 +172,9 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
 
     @Override
     public void connectionLost(Throwable cause) {
-        if (state != MqttConnectionState.CONNECTED) {
-            return;
-        }
+//        if (state != MqttConnectionState.CONNECTED) {
+//            return;
+//        }
         log.info(messages.getString("mqtt_lost_connection"));
 
         reporter.report(EventType.UPLOADER, EventSeverity.WARN,

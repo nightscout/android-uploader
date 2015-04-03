@@ -193,6 +193,7 @@ public class MqttEventMgrTest {
     @Test
     public void lostConnectionShouldSetTimerToReconnect() {
         MqttMgrObserver observer = mock(MqttMgrObserver.class);
+        manager.setShouldReconnect(true);
         manager.connectionLost(new Throwable("Some random throwable"));
         verify(mockTimer).setTimer(anyInt());
     }

@@ -3,8 +3,8 @@ package com.nightscout.android.wearables;
 import android.content.Intent;
 
 import com.getpebble.android.kit.util.PebbleDictionary;
-import com.nightscout.android.MainActivity;
 import com.nightscout.android.test.RobolectricTestBase;
+import com.nightscout.android.ui.NightscoutNavigationDrawer;
 import com.nightscout.core.dexcom.TrendArrow;
 
 import org.junit.Before;
@@ -15,11 +15,11 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 public class WearableTest extends RobolectricTestBase {
-    MainActivity activity;
+    NightscoutNavigationDrawer activity;
 
     @Before
     public void setUp() {
-        activity = Robolectric.buildActivity(MainActivity.class).create().get();
+        activity = Robolectric.buildActivity(NightscoutNavigationDrawer.class).create().get();
     }
 
     @Test

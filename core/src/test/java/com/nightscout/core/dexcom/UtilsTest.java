@@ -15,24 +15,25 @@ public class UtilsTest {
 
     @Test
     public void testReceiverTimeToDateTime_epoch() {
-        DateTimeZone zone = DateTimeZone.getDefault();
-        int offset = zone.getOffset(Instant.now());
+        int offset = DateTimeZone.getDefault().getOffset(Utils.DEXCOM_EPOCH) - DateTimeZone.getDefault().getOffset(Instant.now());
         assertThat(Utils.receiverTimeToDateTime(0),
-                is(Utils.DEXCOM_EPOCH.withZone(DateTimeZone.UTC)));
+                is(Utils.DEXCOM_EPOCH.withZone(DateTimeZone.UTC).plus(offset)));
     }
 
     @Test
     public void testReceiverTimeToDateTime_positiveDelta() {
         int secondsDelta = 10;
+        int offset = DateTimeZone.getDefault().getOffset(Utils.DEXCOM_EPOCH) - DateTimeZone.getDefault().getOffset(Instant.now());
         assertThat(Utils.receiverTimeToDateTime(secondsDelta),
-                is(Utils.DEXCOM_EPOCH.plusSeconds(secondsDelta).withZone(DateTimeZone.UTC)));
+                is(Utils.DEXCOM_EPOCH.plusSeconds(secondsDelta).withZone(DateTimeZone.UTC).plus(offset)));
     }
 
     @Test
     public void testReceiverTimeToDateTime_negativeDelta() {
         int secondsDelta = -10;
+        int offset = DateTimeZone.getDefault().getOffset(Utils.DEXCOM_EPOCH) - DateTimeZone.getDefault().getOffset(Instant.now());
         assertThat(Utils.receiverTimeToDateTime(secondsDelta),
-                is(Utils.DEXCOM_EPOCH.minusSeconds(10).withZone(DateTimeZone.UTC)));
+                is(Utils.DEXCOM_EPOCH.minusSeconds(10).withZone(DateTimeZone.UTC).plus(offset)));
     }
 
     @Test

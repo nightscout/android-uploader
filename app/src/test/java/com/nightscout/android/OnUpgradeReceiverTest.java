@@ -15,11 +15,11 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 public class OnUpgradeReceiverTest extends RobolectricTestBase {
-    MainActivity activity;
+    NightscoutNavigationDrawer activity;
 
     @Before
     public void setUp() {
-        activity = Robolectric.buildActivity(MainActivity.class).create().get();
+        activity = Robolectric.buildActivity(NightscoutNavigationDrawer.class).create().get();
     }
 
     @Test

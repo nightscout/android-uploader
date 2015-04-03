@@ -16,7 +16,6 @@ import com.nightscout.core.preferences.NightscoutPreferences;
 import org.junit.Before;
 import org.junit.Test;
 import org.robolectric.Robolectric;
-import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowPreferenceManager;
 
 import java.util.List;
@@ -24,7 +23,6 @@ import java.util.List;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-@Config(emulateSdk = 16)
 public class AndroidBarcodeTest extends RobolectricTestBase {
     Activity activity;
     SharedPreferences sharedPrefs;
@@ -34,7 +32,7 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
     @Before
     public void setUp() {
         activity = Robolectric.buildActivity(SettingsActivity.class).create().get();
-        sharedPrefs = ShadowPreferenceManager.getDefaultSharedPreferences(Robolectric.application.getApplicationContext());
+        sharedPrefs = ShadowPreferenceManager.getDefaultSharedPreferences(getShadowApplication().getApplicationContext());
         prefs = new AndroidPreferences(activity.getApplicationContext(), sharedPrefs);
     }
 
@@ -301,7 +299,7 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
     private Intent createFakeScanIntent(String jsonString){
         Intent intent = new Intent(AndroidBarcode.SCAN_INTENT);
         intent.putExtra("SCAN_RESULT", jsonString);
-        intent.putExtra("SCAN_RESULT_FORMAT", "");
+        intent.putExtra("SCAN_RESULT_FORMAT", "QR_CODE");
         intent.putExtra("SCAN_RESULT_BYTES", new byte[0]);
         intent.putExtra("SCAN_RESULT_ORIENTATION", Integer.MIN_VALUE);
         intent.putExtra("SCAN_RESULT_ERROR_CORRECTION_LEVEL", "");

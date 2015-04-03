@@ -36,6 +36,14 @@ jacoco {
     reportsDir = file("build/reports/jacoco/")
 }
 
+sourceSets {
+    test {
+        resources {
+            srcDir "main/resources"
+        }
+    }
+}
+
 jacocoTestReport {
     additionalSourceDirs = files(sourceSets.main.allSource.srcDirs)
     sourceDirectories = files(sourceSets.main.allSource.srcDirs)
