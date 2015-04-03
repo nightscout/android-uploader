@@ -42,7 +42,7 @@ before_install:
   - echo yes | android update sdk --filter extra-android-support --no-ui --force > /dev/null
   - echo yes | android update sdk --filter extra-android-m2repository --no-ui --force > /dev/null
 
-#after_success:
-#  - cp app/build/jacoco/jacocoTestReport/*.xml jacoco.xml
-#  - cp app/build/jacoco/jacocoTestReport/*.xml jacoco2.xml
-#  - codecov
+after_success:
+  - cp app/build/jacoco/jacocoTestReport/*.xml jacoco.xml
+  - cp app/build/jacoco/jacocoTestReport/*.xml jacoco2.xml
+  - codecov
