@@ -1,8 +1,5 @@
 package com.nightscout.core.dexcom;
 
-//import com.google.common.base.Strings;
-//import com.google.common.hash.HashCode;
-
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.model.G4Download;
 import com.nightscout.core.model.SensorEntry;

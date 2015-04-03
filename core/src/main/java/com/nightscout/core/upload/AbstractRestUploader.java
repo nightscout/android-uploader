@@ -1,6 +1,5 @@
 package com.nightscout.core.upload;
 
-//import com.google.common.base.Joiner;
 
 import com.nightscout.core.preferences.NightscoutPreferences;
 
@@ -18,8 +17,6 @@ import java.io.IOException;
 import java.net.URI;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
-
-//import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractRestUploader extends BaseUploader {
     private final URI uri;

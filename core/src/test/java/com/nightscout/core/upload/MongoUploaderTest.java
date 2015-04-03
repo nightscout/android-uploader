@@ -1,6 +1,5 @@
 package com.nightscout.core.upload;
 
-import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
@@ -14,6 +13,9 @@ import com.nightscout.core.preferences.TestPreferences;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static com.nightscout.core.test.MockFactory.mockCalRecord;
 import static com.nightscout.core.test.MockFactory.mockDeviceStatus;
@@ -110,20 +112,21 @@ public class MongoUploaderTest {
 
     @Test
     public void testUploadGlucoseDataSets() {
-        mongoUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
+        mongoUploader.uploadGlucoseDataSets(new ArrayList<>(Arrays.asList(mockGlucoseDataSet())));
         verifyGlucoseDataSet(false);
     }
 
     @Test
     public void testUploadGlucoseDataSets_CloudSensorData() {
         preferences.setSensorUploadEnabled(true);
-        mongoUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
+        mongoUploader.uploadGlucoseDataSets(new ArrayList<>(Arrays.asList(mockGlucoseDataSet())));
         verifyGlucoseDataSet(true);
     }
 
     @Test
     public void testUploadMeterRecord() throws Exception {
-        mongoUploader.uploadMeterRecords(Lists.newArrayList(mockMeterRecord()));
+        mongoUploader.uploadMeterRecords(new ArrayList<>(Arrays.asList(mockMeterRecord())));
+
         verifyMeterRecord();
     }
 
@@ -131,7 +134,7 @@ public class MongoUploaderTest {
     public void testUploadCalRecord() {
         preferences.setCalibrationUploadEnabled(true);
         try {
-            mongoUploader.uploadCalRecords(Lists.newArrayList(mockCalRecord()));
+            mongoUploader.uploadCalRecords(new ArrayList<>(Arrays.asList(mockCalRecord())));
         } catch (InvalidRecordLengthException e) {
             fail("Shouldn't get an exception");
         }

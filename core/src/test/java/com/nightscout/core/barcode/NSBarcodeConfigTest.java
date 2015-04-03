@@ -1,11 +1,9 @@
 package com.nightscout.core.barcode;
 
-
-import com.google.common.collect.Lists;
-
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
@@ -86,12 +84,15 @@ public class NSBarcodeConfigTest {
     }
 
     private void verifySingleApiUri() {
-        List<String> uris = Lists.newArrayList("http://abc@test.com/v1");
+        List<String> uris = new ArrayList<>();
+        uris.add("http://abc@test.com/v1");
         assertThat(barcode.getApiUris(), is(uris));
     }
 
     private void verifyMultipleApiUri() {
-        List<String> uris = Lists.newArrayList("http://abc@test.com/v1", "http://test.com/");
+        List<String> uris = new ArrayList<>();
+        uris.add("http://abc@test.com/v1");
+        uris.add("http://test.com/");
         assertThat(barcode.getApiUris(), is(uris));
     }
 

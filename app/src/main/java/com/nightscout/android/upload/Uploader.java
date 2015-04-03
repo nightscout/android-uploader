@@ -34,7 +34,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static net.tribe7.common.base.Preconditions.checkNotNull;
 
 public class Uploader {
     private static final String LOG_TAG = Uploader.class.getSimpleName();

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
-import com.google.common.collect.Lists;
 import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.nightscout.android.R;
@@ -13,11 +12,14 @@ import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.android.test.RobolectricTestBase;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
+import net.tribe7.common.collect.Lists;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.robolectric.Robolectric;
 import org.robolectric.shadows.ShadowPreferenceManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
@@ -196,7 +198,9 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
 
     @Test
     public void multipleValidApiUriConfigShouldSetApiUriPrefsOnScanResult() throws Exception {
-        List<String> uris = Lists.newArrayList("http://abc@test.com/v1", "http://test.com/");
+        List<String> uris = new ArrayList<>();
+        uris.add("http://abc@test.com/v1");
+        uris.add("http://test.com/");
         setMultipleValidApiOnlyWithIntentResult();
         assertThat(prefs.getRestApiBaseUris(), is(uris));
     }
@@ -222,7 +226,8 @@ public class AndroidBarcodeTest extends RobolectricTestBase {
     @Test
     public void mongoAndApiConfigShouldSetApiPrefsOnScanResult() throws Exception {
         setSingleValidApiAndMongoWithIntentResult();
-        List<String> uris = Lists.newArrayList("http://abc@test.com/");
+        List<String> uris = new ArrayList<>();
+        uris.add("http://abc@test.com/");
         assertThat(prefs.getRestApiBaseUris(), is(uris));
     }
 

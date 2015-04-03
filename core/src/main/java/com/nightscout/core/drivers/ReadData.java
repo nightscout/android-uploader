@@ -1,7 +1,5 @@
 package com.nightscout.core.drivers;
 
-//import com.google.common.base.Optional;
-
 import com.nightscout.core.dexcom.Command;
 import com.nightscout.core.dexcom.PacketBuilder;
 import com.nightscout.core.dexcom.ReadPacket;

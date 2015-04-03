@@ -19,10 +19,11 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.util.Log;
 
-import com.google.common.primitives.Bytes;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.drivers.DeviceTransport;
+
+import net.tribe7.common.primitives.Bytes;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

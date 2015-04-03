@@ -1,9 +1,10 @@
 package com.nightscout.core.upload;
 
-import com.google.common.collect.Lists;
-import com.google.common.io.CharStreams;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.preferences.TestPreferences;
+
+import net.tribe7.common.collect.Lists;
+import net.tribe7.common.io.CharStreams;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;

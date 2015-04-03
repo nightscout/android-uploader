@@ -2,14 +2,18 @@ package com.nightscout.android.upload;
 
 import android.content.Intent;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import com.nightscout.android.R;
 import com.nightscout.android.ToastReceiver;
 import com.nightscout.android.test.RobolectricTestBase;
 import com.nightscout.core.preferences.TestPreferences;
 
+import net.tribe7.common.base.Function;
+
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -52,7 +56,8 @@ public class UploaderTest extends RobolectricTestBase {
     public void shouldSendToastIntentOnInvalidRestv1Uri() throws Exception {
         TestPreferences prefs = new TestPreferences();
         prefs.setRestApiEnabled(true);
-        prefs.setRestApiBaseUris(Lists.newArrayList("http://test/v1"));
+        List<String> invalidUri = new ArrayList<>(Arrays.asList(new String[]{"http://test/v1"}));
+        prefs.setRestApiBaseUris(invalidUri);
 
         whenOnBroadcastReceived(ToastReceiver.ACTION_SEND_NOTIFICATION,
                 new Function<Intent, Void>() {
@@ -72,7 +77,8 @@ public class UploaderTest extends RobolectricTestBase {
     public void shouldSendToastIntentOnInvalidRestUri() throws Exception {
         TestPreferences prefs = new TestPreferences();
         prefs.setRestApiEnabled(true);
-        prefs.setRestApiBaseUris(Lists.newArrayList("\\invalid"));
+        List<String> invalidUri = new ArrayList<>(Arrays.asList(new String[]{"\\invalid"}));
+        prefs.setRestApiBaseUris(invalidUri);
 
         whenOnBroadcastReceived(ToastReceiver.ACTION_SEND_NOTIFICATION,
                 new Function<Intent, Void>() {

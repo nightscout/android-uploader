@@ -3,11 +3,12 @@ package com.nightscout.android.preferences;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Strings;
 import com.mongodb.MongoClientURI;
 import com.nightscout.android.R;
 import com.nightscout.core.utils.RestUriUtils;
+
+import net.tribe7.common.base.Optional;
+import net.tribe7.common.base.Strings;
 
 import java.net.URI;
 import java.net.URLEncoder;

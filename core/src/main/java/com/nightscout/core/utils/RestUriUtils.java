@@ -1,9 +1,5 @@
 package com.nightscout.core.utils;
 
-//import com.google.common.base.Charsets;
-//import com.google.common.base.Splitter;
-//import com.google.common.base.Strings;
-//import com.google.common.hash.Hashing;
 
 import net.tribe7.common.base.Charsets;
 import net.tribe7.common.base.Splitter;
@@ -17,9 +13,6 @@ import java.util.List;
 import static net.tribe7.common.base.Preconditions.checkArgument;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-//import static com.google.common.base.Preconditions.checkArgument;
-//import static com.google.common.base.Preconditions.checkNotNull;
-
 public class RestUriUtils {
     public static boolean isV1Uri(URI uri) {
         return uri != null && (uri.getPath().endsWith("v1") || uri.getPath().endsWith("v1/"));
@@ -31,6 +24,7 @@ public class RestUriUtils {
 
     /**
      * Removes the token from the uri.
+     *
      * @param uri Non-null uri to strip the token from.
      * @return uri without token.
      */
@@ -42,6 +36,7 @@ public class RestUriUtils {
 
     /**
      * Generates a secret from the given token.
+     *
      * @param secret Non-null, non-empty secret to generate the token from.
      * @return The generated token.
      */

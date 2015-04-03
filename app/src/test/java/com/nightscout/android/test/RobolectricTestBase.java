@@ -6,8 +6,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.common.base.Function;
 import com.nightscout.android.BuildConfig;
+
+import net.tribe7.common.base.Function;
 
 import org.junit.Before;
 import org.junit.Test;

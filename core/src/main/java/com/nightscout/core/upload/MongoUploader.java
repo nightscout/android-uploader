@@ -20,7 +20,6 @@ import java.util.Date;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-//import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MongoUploader extends BaseUploader {
 
@@ -99,7 +98,7 @@ public class MongoUploader extends BaseUploader {
     private BasicDBObject toBasicDBObject(GlucoseDataSet glucoseDataSet) {
         BasicDBObject output = new BasicDBObject();
         output.put("device", deviceStr);
-        output.put("sysTime",glucoseDataSet.getRawDisplayTimeEgv());
+        output.put("sysTime", glucoseDataSet.getRawDisplayTimeEgv());
         output.put("date", glucoseDataSet.getWallTime().getMillis());
         output.put("dateString", glucoseDataSet.getWallTime().toString());
         output.put("sgv", glucoseDataSet.getBgMgdl());
@@ -160,7 +159,7 @@ public class MongoUploader extends BaseUploader {
         return result.getError() == null;
     }
 
-    private BasicDBObject toBasicDBObjectQuery(String recordType, long systemTime){
+    private BasicDBObject toBasicDBObjectQuery(String recordType, long systemTime) {
         BasicDBObject output = new BasicDBObject();
         output.put("type", recordType);
         output.put("sysTime", systemTime);
@@ -170,7 +169,7 @@ public class MongoUploader extends BaseUploader {
     protected BasicDBObject toBasicDBObjectSgv(GlucoseDataSet glucoseDataSet) {
         BasicDBObject output = new BasicDBObject();
         output.put("device", deviceStr);
-        output.put("sysTime",glucoseDataSet.getRawSysemTimeEgv());
+        output.put("sysTime", glucoseDataSet.getRawSysemTimeEgv());
         output.put("date", glucoseDataSet.getWallTime().getMillis());
         output.put("dateString", glucoseDataSet.getWallTime().toString());
         output.put("sgv", glucoseDataSet.getBgMgdl());
@@ -179,7 +178,7 @@ public class MongoUploader extends BaseUploader {
         return output;
     }
 
-    protected BasicDBObject toBasicDBObjectSensor(GlucoseDataSet glucoseDataSet, BasicDBObject output){
+    protected BasicDBObject toBasicDBObjectSensor(GlucoseDataSet glucoseDataSet, BasicDBObject output) {
         output.put("filtered", glucoseDataSet.getFiltered());
         output.put("unfiltered", glucoseDataSet.getUnfiltered());
         output.put("rssi", glucoseDataSet.getRssi());
@@ -191,8 +190,8 @@ public class MongoUploader extends BaseUploader {
     protected boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException {
         BasicDBObject query = toBasicDBObjectQuery("sgv", glucoseDataSet.getRawSysemTimeEgv());
         BasicDBObject data = toBasicDBObjectSgv(glucoseDataSet);
-        if (preferences.isSensorUploadEnabled()){
-            if (glucoseDataSet.areRecordsMatched()){
+        if (preferences.isSensorUploadEnabled()) {
+            if (glucoseDataSet.areRecordsMatched()) {
                 return upsert(query, toBasicDBObjectSensor(glucoseDataSet, data));
             } else {
                 boolean results;

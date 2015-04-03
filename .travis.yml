@@ -25,7 +25,7 @@ android:
 
 script:
   - TERM=dumb ./gradlew clean lint test jacocoTestReport
-
+`
 deploy:
   provider: releases
   file: "./app/build/outputs/apk/app-debug.apk"

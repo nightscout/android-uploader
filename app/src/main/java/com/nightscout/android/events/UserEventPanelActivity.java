@@ -6,9 +6,10 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.google.common.base.CaseFormat;
 import com.nightscout.android.R;
 import com.nightscout.core.events.EventType;
+
+import net.tribe7.common.base.CaseFormat;
 
 public class UserEventPanelActivity extends Activity {
     @Override

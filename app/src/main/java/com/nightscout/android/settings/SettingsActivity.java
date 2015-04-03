@@ -16,7 +16,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.google.common.base.Optional;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.nightscout.android.BuildConfig;
@@ -27,6 +26,8 @@ import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.preferences.PreferencesValidator;
 import com.nightscout.core.barcode.NSBarcodeConfig;
 import com.nightscout.core.utils.RestUriUtils;
+
+import net.tribe7.common.base.Optional;
 
 import java.lang.reflect.Field;
 import java.net.URI;

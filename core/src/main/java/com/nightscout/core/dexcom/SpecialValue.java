@@ -1,7 +1,5 @@
 package com.nightscout.core.dexcom;
 
-//import com.google.common.base.Optional;
-
 import com.nightscout.core.utils.GlucoseReading;
 
 import net.tribe7.common.base.Optional;
