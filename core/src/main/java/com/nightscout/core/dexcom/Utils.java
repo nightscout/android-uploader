@@ -1,12 +1,16 @@
 package com.nightscout.core.dexcom;
 
-import com.google.common.base.Strings;
-import com.google.common.hash.HashCode;
+//import com.google.common.base.Strings;
+//import com.google.common.hash.HashCode;
+
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.model.G4Download;
 import com.nightscout.core.model.SensorEntry;
 import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.squareup.wire.Message;
+
+import net.tribe7.common.base.Strings;
+import net.tribe7.common.hash.HashCode;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -21,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static org.joda.time.Duration.standardSeconds;
 
 public final class Utils {

@@ -1,7 +1,7 @@
 package com.nightscout.core.dexcom;
 
-import com.google.common.base.CaseFormat;
-import com.google.common.base.Optional;
+import net.tribe7.common.base.CaseFormat;
+import net.tribe7.common.base.Optional;
 
 public enum Command {
     NULL(0),

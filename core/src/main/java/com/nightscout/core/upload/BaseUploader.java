@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static net.tribe7.common.base.Preconditions.checkNotNull;
 
 public abstract class BaseUploader {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());

@@ -1,6 +1,8 @@
 package com.nightscout.core.dexcom;
 
-import com.google.common.primitives.Bytes;
+//import com.google.common.primitives.Bytes;
+
+import net.tribe7.common.primitives.Bytes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +24,7 @@ public class PacketBuilder {
     private Command command;
     private List<Byte> payload;
 
-    public PacketBuilder(Command command){
+    public PacketBuilder(Command command) {
         this.command = command;
     }
 

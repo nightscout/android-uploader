@@ -1,7 +1,10 @@
 package com.nightscout.core.dexcom;
 
-import com.google.common.base.Optional;
+//import com.google.common.base.Optional;
+
 import com.nightscout.core.utils.GlucoseReading;
+
+import net.tribe7.common.base.Optional;
 
 public enum SpecialValue {
     NONE("??0", 0),

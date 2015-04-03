@@ -1,6 +1,7 @@
 package com.nightscout.core.mqtt;
 
-import com.google.common.collect.Lists;
+//import com.google.common.collect.Lists;
+
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
@@ -16,17 +17,18 @@ import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static net.tribe7.common.base.Preconditions.checkNotNull;
 
 public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrObservable,
         MqttTimerObserver {
     protected final Logger log = LoggerFactory.getLogger(MqttEventMgr.class);
     private final static String TAG = MqttEventMgr.class.getSimpleName();
-    private List<MqttMgrObserver> observers = Lists.newArrayList();
+    private List<MqttMgrObserver> observers = new ArrayList<>();
     private MqttClient client;
     private MqttConnectOptions options;
     private MqttTimer timer;
@@ -223,9 +225,11 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
     }
 
     public void subscribe(int QOS, String... topics) {
-        List<String> mqTopics = Lists.newArrayList(topics);
+//        List<String> mqTopics = Lists.newArrayList(topics);
+//        List<String> mqTopics = new ArrayList<>();
+//        mqTopics.addAll(topics)
         boolean willReconnect = false;
-        for (String topic : mqTopics) {
+        for (String topic : topics) {
             try {
                 client.subscribe(topic, QOS);
             } catch (MqttException e) {

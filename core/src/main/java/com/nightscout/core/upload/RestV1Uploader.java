@@ -14,7 +14,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URI;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static net.tribe7.common.base.Preconditions.checkArgument;
 
 public class RestV1Uploader extends AbstractRestUploader {
     private final String secret;

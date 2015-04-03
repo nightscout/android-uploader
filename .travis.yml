@@ -24,13 +24,7 @@ android:
   - ".*intel.+"
 
 script:
-  # Split these out, because of http://stackoverflow.com/questions/27574165/classcastexception-noclassdeffounderror-cannot-be-cast-to-runtimeexception
-  # Remove after upgrading to robolectric 3.0.
-  - TERM=dumb ./gradlew clean
-  - TERM=dumb ./gradlew assemble; ls
-  - TERM=dumb ./gradlew lint 
-  - TERM=dumb ./gradlew test 
-#jacocoTestReport
+  - TERM=dumb ./gradlew clean lint test jacocoTestReport
 
 deploy:
   provider: releases

@@ -1,6 +1,7 @@
 package com.nightscout.core.drivers;
 
-import com.google.common.base.Optional;
+//import com.google.common.base.Optional;
+
 import com.nightscout.core.dexcom.Command;
 import com.nightscout.core.dexcom.PacketBuilder;
 import com.nightscout.core.dexcom.ReadPacket;
@@ -13,6 +14,8 @@ import com.nightscout.core.dexcom.records.GenericTimestampRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.PageHeader;
 import com.nightscout.core.dexcom.records.SensorRecord;
+
+import net.tribe7.common.base.Optional;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;

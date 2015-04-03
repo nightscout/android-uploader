@@ -18,7 +18,9 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Date;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static net.tribe7.common.base.Preconditions.checkNotNull;
+
+//import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MongoUploader extends BaseUploader {
 

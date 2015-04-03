@@ -9,7 +9,12 @@ repositories {
 
 dependencies {
     compile 'joda-time:joda-time:2.5'
-    compile 'com.google.guava:guava:18.0'
+//    compile 'com.google.guava:guava:18.0'
+    compile 'net.tribe7.seeds:seeds-functional:16.0.1'
+    compile 'net.tribe7.seeds:seeds-hash:16.0.1'
+    compile 'net.tribe7.seeds:seeds-strings:16.0.1'
+    compile 'net.tribe7.seeds:seeds-primitives:16.0.1'
+
     compile 'org.slf4j:slf4j-api:1.7.7'
     compile 'org.mongodb:mongo-java-driver:2.10.1'
     /** Android-provided **/
