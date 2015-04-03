@@ -28,6 +28,7 @@ public final class G4Download extends Message {
     public static final List<SensorEntry> DEFAULT_SENSOR = Collections.emptyList();
     public static final List<CalibrationEntry> DEFAULT_CAL = Collections.emptyList();
     public static final String DEFAULT_RECEIVER_ID = "";
+    public static final String DEFAULT_TRANSMITTER_ID = "";
 
     @ProtoField(tag = 1, label = REPEATED)
     public final List<SensorGlucoseValueEntry> sgv;
@@ -83,7 +84,10 @@ public final class G4Download extends Message {
     @ProtoField(tag = 11, type = STRING)
     public final String receiver_id;
 
-    public G4Download(List<SensorGlucoseValueEntry> sgv, GlucoseUnit units, String download_timestamp, Long receiver_system_time_sec, DownloadStatus download_status, Integer receiver_battery, Integer uploader_battery, List<MeterEntry> meter, List<SensorEntry> sensor, List<CalibrationEntry> cal, String receiver_id) {
+    @ProtoField(tag = 12, type = STRING)
+    public final String transmitter_id;
+
+    public G4Download(List<SensorGlucoseValueEntry> sgv, GlucoseUnit units, String download_timestamp, Long receiver_system_time_sec, DownloadStatus download_status, Integer receiver_battery, Integer uploader_battery, List<MeterEntry> meter, List<SensorEntry> sensor, List<CalibrationEntry> cal, String receiver_id, String transmitter_id) {
         this.sgv = immutableCopyOf(sgv);
         this.units = units;
         this.download_timestamp = download_timestamp;
@@ -95,10 +99,11 @@ public final class G4Download extends Message {
         this.sensor = immutableCopyOf(sensor);
         this.cal = immutableCopyOf(cal);
         this.receiver_id = receiver_id;
+        this.transmitter_id = transmitter_id;
     }
 
     private G4Download(Builder builder) {
-        this(builder.sgv, builder.units, builder.download_timestamp, builder.receiver_system_time_sec, builder.download_status, builder.receiver_battery, builder.uploader_battery, builder.meter, builder.sensor, builder.cal, builder.receiver_id);
+        this(builder.sgv, builder.units, builder.download_timestamp, builder.receiver_system_time_sec, builder.download_status, builder.receiver_battery, builder.uploader_battery, builder.meter, builder.sensor, builder.cal, builder.receiver_id, builder.transmitter_id);
         setBuilder(builder);
     }
 
@@ -117,7 +122,8 @@ public final class G4Download extends Message {
                 && equals(meter, o.meter)
                 && equals(sensor, o.sensor)
                 && equals(cal, o.cal)
-                && equals(receiver_id, o.receiver_id);
+                && equals(receiver_id, o.receiver_id)
+                && equals(transmitter_id, o.transmitter_id);
     }
 
     @Override
@@ -135,6 +141,7 @@ public final class G4Download extends Message {
             result = result * 37 + (sensor != null ? sensor.hashCode() : 1);
             result = result * 37 + (cal != null ? cal.hashCode() : 1);
             result = result * 37 + (receiver_id != null ? receiver_id.hashCode() : 0);
+            result = result * 37 + (transmitter_id != null ? transmitter_id.hashCode() : 0);
             hashCode = result;
         }
         return result;
@@ -153,6 +160,7 @@ public final class G4Download extends Message {
         public List<SensorEntry> sensor;
         public List<CalibrationEntry> cal;
         public String receiver_id;
+        public String transmitter_id;
 
         public Builder() {
         }
@@ -171,6 +179,7 @@ public final class G4Download extends Message {
             this.sensor = copyOf(message.sensor);
             this.cal = copyOf(message.cal);
             this.receiver_id = message.receiver_id;
+            this.transmitter_id = message.transmitter_id;
         }
 
         public Builder sgv(List<SensorGlucoseValueEntry> sgv) {
@@ -246,6 +255,11 @@ public final class G4Download extends Message {
 
         public Builder receiver_id(String receiver_id) {
             this.receiver_id = receiver_id;
+            return this;
+        }
+
+        public Builder transmitter_id(String transmitter_id) {
+            this.transmitter_id = transmitter_id;
             return this;
         }
 

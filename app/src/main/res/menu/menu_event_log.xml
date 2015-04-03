@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/clear_log"
         android:title="@string/menu_clear_log"
         android:checkable="false"
         android:orderInCategory="1"
-        android:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom" />
 </menu>

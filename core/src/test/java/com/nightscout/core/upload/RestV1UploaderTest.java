@@ -66,7 +66,7 @@ public class RestV1UploaderTest {
 
     public static void verifyGlucoseDataSet(JSONObject jsonObject, boolean enableCloudSensorData)
             throws JSONException {
-        assertThat(jsonObject.getString("device"), is("dexcom"));
+        assertThat(jsonObject.getString("device"), is("UNKNOWN"));
         assertThat(jsonObject.get("date"), is(not(nullValue())));
         assertThat(jsonObject.get("dateString"), is(not(nullValue())));
         assertThat(jsonObject.get("sgv"), is(not(nullValue())));
@@ -86,7 +86,7 @@ public class RestV1UploaderTest {
     }
 
     public static void verifyMeterRecord(JSONObject jsonObject) throws JSONException {
-        assertThat(jsonObject.getString("device"), is("dexcom"));
+        assertThat(jsonObject.getString("device"), is("UNKNOWN"));
         assertThat(jsonObject.getString("type"), is("mbg"));
         assertThat(jsonObject.get("date"), is(not(nullValue())));
         assertThat(jsonObject.get("dateString"), is(not(nullValue())));
@@ -94,7 +94,7 @@ public class RestV1UploaderTest {
     }
 
     public static void verifyCalRecord(JSONObject jsonObject) throws JSONException {
-        assertThat(jsonObject.getString("device"), is("dexcom"));
+        assertThat(jsonObject.getString("device"), is("UNKNOWN"));
         assertThat(jsonObject.getString("type"), is("cal"));
         assertThat(jsonObject.get("date"), is(not(nullValue())));
         assertThat(jsonObject.get("dateString"), is(not(nullValue())));
@@ -197,16 +197,18 @@ public class RestV1UploaderTest {
 
     @Test
     public void testDeviceStatus_Endpoint() throws Exception {
-        restUploader.uploadDeviceStatus(mockDeviceStatus());
+        restUploader.uploadDeviceStatus(mockDeviceStatus(), 100);
         assertThat(captor.getValue().getURI().toString(), containsString("devicestatus"));
     }
 
     @Test
     public void testDeviceStatus_Entity() throws Exception {
         AbstractUploaderDevice deviceStatus = mockDeviceStatus();
-        restUploader.uploadDeviceStatus(deviceStatus);
+        restUploader.uploadDeviceStatus(deviceStatus, 100);
         HttpPost post = (HttpPost) captor.getValue();
         String entity = CharStreams.toString(new InputStreamReader(post.getEntity().getContent()));
         verifyDeviceStatus(new JSONObject(entity), deviceStatus);
     }
+
+    // TODO add test for mismatched EGV/Sensor records to verify upload
 }

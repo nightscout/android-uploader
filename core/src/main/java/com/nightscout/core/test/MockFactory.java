@@ -9,7 +9,6 @@ import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.SensorRecord;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.model.G4Noise;
-import com.nightscout.core.model.MeterEntry;
 
 import org.joda.time.DateTime;
 
@@ -33,8 +32,8 @@ public class MockFactory {
         return new GlucoseDataSet(egvRecord, sensorRecord);
     }
 
-    public static MeterEntry mockMeterRecord() {
-        return new MeterEntry(100, 0, 0L, 0L);
+    public static MeterRecord mockMeterRecord() {
+        return new MeterRecord(100, 0, 0L, 0L, 0L, 0L);
     }
 
 //    public static CalibrationEntry mockCalRecord() {

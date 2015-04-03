@@ -2,10 +2,10 @@ package com.nightscout.core.upload;
 
 import com.google.common.collect.Lists;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
+import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
+import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
-import com.nightscout.core.model.CalibrationEntry;
-import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.preferences.TestPreferences;
 
@@ -32,9 +32,9 @@ public class BaseUploaderTest {
     private TestPreferences preferences;
 
     class MockUploader extends BaseUploader {
-        public List<CalibrationEntry> calRecords;
+        public List<CalRecord> calRecords;
         public List<GlucoseDataSet> glucoseDataSets;
-        public List<MeterEntry> meterRecords;
+        public List<MeterRecord> meterRecords;
 
         public MockUploader(NightscoutPreferences preferences) {
             super(preferences);
@@ -54,13 +54,13 @@ public class BaseUploaderTest {
         }
 
         @Override
-        protected boolean doUpload(MeterEntry meterRecord) throws IOException {
+        protected boolean doUpload(MeterRecord meterRecord) throws IOException {
             meterRecords.add(meterRecord);
             return true;
         }
 
         @Override
-        protected boolean doUpload(CalibrationEntry calRecord) throws IOException {
+        protected boolean doUpload(CalRecord calRecord) throws IOException {
             calRecords.add(calRecord);
             return true;
         }
@@ -77,17 +77,17 @@ public class BaseUploaderTest {
         }
 
         @Override
-        protected boolean doUpload(MeterEntry meterRecord) throws IOException {
+        protected boolean doUpload(MeterRecord meterRecord) throws IOException {
             throw new IOException("meter");
         }
 
         @Override
-        protected boolean doUpload(CalibrationEntry calRecord) throws IOException {
+        protected boolean doUpload(CalRecord calRecord) throws IOException {
             throw new IOException("cal");
         }
 
         @Override
-        protected boolean doUpload(AbstractUploaderDevice deviceStatus) throws IOException {
+        protected boolean doUpload(AbstractUploaderDevice deviceStatus, int receiverBattery) throws IOException {
             throw new IOException("device");
         }
     }
@@ -151,20 +151,20 @@ public class BaseUploaderTest {
 
     @Test
     public void testUploadMeterRecords_Zero() {
-        mockUploader.uploadMeterRecords(new ArrayList<MeterEntry>());
+        mockUploader.uploadMeterRecords(new ArrayList<MeterRecord>());
         assertThat(mockUploader.meterRecords, is(empty()));
     }
 
     @Test
     public void testUploadMeterRecords_One() throws Exception {
-        List<MeterEntry> list = Lists.newArrayList(mockMeterRecord());
+        List<MeterRecord> list = Lists.newArrayList(mockMeterRecord());
         mockUploader.uploadMeterRecords(list);
         assertThat(mockUploader.meterRecords, hasSize(1));
     }
 
     @Test
     public void testUploadMeterRecords_Many() throws Exception {
-        List<MeterEntry> list = Lists.newArrayList(
+        List<MeterRecord> list = Lists.newArrayList(
                 mockMeterRecord(),
                 mockMeterRecord(),
                 mockMeterRecord());
@@ -194,14 +194,14 @@ public class BaseUploaderTest {
     @Test
     public void testUploadCalRecords_Zero() {
         preferences.setCalibrationUploadEnabled(true);
-        mockUploader.uploadCalRecords(new ArrayList<CalibrationEntry>());
+        mockUploader.uploadCalRecords(new ArrayList<CalRecord>());
         assertThat(mockUploader.calRecords, is(empty()));
     }
 
     @Test
     public void testUploadCalRecords_One() {
         preferences.setCalibrationUploadEnabled(true);
-        List<CalibrationEntry> list = null;
+        List<CalRecord> list = null;
         try {
             list = Lists.newArrayList(mockCalRecord());
         } catch (InvalidRecordLengthException e) {
@@ -214,7 +214,7 @@ public class BaseUploaderTest {
     @Test
     public void testUploadCalRecords_Many() {
         preferences.setCalibrationUploadEnabled(true);
-        List<CalibrationEntry> list = null;
+        List<CalRecord> list = null;
         try {
             list = Lists.newArrayList(
                     mockCalRecord(),
@@ -240,7 +240,7 @@ public class BaseUploaderTest {
     @Test
     public void testUploadDeviceStatus_Exception() {
         try {
-            exceptionUploader.uploadDeviceStatus(mockDeviceStatus());
+            exceptionUploader.uploadDeviceStatus(mockDeviceStatus(), 100);
         } catch (Exception e) {
             fail("Shouldn't throw an exception.");
         }

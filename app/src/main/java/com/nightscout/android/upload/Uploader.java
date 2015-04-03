@@ -38,6 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class Uploader {
     private static final String LOG_TAG = Uploader.class.getSimpleName();
+
     private final List<BaseUploader> uploaders;
     private boolean allUploadersInitalized = true;
     private EventReporter reporter;
@@ -137,9 +138,10 @@ public class Uploader {
         List<CalRecord> calRecords = new ArrayList<>();
         List<MeterRecord> meterRecords = new ArrayList<>();
         if (download.receiver_system_time_sec != null) {
-            calRecords = asRecordList(download.cal, CalRecord.class, download.receiver_system_time_sec, refTime);
-            meterRecords = asRecordList(download.meter, MeterRecord.class, download.receiver_system_time_sec, refTime);
+            calRecords = asRecordList(calList, CalRecord.class, download.receiver_system_time_sec, refTime);
+            meterRecords = asRecordList(meterList, MeterRecord.class, download.receiver_system_time_sec, refTime);
         }
+
 
         List<GlucoseDataSet> glucoseDataSets = new ArrayList<>();
         if (download.sgv.size() > 0) {
@@ -157,7 +159,8 @@ public class Uploader {
             try {
                 result.add(clazz.getConstructor(entry.getClass(), long.class, long.class).newInstance(entry, rcvrTime, refTime));
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                e.printStackTrace();
+                // nom
+                Log.w(LOG_TAG, "Exception " + e);
             }
         }
         return result;

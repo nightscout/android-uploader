@@ -36,6 +36,7 @@ public class DexcomG4 extends AbstractDevice {
     protected AbstractUploaderDevice uploaderDevice;
     protected DeviceTransport transport;
     protected String receiverId = "";
+    protected String transmitterId = "";
 
     protected Action1<Boolean> connectionStateListener = new Action1<Boolean>() {
 
@@ -69,9 +70,10 @@ public class DexcomG4 extends AbstractDevice {
     @Override
     public void onConnect() {
         super.onConnect();
-//        ReadData readData = new ReadData(transport);
+        ReadData readData = new ReadData(transport);
 //        try {
 //            receiverId = readData.readSerialNumber();
+//            transmitterId = readData.readTrasmitterId();
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
@@ -101,6 +103,7 @@ public class DexcomG4 extends AbstractDevice {
         int batLevel = 100;
         long systemTime = 0;
         try {
+//            String receiverId = readData.readSerialNumber();
             systemTime = readData.readSystemTime();
 
             dateTime = new DateTime();
@@ -149,6 +152,8 @@ public class DexcomG4 extends AbstractDevice {
                 .download_status(status)
                 .uploader_battery(uploaderDevice.getBatteryLevel())
                 .receiver_battery(batLevel)
+                .receiver_id(receiverId)
+                .transmitter_id(transmitterId)
                 .units(GlucoseUnit.MGDL);
         return downloadBuilder.build();
     }

@@ -4,6 +4,7 @@ import com.google.common.primitives.UnsignedBytes;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
 import org.joda.time.Period;
 import org.junit.Test;
 
@@ -14,6 +15,8 @@ public class UtilsTest {
 
     @Test
     public void testReceiverTimeToDateTime_epoch() {
+        DateTimeZone zone = DateTimeZone.getDefault();
+        int offset = zone.getOffset(Instant.now());
         assertThat(Utils.receiverTimeToDateTime(0),
                 is(Utils.DEXCOM_EPOCH.withZone(DateTimeZone.UTC)));
     }

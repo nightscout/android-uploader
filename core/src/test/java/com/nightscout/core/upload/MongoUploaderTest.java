@@ -52,7 +52,7 @@ public class MongoUploaderTest {
 
     public void verifyGlucoseDataSet(boolean enableCloudSensorData) {
         BasicDBObject dbObject = captor.getValue();
-        assertThat(dbObject.getString("device"), is("dexcom"));
+        assertThat(dbObject.getString("device"), is("UNKNOWN"));
         assertThat(dbObject.get("date"), is(not(nullValue())));
         assertThat(dbObject.get("dateString"), is(not(nullValue())));
         assertThat(dbObject.get("sgv"), is(not(nullValue())));
@@ -71,7 +71,7 @@ public class MongoUploaderTest {
 
     public void verifyMeterRecord() {
         BasicDBObject dbObject = captor.getValue();
-        assertThat(dbObject.getString("device"), is("dexcom"));
+        assertThat(dbObject.getString("device"), is("UNKNOWN"));
         assertThat(dbObject.getString("type"), is("mbg"));
         assertThat(dbObject.get("date"), is(not(nullValue())));
         assertThat(dbObject.get("dateString"), is(not(nullValue())));
@@ -80,7 +80,7 @@ public class MongoUploaderTest {
 
     public void verifyCalRecord() {
         BasicDBObject dbObject = captor.getValue();
-        assertThat(dbObject.getString("device"), is("dexcom"));
+        assertThat(dbObject.getString("device"), is("UNKNOWN"));
         assertThat(dbObject.getString("type"), is("cal"));
         assertThat(dbObject.get("date"), is(not(nullValue())));
         assertThat(dbObject.get("dateString"), is(not(nullValue())));
@@ -141,7 +141,7 @@ public class MongoUploaderTest {
     @Test
     public void testUploadDeviceStatus() {
         AbstractUploaderDevice deviceStatus = mockDeviceStatus();
-        mongoUploader.uploadDeviceStatus(deviceStatus);
+        mongoUploader.uploadDeviceStatus(deviceStatus, 100);
         verifyDeviceStatus(deviceStatus);
     }
 
@@ -153,6 +153,8 @@ public class MongoUploaderTest {
                 "collection",
                 "dsCollection");
         AbstractUploaderDevice deviceStatus = mockDeviceStatus();
-        assertThat(mongoUploader.uploadDeviceStatus(deviceStatus), is(false));
+        assertThat(mongoUploader.uploadDeviceStatus(deviceStatus, 100), is(false));
     }
+
+    // TODO test mismatched EGV and sensor record has expected behavior
 }

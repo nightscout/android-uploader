@@ -56,8 +56,8 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
     public void connect() {
         try {
             log.info("MQTT connect issued");
-            timer.deactivate();
-            pinger.stop();
+//            timer.deactivate();
+//            pinger.stop();
             client.connect(options);
             reporter.report(EventType.UPLOADER, EventSeverity.INFO,
                     messages.getString("mqtt_connected"));

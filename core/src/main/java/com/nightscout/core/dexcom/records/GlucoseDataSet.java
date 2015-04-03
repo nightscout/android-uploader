@@ -41,12 +41,13 @@ public class GlucoseDataSet {
         rawSysemTimeEgv = egvRecord.getRawSystemTimeSeconds();
         displayTime = egvRecord.getDisplayTime();
         rawDisplayTimeEgv = egvRecord.getRawDisplayTimeSeconds();
+        wallTime = egvRecord.getWallTime();
         reading = egvRecord.getReading();
         trend = egvRecord.getTrend();
         noise = egvRecord.getNoiseMode().ordinal();
     }
 
-    public boolean areRecordsMatched(){
+    public boolean areRecordsMatched() {
         return Math.abs(rawSysemTimeSensor - rawSysemTimeEgv) <= 10;
     }
 

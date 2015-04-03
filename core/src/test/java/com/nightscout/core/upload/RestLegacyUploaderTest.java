@@ -66,7 +66,7 @@ public class RestLegacyUploaderTest {
 
     public static void verifyGlucoseDataSet(JSONObject jsonObject)
             throws JSONException {
-        assertThat(jsonObject.getString("device"), is("dexcom"));
+        assertThat(jsonObject.getString("device"), is("UNKNOWN"));
         assertThat(jsonObject.get("date"), is(not(nullValue())));
         assertThat(jsonObject.get("dateString"), is(not(nullValue())));
         assertThat(jsonObject.get("sgv"), is(not(nullValue())));
@@ -109,14 +109,14 @@ public class RestLegacyUploaderTest {
 
     @Test
     public void testDeviceStatus_Endpoint() throws Exception {
-        restUploader.uploadDeviceStatus(mockDeviceStatus());
+        restUploader.uploadDeviceStatus(mockDeviceStatus(), 100);
         assertThat(captor.getValue().getURI().toString(), containsString("devicestatus"));
     }
 
     @Test
     public void testDeviceStatus_Entity() throws Exception {
         AbstractUploaderDevice deviceStatus = mockDeviceStatus();
-        restUploader.uploadDeviceStatus(deviceStatus);
+        restUploader.uploadDeviceStatus(deviceStatus, 100);
         HttpPost post = (HttpPost) captor.getValue();
         String entity = CharStreams.toString(new InputStreamReader(post.getEntity().getContent()));
         verifyDeviceStatus(new JSONObject(entity), deviceStatus);

@@ -98,7 +98,7 @@ public class CollectorService extends Service {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (key.equals(PreferenceKeys.DEXCOM_DEVICE_TYPE)) {
-                    Log.d(TAG, "Interesting value changed! "+key);
+                    Log.d(TAG, "Interesting value changed! " + key);
                     if (driver != null && driver.isConnected()) {
                         try {
                             driver.close();
@@ -220,7 +220,6 @@ public class CollectorService extends Service {
 //                } else {
 //                    uploadStatus = uploader.upload(download);
 //                }
-//
                 if (download != null) {
                     bus.post(download);
                 }
@@ -290,14 +289,13 @@ public class CollectorService extends Service {
         return mBinder;
     }
 
-    public DeviceConnectionStatus getDeviceConnectionStatus(){
-        if (device == null){
+    public DeviceConnectionStatus getDeviceConnectionStatus() {
+        if (device == null) {
             return new DeviceConnectionStatus(preferences.getDeviceType(), DeviceState.DISCONNECTED);
         }
-        Log.d(TAG, "From service: "+device.getDeviceConnectionStatus().deviceType.name());
+        Log.d(TAG, "From service: " + device.getDeviceConnectionStatus().deviceType.name());
         return device.getDeviceConnectionStatus();
     }
-
 
 
     @TargetApi(Build.VERSION_CODES.KITKAT)

@@ -139,6 +139,7 @@ public class SettingsActivity extends FragmentActivity {
 
     public static class MainPreferenceFragment extends PreferenceFragment {
         private int labTapCount = 0;
+        private final String TAG = MainPreferenceFragment.class.getSimpleName();
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -151,9 +152,14 @@ public class SettingsActivity extends FragmentActivity {
             setupBtScanner();
             setupDeviceOptions();
             ListPreference deviceType = (ListPreference) findPreference("dexcom_device_type");
-            deviceType.setSummary(deviceType.getEntry().toString());
-            setShareOptions(deviceType.getValue());
+            // FIXME Problem with robolectric. Seems to return null
+            CharSequence entry = deviceType.getEntry();
+            if (entry != null) {
+                deviceType.setSummary(deviceType.getEntry().toString());
+                setShareOptions(deviceType.getValue());
+            }
             setupLabs();
+
             if (getActivity().getActionBar() != null) {
                 getActivity().getActionBar().show();
                 getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -261,7 +267,8 @@ public class SettingsActivity extends FragmentActivity {
                 childFragmentManager.setAccessible(true);
                 childFragmentManager.set(this, null);
             } catch (NoSuchFieldException | IllegalAccessException e) {
-                e.printStackTrace();
+                // nom
+                Log.w(TAG, "Exception: " + e);
             }
 
         }

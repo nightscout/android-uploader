@@ -185,7 +185,7 @@ public class TestPreferences implements NightscoutPreferences {
     // TODO Implement these
     @Override
     public SupportedDevices getDeviceType() {
-        return null;
+        return SupportedDevices.UNKNOWN;
     }
 
     // TODO Implement these

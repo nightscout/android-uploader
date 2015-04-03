@@ -142,6 +142,12 @@ public class ReadData {
         return getManufacturingAttribute("SerialNumber").or("");
     }
 
+    public String readTrasmitterId() throws IOException {
+        writeCommand(Command.READ_TRANSMITTER_ID);
+        byte[] data = read(MIN_LEN).getData();
+        return new String(data);
+    }
+
     private Optional<String> getManufacturingAttribute(String attribute) throws IOException {
         String result = null;
         if (manufacturingDataXml == null) {
@@ -224,20 +230,20 @@ public class ReadData {
         byte[] response = new byte[numOfBytes];
         int len;
 //        try {
-            response = mSerialDevice.read(numOfBytes, IO_TIMEOUT);
-            len = response.length;
-            log.debug("Read {} byte(s) complete.", len);
+        response = mSerialDevice.read(numOfBytes, IO_TIMEOUT);
+        len = response.length;
+        log.debug("Read {} byte(s) complete.", len);
 
-            // Add a 100ms delay for when multiple write/reads are occurring in series
+        // Add a 100ms delay for when multiple write/reads are occurring in series
 //            Thread.sleep(100);
 
-            // TODO: this debug code to print data of the read, should be removed after
-            // finding the source of the reading issue
-            String bytes = "";
-            int readAmount = len;
-            for (int i = 0; i < readAmount; i++) bytes += String.format("%02x", response[i]) + " ";
-            log.debug("Read data: {}", bytes);
-            ////////////////////////////////////////////////////////////////////////////////////////
+        // TODO: this debug code to print data of the read, should be removed after
+        // finding the source of the reading issue
+        String bytes = "";
+        int readAmount = len;
+        for (int i = 0; i < readAmount; i++) bytes += String.format("%02x", response[i]) + " ";
+        log.debug("Read data: {}", bytes);
+        ////////////////////////////////////////////////////////////////////////////////////////
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }
