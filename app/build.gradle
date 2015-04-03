@@ -181,7 +181,7 @@ task jacocoTestReport(type: JacocoReport, dependsOn: "test") {
                        '**/*$ModuleAdapter*.*',
                        '**/BuildConfig.*',
                        '**/USB/*.*',
-                       '**/model/*.*',
+                       '**/model/**',
                        '**/Manifest*.*']
     )
 

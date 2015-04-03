@@ -2,7 +2,7 @@ package com.nightscout.android.preferences;
 
 import android.app.Application;
 
-import com.nightscout.android.MainActivity;
+import com.nightscout.android.ui.NightscoutNavigationDrawer;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
 import javax.inject.Singleton;
@@ -12,7 +12,7 @@ import dagger.Provides;
 
 @Module(
     injects = {
-        MainActivity.class
+            NightscoutNavigationDrawer.class
     },
     complete = false,
     library = true
