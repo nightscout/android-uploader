@@ -153,8 +153,8 @@ public class ReadData {
         String result = null;
         if (manufacturingDataXml == null) {
             byte[] packet = readDataBasePage(RecordType.MANUFACTURING_DATA, 0);
-            String xml = new String(Arrays.copyOfRange(packet, 36, 241));
-            // TODO: it would be best if we could just remove /x00 characters and read till end
+            String raw = new String(packet);
+            String xml = raw.substring(raw.indexOf('<'), raw.lastIndexOf('>') + 1);
             try {
                 log.debug("Manufacturing data: " + xml);
                 log.debug("Manufacturing data: " + new String(packet));
