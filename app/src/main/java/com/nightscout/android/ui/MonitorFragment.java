@@ -250,8 +250,8 @@ public class MonitorFragment extends Fragment {
         intent = new Intent(this.getActivity(), ProcessorService.class);
         getActivity().bindService(intent, mProcessorConnection, Context.BIND_AUTO_CREATE);
         if (mBound) {
-            boolean lastUpload = mProcessorService.getLastUploadStatus();
-            log.warn("Last upload status: {}", (lastUpload) ? "Success" : "Failed");
+            int lastUpload = mProcessorService.getLastUploadStatus();
+            log.warn("Last upload status: {}", (lastUpload == 1) ? "Success" : "Failed");
             setUploaderButtonRes(getUploaderRes(lastUpload));
             getActivity().unbindService(mProcessorConnection);
 
@@ -335,9 +335,9 @@ public class MonitorFragment extends Fragment {
 
     }
 
-    private int getReceiverRes(DeviceConnectionStatus status){
+    private int getReceiverRes(DeviceConnectionStatus status) {
         int res = 0;
-        log.info("Device Type: "+status.deviceType+ " Device State: "+status.deviceState.name());
+        log.info("Device Type: " + status.deviceType + " Device State: " + status.deviceState.name());
         switch (status.deviceState) {
             case CONNECTED:
                 res = (status.deviceType == SupportedDevices.DEXCOM_G4) ? R.drawable.ic_usb : R.drawable.ic_ble;
@@ -366,23 +366,16 @@ public class MonitorFragment extends Fragment {
         uploadButton.setTag(res);
     }
 
-    private int getUploaderRes(boolean status) {
-        if (status) {
+    private int getUploaderRes(int status) {
+        if (status == 0) {
+            return R.drawable.ic_idlecloud;
+        } else if (status == 1) {
             return R.drawable.ic_cloud;
-        } else {
+        } else if (status == 2) {
             return R.drawable.ic_nocloud;
         }
+        return R.drawable.ic_nocloud;
     }
-
-//    private void setSyncButtonRes(int res) {
-//        mSyncButton.setBackgroundResource(res);
-//        mSyncButton.setTag(res);
-//        if (res == R.drawable.ble_read) {
-//            AnimationDrawable frameAnimation = (AnimationDrawable) receiverButton.getBackground();
-//            frameAnimation.start();
-//        }
-//    }
-
 
     @Subscribe
     public void incomingData(final ProcessorService.ProcessorResponse status) {
@@ -394,7 +387,8 @@ public class MonitorFragment extends Fragment {
             @Override
             public void run() {
                 log.info("Incoming status: " + status.success);
-                setUploaderButtonRes(getUploaderRes(status.success));
+                int stat = (status.success) ? 1 : 2;
+                setUploaderButtonRes(getUploaderRes(stat));
 
             }
         });

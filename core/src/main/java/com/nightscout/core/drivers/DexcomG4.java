@@ -70,11 +70,15 @@ public class DexcomG4 extends AbstractDevice {
     @Override
     public void onConnect() {
         super.onConnect();
-        ReadData readData = new ReadData(transport);
+        log.debug("onConnect Called DexcomG4 connection");
+//        ReadData readData = new ReadData(transport);
 //        try {
 //            receiverId = readData.readSerialNumber();
 //            transmitterId = readData.readTrasmitterId();
+//            log.debug("ReceiverId: {}", receiverId);
+//            log.debug("TransmitterId: {}", transmitterId);
 //        } catch (IOException e) {
+//            log.error("Exception {}", e);
 //            e.printStackTrace();
 //        }
     }
@@ -87,6 +91,7 @@ public class DexcomG4 extends AbstractDevice {
     @Override
     protected G4Download doDownload() {
         G4Download.Builder downloadBuilder = new G4Download.Builder();
+
         DateTime dateTime = new DateTime();
         if (!isConnected()) {
             reporter.report(EventType.DEVICE, EventSeverity.WARN, messages.getString("event_g4_not_connected"));
@@ -104,6 +109,15 @@ public class DexcomG4 extends AbstractDevice {
         long systemTime = 0;
         try {
 //            String receiverId = readData.readSerialNumber();
+            if (receiverId.equals("")) {
+                receiverId = readData.readSerialNumber();
+                log.debug("ReceiverId: {}", receiverId);
+            }
+            if (transmitterId.equals("")) {
+                transmitterId = readData.readTrasmitterId();
+                log.debug("TransmitterId: {}", transmitterId);
+            }
+
             systemTime = readData.readSystemTime();
 
             dateTime = new DateTime();
@@ -132,8 +146,13 @@ public class DexcomG4 extends AbstractDevice {
             // TODO pull in other exceptions once we have the analytics/acra reporters
         } catch (IOException e) {
             //TODO record this in the event log later
+            reporter.report(EventType.DEVICE, EventSeverity.ERROR, "IO error to device");
+            log.error("IO error to device " + e);
+
             status = DownloadStatus.IO_ERROR;
         } catch (InvalidRecordLengthException e) {
+            reporter.report(EventType.DEVICE, EventSeverity.ERROR, "Application error " + e.getMessage());
+            log.error("Application error " + e);
             status = DownloadStatus.APPLICATION_ERROR;
         }
 

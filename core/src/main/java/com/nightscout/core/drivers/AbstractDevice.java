@@ -9,6 +9,7 @@ import com.nightscout.core.model.G4Download;
 import com.squareup.otto.Bus;
 import com.squareup.wire.Message;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,12 +41,19 @@ abstract public class AbstractDevice {
     }
 
     public final Message download() {
-        onActivity(true);
-        Message download = doDownload();
-        // TODO figure out a way to not make this specific to the G4
-        onDownload(((G4Download) download).download_status == DownloadStatus.SUCCESS);
-        onActivity(false);
-        return download;
+        try {
+            onActivity(true);
+            Message download = doDownload();
+            // TODO figure out a way to not make this specific to the G4
+            onDownload(((G4Download) download).download_status == DownloadStatus.SUCCESS);
+            onActivity(false);
+            return download;
+        } catch (Exception e) {
+            reporter.report(EventType.DEVICE, EventSeverity.ERROR, "Unknown error - " + e.getMessage());
+            log.error("Exception: {} - {}", e.getMessage(), e);
+        }
+        return new G4Download.Builder().download_status(DownloadStatus.APPLICATION_ERROR)
+                .download_timestamp(new DateTime().toString()).build();
     }
 
     public String getDeviceName() {
@@ -54,7 +62,7 @@ abstract public class AbstractDevice {
 
     abstract protected Message doDownload();
 
-    public void onConnect() {
+    protected void onConnect() {
         log.debug("Connection detected in abstract class");
         reporter.report(EventType.DEVICE, EventSeverity.INFO,
                 messages.getString("g4_connected"));
@@ -62,7 +70,7 @@ abstract public class AbstractDevice {
         postConnectionStatus();
     }
 
-    public void onDisconnect() {
+    protected void onDisconnect() {
         log.debug("Disconnection detected in abstract class");
         reporter.report(EventType.DEVICE, EventSeverity.INFO,
                 messages.getString("g4_disconnected"));

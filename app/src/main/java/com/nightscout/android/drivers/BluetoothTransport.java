@@ -19,9 +19,14 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.util.Log;
 
+import com.nightscout.android.R;
+import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.drivers.DeviceTransport;
+import com.nightscout.core.events.EventReporter;
+import com.nightscout.core.events.EventSeverity;
+import com.nightscout.core.events.EventType;
 
 import net.tribe7.common.primitives.Bytes;
 
@@ -48,7 +53,7 @@ public class BluetoothTransport implements DeviceTransport {
     private boolean authenticated = false;
     private boolean finalCallback = false;
 
-    public final static int CONNECT_TIMEOUT = 2500;
+    public final static int CONNECT_TIMEOUT = 30000;
     public final static int READ_TIMEOUT = 5000;
     public final static int WRITE_TIMEOUT = 5000;
 
@@ -96,7 +101,11 @@ public class BluetoothTransport implements DeviceTransport {
     private BroadcastReceiver reconnectReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            reconnect();
+            try {
+                reconnect();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     };
 
@@ -114,15 +123,16 @@ public class BluetoothTransport implements DeviceTransport {
 
         attemptConnection();
 
-        while (System.currentTimeMillis() + CONNECT_TIMEOUT > System.currentTimeMillis()) {
-            if (finalCallback) {
-//            if (finalCallback && authenticated && readNotifySet && mConnectionState == STATE_CONNECTED) {
+        while (System.currentTimeMillis() + CONNECT_TIMEOUT < System.currentTimeMillis()) {
+//            if (finalCallback) {
+            if (finalCallback && authenticated && readNotifySet && mConnectionState == STATE_CONNECTED) {
                 break;
             }
         }
         if (System.currentTimeMillis() + CONNECT_TIMEOUT < System.currentTimeMillis()) {
             throw new IOException("Timeout while opening BLE connection to receiver");
         }
+        Observable.just(true).subscribe(connectionStateListener);
         shouldBeOpen = true;
     }
 
@@ -141,6 +151,7 @@ public class BluetoothTransport implements DeviceTransport {
         authenticated = false;
         finalCallback = false;
         Log.d(TAG, "Bluetooth has been disconnected.");
+        Observable.just(false).subscribe(connectionStateListener);
     }
 
     @Override
@@ -204,7 +215,7 @@ public class BluetoothTransport implements DeviceTransport {
     }
 
 
-    public void attemptConnection() {
+    public void attemptConnection() throws IOException {
 
         mConnectionState = STATE_DISCONNECTED;
         mBluetoothManager = (BluetoothManager) mContext.getSystemService(Context.BLUETOOTH_SERVICE);
@@ -235,8 +246,17 @@ public class BluetoothTransport implements DeviceTransport {
 
         } else {
             Log.d(TAG, "Bluetooth is disabled");
+            EventReporter reporter = AndroidEventReporter.getReporter(mContext);
+            reporter.report(EventType.DEVICE, EventSeverity.WARN, mContext.getString(R.string.warn_disabled_bluetooth));
         }
 
+//        if (device == null) {
+//            throw new IOException("Unable to open connection to receiver");
+//        }
+//        int state = mBluetoothManager.getConnectionState(device, BluetoothGatt.GATT);
+//        if ((state != BluetoothProfile.STATE_CONNECTED) && (state != BluetoothProfile.STATE_CONNECTING)) {
+//            throw new IOException("Unable to open connection to receiver");
+//        }
         Log.d(TAG, "Connection state: " + mConnectionState);
     }
 
@@ -385,14 +405,14 @@ public class BluetoothTransport implements DeviceTransport {
                 device = mBluetoothGatt.getDevice();
                 mConnectionState = STATE_CONNECTED;
                 Log.w(TAG, "Connected to GATT server.");
-                Observable.just(true).subscribe(connectionStateListener);
+//                Observable.just(true).subscribe(connectionStateListener);
                 Log.w(TAG, "discovering services");
                 if (!mBluetoothGatt.discoverServices()) {
                     Log.w(TAG, "discovering failed");
                 }
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.w(TAG, "Disconnected from GATT server.");
-                Observable.just(false).subscribe(connectionStateListener);
+//                Observable.just(false).subscribe(connectionStateListener);
                 mConnectionState = STATE_DISCONNECTED;
                 if (shouldBeOpen) {
                     Log.w(TAG, "Connection was unexpectedly lost. Attempting to reconnect");
@@ -529,7 +549,7 @@ public class BluetoothTransport implements DeviceTransport {
         }
     }
 
-    public void reconnect() {
+    public void reconnect() throws IOException {
         try {
             Log.d(TAG, "Attempting to close connection");
             close();

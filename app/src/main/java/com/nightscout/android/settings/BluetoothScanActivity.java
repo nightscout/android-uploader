@@ -68,7 +68,6 @@ public class BluetoothScanActivity extends ListActivity {
         }
         mLeDeviceListAdapter = new LeDeviceListAdapter();
         setListAdapter(mLeDeviceListAdapter);
-
     }
 
     @Override

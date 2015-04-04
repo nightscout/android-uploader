@@ -53,7 +53,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/syncButton"
-        android:background="@drawable/ic_nocloud"
+        android:background="@drawable/ic_idlecloud"
         android:adjustViewBounds="false"
         android:baselineAlignBottom="false"
         android:layout_alignParentTop="true"

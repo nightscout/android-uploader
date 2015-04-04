@@ -91,11 +91,11 @@ public class SettingsActivity extends FragmentActivity {
             NSBarcodeConfig barcode = new NSBarcodeConfig(scanResult.getContents());
             if (barcode.hasMongoConfig()) {
                 if (barcode.getMongoUri().isPresent()) {
-                    prefs.setMongoUploadEnabled(true);
                     prefs.setMongoClientUri(barcode.getMongoUri().get());
                     prefs.setMongoCollection(barcode.getMongoCollection().orNull());
                     prefs.setMongoDeviceStatusCollection(
                             barcode.getMongoDeviceStatusCollection().orNull());
+                    prefs.setMongoUploadEnabled(true);
                 }
                 if (barcode.hasApiConfig()) {
                     prefs.setRestApiEnabled(true);
@@ -119,10 +119,12 @@ public class SettingsActivity extends FragmentActivity {
                         if (userInfo.length == 2) {
                             String endpoint = uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort();
                             if (userInfo[0].length() > 0 && userInfo[1].length() > 0) {
-                                prefs.setMqttUploadEnabled(true);
                                 prefs.setMqttEndpoint(endpoint);
                                 prefs.setMqttUser(userInfo[0]);
                                 prefs.setMqttPass(userInfo[1]);
+                                // Needs to be last. As soon as this pref changes, it attempts to connect.
+                                // Everything else must be configured before it attempts to connect.
+                                prefs.setMqttUploadEnabled(true);
                             }
                         }
                     }

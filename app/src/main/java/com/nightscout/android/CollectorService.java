@@ -129,7 +129,7 @@ public class CollectorService extends Service {
             driver = UsbSerialProber.acquire(
                     (UsbManager) getSystemService(USB_SERVICE), getApplicationContext());
         } else if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE2) {
-            driver = new BluetoothTransport(getApplicationContext());
+            driver = new BluetoothTransport(this);
         } else {
             throw new UnsupportedOperationException("Unsupported device selected");
         }

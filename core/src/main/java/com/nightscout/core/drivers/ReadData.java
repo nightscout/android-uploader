@@ -153,13 +153,16 @@ public class ReadData {
         String result = null;
         if (manufacturingDataXml == null) {
             byte[] packet = readDataBasePage(RecordType.MANUFACTURING_DATA, 0);
-            String xml = new String(Arrays.copyOfRange(packet, 8, 241));
+            String xml = new String(Arrays.copyOfRange(packet, 36, 241));
             // TODO: it would be best if we could just remove /x00 characters and read till end
             try {
-
+                log.debug("Manufacturing data: " + xml);
+                log.debug("Manufacturing data: " + new String(packet));
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder builder = factory.newDocumentBuilder();
                 manufacturingDataXml = builder.parse(new InputSource(new StringReader(xml)));
+                Element element = manufacturingDataXml.getDocumentElement();
+                result = element.getAttribute(attribute);
             } catch (ParserConfigurationException | SAXException e) {
                 throw new IOException("Unable to parse manufacturing data", e);
             }

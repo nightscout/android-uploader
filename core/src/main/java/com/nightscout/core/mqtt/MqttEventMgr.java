@@ -56,8 +56,6 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
     public void connect() {
         try {
             log.info("MQTT connect issued");
-//            timer.deactivate();
-//            pinger.stop();
             client.connect(options);
             reporter.report(EventType.UPLOADER, EventSeverity.INFO,
                     messages.getString("mqtt_connected"));
@@ -78,6 +76,7 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
                 pinger.stop();
             }
         } catch (MqttException e) {
+            log.info("MQTT Exception {}", e);
             delayedReconnect();
         }
     }
@@ -110,10 +109,9 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
     public void reconnect() {
         if (pinger.isNetworkActive()) {
             log.info("MQTT issuing reconnect");
-            close();
+            disconnect();
             connect();
         } else {
-            // TODO: Figure out what to do here
             reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
                     messages.getString("mqtt_reconnect_fail"));
         }
@@ -254,7 +252,7 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
             client.publish(topic, message, QOS, true);
             reporter.report(EventType.UPLOADER, EventSeverity.INFO,
                     messages.getString("mqtt_publish_success"));
-            log.info("MainActivity: Published \"" + Utils.bytesToHex(message) + "\" to \"" + topic + "\"");
+            log.info("{}: Published \"{}\" to \"{}\"", MqttEventMgr.class.getSimpleName(), Utils.bytesToHex(message), topic);
         } catch (MqttException e) {
             // TODO: Determine what to do here
             reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
