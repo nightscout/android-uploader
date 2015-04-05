@@ -11,6 +11,7 @@ public class TestPreferences implements NightscoutPreferences {
     private List<String> restApiBaseUris = new ArrayList<>();
     private boolean calibrationUploadEnabled = false;
     private boolean sensorUploadEnabled = false;
+    private boolean rawUploadEnabled = false;
     private boolean mongoUploadEnabled = false;
     private boolean mqttUploadEnabled = false;
     private String mongoClientUri = null;
@@ -75,6 +76,16 @@ public class TestPreferences implements NightscoutPreferences {
     @Override
     public void setSensorUploadEnabled(boolean sensorUploadEnabled) {
         this.sensorUploadEnabled = sensorUploadEnabled;
+    }
+
+    @Override
+    public boolean isRawEnabled() {
+        return rawUploadEnabled;
+    }
+
+    @Override
+    public void setRawEnabled(boolean rawUploadEnabled) {
+        this.rawUploadEnabled = rawUploadEnabled;
     }
 
     @Override

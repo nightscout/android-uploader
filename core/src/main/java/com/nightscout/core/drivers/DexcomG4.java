@@ -128,13 +128,11 @@ public class DexcomG4 extends AbstractDevice {
             if (preferences.isMeterUploadEnabled()) {
                 meterRecords = readData.getRecentMeterRecords(systemTime, dateTime.getMillis());
             }
-            if (preferences.isSensorUploadEnabled()) {
+            if (preferences.isRawEnabled()) {
                 sensorRecords = readData.getRecentSensorRecords(numOfPages, systemTime, dateTime.getMillis());
-            }
-
-            if (preferences.isCalibrationUploadEnabled()) {
                 calRecords = readData.getRecentCalRecords(systemTime, dateTime.getMillis());
             }
+
             if (preferences.isInsertionUploadEnabled()) {
                 log.debug("Reading insertions");
                 insertionRecords = readData.getRecentInsertion(systemTime, dateTime.getMillis());

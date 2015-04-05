@@ -4,6 +4,7 @@
     <string name="cloud_cal_data" translatable="false">cloud_cal_data</string>
     <string name="cloud_sensor_data" translatable="false">cloud_sensor_data</string>
     <string name="cloud_mbg_data" translatable="false">cloud_mbg</string>
+    <string name="enable_raw_upload" translatable="false">enable_raw</string>
     <string name="mongo_enable" translatable="false">cloud_storage_mongodb_enable</string>
     <string name="mongo_uri" translatable="false">cloud_storage_mongodb_uri</string>
     <string name="mongo_entries_collection" translatable="false">cloud_storage_mongodb_collection</string>

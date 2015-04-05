@@ -106,4 +106,6 @@
     <string name="pref_title_insertion_data">Insertion Data</string>
     <string name="pref_summary_insertion_data">Sensor insertion history</string>
     <string name="invalid_share2_serial">Please double check the Share2 serial number provided %s. It does not match the expected pattern</string>
+    <string name="pref_title_raw_data">Raw Data</string>
+    <string name="pref_summary_raw_data">Data required to calculate raw values</string>
 </resources>

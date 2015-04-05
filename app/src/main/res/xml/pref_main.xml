@@ -162,16 +162,22 @@
             android:defaultValue="true" />
 
         <CheckBoxPreference
-            android:key="@string/cloud_sensor_data"
-            android:title="@string/pref_title_sensor_data"
-            android:summary="@string/pref_summary_sensor_data"
+            android:key="@string/enable_raw_upload"
+            android:title="@string/pref_title_raw_data"
+            android:summary="@string/pref_summary_raw_data"
             android:defaultValue="false" />
 
-        <CheckBoxPreference
-            android:key="@string/cloud_cal_data"
-            android:title="@string/pref_title_cal_data"
-            android:summary="@string/pref_summary_cal_data"
-            android:defaultValue="false" />
+        <!--<CheckBoxPreference-->
+        <!--android:key="@string/cloud_sensor_data"-->
+        <!--android:title="@string/pref_title_sensor_data"-->
+        <!--android:summary="@string/pref_summary_sensor_data"-->
+        <!--android:defaultValue="false" />-->
+
+        <!--<CheckBoxPreference-->
+        <!--android:key="@string/cloud_cal_data"-->
+        <!--android:title="@string/pref_title_cal_data"-->
+        <!--android:summary="@string/pref_summary_cal_data"-->
+        <!--android:defaultValue="false" />-->
 
         <CheckBoxPreference
             android:key="@string/insert_data_enabled"

@@ -159,7 +159,7 @@ public class RestV1UploaderTest {
 
     @Test
     public void testGlucoseDataSet_EntitySensorUploadEnabled() throws Exception {
-        preferences.setSensorUploadEnabled(true);
+        preferences.setRawEnabled(true);
         restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
         HttpPost post = (HttpPost) captor.getValue();
         String entity = CharStreams.toString(new InputStreamReader(post.getEntity().getContent()));
@@ -182,14 +182,14 @@ public class RestV1UploaderTest {
 
     @Test
     public void testCalRecord_Endpoint() throws Exception {
-        preferences.setCalibrationUploadEnabled(true);
+        preferences.setRawEnabled(true);
         restUploader.uploadCalRecords(Lists.newArrayList(mockCalRecord()));
         assertThat(captor.getValue().getURI().toString(), containsString("entries"));
     }
 
     @Test
     public void testCalRecord_Entity() throws Exception {
-        preferences.setCalibrationUploadEnabled(true);
+        preferences.setRawEnabled(true);
         restUploader.uploadCalRecords(Lists.newArrayList(mockCalRecord()));
         HttpPost post = (HttpPost) captor.getValue();
         String entity = CharStreams.toString(new InputStreamReader(post.getEntity().getContent()));

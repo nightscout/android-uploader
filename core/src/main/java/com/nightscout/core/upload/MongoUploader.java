@@ -115,7 +115,7 @@ public class MongoUploader extends BaseUploader {
         output.put("sgv", glucoseDataSet.getBgMgdl());
         output.put("direction", glucoseDataSet.getTrend().friendlyTrendName());
         output.put("type", "sgv");
-        if (getPreferences().isSensorUploadEnabled()) {
+        if (getPreferences().isRawEnabled()) {
             output.put("filtered", glucoseDataSet.getFiltered());
             output.put("unfiltered", glucoseDataSet.getUnfiltered());
             output.put("rssi", glucoseDataSet.getRssi());
@@ -222,7 +222,7 @@ public class MongoUploader extends BaseUploader {
     protected boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException {
         BasicDBObject query = toBasicDBObjectQuery("sgv", glucoseDataSet.getRawSysemTimeEgv());
         BasicDBObject data = toBasicDBObjectSgv(glucoseDataSet);
-        if (preferences.isSensorUploadEnabled()) {
+        if (preferences.isRawEnabled()) {
             if (glucoseDataSet.areRecordsMatched()) {
                 return upsert(query, toBasicDBObjectSensor(glucoseDataSet, data));
             } else {

@@ -22,6 +22,10 @@ public interface NightscoutPreferences {
 
     void setSensorUploadEnabled(boolean sensorUploadEnabled);
 
+    boolean isRawEnabled();
+
+    void setRawEnabled(boolean rawUploadEnabled);
+
     boolean isMongoUploadEnabled();
 
     void setMongoUploadEnabled(boolean mongoUploadEnabled);

@@ -4,11 +4,15 @@ import com.nightscout.core.dexcom.Constants;
 import com.nightscout.core.model.GlucoseUnit;
 
 public class GlucoseReading {
-    private int valueMgdl;
+    protected int valueMgdl;
 
     public GlucoseReading(float value, GlucoseUnit units) {
         this.valueMgdl = (units == GlucoseUnit.MGDL) ?
                 Math.round(value) : Math.round(value * Constants.MMOL_L_TO_MG_DL);
+    }
+
+    protected GlucoseReading() {
+        this.valueMgdl = 0;
     }
 
     public float asMmol() {

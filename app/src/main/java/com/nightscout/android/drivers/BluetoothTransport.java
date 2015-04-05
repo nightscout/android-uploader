@@ -152,9 +152,6 @@ public class BluetoothTransport implements DeviceTransport {
         finalCallback = false;
         Log.d(TAG, "Bluetooth has been disconnected.");
         Observable.just(false).subscribe(connectionStateListener);
-        mContext.unregisterReceiver(reconnectReceiver);
-        mContext.unregisterReceiver(mPairReceiver);
-
     }
 
     @Override

@@ -104,7 +104,7 @@ public class RestLegacyUploaderTest {
 
     @Test
     public void testCalRecord_NoPost() throws Exception {
-        preferences.setCalibrationUploadEnabled(true);
+        preferences.setRawEnabled(true);
         reset(mockHttpClient);
         verifyNoMoreInteractions(mockHttpClient);
         restUploader.uploadCalRecords(new ArrayList<>(Arrays.asList(mockCalRecord())));

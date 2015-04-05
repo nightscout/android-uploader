@@ -40,22 +40,32 @@ public class AndroidPreferences implements NightscoutPreferences {
 
     @Override
     public boolean isCalibrationUploadEnabled() {
-        return preferences.getBoolean(context.getString(R.string.cloud_cal_data), false);
+        return preferences.getBoolean(context.getString(R.string.enable_raw_upload), false);
     }
 
     @Override
     public void setCalibrationUploadEnabled(boolean calibrationUploadEnabled) {
-        preferences.edit().putBoolean(context.getString(R.string.cloud_cal_data), calibrationUploadEnabled).apply();
+        preferences.edit().putBoolean(context.getString(R.string.enable_raw_upload), calibrationUploadEnabled).apply();
     }
 
     @Override
     public boolean isSensorUploadEnabled() {
-        return preferences.getBoolean(context.getString(R.string.cloud_sensor_data), false);
+        return preferences.getBoolean(context.getString(R.string.enable_raw_upload), false);
     }
 
     @Override
     public void setSensorUploadEnabled(boolean sensorUploadEnabled) {
-        preferences.edit().putBoolean(context.getString(R.string.cloud_sensor_data), sensorUploadEnabled).apply();
+        preferences.edit().putBoolean(context.getString(R.string.enable_raw_upload), sensorUploadEnabled).apply();
+    }
+
+    @Override
+    public boolean isRawEnabled() {
+        return preferences.getBoolean(context.getString(R.string.enable_raw_upload), false);
+    }
+
+    @Override
+    public void setRawEnabled(boolean rawUploadEnabled) {
+        preferences.edit().putBoolean(context.getString(R.string.enable_raw_upload), rawUploadEnabled).apply();
     }
 
     @Override
@@ -326,7 +336,10 @@ public class AndroidPreferences implements NightscoutPreferences {
 
     public boolean areLabsEnabled() {
         return preferences.getBoolean(context.getString(R.string.labs_enable), false);
+    }
 
+    public void deleteKey(String key) {
+        preferences.edit().remove(key).apply();
     }
 
 }

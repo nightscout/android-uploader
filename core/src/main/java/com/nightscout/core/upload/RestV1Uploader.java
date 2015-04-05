@@ -64,7 +64,7 @@ public class RestV1Uploader extends AbstractRestUploader {
         json.put("sgv", record.getBgMgdl());
         json.put("direction", record.getTrend().friendlyTrendName());
         json.put("type", "sgv");
-        if (getPreferences().isSensorUploadEnabled()) {
+        if (getPreferences().isRawEnabled()) {
             json.put("filtered", record.getFiltered());
             json.put("unfiltered", record.getUnfiltered());
             json.put("rssi", record.getRssi());
@@ -123,7 +123,7 @@ public class RestV1Uploader extends AbstractRestUploader {
         try {
             JSONObject json = toJSONObjectEgv(glucoseDataSet);
             log.error("Json: {}", json);
-            if (!preferences.isSensorUploadEnabled()) {
+            if (!preferences.isRawEnabled()) {
                 log.error("Not enabled Json: {}", json);
                 return doPost("entries", json);
             } else {

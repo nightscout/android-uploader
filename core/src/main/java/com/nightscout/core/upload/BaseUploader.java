@@ -101,7 +101,7 @@ public abstract class BaseUploader {
             return true;
         }
         boolean output = true;
-        if (getPreferences().isCalibrationUploadEnabled()) {
+        if (getPreferences().isRawEnabled()) {
             for (CalRecord calRecord : calRecords) {
                 try {
                     output &= doUpload(calRecord);

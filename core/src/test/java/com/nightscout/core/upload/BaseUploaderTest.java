@@ -195,7 +195,7 @@ public class BaseUploaderTest {
 
     @Test
     public void testUploadCalRecords_Null() {
-        preferences.setCalibrationUploadEnabled(true);
+        preferences.setRawEnabled(true);
         try {
             mockUploader.uploadCalRecords(null);
         } catch (NullPointerException e) {
@@ -205,14 +205,14 @@ public class BaseUploaderTest {
 
     @Test
     public void testUploadCalRecords_Zero() {
-        preferences.setCalibrationUploadEnabled(true);
+        preferences.setRawEnabled(true);
         mockUploader.uploadCalRecords(new ArrayList<CalRecord>());
         assertThat(mockUploader.calRecords, is(empty()));
     }
 
     @Test
     public void testUploadCalRecords_One() {
-        preferences.setCalibrationUploadEnabled(true);
+        preferences.setRawEnabled(true);
         List<CalRecord> list = null;
         try {
             list = new ArrayList<>(Arrays.asList(mockCalRecord()));
@@ -225,7 +225,7 @@ public class BaseUploaderTest {
 
     @Test
     public void testUploadCalRecords_Many() {
-        preferences.setCalibrationUploadEnabled(true);
+        preferences.setRawEnabled(true);
         List<CalRecord> list = null;
         try {
             list = new ArrayList<>(Arrays.asList(new CalRecord[]{mockCalRecord(), mockCalRecord(), mockCalRecord()}));
@@ -238,7 +238,7 @@ public class BaseUploaderTest {
 
     @Test
     public void testUploadCalRecords_Exception() {
-        preferences.setCalibrationUploadEnabled(true);
+        preferences.setRawEnabled(true);
         try {
             exceptionUploader.uploadCalRecords(new ArrayList<>(Arrays.asList(mockCalRecord())));
         } catch (Exception e) {
