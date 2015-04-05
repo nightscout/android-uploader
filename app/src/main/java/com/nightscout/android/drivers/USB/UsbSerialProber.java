@@ -20,6 +20,7 @@
 
 package com.nightscout.android.drivers.USB;
 
+import android.content.Context;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
@@ -35,12 +36,12 @@ public enum UsbSerialProber {
 
     CDC_ACM_SERIAL {
         @Override
-        public UsbSerialDriver getDevice(UsbManager manager, UsbDevice usbDevice) {
+        public UsbSerialDriver getDevice(UsbManager manager, UsbDevice usbDevice, Context context) {
             final UsbDeviceConnection connection = manager.openDevice(usbDevice);
             if (connection == null) {
                 return null;
             }
-            return new CdcAcmSerialDriver(usbDevice, connection, manager);
+            return new CdcAcmSerialDriver(usbDevice, connection, manager, context);
         }
     };
 
@@ -56,7 +57,7 @@ public enum UsbSerialProber {
      * @return the first available {@link UsbSerialDriver}, or {@code null} if
      * no devices could be acquired
      */
-    public abstract UsbSerialDriver getDevice(final UsbManager manager, final UsbDevice usbDevice);
+    public abstract UsbSerialDriver getDevice(final UsbManager manager, final UsbDevice usbDevice, Context context);
 
     /**
      * Acquires and returns the first available serial device among all
@@ -67,9 +68,9 @@ public enum UsbSerialProber {
      * @return the first available {@link UsbSerialDriver}, or {@code null} if
      * no devices could be acquired
      */
-    public static UsbSerialDriver acquire(final UsbManager usbManager) {
+    public static UsbSerialDriver acquire(final UsbManager usbManager, Context context) {
         for (final UsbDevice usbDevice : usbManager.getDeviceList().values()) {
-            final UsbSerialDriver probedDevice = acquire(usbManager, usbDevice);
+            final UsbSerialDriver probedDevice = acquire(usbManager, usbDevice, context);
             if (probedDevice != null) {
                 return probedDevice;
             }
@@ -87,13 +88,13 @@ public enum UsbSerialProber {
      * @return a new {@link UsbSerialDriver}, or {@code null} if no devices
      * could be acquired
      */
-    public static UsbSerialDriver acquire(final UsbManager usbManager, final UsbDevice usbDevice) {
+    public static UsbSerialDriver acquire(final UsbManager usbManager, final UsbDevice usbDevice, Context context) {
         if (!usbManager.hasPermission(usbDevice)) {
             Log.i(TAG, "No permission for " + usbDevice.getVendorId() + " " + usbDevice.getProductId());
             return null;
         }
         for (final UsbSerialProber prober : values()) {
-            final UsbSerialDriver probedDevice = prober.getDevice(usbManager, usbDevice);
+            final UsbSerialDriver probedDevice = prober.getDevice(usbManager, usbDevice, context);
             if (probedDevice != null) {
                 return probedDevice;
             }

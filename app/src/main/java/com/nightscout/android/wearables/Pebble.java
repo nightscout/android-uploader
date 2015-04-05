@@ -110,12 +110,16 @@ public class Pebble {
     }
 
     public void sendDownload(PebbleDictionary dictionary) {
-        if (PebbleKit.isWatchConnected(context)) {
+        if (isConnected()) {
             if (dictionary != null && context != null) {
                 Log.d(TAG, "Sending data to pebble");
                 PebbleKit.sendDataToPebble(context, PEBBLEAPP_UUID, dictionary);
             }
         }
+    }
+
+    public Boolean isConnected() {
+        return PebbleKit.isWatchConnected(context) && PebbleKit.areAppMessagesSupported(context);
     }
 
     public void close() {

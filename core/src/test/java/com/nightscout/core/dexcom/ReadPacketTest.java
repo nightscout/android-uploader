@@ -1,6 +1,7 @@
 package com.nightscout.core.dexcom;
 
-import com.google.common.primitives.UnsignedBytes;
+
+import net.tribe7.common.primitives.UnsignedBytes;
 
 import org.junit.Test;
 

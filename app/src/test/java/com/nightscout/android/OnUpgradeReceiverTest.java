@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 
 import com.nightscout.android.test.RobolectricTestBase;
+import com.nightscout.android.ui.NightscoutNavigationDrawer;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,11 +15,11 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 public class OnUpgradeReceiverTest extends RobolectricTestBase {
-    MainActivity activity;
+    NightscoutNavigationDrawer activity;
 
     @Before
     public void setUp() {
-        activity = Robolectric.buildActivity(MainActivity.class).create().get();
+        activity = Robolectric.buildActivity(NightscoutNavigationDrawer.class).create().get();
     }
 
     @Test
@@ -35,7 +36,7 @@ public class OnUpgradeReceiverTest extends RobolectricTestBase {
         UpgradeReceiver onUpgradeReceiver = new UpgradeReceiver();
         onUpgradeReceiver.onReceive(activity.getApplicationContext(), intent);
         Intent anIntent = getShadowApplication().getNextStartedActivity();
-        assertThat(anIntent.getComponent().getClassName(), is(MainActivity.class.getName()));
+        assertThat(anIntent.getComponent().getClassName(), is(NightscoutNavigationDrawer.class.getName()));
     }
 
     //TODO: need a test to make sure that activity is not started if another package is replaced

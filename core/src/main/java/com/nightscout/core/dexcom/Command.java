@@ -1,7 +1,7 @@
 package com.nightscout.core.dexcom;
 
-import com.google.common.base.CaseFormat;
-import com.google.common.base.Optional;
+import net.tribe7.common.base.CaseFormat;
+import net.tribe7.common.base.Optional;
 
 public enum Command {
     NULL(0),
@@ -44,7 +44,9 @@ public enum Command {
     READ_HARDWARE_BOARD_ID(49),
     READ_FIRMWARE_SETTINGS(54),
     READ_ENABLE_SETUP_WIZARD_FLAG(55),
-    READ_SETUP_WIZARD_STATE(57);
+    READ_SETUP_WIZARD_STATE(57),
+    READ_CHARGER_CURRENT_SETTING(59),
+    WRITE_CHARGER_CURRENT_SETTING(60);
 
     private byte value;
 

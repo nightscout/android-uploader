@@ -6,18 +6,24 @@ import android.content.Intent;
 import android.content.IntentFilter;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.common.base.Function;
-import com.nightscout.robolectric.RobolectricGradleRunner;
+import com.nightscout.android.BuildConfig;
+
+import net.tribe7.common.base.Function;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.Shadows;
+import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowApplication;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-@RunWith(RobolectricGradleRunner.class)
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class)
 public class RobolectricTestBase {
     private final boolean[] intentSeen = {false};
 
@@ -27,6 +33,11 @@ public class RobolectricTestBase {
         // https://github.com/robolectric/robolectric/issues/1075
         getShadowApplication().declareActionUnbindable("com.google.android.gms.analytics.service.START");
         GoogleAnalytics.getInstance(getContext()).setAppOptOut(true);
+    }
+
+    @Test
+    public void doSomething() {
+
     }
 
     public void whenOnBroadcastReceived(String intentKey, final Function<Intent, Void> verifyCallback) {
@@ -48,6 +59,6 @@ public class RobolectricTestBase {
     }
 
     public ShadowApplication getShadowApplication() {
-        return Robolectric.getShadowApplication();
+        return Shadows.shadowOf(RuntimeEnvironment.application);
     }
 }

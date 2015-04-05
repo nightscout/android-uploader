@@ -1,163 +1,216 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="root">
 
-    <PreferenceCategory android:title="@string/pref_header_general">
+    <PreferenceCategory
+        android:title="@string/pref_header_general"
+        android:key="general_category">
+        <com.nightscout.android.settings.CustomSwitchPreference
+            android:title="@string/pref_title_i_understand"
+            android:key="@string/i_understand"
+            android:defaultValue="false"
+            android:switchTextOn="@string/pref_switch_on_i_understand"
+            android:switchTextOff="@string/pref_switch_off_i_understand"
+            android:summary="@string/pref_summary_i_understand" />
         <com.nightscout.android.settings.CustomSwitchPreference
             android:title="@string/pref_title_data_donate"
-            android:key="data_donate"
+            android:key="@string/data_donate"
             android:defaultValue="false"
             android:disableDependentsState="false"
             android:switchTextOn="@string/pref_switch_on_data_donate"
             android:switchTextOff="@string/pref_switch_off_data_donate"
             android:summary="@string/pref_summary_data_donate" />
 
+        <ListPreference
+            android:title="@string/pref_title_device_type"
+            android:key="@string/dexcom_device_type"
+            android:entries="@array/pref_options_type"
+            android:entryValues="@array/pref_options_type_values"
+            android:defaultValue="0"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null" />
+
+        <PreferenceScreen
+            android:key="share_options"
+            android:title="Share settings"
+            android:summary="Settings specific to the Dexcom Share2 system">
+            <com.nightscout.android.settings.SummaryBoundEditTextPreference
+                android:title="@string/pref_share2_serial_number"
+                android:key="@string/share2_serial"
+                android:dialogTitle="@string/pref_share2_serial_number"
+                android:defaultValue="SM00000000" />
+            <PreferenceScreen
+                android:title="@string/scan_share2_barcode"
+                android:key="scan_share2_barcode"
+                android:summary="@string/pref_share2_scan_barcode_summary" />
+            <PreferenceScreen
+                android:title="@string/pref_bt_scan_share2"
+                android:key="@string/bt_scan_share2"
+                android:summary="@string/pref_bt_scan_summary" />
+
+        </PreferenceScreen>
+
+    </PreferenceCategory>
+
+    <PreferenceScreen
+        android:title="Upload options"
+        android:summary="Various methods used to upload your data to the cloud. Please note that Mongo will be deprecated soon. We encourage you to migrate to MQTT and REST.">
         <PreferenceScreen
             android:title="@string/auto_configure_title"
             android:key="auto_configure"
             android:summary="@string/prefs_auto_config_summary" />
-    </PreferenceCategory>
 
-    <PreferenceCategory
-        android:key="cloud_storage_mqtt"
-        android:title="@string/pref_title_mqtt"
-        android:summary="@string/pref_summary_mqtt_enabled">
-        <com.nightscout.android.settings.CustomSwitchPreference
-            android:title="@string/pref_title_mqtt_enabled"
-            android:key="cloud_storage_mqtt_enable"
-            android:disableDependentsState="false"
-            android:summary="@string/pref_summary_mqtt_enabled" />
-        <EditTextPreference
-            android:dependency="cloud_storage_mqtt_enable"
-            android:title="@string/pref_title_mqtt_endpoint"
-            android:key="cloud_storage_mqtt_endpoint"
-            android:dialogTitle="@string/pref_dialog_mqtt_endpoint"
-            android:dialogMessage="@string/pref_message_mqtt_endpoint"
-            android:defaultValue="@string/pref_default_mqtt_endpoint" />
-        <EditTextPreference
-            android:dependency="cloud_storage_mqtt_enable"
-            android:title="@string/pref_title_mqtt_user"
-            android:key="cloud_storage_mqtt_user"
-            android:dialogTitle="@string/pref_dialog_mqtt_user"
-            android:dialogMessage="@string/pref_message_mqtt_user"
-            android:defaultValue="@string/pref_default_mqtt_user" />
-        <EditTextPreference
-            android:dependency="cloud_storage_mqtt_enable"
-            android:title="@string/pref_title_mqtt_pass"
-            android:password="true"
-            android:key="cloud_storage_mqtt_pass"
-            android:dialogTitle="@string/pref_dialog_mqtt_pass"
-            android:dialogMessage="@string/pref_message_mqtt_pass"
-            android:defaultValue="@string/pref_default_mqtt_pass" />
-    </PreferenceCategory>
+        <PreferenceCategory
+            android:key="cloud_storage_mqtt"
+            android:title="@string/pref_title_mqtt"
+            android:summary="@string/pref_summary_mqtt_enabled">
+            <com.nightscout.android.settings.CustomSwitchPreference
+                android:title="@string/pref_title_mqtt_enabled"
+                android:key="@string/mqtt_enable"
+                android:disableDependentsState="false"
+                android:summary="@string/pref_summary_mqtt_enabled" />
+            <com.nightscout.android.settings.SummaryBoundEditTextPreference
+                android:dependency="@string/mqtt_enable"
+                android:title="@string/pref_title_mqtt_endpoint"
+                android:key="@string/mqtt_endpoint"
+                android:dialogTitle="@string/pref_dialog_mqtt_endpoint"
+                android:dialogMessage="@string/pref_message_mqtt_endpoint"
+                android:defaultValue="@string/pref_default_mqtt_endpoint" />
+            <com.nightscout.android.settings.SummaryBoundEditTextPreference
+                android:dependency="@string/mqtt_enable"
+                android:title="@string/pref_title_mqtt_user"
+                android:key="@string/mqtt_user"
+                android:dialogTitle="@string/pref_dialog_mqtt_user"
+                android:dialogMessage="@string/pref_message_mqtt_user"
+                android:defaultValue="@string/pref_default_mqtt_user" />
+            <EditTextPreference
+                android:dependency="@string/mqtt_enable"
+                android:title="@string/pref_title_mqtt_pass"
+                android:password="true"
+                android:key="@string/mqtt_pass"
+                android:dialogTitle="@string/pref_dialog_mqtt_pass"
+                android:dialogMessage="@string/pref_message_mqtt_pass"
+                android:defaultValue="@string/pref_default_mqtt_pass" />
+        </PreferenceCategory>
 
-    <PreferenceCategory
-        android:key="cloud_storage_api"
-        android:title="@string/pref_title_api"
-        android:summary="@string/pref_summary_api_enabled">
+        <PreferenceCategory
+            android:key="cloud_storage_api"
+            android:title="@string/pref_title_api"
+            android:summary="@string/pref_summary_api_enabled">
 
-        <SwitchPreference
-            android:title="@string/pref_title_api_enabled"
-            android:key="cloud_storage_api_enable"
-            android:disableDependentsState="false"
-            android:summary="@string/pref_summary_api_enabled" />
+            <SwitchPreference
+                android:title="@string/pref_title_api_enabled"
+                android:key="@string/rest_enable"
+                android:disableDependentsState="false"
+                android:summary="@string/pref_summary_api_enabled" />
 
-        <com.nightscout.android.settings.SummaryBoundEditTextPreference
-            android:dependency="cloud_storage_api_enable"
-            android:title="@string/pref_title_api_url"
-            android:key="cloud_storage_api_base"
-            android:dialogTitle="@string/pref_dialog_api_url"
-            android:dialogMessage="@string/pref_message_api_url"
-            android:hint="@string/pref_default_api_url" />
-    </PreferenceCategory>
+            <com.nightscout.android.settings.SummaryBoundEditTextPreference
+                android:dependency="@string/rest_enable"
+                android:title="@string/pref_title_api_url"
+                android:key="@string/rest_uris"
+                android:dialogTitle="@string/pref_dialog_api_url"
+                android:dialogMessage="@string/pref_message_api_url"
+                android:hint="@string/pref_default_api_url" />
+        </PreferenceCategory>
 
-    <PreferenceCategory
-        android:key="cloud_storage_mongo"
-        android:title="@string/pref_title_mongodb"
-        android:summary="@string/pref_summary_mongodb_enabled">
+        <PreferenceCategory
+            android:key="cloud_storage_mongo"
+            android:title="@string/pref_title_mongodb"
+            android:summary="@string/pref_summary_mongodb_enabled">
 
-        <SwitchPreference
-            android:title="@string/pref_title_mongo_enabled"
-            android:key="cloud_storage_mongodb_enable"
-            android:disableDependentsState="false"
-            android:summary="@string/pref_summary_mongodb_enabled" />
+            <SwitchPreference
+                android:title="@string/pref_title_mongo_enabled"
+                android:key="@string/mongo_enable"
+                android:disableDependentsState="false"
+                android:summary="@string/pref_summary_mongodb_enabled" />
 
-        <com.nightscout.android.settings.SummaryBoundEditTextPreference
-            android:dependency="cloud_storage_mongodb_enable"
-            android:title="@string/pref_title_mongodb_uri"
-            android:key="cloud_storage_mongodb_uri"
-            android:dialogTitle="@string/pref_dialog_mongodb_uri"
-            android:dialogMessage="@string/pref_message_mongodb_uri"
-            android:hint="@string/pref_default_mongodb_uri" />
+            <com.nightscout.android.settings.SummaryBoundEditTextPreference
+                android:dependency="cloud_storage_mongodb_enable"
+                android:title="@string/pref_title_mongodb_uri"
+                android:key="@string/mongo_uri"
+                android:dialogTitle="@string/pref_dialog_mongodb_uri"
+                android:dialogMessage="@string/pref_message_mongodb_uri"
+                android:hint="@string/pref_default_mongodb_uri" />
 
-        <com.nightscout.android.settings.SummaryBoundEditTextPreference
-            android:dependency="cloud_storage_mongodb_enable"
-            android:title="@string/pref_title_mongodb_collection"
-            android:key="cloud_storage_mongodb_collection"
-            android:dialogTitle="@string/pref_dialog_mongodb_collection"
-            android:dialogMessage="@string/pref_message_mongodb_collection"
-            android:defaultValue="@string/pref_default_mongodb_collection" />
+            <com.nightscout.android.settings.SummaryBoundEditTextPreference
+                android:dependency="@string/mongo_enable"
+                android:title="@string/pref_title_mongodb_collection"
+                android:key="@string/mongo_entries_collection"
+                android:dialogTitle="@string/pref_dialog_mongodb_collection"
+                android:dialogMessage="@string/pref_message_mongodb_collection"
+                android:defaultValue="@string/pref_default_mongodb_collection" />
 
-        <com.nightscout.android.settings.SummaryBoundEditTextPreference
-            android:dependency="cloud_storage_mongodb_enable"
-            android:title="@string/pref_title_mongodb_device_status_collection"
-            android:key="cloud_storage_mongodb_device_status_collection"
-            android:dialogTitle="@string/pref_dialog_mongodb_device_status_collection"
-            android:dialogMessage="@string/pref_message_mongodb_device_status_collection"
-            android:defaultValue="@string/pref_default_mongodb_device_status_collection" />
-    </PreferenceCategory>
+            <com.nightscout.android.settings.SummaryBoundEditTextPreference
+                android:dependency="@string/mongo_enable"
+                android:title="@string/pref_title_mongodb_device_status_collection"
+                android:key="@string/mongo_devicestatus_collection"
+                android:dialogTitle="@string/pref_dialog_mongodb_device_status_collection"
+                android:dialogMessage="@string/pref_message_mongodb_device_status_collection"
+                android:defaultValue="@string/pref_default_mongodb_device_status_collection" />
+        </PreferenceCategory>
+    </PreferenceScreen>
 
-    <PreferenceCategory
+    <PreferenceScreen
         android:key="cloud_data_to_upload"
         android:title="@string/pref_title_data_to_upload"
         android:summary="@string/pref_summary_data_to_upload">
 
         <CheckBoxPreference
-            android:key="cloud_android_battery"
-            android:title="@string/pref_title_android_battery"
-            android:summary="@string/pref_summary_android_battery"
-            android:defaultValue="true" />
-
-        <CheckBoxPreference
-            android:key="cloud_egv"
-            android:title="@string/pref_title_egv"
-            android:summary="@string/pref_summary_egv"
-            android:defaultValue="true" />
-
-        <CheckBoxPreference
-            android:key="cloud_mbg"
+            android:key="@string/cloud_mbg_data"
             android:title="@string/pref_title_meter_bg"
             android:summary="@string/pref_summary_meter_bg"
             android:defaultValue="true" />
 
         <CheckBoxPreference
-            android:key="cloud_sensor_data"
+            android:key="@string/cloud_sensor_data"
             android:title="@string/pref_title_sensor_data"
             android:summary="@string/pref_summary_sensor_data"
             android:defaultValue="false" />
 
         <CheckBoxPreference
-            android:key="cloud_cal_data"
+            android:key="@string/cloud_cal_data"
             android:title="@string/pref_title_cal_data"
             android:summary="@string/pref_summary_cal_data"
             android:defaultValue="false" />
-    </PreferenceCategory>
+
+        <CheckBoxPreference
+            android:key="@string/insert_data_enabled"
+            android:title="@string/pref_title_insertion_data"
+            android:summary="@string/pref_summary_insertion_data"
+            android:defaultValue="false" />
+    </PreferenceScreen>
 
     <PreferenceCategory android:title="@string/pref_header_display_options">
         <ListPreference
             android:title="@string/pref_title_chart_units_options"
-            android:key="display_options_units"
+            android:key="@string/preferred_units"
             android:entries="@array/pref_options_units"
             android:entryValues="@array/pref_options_units_values"
             android:defaultValue="0"
             android:negativeButtonText="@null"
-            android:positiveButtonText="@null"></ListPreference>
+            android:positiveButtonText="@null" />
     </PreferenceCategory>
+
+    <PreferenceScreen android:title="@string/pref_header_privacy">
+        <CheckBoxPreference
+            android:key="acra.enable"
+            android:title="@string/pref_enable_acra"
+            android:summaryOn="@string/acra_enabled_summary"
+            android:summaryOff="@string/acra_disabled_summary"
+            android:defaultValue="true" />
+        <com.nightscout.android.settings.SummaryBoundEditTextPreference
+            android:key="acra.user.email"
+            android:dependency="acra.enable"
+            android:title="@string/pref_acra_user_email"
+            android:dialogTitle="@string/acra_email_dialog_title"
+            android:dialogMessage="@string/acra_user_email_dialog_message" />
+    </PreferenceScreen>
+
 
     <PreferenceCategory android:title="@string/pref_header_about">
         <Preference
             android:key="about_version_name"
             android:title="@string/pref_title_about_release_name"
-            android:summary="@string/pref_summary_about_release_name"
             android:positiveButtonText="@string/ok"
             android:negativeButtonText="@null" />
 
@@ -189,26 +242,14 @@
             android:negativeButtonText="@null" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/pref_header_privacy">
-        <CheckBoxPreference
-            android:key="acra.enable"
-            android:title="@string/pref_enable_acra"
-            android:summaryOn="@string/acra_enabled_summary"
-            android:summaryOff="@string/acra_disabled_summary"
-            android:defaultValue="true" />
-        <com.nightscout.android.settings.SummaryBoundEditTextPreference
-            android:key="acra.user.email"
-            android:dependency="acra.enable"
-            android:title="@string/pref_acra_user_email"
-            android:dialogTitle="@string/acra_email_dialog_title"
-            android:dialogMessage="@string/acra_user_email_dialog_message" />
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="@string/pref_header_labs">
+    <PreferenceScreen
+        android:title="@string/pref_header_labs"
+        android:key="labs"
+        android:summary="Experimental labs">
         <com.nightscout.android.settings.CustomSwitchPreference
             android:title="@string/pref_title_root"
-            android:key="root_support_enabled"
+            android:key="@string/root_enable"
             android:defaultValue="false"
-            android:summary="@string/pref_summary_root"></com.nightscout.android.settings.CustomSwitchPreference>
-    </PreferenceCategory>
+            android:summary="@string/pref_summary_root" />
+    </PreferenceScreen>
 </PreferenceScreen>

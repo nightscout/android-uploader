@@ -1,7 +1,9 @@
 package com.nightscout.core.upload;
 
-import com.google.common.base.Joiner;
+
 import com.nightscout.core.preferences.NightscoutPreferences;
+
+import net.tribe7.common.base.Joiner;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -14,7 +16,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URI;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static net.tribe7.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractRestUploader extends BaseUploader {
     private final URI uri;
@@ -53,6 +55,8 @@ public abstract class AbstractRestUploader extends BaseUploader {
         setExtraHeaders(httpPost);
         httpPost.setEntity(new StringEntity(jsonObject.toString()));
         HttpResponse response = getClient().execute(httpPost);
+        log.error("JSON in doPost: {}", jsonObject);
+        log.error("Response code: {}", response.getStatusLine().getStatusCode());
         int statusCodeFamily = response.getStatusLine().getStatusCode() / 100;
         response.getEntity().consumeContent();
         return statusCodeFamily == 2;

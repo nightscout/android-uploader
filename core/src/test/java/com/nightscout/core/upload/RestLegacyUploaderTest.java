@@ -1,9 +1,9 @@
 package com.nightscout.core.upload;
 
-import com.google.common.collect.Lists;
-import com.google.common.io.CharStreams;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.preferences.TestPreferences;
+
+import net.tribe7.common.io.CharStreams;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolVersion;
@@ -22,6 +22,8 @@ import org.mockito.ArgumentCaptor;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static com.nightscout.core.test.MockFactory.mockCalRecord;
 import static com.nightscout.core.test.MockFactory.mockDeviceStatus;
@@ -66,7 +68,7 @@ public class RestLegacyUploaderTest {
 
     public static void verifyGlucoseDataSet(JSONObject jsonObject)
             throws JSONException {
-        assertThat(jsonObject.getString("device"), is("dexcom"));
+        assertThat(jsonObject.getString("device"), is("UNKNOWN"));
         assertThat(jsonObject.get("date"), is(not(nullValue())));
         assertThat(jsonObject.get("dateString"), is(not(nullValue())));
         assertThat(jsonObject.get("sgv"), is(not(nullValue())));
@@ -80,13 +82,14 @@ public class RestLegacyUploaderTest {
 
     @Test
     public void testGlucoseDataSet_Endpoint() throws Exception {
-        restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
+        restUploader.uploadGlucoseDataSets(new ArrayList<>(Arrays.asList(mockGlucoseDataSet())));
         assertThat(captor.getValue().getURI().toString(), containsString("entries"));
     }
 
     @Test
     public void testGlucoseDataSet_Entity() throws Exception {
-        restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
+        restUploader.uploadGlucoseDataSets(new ArrayList<>(Arrays.asList(mockGlucoseDataSet())));
+
         HttpPost post = (HttpPost) captor.getValue();
         String entity = CharStreams.toString(new InputStreamReader(post.getEntity().getContent()));
         verifyGlucoseDataSet(new JSONObject(entity));
@@ -96,7 +99,7 @@ public class RestLegacyUploaderTest {
     public void testMeterRecord_NoPost() throws Exception {
         reset(mockHttpClient);
         verifyNoMoreInteractions(mockHttpClient);
-        restUploader.uploadMeterRecords(Lists.newArrayList(mockMeterRecord()));
+        restUploader.uploadMeterRecords(new ArrayList<>(Arrays.asList(mockMeterRecord())));
     }
 
     @Test
@@ -104,19 +107,20 @@ public class RestLegacyUploaderTest {
         preferences.setCalibrationUploadEnabled(true);
         reset(mockHttpClient);
         verifyNoMoreInteractions(mockHttpClient);
-        restUploader.uploadCalRecords(Lists.newArrayList(mockCalRecord()));
+        restUploader.uploadCalRecords(new ArrayList<>(Arrays.asList(mockCalRecord())));
+
     }
 
     @Test
     public void testDeviceStatus_Endpoint() throws Exception {
-        restUploader.uploadDeviceStatus(mockDeviceStatus());
+        restUploader.uploadDeviceStatus(mockDeviceStatus(), 100);
         assertThat(captor.getValue().getURI().toString(), containsString("devicestatus"));
     }
 
     @Test
     public void testDeviceStatus_Entity() throws Exception {
         AbstractUploaderDevice deviceStatus = mockDeviceStatus();
-        restUploader.uploadDeviceStatus(deviceStatus);
+        restUploader.uploadDeviceStatus(deviceStatus, 100);
         HttpPost post = (HttpPost) captor.getValue();
         String entity = CharStreams.toString(new InputStreamReader(post.getEntity().getContent()));
         verifyDeviceStatus(new JSONObject(entity), deviceStatus);

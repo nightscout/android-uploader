@@ -1,5 +1,6 @@
 package com.nightscout.core.preferences;
 
+import com.nightscout.core.drivers.SupportedDevices;
 import com.nightscout.core.model.GlucoseUnit;
 
 import java.util.ArrayList;
@@ -21,6 +22,10 @@ public class TestPreferences implements NightscoutPreferences {
     private boolean understand;
     private boolean askedForData;
     private String mqttEndpoint;
+    private String serialNumber;
+    private boolean mgbUploadEnabled = false;
+    private String btAddress = null;
+    private String btDeviceName = null;
 
     @Override
     public boolean isRestApiEnabled() {
@@ -175,6 +180,55 @@ public class TestPreferences implements NightscoutPreferences {
     @Override
     public void setAskedForData(boolean askedForData) {
         this.askedForData = askedForData;
+    }
+
+    // TODO Implement these
+    @Override
+    public SupportedDevices getDeviceType() {
+        return SupportedDevices.UNKNOWN;
+    }
+
+    // TODO Implement these
+    @Override
+    public void setBluetoothDevice(String btDeviceName, String btAddress) {
+        this.btAddress = btAddress;
+        this.btDeviceName = btDeviceName;
+    }
+
+    // TODO Implement these
+    @Override
+    public String getBtAddress() {
+        return this.btAddress;
+    }
+
+    @Override
+    public String getShareSerial() {
+        return this.serialNumber;
+    }
+
+    @Override
+    public void setShareSerial(String serialNumber) {
+        this.serialNumber = serialNumber;
+    }
+
+    @Override
+    public boolean isMeterUploadEnabled() {
+        return mgbUploadEnabled;
+    }
+
+    @Override
+    public void setMeterUploadEnabled(boolean enabled) {
+        mgbUploadEnabled = enabled;
+    }
+
+    @Override
+    public boolean isInsertionUploadEnabled() {
+        return false;
+    }
+
+    @Override
+    public void setInsertionUploadEnabled(boolean enabled) {
+
     }
 
     @Override

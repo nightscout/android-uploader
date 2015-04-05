@@ -3,7 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.nightscout.android">
 
+    <permission
+        android:name="org.nightscout.uploader.ACCESS_NIGHTSCOUT_DATA"
+        android:protectionLevel="dangerous" />
+    <permission
+        android:name="org.nightscout.uploader.UPDATE_NIGHTSCOUT_DATA"
+        android:protectionLevel="dangerous" />
+
     <uses-feature android:name="android.hardware.usb.host" />
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_LOGS" />
@@ -14,6 +24,9 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="com.nightscout.android.dexcom.action.SYNC" />
 
 
     <application
@@ -28,11 +41,111 @@
             android:name="com.google.android.gms.version"
             tools:replace="android:value"
             android:value="6587000" />
+        <!--<activity-->
+        <!--android:name=".MainActivity"-->
+        <!--android:screenOrientation="portrait"-->
+        <!--android:launchMode="singleTask">-->
+
+        <!--<intent-filter>-->
+        <!--<action android:name="android.intent.action.MAIN" />-->
+
+        <!--<category android:name="android.intent.category.DEFAULT" />-->
+        <!--<category android:name="android.intent.category.LAUNCHER" />-->
+
+        <!--<action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />-->
+        <!--</intent-filter>-->
+
+        <!--<meta-data-->
+        <!--android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"-->
+        <!--android:resource="@xml/device_filter" />-->
+        <!--</activity>-->
+
+        <receiver android:name=".UpgradeReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <data
+                    android:scheme="package"
+                    android:path="com.nightscout.android" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".SyncReceiver"
+            android:enabled="true"
+            android:exported="false">
+        <intent-filter>
+                <action android:name="com.nightscout.android.dexcom.action.SYNC" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".UploadReceiver"
+            android:enabled="true"
+            android:permission="org.nightscout.uploader.UPDATE_NIGHTSCOUT_DATA">
+            <intent-filter>
+                <action android:name="com.nightscout.android.dexcom.action.SYNC" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".G4UsbReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED" />
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+            </intent-filter>
+
+        </receiver>
+
         <activity
-            android:name=".MainActivity"
+            android:name="org.acra.CrashReportDialog"
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true"
+            android:launchMode="singleInstance"
+            android:theme="@android:style/Theme.Dialog" />
+
+        <!--<service android:name=".SyncingService" />-->
+        <service android:name=".CollectorService" />
+        <service android:name=".ProcessorService" />
+
+        <activity
+            android:name=".settings.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:launchMode="singleTask"
+            android:parentActivityName=".ui.NightscoutNavigationDrawer">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nightscout.android.ui.NightscoutNavigationDrawer" />
+        </activity>
+
+        <activity
+            android:name=".events.UserEventPanelActivity"
+            android:label="Events"
+            android:parentActivityName=".ui.NightscoutNavigationDrawer">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.NightscoutNavigationDrawer" />
+        </activity>
+
+        <activity
+            android:name=".settings.BluetoothScanActivity"
+            android:label="@string/title_activity_bluetooth_scan">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".settings.SettingsActivity" />
+        </activity>
+
+        <activity
+            android:name=".ui.NightscoutNavigationDrawer"
+            android:theme="@style/MyNavigationDrawerTheme"
             android:screenOrientation="portrait"
             android:launchMode="singleTask">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -45,43 +158,7 @@
             <meta-data
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/device_filter" />
-        </activity>
 
-        <receiver android:name=".UpgradeReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_REPLACED" />
-                <data
-                    android:scheme="package"
-                    android:path="com.nightscout.android" />
-            </intent-filter>
-        </receiver>
-
-
-        <activity
-            android:name="org.acra.CrashReportDialog"
-            android:excludeFromRecents="true"
-            android:finishOnTaskLaunch="true"
-            android:launchMode="singleInstance"
-            android:theme="@android:style/Theme.Dialog" />
-
-        <service android:name=".SyncingService" />
-
-        <activity
-            android:name=".settings.SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nightscout.android.MainActivity" />
-        </activity>
-
-        <activity
-            android:name=".events.UserEventPanelActivity"
-            android:label="Events"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
         </activity>
 
     </application>

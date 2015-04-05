@@ -22,7 +22,7 @@ public class SensorRecordTest {
                 (byte) 0xDB, (byte) 0x1A, (byte) 0x0B, (byte) 0xC0, (byte) 0x3B, (byte) 0x02,
                 (byte) 0x00, (byte) 0x50, (byte) 0xFD, (byte) 0x01, (byte) 0x00, (byte) 0xA6,
                 (byte) 0x00, (byte) 0xC7};
-        SensorRecord sensorRecord = new SensorRecord(record);
+        SensorRecord sensorRecord = new SensorRecord(record, 0, 0);
         assertThat(sensorRecord.getUnfiltered(), is(146368L));
         assertThat(sensorRecord.getFiltered(), is(130384L));
         assertThat(sensorRecord.getRssi(), is(166));
@@ -36,7 +36,7 @@ public class SensorRecordTest {
                 (byte) 0xDB, (byte) 0x1A, (byte) 0x0B, (byte) 0xC0, (byte) 0x3B, (byte) 0x02,
                 (byte) 0x00, (byte) 0x50, (byte) 0xFD, (byte) 0x01, (byte) 0x00, (byte) 0xA6,
                 (byte) 0x00};
-        SensorRecord sensorRecord = new SensorRecord(record);
+        SensorRecord sensorRecord = new SensorRecord(record, 0, 0);
     }
 
     @Test(expected = InvalidRecordLengthException.class)
@@ -45,7 +45,7 @@ public class SensorRecordTest {
                 (byte) 0xDB, (byte) 0x1A, (byte) 0x0B, (byte) 0xC0, (byte) 0x3B, (byte) 0x02,
                 (byte) 0x00, (byte) 0x50, (byte) 0xFD, (byte) 0x01, (byte) 0x00, (byte) 0xA6,
                 (byte) 0x00, (byte) 0xC7, (byte) 0x00};
-        SensorRecord sensorRecord = new SensorRecord(record);
+        SensorRecord sensorRecord = new SensorRecord(record, 0, 0);
     }
 
 }

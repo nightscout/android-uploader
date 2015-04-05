@@ -10,7 +10,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
@@ -64,6 +63,7 @@ public class MqttEventMgrTest {
     @Test
     public void connectWithMqttExceptionShouldReconnectDelayed() throws Exception {
         doThrow(new MqttException(1)).when(mockClient).connect((MqttConnectOptions) anyObject());
+        manager.setShouldReconnect(true);
         manager.connect();
         verify(mockTimer).setTimer(anyInt());
     }
@@ -95,6 +95,7 @@ public class MqttEventMgrTest {
     @Test
     public void reconnectDelayedWithInactiveTimerShouldActivateTimer() throws Exception {
         when(mockTimer.isActive()).thenReturn(false);
+        manager.setShouldReconnect(true);
         manager.delayedReconnect();
         verify(mockTimer, times(1)).activate();
     }
@@ -179,7 +180,6 @@ public class MqttEventMgrTest {
 
     // Moved some of the reconnect logic out from lostConnection to prevent double reconnects.
     // May readd it later.
-    @Ignore
     @Test
     public void lostConnectionShouldNotifyObserver() {
         MqttMgrObserver observer = mock(MqttMgrObserver.class);
@@ -190,10 +190,10 @@ public class MqttEventMgrTest {
 
     // Moved some of the reconnect logic out from lostConnection to prevent double reconnects.
     // May readd it later.
-    @Ignore
     @Test
     public void lostConnectionShouldSetTimerToReconnect() {
         MqttMgrObserver observer = mock(MqttMgrObserver.class);
+        manager.setShouldReconnect(true);
         manager.connectionLost(new Throwable("Some random throwable"));
         verify(mockTimer).setTimer(anyInt());
     }
@@ -259,6 +259,7 @@ public class MqttEventMgrTest {
     @Test
     public void subscribeMultipleTopicsShouldReconnectWithExceptions() throws Exception {
         doThrow(new MqttException(1)).when(mockClient).subscribe(anyString(), anyInt());
+        manager.setShouldReconnect(true);
         manager.subscribe("/topic/1", "/topic/2", "/topic/3");
         verify(mockTimer, times(1)).setTimer(anyInt());
     }
@@ -266,6 +267,7 @@ public class MqttEventMgrTest {
     @Test
     public void publishWithExceptionShouldReconnectDelayed() throws Exception {
         doThrow(new MqttException(1)).when(mockClient).publish(anyString(), (byte[]) anyObject(), anyInt(), anyBoolean());
+        manager.setShouldReconnect(true);
         manager.publish("my message".getBytes(), "/topic/1");
         verify(mockTimer, times(1)).setTimer(anyInt());
     }
@@ -292,6 +294,7 @@ public class MqttEventMgrTest {
     @Test
     public void reconnectDelayedShouldRegisterWithTimer() throws Exception {
         when(mockTimer.isActive()).thenReturn(false);
+        manager.setShouldReconnect(true);
         manager.delayedReconnect();
         verify(mockTimer, times(1)).registerObserver(manager);
     }

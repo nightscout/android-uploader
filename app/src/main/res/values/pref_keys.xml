@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="insert_data_enabled" translatable="false">cloud_ins_data</string>
+    <string name="cloud_cal_data" translatable="false">cloud_cal_data</string>
+    <string name="cloud_sensor_data" translatable="false">cloud_sensor_data</string>
+    <string name="cloud_mbg_data" translatable="false">cloud_mbg</string>
+    <string name="mongo_enable" translatable="false">cloud_storage_mongodb_enable</string>
+    <string name="mongo_uri" translatable="false">cloud_storage_mongodb_uri</string>
+    <string name="mongo_entries_collection" translatable="false">cloud_storage_mongodb_collection</string>
+    <string name="mongo_devicestatus_collection" translatable="false">cloud_storage_mongodb_device_status_collection</string>
+    <string name="rest_enable" translatable="false">cloud_storage_api_enable</string>
+    <string name="rest_uris" translatable="false">cloud_storage_api_base</string>
+    <string name="mqtt_enable" translatable="false">cloud_storage_mqtt_enable</string>
+    <string name="mqtt_endpoint" translatable="false">cloud_storage_mqtt_endpoint</string>
+    <string name="mqtt_user" translatable="false">cloud_storage_mqtt_user</string>
+    <string name="mqtt_pass" translatable="false">cloud_storage_mqtt_pass</string>
+    <string name="last_mqtt_egv_time" translatable="false">last_mqtt_egv_time</string>
+    <string name="last_mqtt_sensor_time" translatable="false">last_mqtt_sensor_time</string>
+    <string name="last_mqtt_cal_time" translatable="false">last_mqtt_cal_time</string>
+    <string name="last_mqtt_meter_time" translatable="false">last_mqtt_meter_time</string>
+    <string name="labs_enable" translatable="false">enable_labs</string>
+    <string name="root_enable" translatable="false">root_support_enabled</string>
+    <string name="data_donate" translatable="false">data_donate</string>
+    <string name="i_understand" translatable="false">i_understand</string>
+    <string name="preferred_units" translatable="false">display_options_units</string>
+    <string name="pwd_name" translatable="false">pwd_name</string>
+    <string name="donate_data_query" translatable="false">donate_data_query</string>
+    <string name="dexcom_device_type" translatable="false">dexcom_device_type</string>
+    <string name="share2_serial" translatable="false">share2_serial</string>
+    <string name="share_bluetooth_device" translatable="false">share_bluetooth_device</string>
+    <string name="share_bluetooth_address" translatable="false">share_bluetooth_address</string>
+    <string name="bt_scan_share2" translatable="false">bt_scan_share2</string>
+</resources>

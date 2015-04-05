@@ -17,29 +17,36 @@ public class SensorRecord extends GenericTimestampRecord {
     private int OFFSET_FILTERED = 12;
     private int OFFSET_RSSI = 16;
 
-    public SensorRecord(byte[] packet) {
-        super(packet);
+    public SensorRecord(byte[] packet, long rcvrTime, long refTime) {
+        super(packet, rcvrTime, refTime);
         if (packet.length != RECORD_SIZE) {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
                     ". Expected size: " + RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
         }
-        unfiltered = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(OFFSET_UNFILTERED);
-        filtered = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(OFFSET_FILTERED);
-        rssi = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(OFFSET_RSSI);
+        this.unfiltered = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(OFFSET_UNFILTERED);
+        this.filtered = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(OFFSET_FILTERED);
+        this.rssi = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(OFFSET_RSSI);
+        setRecordType();
     }
 
-    public SensorRecord(int filtered, int unfiltered, int rssi, long displayTime, int systemTime) {
-        super(displayTime, systemTime);
+    public SensorRecord(int filtered, int unfiltered, int rssi, long displayTime, long systemTime, long rcvrTime, long refTime) {
+        super(displayTime, systemTime, rcvrTime, refTime);
         this.filtered = filtered;
         this.unfiltered = unfiltered;
         this.rssi = rssi;
+        setRecordType();
     }
 
-    public SensorRecord(SensorEntry sensor) {
-        super(sensor.disp_timestamp_sec, sensor.sys_timestamp_sec);
+    public SensorRecord(SensorEntry sensor, long rcvrTime, long refTime) {
+        super(sensor.disp_timestamp_sec, sensor.sys_timestamp_sec, rcvrTime, refTime);
         this.filtered = sensor.filtered;
         this.unfiltered = sensor.unfiltered;
         this.rssi = sensor.rssi;
+        setRecordType();
+    }
+
+    protected void setRecordType() {
+        this.recordType = "sensor";
     }
 
     public long getUnfiltered() {
@@ -63,7 +70,6 @@ public class SensorRecord extends GenericTimestampRecord {
                 .filtered(filtered)
                 .unfiltered(unfiltered)
                 .build();
-
     }
 
     public static List<SensorEntry> toProtobufList(List<SensorRecord> list) {

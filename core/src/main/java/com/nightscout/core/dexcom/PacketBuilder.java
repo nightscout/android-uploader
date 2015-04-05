@@ -1,8 +1,11 @@
 package com.nightscout.core.dexcom;
 
-import com.google.common.primitives.Bytes;
+//import com.google.common.primitives.Bytes;
+
+import net.tribe7.common.primitives.Bytes;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PacketBuilder {
     public static final int MAX_PAYLOAD = 1584;
@@ -17,15 +20,15 @@ public class PacketBuilder {
     public static final int OFFSET_PAYLOAD = 4;
     public static final int CRC_LEN = 2;
     public static final int HEADER_LEN = 4;
-    private ArrayList<Byte> packet;
+    private List<Byte> packet;
     private Command command;
-    private ArrayList<Byte> payload;
+    private List<Byte> payload;
 
-    public PacketBuilder(Command command){
+    public PacketBuilder(Command command) {
         this.command = command;
     }
 
-    public PacketBuilder(Command command, ArrayList<Byte> payload) {
+    public PacketBuilder(Command command, List<Byte> payload) {
         this.command = command;
         this.payload = payload;
     }

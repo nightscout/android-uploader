@@ -5,14 +5,12 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
 import com.nightscout.android.R;
-import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.test.RobolectricTestBase;
 
 import org.junit.Test;
 import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.util.FragmentTestUtil;
 
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.Matchers.not;
@@ -24,7 +22,7 @@ public class SettingsActivityTest extends RobolectricTestBase {
     private PreferenceFragment setUpPreferenceFragment(Class<? extends PreferenceFragment> clazz) {
         PreferenceFragment instance;
         try {
-             instance = clazz.newInstance();
+            instance = clazz.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -36,7 +34,7 @@ public class SettingsActivityTest extends RobolectricTestBase {
     public void testValidation_RestApi_Invalid() {
         EditTextPreference editTextPreference = (EditTextPreference) setUpPreferenceFragment(
                 SettingsActivity.MainPreferenceFragment.class)
-                .findPreference(PreferenceKeys.API_URIS);
+                .findPreference(getShadowApplication().getString(R.string.rest_uris));
         assertThat(editTextPreference.getOnPreferenceChangeListener()
                 .onPreferenceChange(editTextPreference, "\\invalidUri"), is(false));
     }
@@ -45,9 +43,9 @@ public class SettingsActivityTest extends RobolectricTestBase {
     public void testValidation_RestApi_MultipleInvalid() {
         EditTextPreference editTextPreference = (EditTextPreference) setUpPreferenceFragment(
                 SettingsActivity.MainPreferenceFragment.class)
-                .findPreference(PreferenceKeys.API_URIS);
+                .findPreference(getShadowApplication().getString(R.string.rest_uris));
         assertThat(editTextPreference.getOnPreferenceChangeListener()
-                .onPreferenceChange(editTextPreference, "http://example.com \\invalidUri"),
+                        .onPreferenceChange(editTextPreference, "http://example.com \\invalidUri"),
                 is(false));
     }
 
@@ -55,9 +53,9 @@ public class SettingsActivityTest extends RobolectricTestBase {
     public void testValidation_RestApi_MultipleValid() {
         EditTextPreference editTextPreference = (EditTextPreference) setUpPreferenceFragment(
                 SettingsActivity.MainPreferenceFragment.class)
-                .findPreference(PreferenceKeys.API_URIS);
+                .findPreference(getShadowApplication().getString(R.string.rest_uris));
         assertThat(editTextPreference.getOnPreferenceChangeListener()
-                        .onPreferenceChange(editTextPreference, "http://example.com validUri.com"),
+                        .onPreferenceChange(editTextPreference, "http://example.com http://validUri.com"),
                 is(true));
     }
 
@@ -65,7 +63,7 @@ public class SettingsActivityTest extends RobolectricTestBase {
     public void testValidation_RestApi_Valid() {
         EditTextPreference editTextPreference = (EditTextPreference) setUpPreferenceFragment(
                 SettingsActivity.MainPreferenceFragment.class)
-                .findPreference(PreferenceKeys.API_URIS);
+                .findPreference(getShadowApplication().getString(R.string.rest_uris));
         assertThat(editTextPreference.getOnPreferenceChangeListener()
                 .onPreferenceChange(editTextPreference, "http://example.com"), is(true));
     }
@@ -74,7 +72,7 @@ public class SettingsActivityTest extends RobolectricTestBase {
     public void testAlert_RestApi_InvalidShowsDialog() {
         EditTextPreference editTextPreference = (EditTextPreference) setUpPreferenceFragment(
                 SettingsActivity.MainPreferenceFragment.class)
-                .findPreference(PreferenceKeys.API_URIS);
+                .findPreference(getShadowApplication().getString(R.string.rest_uris));
         editTextPreference.getOnPreferenceChangeListener()
                 .onPreferenceChange(editTextPreference, "\\invalidUri");
         ShadowAlertDialog alertDialog = getShadowApplication().getLatestAlertDialog();
@@ -87,7 +85,7 @@ public class SettingsActivityTest extends RobolectricTestBase {
     public void testValidation_Mongo_Invalid() {
         EditTextPreference editTextPreference = (EditTextPreference) setUpPreferenceFragment(
                 SettingsActivity.MainPreferenceFragment.class)
-                .findPreference(PreferenceKeys.MONGO_URI);
+                .findPreference(getShadowApplication().getString(R.string.mongo_uri));
         assertThat(editTextPreference.getOnPreferenceChangeListener()
                 .onPreferenceChange(editTextPreference, "invalidMongo"), is(false));
     }
@@ -96,7 +94,7 @@ public class SettingsActivityTest extends RobolectricTestBase {
     public void testValidation_Mongo_Valid() {
         EditTextPreference editTextPreference = (EditTextPreference) setUpPreferenceFragment(
                 SettingsActivity.MainPreferenceFragment.class)
-                .findPreference(PreferenceKeys.MONGO_URI);
+                .findPreference(getShadowApplication().getString(R.string.mongo_uri));
         assertThat(editTextPreference.getOnPreferenceChangeListener()
                 .onPreferenceChange(editTextPreference, "mongodb://example.com"), is(true));
     }
@@ -105,7 +103,7 @@ public class SettingsActivityTest extends RobolectricTestBase {
     public void testAlert_Mongo_InvalidShowsDialog() {
         EditTextPreference editTextPreference = (EditTextPreference) setUpPreferenceFragment(
                 SettingsActivity.MainPreferenceFragment.class)
-                .findPreference(PreferenceKeys.MONGO_URI);
+                .findPreference(getShadowApplication().getString(R.string.mongo_uri));
         editTextPreference.getOnPreferenceChangeListener()
                 .onPreferenceChange(editTextPreference, "invalidMongo");
         ShadowAlertDialog alertDialog = getShadowApplication().getLatestAlertDialog();

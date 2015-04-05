@@ -1,6 +1,6 @@
 package com.nightscout.core.dexcom.records;
 
-import com.google.common.base.Optional;
+import net.tribe7.common.base.Optional;
 
 public interface ProtobufRecord {
     public <T> T toProtoBuf();

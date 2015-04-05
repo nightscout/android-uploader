@@ -1,11 +1,11 @@
 package com.nightscout.core.upload;
 
-import com.google.common.collect.Lists;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
+import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
+import com.nightscout.core.dexcom.records.InsertionRecord;
+import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
-import com.nightscout.core.model.CalibrationEntry;
-import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.preferences.TestPreferences;
 
@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.nightscout.core.test.MockFactory.mockCalRecord;
@@ -32,9 +33,10 @@ public class BaseUploaderTest {
     private TestPreferences preferences;
 
     class MockUploader extends BaseUploader {
-        public List<CalibrationEntry> calRecords;
+        public List<CalRecord> calRecords;
         public List<GlucoseDataSet> glucoseDataSets;
-        public List<MeterEntry> meterRecords;
+        public List<MeterRecord> meterRecords;
+        public List<InsertionRecord> insertionRecords;
 
         public MockUploader(NightscoutPreferences preferences) {
             super(preferences);
@@ -54,16 +56,23 @@ public class BaseUploaderTest {
         }
 
         @Override
-        protected boolean doUpload(MeterEntry meterRecord) throws IOException {
+        protected boolean doUpload(MeterRecord meterRecord) throws IOException {
             meterRecords.add(meterRecord);
             return true;
         }
 
         @Override
-        protected boolean doUpload(CalibrationEntry calRecord) throws IOException {
+        protected boolean doUpload(CalRecord calRecord) throws IOException {
             calRecords.add(calRecord);
             return true;
         }
+
+        @Override
+        protected boolean doUpload(InsertionRecord insertionRecord) throws IOException {
+            insertionRecords.add(insertionRecord);
+            return true;
+        }
+
     }
 
     class ExceptionThrowingUploader extends BaseUploader {
@@ -77,17 +86,22 @@ public class BaseUploaderTest {
         }
 
         @Override
-        protected boolean doUpload(MeterEntry meterRecord) throws IOException {
+        protected boolean doUpload(MeterRecord meterRecord) throws IOException {
             throw new IOException("meter");
         }
 
         @Override
-        protected boolean doUpload(CalibrationEntry calRecord) throws IOException {
+        protected boolean doUpload(CalRecord calRecord) throws IOException {
             throw new IOException("cal");
         }
 
         @Override
-        protected boolean doUpload(AbstractUploaderDevice deviceStatus) throws IOException {
+        protected boolean doUpload(InsertionRecord insertionRecord) throws IOException {
+            throw new IOException("insertion");
+        }
+
+        @Override
+        protected boolean doUpload(AbstractUploaderDevice deviceStatus, int receiverBattery) throws IOException {
             throw new IOException("device");
         }
     }
@@ -116,17 +130,18 @@ public class BaseUploaderTest {
 
     @Test
     public void testUploadGlucoseDataSets_One() {
-        List<GlucoseDataSet> list = Lists.newArrayList(mockGlucoseDataSet());
+        List<GlucoseDataSet> list = new ArrayList<>(Arrays.asList(mockGlucoseDataSet()));
         mockUploader.uploadGlucoseDataSets(list);
         assertThat(mockUploader.glucoseDataSets, hasSize(1));
     }
 
     @Test
     public void testUploadGlucoseDataSets_Many() {
-        List<GlucoseDataSet> list = Lists.newArrayList(
-                mockGlucoseDataSet(),
-                mockGlucoseDataSet(),
-                mockGlucoseDataSet());
+//        List<GlucoseDataSet> list = Lists.newArrayList(
+//                mockGlucoseDataSet(),
+//                mockGlucoseDataSet(),
+//                mockGlucoseDataSet());
+        List<GlucoseDataSet> list = new ArrayList<>(Arrays.asList(new GlucoseDataSet[]{mockGlucoseDataSet(), mockGlucoseDataSet(), mockGlucoseDataSet()}));
         mockUploader.uploadGlucoseDataSets(list);
         assertThat(mockUploader.glucoseDataSets, hasSize(3));
     }
@@ -134,7 +149,7 @@ public class BaseUploaderTest {
     @Test
     public void testUploadGlucoseDataSets_Exception() {
         try {
-            exceptionUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
+            exceptionUploader.uploadGlucoseDataSets(new ArrayList<>(Arrays.asList(mockGlucoseDataSet())));
         } catch (Exception e) {
             fail("Shouldn't throw an exception.");
         }
@@ -151,23 +166,20 @@ public class BaseUploaderTest {
 
     @Test
     public void testUploadMeterRecords_Zero() {
-        mockUploader.uploadMeterRecords(new ArrayList<MeterEntry>());
+        mockUploader.uploadMeterRecords(new ArrayList<MeterRecord>());
         assertThat(mockUploader.meterRecords, is(empty()));
     }
 
     @Test
     public void testUploadMeterRecords_One() throws Exception {
-        List<MeterEntry> list = Lists.newArrayList(mockMeterRecord());
+        List<MeterRecord> list = new ArrayList<>(Arrays.asList(mockMeterRecord()));
         mockUploader.uploadMeterRecords(list);
         assertThat(mockUploader.meterRecords, hasSize(1));
     }
 
     @Test
     public void testUploadMeterRecords_Many() throws Exception {
-        List<MeterEntry> list = Lists.newArrayList(
-                mockMeterRecord(),
-                mockMeterRecord(),
-                mockMeterRecord());
+        List<MeterRecord> list = new ArrayList<>(Arrays.asList(new MeterRecord[]{mockMeterRecord(), mockMeterRecord(), mockMeterRecord()}));
         mockUploader.uploadMeterRecords(list);
         assertThat(mockUploader.meterRecords, hasSize(3));
     }
@@ -175,7 +187,7 @@ public class BaseUploaderTest {
     @Test
     public void testUploadMeterRecords_Exception() {
         try {
-            exceptionUploader.uploadMeterRecords(Lists.newArrayList(mockMeterRecord()));
+            exceptionUploader.uploadMeterRecords(new ArrayList<>(Arrays.asList(mockMeterRecord())));
         } catch (Exception e) {
             fail("Shouldn't throw an exception.");
         }
@@ -194,16 +206,16 @@ public class BaseUploaderTest {
     @Test
     public void testUploadCalRecords_Zero() {
         preferences.setCalibrationUploadEnabled(true);
-        mockUploader.uploadCalRecords(new ArrayList<CalibrationEntry>());
+        mockUploader.uploadCalRecords(new ArrayList<CalRecord>());
         assertThat(mockUploader.calRecords, is(empty()));
     }
 
     @Test
     public void testUploadCalRecords_One() {
         preferences.setCalibrationUploadEnabled(true);
-        List<CalibrationEntry> list = null;
+        List<CalRecord> list = null;
         try {
-            list = Lists.newArrayList(mockCalRecord());
+            list = new ArrayList<>(Arrays.asList(mockCalRecord()));
         } catch (InvalidRecordLengthException e) {
             fail("Shouldn't get an exception");
         }
@@ -214,12 +226,9 @@ public class BaseUploaderTest {
     @Test
     public void testUploadCalRecords_Many() {
         preferences.setCalibrationUploadEnabled(true);
-        List<CalibrationEntry> list = null;
+        List<CalRecord> list = null;
         try {
-            list = Lists.newArrayList(
-                    mockCalRecord(),
-                    mockCalRecord(),
-                    mockCalRecord());
+            list = new ArrayList<>(Arrays.asList(new CalRecord[]{mockCalRecord(), mockCalRecord(), mockCalRecord()}));
         } catch (InvalidRecordLengthException e) {
             fail("Shouldn't get an exception");
         }
@@ -231,7 +240,7 @@ public class BaseUploaderTest {
     public void testUploadCalRecords_Exception() {
         preferences.setCalibrationUploadEnabled(true);
         try {
-            exceptionUploader.uploadCalRecords(Lists.newArrayList(mockCalRecord()));
+            exceptionUploader.uploadCalRecords(new ArrayList<>(Arrays.asList(mockCalRecord())));
         } catch (Exception e) {
             fail("Shouldn't throw an exception.");
         }
@@ -240,7 +249,7 @@ public class BaseUploaderTest {
     @Test
     public void testUploadDeviceStatus_Exception() {
         try {
-            exceptionUploader.uploadDeviceStatus(mockDeviceStatus());
+            exceptionUploader.uploadDeviceStatus(mockDeviceStatus(), 100);
         } catch (Exception e) {
             fail("Shouldn't throw an exception.");
         }

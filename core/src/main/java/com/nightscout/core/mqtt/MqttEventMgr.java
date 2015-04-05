@@ -1,6 +1,5 @@
 package com.nightscout.core.mqtt;
 
-import com.google.common.collect.Lists;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
@@ -16,17 +15,18 @@ import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static net.tribe7.common.base.Preconditions.checkNotNull;
 
 public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrObservable,
         MqttTimerObserver {
     protected final Logger log = LoggerFactory.getLogger(MqttEventMgr.class);
     private final static String TAG = MqttEventMgr.class.getSimpleName();
-    private List<MqttMgrObserver> observers = Lists.newArrayList();
+    private List<MqttMgrObserver> observers = new ArrayList<>();
     private MqttClient client;
     private MqttConnectOptions options;
     private MqttTimer timer;
@@ -37,6 +37,7 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
     private MqttConnectionState state = MqttConnectionState.DISCONNECTED;
     private ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle",
             Locale.getDefault());
+    private boolean shouldReconnect = false;
 
     public MqttEventMgr(MqttClient client, MqttConnectOptions options, MqttPinger pinger,
                         MqttTimer timer, EventReporter reporter) {
@@ -46,6 +47,10 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
         this.pinger = checkNotNull(pinger);
         this.client.setCallback(MqttEventMgr.this);
         this.reporter = reporter;
+    }
+
+    public void setShouldReconnect(boolean shouldReconnect) {
+        this.shouldReconnect = shouldReconnect;
     }
 
     public void connect() {
@@ -71,6 +76,7 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
                 pinger.stop();
             }
         } catch (MqttException e) {
+            log.info("MQTT Exception {}", e);
             delayedReconnect();
         }
     }
@@ -81,6 +87,11 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
 
     public void delayedReconnect(long delayMs) {
         if (state == MqttConnectionState.RECONNECTING) {
+            return;
+        }
+        // FIXME - reconnect flags are ugly. Seems to be a problem somewhere in the reconnect logic
+        if (!shouldReconnect) {
+            log.warn("Should not attempt to reconnect. Ignoring");
             return;
         }
         log.info("MQTT delayed reconnect");
@@ -101,7 +112,6 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
             disconnect();
             connect();
         } else {
-            // TODO: Figure out what to do here
             reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
                     messages.getString("mqtt_reconnect_fail"));
         }
@@ -134,7 +144,7 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
             reporter.report(EventType.UPLOADER, EventSeverity.INFO,
                     messages.getString("mqtt_close"));
         } catch (MqttException e) {
-            // TODO: determine how to handle this
+            // TODO: determine how to handle this. Cruton maybe?
             log.info(messages.getString("mqtt_close_fail"));
             reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
                     messages.getString("mqtt_close_fail"));
@@ -160,9 +170,9 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
 
     @Override
     public void connectionLost(Throwable cause) {
-        if (state != MqttConnectionState.CONNECTED) {
-            return;
-        }
+//        if (state != MqttConnectionState.CONNECTED) {
+//            return;
+//        }
         log.info(messages.getString("mqtt_lost_connection"));
 
         reporter.report(EventType.UPLOADER, EventSeverity.WARN,
@@ -211,9 +221,11 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
     }
 
     public void subscribe(int QOS, String... topics) {
-        List<String> mqTopics = Lists.newArrayList(topics);
+//        List<String> mqTopics = Lists.newArrayList(topics);
+//        List<String> mqTopics = new ArrayList<>();
+//        mqTopics.addAll(topics)
         boolean willReconnect = false;
-        for (String topic : mqTopics) {
+        for (String topic : topics) {
             try {
                 client.subscribe(topic, QOS);
             } catch (MqttException e) {
@@ -240,7 +252,7 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
             client.publish(topic, message, QOS, true);
             reporter.report(EventType.UPLOADER, EventSeverity.INFO,
                     messages.getString("mqtt_publish_success"));
-            log.info("MainActivity: Published \"" + Utils.bytesToHex(message) + "\" to \"" + topic + "\"");
+            log.info("{}: Published \"{}\" to \"{}\"", MqttEventMgr.class.getSimpleName(), Utils.bytesToHex(message), topic);
         } catch (MqttException e) {
             // TODO: Determine what to do here
             reporter.report(EventType.UPLOADER, EventSeverity.ERROR,

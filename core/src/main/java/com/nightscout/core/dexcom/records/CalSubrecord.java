@@ -2,16 +2,17 @@ package com.nightscout.core.dexcom.records;
 
 import com.nightscout.core.dexcom.Utils;
 
+import org.joda.time.DateTime;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Date;
 
 public class CalSubrecord {
-    private Date dateEntered;
+    private DateTime dateEntered;
     private int rawDateEntered;
     private int calBGL;
     private int calRaw;
-    private Date dateApplied;
+    private DateTime dateApplied;
     private int rawDateApplied;
     private byte unk;
 
@@ -27,7 +28,7 @@ public class CalSubrecord {
         unk = packet[16];
     }
 
-    public CalSubrecord(int calBGL, int calRaw, Date dateApplied, Date dateEntered) {
+    public CalSubrecord(int calBGL, int calRaw, DateTime dateApplied, DateTime dateEntered) {
         this.calBGL = calBGL;
         this.calRaw = calRaw;
         this.dateEntered = dateEntered;
@@ -42,7 +43,7 @@ public class CalSubrecord {
     }
 
 
-    public Date getDateEntered() {
+    public DateTime getDateEntered() {
         return dateEntered;
     }
 
@@ -54,7 +55,7 @@ public class CalSubrecord {
         return calRaw;
     }
 
-    public Date getDateApplied() {
+    public DateTime getDateApplied() {
         return dateApplied;
     }
 

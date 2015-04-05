@@ -7,9 +7,9 @@ import android.util.Log;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
+import com.nightscout.android.exceptions.FeedbackDialog;
 import com.nightscout.android.ui.ActivityHierarchyServer;
-
-import net.danlew.android.joda.JodaTimeAndroid;
+import com.nightscout.core.BusProvider;
 
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
@@ -17,6 +17,9 @@ import org.acra.annotation.ReportsCrashes;
 import javax.inject.Inject;
 
 import dagger.ObjectGraph;
+
+//import com.nightscout.android.exceptions.AcraFeedbackDialog;
+//import net.danlew.android.joda.JodaTimeAndroid;
 
 @ReportsCrashes(
         formUri = "https://collector.tracepot.com/a64e4a51",
@@ -26,23 +29,29 @@ import dagger.ObjectGraph;
         resDialogTitle = R.string.feedback_dialog_title,
         resDialogCommentPrompt = R.string.feedback_dialog_comment_prompt,
         resDialogOkToast = R.string.feedback_dialog_ok_toast,
-        excludeMatchingSharedPreferencesKeys = {"cloud_storage_mongodb_uri", "cloud_storage_api_base"},
+        excludeMatchingSharedPreferencesKeys = {"cloud_storage_mongodb_uri", "cloud_storage_api_base", "cloud_storage_mqtt_user", "cloud_storage_mqtt_pass"},
         mode = ReportingInteractionMode.TOAST,
         logcatArguments = {"-t", "500", "-v", "time"}
 )
+
 public class Nightscout extends Application {
-    private final String TAG = MainActivity.class.getSimpleName();
+    private final String TAG = Nightscout.class.getSimpleName();
     private Tracker tracker = null;
 
     private ObjectGraph objectGraph;
 
-    @Inject ActivityHierarchyServer activityHierarchyServer;
+    @Inject
+    ActivityHierarchyServer activityHierarchyServer;
+
+    @Inject
+    FeedbackDialog feedbackDialog;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        JodaTimeAndroid.init(this);
+//        JodaTimeAndroid.init(this);
         buildObjectGraphAndInject();
+        BusProvider.getInstance();
         registerActivityLifecycleCallbacks(activityHierarchyServer);
     }
 

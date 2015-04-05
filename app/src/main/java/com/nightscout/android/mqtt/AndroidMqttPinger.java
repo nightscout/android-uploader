@@ -10,7 +10,6 @@ import android.net.ConnectivityManager;
 import android.os.Build;
 import android.util.Log;
 
-import com.google.common.collect.Lists;
 import com.nightscout.core.mqtt.Constants;
 import com.nightscout.core.mqtt.MqttPinger;
 import com.nightscout.core.mqtt.MqttPingerObservable;
@@ -20,6 +19,7 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AndroidMqttPinger implements MqttPinger, MqttPingerObservable {
@@ -39,7 +39,7 @@ public class AndroidMqttPinger implements MqttPinger, MqttPingerObservable {
         this.context = context;
         this.instanceId = instanceId;
         this.alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        this.observers = Lists.newArrayList();
+        this.observers = new ArrayList<>();
         this.mqttClient = mqttClient;
         this.keepAliveInterval = keepAliveInterval;
     }
@@ -89,10 +89,10 @@ public class AndroidMqttPinger implements MqttPinger, MqttPingerObservable {
     @Override
     public void stop() {
         Log.i(TAG, "Stopping ping");
+        alarmMgr.cancel(pingerPendingIntent);
         if (isActive()) {
             context.unregisterReceiver(pingerReceiver);
             active = false;
-            alarmMgr.cancel(pingerPendingIntent);
             Log.d(TAG, "Pinger stopped");
         } else {
             Log.d(TAG, "Can't stop pinger because it is not active");

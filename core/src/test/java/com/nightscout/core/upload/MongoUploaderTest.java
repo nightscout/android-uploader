@@ -1,6 +1,5 @@
 package com.nightscout.core.upload;
 
-import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
@@ -9,11 +8,17 @@ import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.events.EventReporter;
+import com.nightscout.core.events.EventSeverity;
+import com.nightscout.core.events.EventType;
 import com.nightscout.core.preferences.TestPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static com.nightscout.core.test.MockFactory.mockCalRecord;
 import static com.nightscout.core.test.MockFactory.mockDeviceStatus;
@@ -35,16 +40,23 @@ public class MongoUploaderTest {
     DBCollection mockCollection;
     ArgumentCaptor<BasicDBObject> captor;
     private TestPreferences preferences;
+    private EventReporter reporter;
 
     @Before
     public void setUp() throws Exception {
         mockCollection = mock(DBCollection.class);
         preferences = new TestPreferences();
+        reporter = new EventReporter() {
+            @Override
+            public void report(EventType type, EventSeverity severity, String message) {
+                // This is a stub
+            }
+        };
         mongoUploader = new MongoUploader(
                 preferences,
                 new MongoClientURI("mongodb://localhost"),
                 "collection",
-                "dsCollection");
+                "dsCollection", reporter);
         mongoUploader.setCollection(mockCollection);
         mongoUploader.setDeviceStatusCollection(mockCollection);
         setUpUpsertCapture();
@@ -52,7 +64,7 @@ public class MongoUploaderTest {
 
     public void verifyGlucoseDataSet(boolean enableCloudSensorData) {
         BasicDBObject dbObject = captor.getValue();
-        assertThat(dbObject.getString("device"), is("dexcom"));
+        assertThat(dbObject.getString("device"), is("UNKNOWN"));
         assertThat(dbObject.get("date"), is(not(nullValue())));
         assertThat(dbObject.get("dateString"), is(not(nullValue())));
         assertThat(dbObject.get("sgv"), is(not(nullValue())));
@@ -71,7 +83,7 @@ public class MongoUploaderTest {
 
     public void verifyMeterRecord() {
         BasicDBObject dbObject = captor.getValue();
-        assertThat(dbObject.getString("device"), is("dexcom"));
+        assertThat(dbObject.getString("device"), is("UNKNOWN"));
         assertThat(dbObject.getString("type"), is("mbg"));
         assertThat(dbObject.get("date"), is(not(nullValue())));
         assertThat(dbObject.get("dateString"), is(not(nullValue())));
@@ -80,7 +92,7 @@ public class MongoUploaderTest {
 
     public void verifyCalRecord() {
         BasicDBObject dbObject = captor.getValue();
-        assertThat(dbObject.getString("device"), is("dexcom"));
+        assertThat(dbObject.getString("device"), is("UNKNOWN"));
         assertThat(dbObject.getString("type"), is("cal"));
         assertThat(dbObject.get("date"), is(not(nullValue())));
         assertThat(dbObject.get("dateString"), is(not(nullValue())));
@@ -110,20 +122,21 @@ public class MongoUploaderTest {
 
     @Test
     public void testUploadGlucoseDataSets() {
-        mongoUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
+        mongoUploader.uploadGlucoseDataSets(new ArrayList<>(Arrays.asList(mockGlucoseDataSet())));
         verifyGlucoseDataSet(false);
     }
 
     @Test
     public void testUploadGlucoseDataSets_CloudSensorData() {
         preferences.setSensorUploadEnabled(true);
-        mongoUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
+        mongoUploader.uploadGlucoseDataSets(new ArrayList<>(Arrays.asList(mockGlucoseDataSet())));
         verifyGlucoseDataSet(true);
     }
 
     @Test
     public void testUploadMeterRecord() throws Exception {
-        mongoUploader.uploadMeterRecords(Lists.newArrayList(mockMeterRecord()));
+        mongoUploader.uploadMeterRecords(new ArrayList<>(Arrays.asList(mockMeterRecord())));
+
         verifyMeterRecord();
     }
 
@@ -131,7 +144,7 @@ public class MongoUploaderTest {
     public void testUploadCalRecord() {
         preferences.setCalibrationUploadEnabled(true);
         try {
-            mongoUploader.uploadCalRecords(Lists.newArrayList(mockCalRecord()));
+            mongoUploader.uploadCalRecords(new ArrayList<>(Arrays.asList(mockCalRecord())));
         } catch (InvalidRecordLengthException e) {
             fail("Shouldn't get an exception");
         }
@@ -141,7 +154,7 @@ public class MongoUploaderTest {
     @Test
     public void testUploadDeviceStatus() {
         AbstractUploaderDevice deviceStatus = mockDeviceStatus();
-        mongoUploader.uploadDeviceStatus(deviceStatus);
+        mongoUploader.uploadDeviceStatus(deviceStatus, 100);
         verifyDeviceStatus(deviceStatus);
     }
 
@@ -151,8 +164,10 @@ public class MongoUploaderTest {
                 preferences,
                 new MongoClientURI("mongodb://foobar/db"),
                 "collection",
-                "dsCollection");
+                "dsCollection", reporter);
         AbstractUploaderDevice deviceStatus = mockDeviceStatus();
-        assertThat(mongoUploader.uploadDeviceStatus(deviceStatus), is(false));
+        assertThat(mongoUploader.uploadDeviceStatus(deviceStatus, 100), is(false));
     }
+
+    // TODO test mismatched EGV and sensor record has expected behavior
 }

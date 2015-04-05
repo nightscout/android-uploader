@@ -1,5 +1,6 @@
 package com.nightscout.core.preferences;
 
+import com.nightscout.core.drivers.SupportedDevices;
 import com.nightscout.core.model.GlucoseUnit;
 
 import java.util.List;
@@ -69,4 +70,24 @@ public interface NightscoutPreferences {
     boolean hasAskedForData();
 
     void setAskedForData(boolean askedForData);
+
+    SupportedDevices getDeviceType();
+
+    void setBluetoothDevice(String btDeviceName, String btAddress);
+
+    String getBtAddress();
+
+    String getShareSerial();
+
+    void setShareSerial(String serialNumber);
+
+    boolean isMeterUploadEnabled();
+
+    void setMeterUploadEnabled(boolean enabled);
+
+    boolean isInsertionUploadEnabled();
+
+    void setInsertionUploadEnabled(boolean enabled);
+
+
 }

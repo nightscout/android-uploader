@@ -1,6 +1,7 @@
 package com.nightscout.core.dexcom;
 
-import com.google.common.base.Optional;
+
+import net.tribe7.common.base.Optional;
 
 import java.util.Arrays;
 

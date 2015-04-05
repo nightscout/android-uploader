@@ -1,13 +1,16 @@
 package com.nightscout.android.preferences;
 
+import com.nightscout.android.BuildConfig;
 import com.nightscout.android.R;
 import com.nightscout.android.test.RobolectricTestBase;
 
 import org.junit.Test;
+import org.robolectric.annotation.Config;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+@Config(constants = BuildConfig.class)
 public class PreferencesValidatorTest extends RobolectricTestBase {
     @Test
     public void testValidateMongoUriSyntax_Empty() {
@@ -24,7 +27,7 @@ public class PreferencesValidatorTest extends RobolectricTestBase {
     @Test
     public void testValidateMongoUriSyntax_EmptyPassword() {
         assertThat(PreferencesValidator.validateMongoUriSyntax(getContext(), "mongodb://a@b.com/db").get(),
-               is(getContext().getString(R.string.illegal_mongo_uri, "mongodb://a@b.com/db")));
+                is(getContext().getString(R.string.illegal_mongo_uri, "mongodb://a@b.com/db")));
     }
 
     @Test

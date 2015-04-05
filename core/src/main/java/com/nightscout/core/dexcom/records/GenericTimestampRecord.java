@@ -3,48 +3,53 @@ package com.nightscout.core.dexcom.records;
 import com.nightscout.core.dexcom.Utils;
 import com.squareup.wire.Message;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 abstract public class GenericTimestampRecord {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     protected final int OFFSET_SYS_TIME = 0;
     protected final int OFFSET_DISPLAY_TIME = 4;
-    protected Date systemTime;
+    protected DateTime systemTime;
     protected long rawSystemTimeSeconds;
-    protected Date displayTime;
+    protected DateTime displayTime;
     protected long rawDisplayTimeSeconds;
+    protected DateTime wallTime;
+    protected String recordType = "unknown";
 
-    public GenericTimestampRecord(byte[] packet) {
+    public GenericTimestampRecord(byte[] packet, long rcvrTime, long refTime) {
         rawSystemTimeSeconds = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(OFFSET_SYS_TIME);
         systemTime = Utils.receiverTimeToDate(rawSystemTimeSeconds);
         rawDisplayTimeSeconds = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(OFFSET_DISPLAY_TIME);
         displayTime = Utils.receiverTimeToDate(rawDisplayTimeSeconds);
+        this.wallTime = Utils.systemTimeToWallTime(rawSystemTimeSeconds, rcvrTime, refTime);
     }
 
-    public GenericTimestampRecord(Date displayTime, Date systemTime) {
+    public GenericTimestampRecord(DateTime displayTime, DateTime systemTime, DateTime wallTime) {
         this.displayTime = displayTime;
         this.systemTime = systemTime;
+        this.wallTime = wallTime;
     }
 
-    public GenericTimestampRecord(long rawDisplayTimeSeconds, long rawSystemTimeSeconds) {
+    public GenericTimestampRecord(long rawDisplayTimeSeconds, long rawSystemTimeSeconds, long receiverTime, long refTime) {
         this.rawDisplayTimeSeconds = rawDisplayTimeSeconds;
         this.rawSystemTimeSeconds = rawSystemTimeSeconds;
         this.systemTime = Utils.receiverTimeToDate(rawSystemTimeSeconds);
         this.displayTime = Utils.receiverTimeToDate(rawDisplayTimeSeconds);
+        this.wallTime = Utils.systemTimeToWallTime(rawSystemTimeSeconds, receiverTime, refTime);
     }
 
     public GenericTimestampRecord(long rawSystemTimeSeconds) {
         this.rawSystemTimeSeconds = rawSystemTimeSeconds;
     }
 
-    public Date getSystemTime() {
+    public DateTime getSystemTime() {
         return systemTime;
     }
 
@@ -52,16 +57,20 @@ abstract public class GenericTimestampRecord {
         return rawSystemTimeSeconds;
     }
 
-    public Date getDisplayTime() {
+    public DateTime getDisplayTime() {
         return displayTime;
     }
 
     public long getDisplayTimeSeconds() {
-        return displayTime.getTime();
+        return displayTime.getMillis();
     }
 
     public long getRawDisplayTimeSeconds() {
         return rawDisplayTimeSeconds;
+    }
+
+    public DateTime getWallTime() {
+        return wallTime;
     }
 
     abstract protected Message toProtobuf();
@@ -75,6 +84,12 @@ abstract public class GenericTimestampRecord {
         }
         return results;
     }
+
+    public String getRecordType() {
+        return recordType;
+    }
+
+    abstract protected void setRecordType();
 
     @Override
     public boolean equals(Object o) {

@@ -9,12 +9,12 @@ import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.nightscout.core.utils.GlucoseReading;
 
+import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Date;
 import java.util.List;
 
 public class EGVRecord extends GenericTimestampRecord {
@@ -23,40 +23,48 @@ public class EGVRecord extends GenericTimestampRecord {
     private TrendArrow trend;
     private G4Noise noiseMode;
 
-    public EGVRecord(byte[] packet) {
-        super(packet);
+    public EGVRecord(byte[] packet, long rcvrTime, long refTime) {
+        super(packet, rcvrTime, refTime);
         if (packet.length != RECORD_SIZE) {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
                     ". Expected size: " + RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
         }
         int bGValue = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8) & Constants.EGV_VALUE_MASK;
-        reading = new GlucoseReading(bGValue, GlucoseUnit.MGDL);
+        this.reading = new GlucoseReading(bGValue, GlucoseUnit.MGDL);
         byte trendAndNoise = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).get(10);
         int trendValue = trendAndNoise & Constants.EGV_TREND_ARROW_MASK;
         byte noiseValue = (byte) ((trendAndNoise & Constants.EGV_NOISE_MASK) >> 4);
-        trend = TrendArrow.values()[trendValue];
-        noiseMode = G4Noise.values()[noiseValue];
+        this.trend = TrendArrow.values()[trendValue];
+        this.noiseMode = G4Noise.values()[noiseValue];
+        setRecordType();
     }
 
-    public EGVRecord(int bGValueMgdl, TrendArrow trend, Date displayTime, Date systemTime, G4Noise noise) {
-        super(displayTime, systemTime);
+    public EGVRecord(int bGValueMgdl, TrendArrow trend, DateTime displayTime, DateTime systemTime, G4Noise noise, DateTime wallTime) {
+        super(displayTime, systemTime, wallTime);
         this.reading = new GlucoseReading(bGValueMgdl, GlucoseUnit.MGDL);
         this.trend = trend;
         this.noiseMode = noise;
+        setRecordType();
     }
 
-    public EGVRecord(int bGValueMgdl, TrendArrow trend, long displayTime, long systemTime, G4Noise noise) {
-        super(displayTime, systemTime);
+    public EGVRecord(int bGValueMgdl, TrendArrow trend, long displayTime, long systemTime, G4Noise noise, long rcvrTime, long refTime) {
+        super(displayTime, systemTime, rcvrTime, refTime);
         this.reading = new GlucoseReading(bGValueMgdl, GlucoseUnit.MGDL);
         this.trend = trend;
         this.noiseMode = noise;
+        setRecordType();
     }
 
-    public EGVRecord(SensorGlucoseValueEntry sgv) {
-        super(sgv.disp_timestamp_sec, sgv.sys_timestamp_sec);
+    public EGVRecord(SensorGlucoseValueEntry sgv, long rcvrTime, long refTime) {
+        super(sgv.disp_timestamp_sec, sgv.sys_timestamp_sec, rcvrTime, refTime);
         this.reading = new GlucoseReading(sgv.sgv_mgdl, GlucoseUnit.MGDL);
         this.trend = TrendArrow.values()[sgv.trend.ordinal()];
         this.noiseMode = sgv.noise;
+        setRecordType();
+    }
+
+    protected void setRecordType() {
+        this.recordType = "sgv";
     }
 
     public int getBgMgdl() {

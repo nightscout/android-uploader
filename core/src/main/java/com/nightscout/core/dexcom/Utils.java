@@ -1,13 +1,17 @@
 package com.nightscout.core.dexcom;
 
-import com.google.common.base.Strings;
-import com.google.common.hash.HashCode;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
+import com.nightscout.core.model.G4Download;
 import com.nightscout.core.model.SensorEntry;
 import com.nightscout.core.model.SensorGlucoseValueEntry;
+import com.squareup.wire.Message;
+
+import net.tribe7.common.base.Strings;
+import net.tribe7.common.hash.HashCode;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
@@ -16,10 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static net.tribe7.common.base.Preconditions.checkNotNull;
 import static org.joda.time.Duration.standardSeconds;
 
 public final class Utils {
@@ -43,11 +46,16 @@ public final class Utils {
     // TODO: probably not the right way to do this but it seems to do the trick. Need to revisit this to fully understand what is going on during DST change
     public static DateTime receiverTimeToDateTime(long deltaInSeconds) {
         int offset = DateTimeZone.getDefault().getOffset(DEXCOM_EPOCH) - DateTimeZone.getDefault().getOffset(Instant.now());
-        return DEXCOM_EPOCH.plus(offset).plus(standardSeconds(deltaInSeconds)).withZone(DateTimeZone.UTC);
+        return DEXCOM_EPOCH.plus(offset).plus(standardSeconds(deltaInSeconds));
     }
 
-    public static Date receiverTimeToDate(long delta) {
-        return receiverTimeToDateTime(delta).toDate();
+    public static DateTime receiverTimeToDate(long delta) {
+        return receiverTimeToDateTime(delta);
+    }
+
+    public static DateTime systemTimeToWallTime(long recordTimeSec, long receiverTimeSec, long referenceTimeMs) {
+        long recordOffset = Duration.standardSeconds(receiverTimeSec - recordTimeSec).getMillis();
+        return new DateTime(referenceTimeMs - recordOffset);
     }
 
     /**
@@ -92,27 +100,50 @@ public final class Utils {
         return (timeAgoString.equals("") ? "--" : timeAgoString + "ago");
     }
 
+    public static List<GlucoseDataSet> mergeGlucoseDataRecords(G4Download download, int numRecords) {
+        List<SensorGlucoseValueEntry> sgvList = filterRecords(numRecords, download.sgv);
+//        List<CalibrationEntry> calList = filterRecords(numRecords, download.cal);
+//        List<MeterEntry> meterList = filterRecords(numRecords, download.meter);
+        List<SensorEntry> sensorList = filterRecords(numRecords, download.sensor);
+        long downloadTimestamp = DateTime.parse(download.download_timestamp).getMillis();
+        return mergeGlucoseDataRecords(sgvList, sensorList, download.receiver_system_time_sec, downloadTimestamp);
+    }
+
+    public static <T extends Message> List<T> filterRecords(int numRecords, List<T> records) {
+        int recordIndexToStop = Math.max(records.size() - numRecords, 0);
+        List<T> results = new ArrayList<>();
+        for (int i = records.size(); i > recordIndexToStop; i--) {
+            results.add(records.get(i - 1));
+        }
+        return results;
+    }
+
+
     public static List<GlucoseDataSet> mergeGlucoseDataRecords(List<SensorGlucoseValueEntry> egvRecords,
-                                                               List<SensorEntry> sensorRecords) {
+                                                               List<SensorEntry> sensorRecords,
+                                                               long receiverTimestamp, long downloadTimestamp) {
         int egvLength = egvRecords.size();
         int sensorLength = sensorRecords.size();
         List<GlucoseDataSet> glucoseDataSets = new ArrayList<>();
         if (egvLength >= 0 && sensorLength == 0) {
             for (int i = 1; i <= egvLength; i++) {
-                glucoseDataSets.add(new GlucoseDataSet(egvRecords.get(egvLength - i)));
+                glucoseDataSets.add(new GlucoseDataSet(egvRecords.get(egvLength - i), receiverTimestamp, downloadTimestamp));
             }
             return glucoseDataSets;
         }
         int smallerLength = egvLength < sensorLength ? egvLength : sensorLength;
         for (int i = 1; i <= smallerLength; i++) {
             glucoseDataSets.add(new GlucoseDataSet(egvRecords.get(egvLength - i),
-                    sensorRecords.get(sensorLength - i)));
+                    sensorRecords.get(sensorLength - i), receiverTimestamp, downloadTimestamp));
         }
         return glucoseDataSets;
     }
 
 
     public static String bytesToHex(byte[] bytes) {
+        if (bytes == null || bytes.length == 0) {
+            return "";
+        }
         return HashCode.fromBytes(bytes).toString().toUpperCase();
     }
 }

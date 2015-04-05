@@ -7,9 +7,9 @@
     <string name="unknown_values">---</string>
 
     <string name="crash_toast_text">Oops! È crashato il software. Sto mandando un rapporto a Nightscout così magari lo possono sistemare!</string>
-    <string name="feedback_dialog_title">Feedback a Nightscout</string>
-    <string name="feebback_dialog_text">Per favore facci sapere cosa ne pensi</string>
-    <string name="feedback_dialog_comment_prompt">Aggiungi i tuoi commenti qui sotto:</string>
+    <string name="feedback_dialog_title">Report an issue</string>
+    <string name="feebback_dialog_text">Report an issue</string>
+    <string name="feedback_dialog_comment_prompt">Please include brief description of the issue you encountered</string>
     <string name="feedback_dialog_ok_toast">Grazie!</string>
     <string name="feedback_toast_text" />
     <string name="message_user_not_understand">La lettura dal device è disabilitata finchè non leggi e accetti \"HO CAPITO\" nelle preferenze</string>
@@ -22,7 +22,7 @@
     <string name="display_trend" />
 
     <string name="close_menu_text">Esci</string>
-    <string name="feedback_menu_text">Feedback</string>
+    <string name="feedback_menu_text">Report an issue</string>
     <string name="gap_sync_menu_text">Forza sincronizzazione</string>
     <string name="preferences_menu_text">Preferenze</string>
     <string name="USBLabelText">USB</string>
@@ -62,7 +62,7 @@
     <string name="TimeChangeDetected">Trovata modifica temporale</string>
     <string name="illegal_mongo_uri">Mongo uri ha sintassi non valida. Si prega di doppio controllo.</string>
     <string name="invalid_input_title">Invalid Input</string>
-    <string name="invalid_rest_uri">Invalid rest url %s, si prega di controllare due volte la formattazione.</string>
+    <string name="invalid_rest_uri">Invalid rest url %s, si prega di controllare due volte la formattazione. Gli URL devono essere codificati per cento</string>
     <string name="ok">Ok</string>
     <string name="rest_uri_missing_token">Missing token for rest uri %s.</string>
     <string name="unknown_rest_host">Impossibile connettersi a %s, si prega di verificare che si è connessi a Internet, e che l\'URL sia corretto.</string>
@@ -82,10 +82,28 @@
     <string name="nightscout_icon">Nightscout Icon</string>
     <string name="pref_about_hash">Git hash</string>
     <string name="event_fail_upload">Upload to %s has failed</string>
-    <string name="event_mongo_invalid_credentials">Please double check your MQTT username and password.</string>
     <string name="device_log_menu">Device logs</string>
     <string name="upload_log_menu">Upload Logs</string>
     <string name="mqtt_mgr_not_initialized">MQTT connection has not been initialized.</string>
     <string name="no_uploaders">No uploaders have been configured.</string>
     <string name="unhandled_mqtt_exception">MQTT Exception: %s</string>
+    <string name="error_bluetooth_not_supported">Bluetooth not supported</string>
+    <string name="unknown_device">Unknown device</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_scan">Scan</string>
+    <string name="menu_stop">Stop</string>
+    <string name="connecting_to_device">Connecting</string>
+    <string name="bluetooth_scan_text">BT Scan</string>
+    <string name="title_activity_bluetooth_scan">Bluetooth</string>
+    <string name="pref_title_device_type">Device type</string>
+    <string name="pref_share2_serial_number">Share Serial number</string>
+    <string name="scan_share2_barcode">Scan Share Barcode</string>
+    <string name="pref_share2_scan_barcode_summary">Scan the barcode on the share receiver</string>
+    <string name="pref_bt_scan_share2">Discover Share device</string>
+    <string name="pref_bt_scan_summary">Scan for bluetooth G4 Share receivers</string>
+    <string name="menu_clear_log">Clear</string>
+    <string name="warn_disabled_bluetooth">Bluetooth must be enabled to access the Share system</string>
+    <string name="pref_title_insertion_data">Insertion Data</string>
+    <string name="pref_summary_insertion_data">Sensor insertion history</string>
+    <string name="invalid_share2_serial">Please double check the Share2 serial number provided %s. It does not match the expected pattern</string>
 </resources>

@@ -1,9 +1,11 @@
 package com.nightscout.core.dexcom;
 
-import com.google.common.primitives.UnsignedBytes;
+
+import net.tribe7.common.primitives.UnsignedBytes;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
 import org.joda.time.Period;
 import org.junit.Test;
 
@@ -14,22 +16,25 @@ public class UtilsTest {
 
     @Test
     public void testReceiverTimeToDateTime_epoch() {
+        int offset = DateTimeZone.getDefault().getOffset(Utils.DEXCOM_EPOCH) - DateTimeZone.getDefault().getOffset(Instant.now());
         assertThat(Utils.receiverTimeToDateTime(0),
-                is(Utils.DEXCOM_EPOCH.withZone(DateTimeZone.UTC)));
+                is(Utils.DEXCOM_EPOCH.withZone(DateTimeZone.UTC).plus(offset)));
     }
 
     @Test
     public void testReceiverTimeToDateTime_positiveDelta() {
         int secondsDelta = 10;
+        int offset = DateTimeZone.getDefault().getOffset(Utils.DEXCOM_EPOCH) - DateTimeZone.getDefault().getOffset(Instant.now());
         assertThat(Utils.receiverTimeToDateTime(secondsDelta),
-                is(Utils.DEXCOM_EPOCH.plusSeconds(secondsDelta).withZone(DateTimeZone.UTC)));
+                is(Utils.DEXCOM_EPOCH.plusSeconds(secondsDelta).withZone(DateTimeZone.UTC).plus(offset)));
     }
 
     @Test
     public void testReceiverTimeToDateTime_negativeDelta() {
         int secondsDelta = -10;
+        int offset = DateTimeZone.getDefault().getOffset(Utils.DEXCOM_EPOCH) - DateTimeZone.getDefault().getOffset(Instant.now());
         assertThat(Utils.receiverTimeToDateTime(secondsDelta),
-                is(Utils.DEXCOM_EPOCH.minusSeconds(10).withZone(DateTimeZone.UTC)));
+                is(Utils.DEXCOM_EPOCH.minusSeconds(10).withZone(DateTimeZone.UTC).plus(offset)));
     }
 
     @Test

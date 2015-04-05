@@ -1,11 +1,11 @@
 package com.nightscout.core.upload;
 
+import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
+import com.nightscout.core.dexcom.records.InsertionRecord;
+import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
-import com.nightscout.core.model.CalibrationEntry;
-import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
-import com.nightscout.core.records.DeviceStatus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,27 +13,34 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static net.tribe7.common.base.Preconditions.checkNotNull;
 
 public abstract class BaseUploader {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private final NightscoutPreferences preferences;
+    protected final NightscoutPreferences preferences;
     protected String identifier;
+    protected String deviceStr;
 
     protected abstract boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException;
 
-    protected boolean doUpload(MeterEntry meterRecord) throws IOException {
+    protected boolean doUpload(MeterRecord meterRecord) throws IOException {
         log.info("Meter record upload not supported.");
         return true;
     }
 
-    protected boolean doUpload(CalibrationEntry calRecord) throws IOException {
+    protected boolean doUpload(CalRecord calRecord) throws IOException {
         log.info("Cal record upload not supported.");
         return true;
     }
 
-    protected boolean doUpload(AbstractUploaderDevice deviceStatus) throws IOException {
+    protected boolean doUpload(InsertionRecord insertionRecord) throws IOException {
+        log.info("Insertion record upload not supported.");
+        return true;
+    }
+
+
+    protected boolean doUpload(AbstractUploaderDevice deviceStatus, int rcvrBat) throws IOException {
         log.info("Device status upload not supported.");
         return true;
     }
@@ -41,6 +48,7 @@ public abstract class BaseUploader {
     public BaseUploader(NightscoutPreferences preferences) {
         checkNotNull(preferences);
         this.preferences = preferences;
+        deviceStr = preferences.getDeviceType().name();
     }
 
     // TODO(trhodeos): implement some sort of retry logic in all of these public functions.
@@ -66,12 +74,12 @@ public abstract class BaseUploader {
      * @param meterRecords
      * @return True if the upload was successful, false if the upload was unsuccessful
      */
-    public final boolean uploadMeterRecords(List<MeterEntry> meterRecords) {
+    public final boolean uploadMeterRecords(List<MeterRecord> meterRecords) {
         if (meterRecords == null) {
             return true;
         }
         boolean output = true;
-        for (MeterEntry meterRecord : meterRecords) {
+        for (MeterRecord meterRecord : meterRecords) {
             try {
                 output &= doUpload(meterRecord);
             } catch (IOException e) {
@@ -88,17 +96,41 @@ public abstract class BaseUploader {
      * @param calRecords
      * @return True if the upload was successful, false if the upload was unsuccessful
      */
-    public final boolean uploadCalRecords(List<CalibrationEntry> calRecords) {
+    public final boolean uploadCalRecords(List<CalRecord> calRecords) {
         if (calRecords == null) {
             return true;
         }
         boolean output = true;
         if (getPreferences().isCalibrationUploadEnabled()) {
-            for (CalibrationEntry calRecord : calRecords) {
+            for (CalRecord calRecord : calRecords) {
                 try {
                     output &= doUpload(calRecord);
                 } catch (IOException e) {
                     log.error("Error uploading calibration record.", e);
+                    output = false;
+                }
+            }
+        }
+        return output;
+    }
+
+    /**
+     * Uploads the insertion records
+     *
+     * @param insertionRecords
+     * @return True if the upload was successful, false if the upload was unsuccessful
+     */
+    public final boolean uploadInsertionRecords(List<InsertionRecord> insertionRecords) {
+        if (insertionRecords == null) {
+            return true;
+        }
+        boolean output = true;
+        if (getPreferences().isInsertionUploadEnabled()) {
+            for (InsertionRecord insertionRecord : insertionRecords) {
+                try {
+                    output &= doUpload(insertionRecord);
+                } catch (IOException e) {
+                    log.error("Error uploading meter record.", e);
                     output = false;
                 }
             }
@@ -112,12 +144,12 @@ public abstract class BaseUploader {
      * @param deviceStatus
      * @return True if the upload was successful or False if the upload was unsuccessful
      */
-    public final boolean uploadDeviceStatus(AbstractUploaderDevice deviceStatus) {
+    public final boolean uploadDeviceStatus(AbstractUploaderDevice deviceStatus, int rcvrBat) {
         if (deviceStatus == null) {
             return true;
         }
         try {
-            return doUpload(deviceStatus);
+            return doUpload(deviceStatus, rcvrBat);
         } catch (IOException e) {
             log.error("Error uploading device status", e);
             return false;
@@ -134,17 +166,25 @@ public abstract class BaseUploader {
 
     /**
      * Upload records, can be overridden to send all data in one batch.
+     *
      * @param glucoseDataSets
      * @param meterRecords
      * @param calRecords
      * @param deviceStatus
      * @return True if the (all) uploads was successful or False if at least one upload was unsuccessful.
      */
-    public boolean uploadRecords(List<GlucoseDataSet> glucoseDataSets, List<MeterEntry> meterRecords, List<CalibrationEntry> calRecords, AbstractUploaderDevice deviceStatus) {
+    public boolean uploadRecords(List<GlucoseDataSet> glucoseDataSets, List<MeterRecord> meterRecords, List<CalRecord> calRecords, List<InsertionRecord> insertionRecords, AbstractUploaderDevice deviceStatus, int rcvrBat) {
         boolean allSuccessful = uploadGlucoseDataSets(glucoseDataSets);
+        log.debug("allSuccessful after glucoseDatasets: {}", allSuccessful);
         allSuccessful &= uploadMeterRecords(meterRecords);
+        log.debug("allSuccessful after meterrecords: {}", allSuccessful);
         allSuccessful &= uploadCalRecords(calRecords);
-        allSuccessful &= uploadDeviceStatus(deviceStatus);
+        log.debug("allSuccessful after cal records: {}", allSuccessful);
+        allSuccessful &= uploadDeviceStatus(deviceStatus, rcvrBat);
+        log.debug("allSuccessful after device status: {}", allSuccessful);
+        allSuccessful &= uploadInsertionRecords(insertionRecords);
+        log.debug("allSuccessful after insertion records: {}", allSuccessful);
         return allSuccessful;
     }
+
 }

@@ -1,10 +1,10 @@
 package com.nightscout.core.dexcom;
 
-import com.google.common.collect.Lists;
 
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -37,7 +37,9 @@ public class PacketBuilderTest {
     @Test
     public void testReadDatabasePageRangeCommand() {
         byte[] readDatabasePageRangeCommand = new byte[]{0x01, 0x07, 0x00, 0x10, 0x04, (byte) 0x8B, (byte) 0xB8};
-        PacketBuilder builder = new PacketBuilder(Command.READ_DATABASE_PAGE_RANGE, Lists.newArrayList((byte) 0x04));
+        List<Byte> payload = new ArrayList<>();
+        payload.add((byte) 0x04);
+        PacketBuilder builder = new PacketBuilder(Command.READ_DATABASE_PAGE_RANGE, payload);
         assertThat(builder.build(), is(readDatabasePageRangeCommand));
     }
 
@@ -68,7 +70,13 @@ public class PacketBuilderTest {
     @Test
     public void testReadDatabasePagesCommand() {
         byte[] readDatabasePages = new byte[]{0x01, 0x0C, 0x00, 0x11, 0x05, 0x26, 0x00, 0x00, 0x00, 0x01, 0x5E, (byte) 0xC3};
-        ArrayList<Byte> payload = Lists.newArrayList((byte) 0x05, (byte) 0x26, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01);
+        List<Byte> payload = new ArrayList<>();
+        payload.add((byte) 0x05);
+        payload.add((byte) 0x26);
+        payload.add((byte) 0x00);
+        payload.add((byte) 0x00);
+        payload.add((byte) 0x00);
+        payload.add((byte) 0x01);
         PacketBuilder builder = new PacketBuilder(Command.READ_DATABASE_PAGES, payload);
         assertThat(builder.build(), is(readDatabasePages));
     }

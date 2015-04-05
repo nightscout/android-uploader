@@ -1,6 +1,8 @@
 package com.nightscout.core.barcode;
 
-import com.google.common.base.Optional;
+//import com.google.common.base.Optional;
+
+import net.tribe7.common.base.Optional;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,7 +51,7 @@ public class NSBarcodeConfig {
 
     public List<String> getApiUris() {
         List<String> apiUris = new ArrayList<>();
-        if (hasApiConfig()){
+        if (hasApiConfig()) {
             JSONArray jsonArray = null;
             try {
                 jsonArray = config.getJSONObject(NSBarcodeConfigKeys.API_CONFIG)

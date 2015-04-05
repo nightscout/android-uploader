@@ -5,7 +5,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
@@ -20,14 +25,90 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
 public class EventFragment extends ListFragment {
+    private EventType currentFilter = EventType.ALL;
+    private boolean menuInflated = false;
+    private EventFragment mainFragment;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    private void refreshFragments() {
+        mainFragment = new EventFragment();
+        getFragmentManager().beginTransaction().replace(android.R.id.content,
+                mainFragment).commit();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        if (!menuInflated) {
+            inflater.inflate(R.menu.menu_event_log, menu);
+            menuInflated = true;
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case (R.id.clear_log):
+                clear(currentFilter);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("menu_inflated", menuInflated);
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Bundle bundle = getArguments();
-        EventType type = EventType.values()[bundle.getInt("Filter")];
-        setListAdapter(getMessages(type));
+        if (savedInstanceState != null && savedInstanceState.containsKey("menu_inflated")) {
+            menuInflated = savedInstanceState.getBoolean("menu_inflated");
+        }
+
+        currentFilter = EventType.ALL;
+        if (bundle != null && bundle.containsKey("Filter")) {
+            currentFilter = EventType.values()[bundle.getInt("Filter")];
+        }
+
+        setListAdapter(getMessages(currentFilter));
+        if (getActivity().getActionBar() != null) {
+            getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    public static EventFragment newDeviceLogPanel() {
+        EventFragment fragment = new EventFragment();
+        Bundle args = new Bundle();
+        args.putInt("Filter", EventType.DEVICE.ordinal());
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static EventFragment newUploadLogPanel() {
+        EventFragment fragment = new EventFragment();
+        Bundle args = new Bundle();
+        args.putInt("Filter", EventType.UPLOADER.ordinal());
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static EventFragment newAllLogPanel() {
+        EventFragment fragment = new EventFragment();
+        Bundle args = new Bundle();
+        args.putInt("Filter", EventType.ALL.ordinal());
+        fragment.setArguments(args);
+        return fragment;
     }
 
     private CursorAdapter getMessages(EventType type) {
@@ -83,6 +164,21 @@ public class EventFragment extends ListFragment {
                 return true;
             }
         });
+//        db.close();
         return cursorAdapter;
     }
+
+    public synchronized void clear(EventType type) {
+        Log.d("AndroidEventReporter", "Clearing logs for: " + type.name());
+        EventsDbHelper dbHelper = EventsDbHelper.getHelper(getActivity().getApplicationContext());
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        if (type == EventType.ALL) {
+            db.delete(EventsContract.EventEntry.TABLE_NAME, null, null);
+        } else {
+            db.delete(EventsContract.EventEntry.TABLE_NAME, EventsContract.EventEntry.COLUMN_NAME_EVENT_TYPE + "=" + type.ordinal(), null);
+        }
+//        db.close();
+    }
+
 }

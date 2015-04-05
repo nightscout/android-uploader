@@ -1,18 +1,22 @@
 package com.nightscout.core.drivers;
 
-import com.google.common.base.Optional;
 import com.nightscout.core.dexcom.Command;
 import com.nightscout.core.dexcom.PacketBuilder;
 import com.nightscout.core.dexcom.ReadPacket;
+import com.nightscout.core.dexcom.ReceiverPowerLevel;
 import com.nightscout.core.dexcom.RecordType;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.dexcom.records.GenericTimestampRecord;
+import com.nightscout.core.dexcom.records.InsertionRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.PageHeader;
 import com.nightscout.core.dexcom.records.SensorRecord;
 
+import net.tribe7.common.base.Optional;
+
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -26,7 +30,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -36,7 +39,7 @@ import javax.xml.parsers.ParserConfigurationException;
 public class ReadData {
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
-    private static final int IO_TIMEOUT = 1000;
+    private static final int IO_TIMEOUT = 15000;
     private static final int MIN_LEN = 256;
     private DeviceTransport mSerialDevice;
 
@@ -47,13 +50,19 @@ public class ReadData {
         mSerialDevice = device;
     }
 
-    public List<EGVRecord> getRecentEGVs() throws IOException {
+    public List<EGVRecord> getRecentEGVs(long rcvrTime, long refTime) throws IOException {
         int endPage = readDataBasePageRange(RecordType.EGV_DATA);
         byte[] data = readDataBasePage(RecordType.EGV_DATA, endPage);
-        return parsePage(data, EGVRecord.class);
+        return parsePage(data, EGVRecord.class, rcvrTime, refTime);
     }
 
-    public List<EGVRecord> getRecentEGVsPages(int numOfRecentPages) throws IOException {
+    public List<InsertionRecord> getRecentInsertion(long rcvrTime, long refTime) throws IOException {
+        int endPage = readDataBasePageRange(RecordType.INSERTION_TIME);
+        byte[] data = readDataBasePage(RecordType.INSERTION_TIME, endPage);
+        return parsePage(data, InsertionRecord.class, rcvrTime, refTime);
+    }
+
+    public List<EGVRecord> getRecentEGVsPages(int numOfRecentPages, long rcvrTime, long refTime) throws IOException {
         if (numOfRecentPages < 1) {
             throw new IllegalArgumentException("Number of pages must be greater than 1.");
         }
@@ -66,7 +75,7 @@ public class ReadData {
             int nextPage = endPage - i;
             log.debug("Reading #{} EGV pages (page number {})", i, nextPage);
             byte[] data = readDataBasePage(RecordType.EGV_DATA, nextPage);
-            allPages.addAll(parsePage(data, EGVRecord.class));
+            allPages.addAll(parsePage(data, EGVRecord.class, rcvrTime, refTime));
         }
         log.debug("Read complete of EGV pages.");
         return allPages;
@@ -76,14 +85,14 @@ public class ReadData {
         return readSystemTime() - egvRecord.getRawSystemTimeSeconds();
     }
 
-    public List<MeterRecord> getRecentMeterRecords() throws IOException {
+    public List<MeterRecord> getRecentMeterRecords(long rcvrTime, long refTime) throws IOException {
         log.debug("Reading Meter page...");
         int endPage = readDataBasePageRange(RecordType.METER_DATA);
         byte[] data = readDataBasePage(RecordType.METER_DATA, endPage);
-        return parsePage(data, MeterRecord.class);
+        return parsePage(data, MeterRecord.class, rcvrTime, refTime);
     }
 
-    public List<SensorRecord> getRecentSensorRecords(int numOfRecentPages) throws IOException {
+    public List<SensorRecord> getRecentSensorRecords(int numOfRecentPages, long rcvrTime, long refTime) throws IOException {
         if (numOfRecentPages < 1) {
             throw new IllegalArgumentException("Number of pages must be greater than 1.");
         }
@@ -96,18 +105,18 @@ public class ReadData {
             int nextPage = endPage - i;
             log.debug("Reading #{} Sensor pages (page number {})", i, nextPage);
             byte[] data = readDataBasePage(RecordType.SENSOR_DATA, nextPage);
-            allPages.addAll(parsePage(data, SensorRecord.class));
+            allPages.addAll(parsePage(data, SensorRecord.class, rcvrTime, refTime));
         }
         log.debug("Read complete of Sensor pages.");
         return allPages;
     }
 
-    public List<CalRecord> getRecentCalRecords() throws IOException {
+    public List<CalRecord> getRecentCalRecords(long rcvrTime, long refTime) throws IOException {
         log.debug("Reading Cal Records page range...");
         int endPage = readDataBasePageRange(RecordType.CAL_SET);
         log.debug("Reading Cal Records page...");
         byte[] data = readDataBasePage(RecordType.CAL_SET, endPage);
-        return parsePage(data, CalRecord.class);
+        return parsePage(data, CalRecord.class, rcvrTime, refTime);
     }
 
     public boolean ping() throws IOException {
@@ -115,10 +124,25 @@ public class ReadData {
         return read(MIN_LEN).getCommand() == Command.ACK;
     }
 
+    public ReceiverPowerLevel getPowerLevel() throws IOException {
+        writeCommand(Command.READ_CHARGER_CURRENT_SETTING);
+        byte[] readData = read(MIN_LEN).getData();
+        return ReceiverPowerLevel.values()[ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt()];
+    }
+
+    public boolean setPowerLevel(ReceiverPowerLevel powerLevel) throws IOException {
+        List<Byte> payload = new ArrayList<>();
+        payload.add((byte) powerLevel.ordinal());
+        writeCommand(Command.WRITE_CHARGER_CURRENT_SETTING, payload);
+        return read(MIN_LEN).getCommand() == Command.ACK;
+    }
+
+
     public int readBatteryLevel() throws IOException {
         log.debug("Reading battery level...");
         writeCommand(Command.READ_BATTERY_LEVEL);
-        byte[] readData = read(MIN_LEN).getData();
+//        byte[] readData = read(MIN_LEN).getData();
+        byte[] readData = read(10).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
@@ -126,17 +150,27 @@ public class ReadData {
         return getManufacturingAttribute("SerialNumber").or("");
     }
 
+    public String readTrasmitterId() throws IOException {
+        writeCommand(Command.READ_TRANSMITTER_ID);
+        byte[] data = read(MIN_LEN).getData();
+        return new String(data);
+    }
+
     private Optional<String> getManufacturingAttribute(String attribute) throws IOException {
         String result = null;
         if (manufacturingDataXml == null) {
             byte[] packet = readDataBasePage(RecordType.MANUFACTURING_DATA, 0);
-            String xml = new String(Arrays.copyOfRange(packet, 8, 241));
-            // TODO: it would be best if we could just remove /x00 characters and read till end
+            String raw = new String(packet);
+            String xml = raw.substring(raw.indexOf('<'), raw.lastIndexOf('>') + 1);
             try {
-
+                log.debug("Manufacturing Response size: " + packet.length);
+                log.debug("Manufacturing data: " + xml);
+                log.debug("Manufacturing data: " + new String(packet));
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder builder = factory.newDocumentBuilder();
                 manufacturingDataXml = builder.parse(new InputSource(new StringReader(xml)));
+                Element element = manufacturingDataXml.getDocumentElement();
+                result = element.getAttribute(attribute);
             } catch (ParserConfigurationException | SAXException e) {
                 throw new IOException("Unable to parse manufacturing data", e);
             }
@@ -147,14 +181,14 @@ public class ReadData {
         return Optional.fromNullable(result);
     }
 
-    public Date readDisplayTime() throws IOException {
+    public DateTime readDisplayTime() throws IOException {
         return Utils.receiverTimeToDate(readSystemTime() + readDisplayTimeOffset());
     }
 
     public long readSystemTime() throws IOException {
         log.debug("Reading system time...");
         writeCommand(Command.READ_SYSTEM_TIME);
-        byte[] readData = read(MIN_LEN).getData();
+        byte[] readData = read(10).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
@@ -169,7 +203,7 @@ public class ReadData {
         ArrayList<Byte> payload = new ArrayList<>();
         payload.add((byte) recordType.ordinal());
         writeCommand(Command.READ_DATABASE_PAGE_RANGE, payload);
-        byte[] readData = read(MIN_LEN).getData();
+        byte[] readData = read(14).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt(4);
     }
 
@@ -187,10 +221,10 @@ public class ReadData {
         payload.add(pageInt[0]);
         payload.add(numOfPages);
         writeCommand(Command.READ_DATABASE_PAGES, payload);
-        return read(2122).getData();
+        return read(534).getData();
     }
 
-    private void writeCommand(Command command, ArrayList<Byte> payload) throws IOException {
+    private void writeCommand(Command command, List<Byte> payload) throws IOException {
         byte[] packet = new PacketBuilder(command, payload).build();
         if (mSerialDevice != null) {
             mSerialDevice.write(packet, IO_TIMEOUT);
@@ -207,28 +241,28 @@ public class ReadData {
     private ReadPacket read(int numOfBytes) throws IOException {
         byte[] response = new byte[numOfBytes];
         int len;
-        try {
-            response = mSerialDevice.read(numOfBytes, IO_TIMEOUT);
-            len = response.length;
-            log.debug("Read {} byte(s) complete.", len);
+//        try {
+        response = mSerialDevice.read(numOfBytes, IO_TIMEOUT);
+        len = response.length;
+        log.debug("Read {} byte(s) complete.", len);
 
-            // Add a 100ms delay for when multiple write/reads are occurring in series
-            Thread.sleep(100);
+        // Add a 100ms delay for when multiple write/reads are occurring in series
+//            Thread.sleep(100);
 
-            // TODO: this debug code to print data of the read, should be removed after
-            // finding the source of the reading issue
-            String bytes = "";
-            int readAmount = len;
-            for (int i = 0; i < readAmount; i++) bytes += String.format("%02x", response[i]) + " ";
-            log.debug("Read data: {}", bytes);
-            ////////////////////////////////////////////////////////////////////////////////////////
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // TODO: this debug code to print data of the read, should be removed after
+        // finding the source of the reading issue
+        String bytes = "";
+        int readAmount = len;
+        for (int i = 0; i < readAmount; i++) bytes += String.format("%02x", response[i]) + " ";
+        log.debug("Read data: {}", bytes);
+        ////////////////////////////////////////////////////////////////////////////////////////
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         return new ReadPacket(response);
     }
 
-    private <T extends GenericTimestampRecord> List<T> parsePage(byte[] data, Class<T> clazz) {
+    private <T extends GenericTimestampRecord> List<T> parsePage(byte[] data, Class<T> clazz, long rcvrTime, long refTime) {
         PageHeader pageHeader = new PageHeader(data);
         List<T> records = new ArrayList<>();
         try {
@@ -237,20 +271,24 @@ public class ReadData {
                 switch (pageHeader.getRecordType()) {
                     case EGV_DATA:
                         startIdx = PageHeader.HEADER_SIZE + (EGVRecord.RECORD_SIZE + 1) * i;
-                        records.add(clazz.cast(new EGVRecord(Arrays.copyOfRange(data, startIdx, startIdx + EGVRecord.RECORD_SIZE))));
+                        records.add(clazz.cast(new EGVRecord(Arrays.copyOfRange(data, startIdx, startIdx + EGVRecord.RECORD_SIZE), rcvrTime, refTime)));
                         break;
                     case CAL_SET:
                         int recordLength = (pageHeader.getRevision() <= 2) ? CalRecord.RECORD_SIZE : CalRecord.RECORD_V2_SIZE;
                         startIdx = PageHeader.HEADER_SIZE + (recordLength + 1) * i;
-                        records.add(clazz.cast(new CalRecord(Arrays.copyOfRange(data, startIdx, startIdx + recordLength))));
+                        records.add(clazz.cast(new CalRecord(Arrays.copyOfRange(data, startIdx, startIdx + recordLength), rcvrTime, refTime)));
                         break;
                     case METER_DATA:
                         startIdx = PageHeader.HEADER_SIZE + (MeterRecord.RECORD_SIZE + 1) * i;
-                        records.add(clazz.cast(new MeterRecord(Arrays.copyOfRange(data, startIdx, startIdx + MeterRecord.RECORD_SIZE))));
+                        records.add(clazz.cast(new MeterRecord(Arrays.copyOfRange(data, startIdx, startIdx + MeterRecord.RECORD_SIZE), rcvrTime, refTime)));
                         break;
                     case SENSOR_DATA:
                         startIdx = PageHeader.HEADER_SIZE + (SensorRecord.RECORD_SIZE + 1) * i;
-                        records.add(clazz.cast(new SensorRecord(Arrays.copyOfRange(data, startIdx, startIdx + SensorRecord.RECORD_SIZE))));
+                        records.add(clazz.cast(new SensorRecord(Arrays.copyOfRange(data, startIdx, startIdx + SensorRecord.RECORD_SIZE), rcvrTime, refTime)));
+                        break;
+                    case INSERTION_TIME:
+                        startIdx = PageHeader.HEADER_SIZE + (InsertionRecord.RECORD_SIZE + 1) * i;
+                        records.add(clazz.cast(new InsertionRecord(Arrays.copyOfRange(data, startIdx, startIdx + InsertionRecord.RECORD_SIZE), rcvrTime, refTime)));
                         break;
                     default:
                         throw new IllegalArgumentException(String.format("Unknown record type: %s", pageHeader.getRecordType().name()));

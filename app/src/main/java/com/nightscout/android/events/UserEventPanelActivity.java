@@ -6,9 +6,10 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.google.common.base.CaseFormat;
 import com.nightscout.android.R;
 import com.nightscout.core.events.EventType;
+
+import net.tribe7.common.base.CaseFormat;
 
 public class UserEventPanelActivity extends Activity {
     @Override
@@ -27,10 +28,11 @@ public class UserEventPanelActivity extends Activity {
 
         Bundle bundle = new Bundle();
         bundle.putInt("Filter", intent.getIntExtra("Filter", 0));
+//        bundle.putBoolean("fromActivity", true);
         fragment.setArguments(bundle);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.fragment, fragment);
+        fragmentTransaction.add(R.id.eventlogfragment, fragment);
         fragmentTransaction.commit();
 
     }

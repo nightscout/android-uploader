@@ -1,11 +1,11 @@
 package com.nightscout.core.upload;
 
-import com.google.common.collect.Lists;
-import com.google.common.io.CharStreams;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.preferences.TestPreferences;
+
+import net.tribe7.common.io.CharStreams;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolVersion;
@@ -25,6 +25,9 @@ import org.mockito.ArgumentCaptor;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.nightscout.core.test.MockFactory.mockGlucoseDataSet;
 import static junit.framework.TestCase.fail;
@@ -86,14 +89,16 @@ public class AbstractRestUploaderTest {
     @Test
     public void testUploads_isPost() throws Exception {
         setUpExecuteCaptor();
-        restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
+        List<GlucoseDataSet> dataSets = new ArrayList<>(Arrays.asList(mockGlucoseDataSet()));
+        restUploader.uploadGlucoseDataSets(dataSets);
         assertThat(captor.getValue().getMethod(), is("POST"));
     }
 
     @Test
     public void testUploads_setsUrl() throws Exception {
         setUpExecuteCaptor();
-        restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
+        List<GlucoseDataSet> dataSets = new ArrayList<>(Arrays.asList(mockGlucoseDataSet()));
+        restUploader.uploadGlucoseDataSets(dataSets);
         assertThat(captor.getValue().getURI(), is(not(nullValue())));
         assertThat(captor.getValue().getURI().toString(), is("http://test.com/endpoint"));
     }
@@ -101,7 +106,8 @@ public class AbstractRestUploaderTest {
     @Test
     public void testUploads_setsContentType() throws Exception {
         setUpExecuteCaptor();
-        restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
+        List<GlucoseDataSet> dataSets = new ArrayList<>(Arrays.asList(mockGlucoseDataSet()));
+        restUploader.uploadGlucoseDataSets(dataSets);
         assertThat(captor.getValue().getFirstHeader("Content-Type"), is(not(nullValue())));
         assertThat(captor.getValue().getFirstHeader("Content-Type").getValue(),
                 is("application/json"));
@@ -110,7 +116,8 @@ public class AbstractRestUploaderTest {
     @Test
     public void testUploads_setsAccept() throws Exception {
         setUpExecuteCaptor();
-        restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
+        List<GlucoseDataSet> dataSets = new ArrayList<>(Arrays.asList(mockGlucoseDataSet()));
+        restUploader.uploadGlucoseDataSets(dataSets);
         assertThat(captor.getValue().getFirstHeader("Accept"), is(not(nullValue())));
         assertThat(captor.getValue().getFirstHeader("Accept").getValue(), is("application/json"));
     }
@@ -118,14 +125,16 @@ public class AbstractRestUploaderTest {
     @Test
     public void testUploads_setsExtraHeaders() throws Exception {
         setUpExecuteCaptor();
-        restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
+        List<GlucoseDataSet> dataSets = new ArrayList<>(Arrays.asList(mockGlucoseDataSet()));
+        restUploader.uploadGlucoseDataSets(dataSets);
         assertThat(captor.getValue().getFirstHeader("key").getValue(), is("value"));
     }
 
     @Test
     public void testUploads_setsEntity() throws IOException, InvalidRecordLengthException {
         setUpExecuteCaptor();
-        restUploader.uploadGlucoseDataSets(Lists.newArrayList(mockGlucoseDataSet()));
+        List<GlucoseDataSet> dataSets = new ArrayList<>(Arrays.asList(mockGlucoseDataSet()));
+        restUploader.uploadGlucoseDataSets(dataSets);
         HttpPost post = (HttpPost) captor.getValue();
         String entity = CharStreams.toString(new InputStreamReader(post.getEntity().getContent()));
         assertThat(entity, containsString("jsonKey"));
@@ -135,16 +144,14 @@ public class AbstractRestUploaderTest {
     @Test
     public void testUploads_2XXStatusCodeReturnsTrue() throws IOException, InvalidRecordLengthException {
         setUpExecuteCaptor(251);
-        boolean result = restUploader.uploadGlucoseDataSets(
-                Lists.newArrayList(mockGlucoseDataSet()));
+        boolean result = restUploader.uploadGlucoseDataSets(new ArrayList<>(Arrays.asList(mockGlucoseDataSet())));
         assertThat(result, is(true));
     }
 
     @Test
     public void testUploads_Non200StatusCodeReturnsFalse() throws IOException, InvalidRecordLengthException {
         setUpExecuteCaptor(400);
-        boolean result = restUploader.uploadGlucoseDataSets(
-                Lists.newArrayList(mockGlucoseDataSet()));
+        boolean result = restUploader.uploadGlucoseDataSets(new ArrayList<>(Arrays.asList(mockGlucoseDataSet())));
         assertThat(result, is(false));
     }
 }

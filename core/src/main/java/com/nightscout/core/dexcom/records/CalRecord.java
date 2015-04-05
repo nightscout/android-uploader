@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class CalRecord extends GenericTimestampRecord {
@@ -28,8 +27,8 @@ public class CalRecord extends GenericTimestampRecord {
     private List<CalSubrecord> calSubrecords;
     private int SUB_LEN = 17;
 
-    public CalRecord(byte[] packet) {
-        super(packet);
+    public CalRecord(byte[] packet, long rcvrTime, long refTime) {
+        super(packet, rcvrTime, refTime);
         if (packet.length != RECORD_SIZE && packet.length != RECORD_V2_SIZE) {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
                     ". Expected size: " + RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
@@ -49,42 +48,45 @@ public class CalRecord extends GenericTimestampRecord {
                 new DateTime(getDisplayTime())).toStandardDuration().getMillis();
         int start = 44;
         for (int i = 0; i < numRecords; i++) {
-            LOG.debug("Loop #" + i);
             byte[] temp = new byte[SUB_LEN];
             System.arraycopy(packet, start, temp, 0, temp.length);
             calSubrecords.add(new CalSubrecord(temp, displayTimeOffset));
             start += SUB_LEN;
         }
+        setRecordType();
     }
 
-    public CalRecord(double intercept, double slope, double scale, double decay, Date displayTime, Date systemTime, List<CalSubrecord> subrecord) {
-        super(displayTime, systemTime);
+    public CalRecord(double intercept, double slope, double scale, double decay, DateTime displayTime, DateTime systemTime, List<CalSubrecord> subrecord, DateTime wallTime) {
+        super(displayTime, systemTime, wallTime);
         this.intercept = intercept;
         this.slope = slope;
         this.scale = scale;
         this.decay = decay;
         this.numRecords = subrecord.size();
         this.calSubrecords = subrecord;
+        setRecordType();
     }
 
-    public CalRecord(double intercept, double slope, double scale, double decay, long displayTime, int systemTime, List<CalSubrecord> subrecord) {
-        super(displayTime, systemTime);
+    public CalRecord(double intercept, double slope, double scale, double decay, long displayTime, int systemTime, List<CalSubrecord> subrecord, long rcvrTime, long refTime) {
+        super(displayTime, systemTime, rcvrTime, refTime);
         this.intercept = intercept;
         this.slope = slope;
         this.scale = scale;
         this.decay = decay;
         this.numRecords = subrecord.size();
         this.calSubrecords = subrecord;
+        setRecordType();
     }
 
-    public CalRecord(CalibrationEntry cal) {
-        super(cal.disp_timestamp_sec, cal.sys_timestamp_sec);
+    public CalRecord(CalibrationEntry cal, long rcvrTime, long refTime) {
+        super(cal.disp_timestamp_sec, cal.sys_timestamp_sec, rcvrTime, refTime);
         this.intercept = cal.intercept;
         this.slope = cal.slope;
         this.scale = cal.scale;
         this.decay = cal.decay;
         this.numRecords = 0;
         this.calSubrecords = new ArrayList<>();
+        setRecordType();
     }
 
     @Override
@@ -95,6 +97,7 @@ public class CalRecord extends GenericTimestampRecord {
                 .intercept(intercept)
                 .scale(scale)
                 .slope(slope)
+                .decay(decay)
                 .build();
     }
 
@@ -148,6 +151,11 @@ public class CalRecord extends GenericTimestampRecord {
             return false;
 
         return true;
+    }
+
+    @Override
+    protected void setRecordType() {
+        this.recordType = "cal";
     }
 
     public CalibrationEntry toProtoBuf() {

@@ -1,15 +1,16 @@
 package com.nightscout.android.preferences;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.google.common.base.Joiner;
 import com.nightscout.android.R;
+import com.nightscout.core.drivers.SupportedDevices;
 import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.RestUriUtils;
+
+import net.tribe7.common.base.Joiner;
 
 import java.util.List;
 
@@ -29,104 +30,104 @@ public class AndroidPreferences implements NightscoutPreferences {
 
     @Override
     public boolean isRestApiEnabled() {
-        return preferences.getBoolean(PreferenceKeys.API_UPLOADER_ENABLED, false);
+        return preferences.getBoolean(context.getString(R.string.rest_enable), false);
     }
 
     @Override
     public List<String> getRestApiBaseUris() {
-        return RestUriUtils.splitIntoMultipleUris(preferences.getString(PreferenceKeys.API_URIS, ""));
+        return RestUriUtils.splitIntoMultipleUris(preferences.getString(context.getString(R.string.rest_uris), ""));
     }
 
     @Override
     public boolean isCalibrationUploadEnabled() {
-        return preferences.getBoolean(PreferenceKeys.CAL_UPLOAD_ENABLED, false);
+        return preferences.getBoolean(context.getString(R.string.cloud_cal_data), false);
     }
 
     @Override
     public void setCalibrationUploadEnabled(boolean calibrationUploadEnabled) {
-        preferences.edit().putBoolean(PreferenceKeys.CAL_UPLOAD_ENABLED, calibrationUploadEnabled).apply();
+        preferences.edit().putBoolean(context.getString(R.string.cloud_cal_data), calibrationUploadEnabled).apply();
     }
 
     @Override
     public boolean isSensorUploadEnabled() {
-        return preferences.getBoolean(PreferenceKeys.SENSOR_UPLOAD_ENABLED, false);
+        return preferences.getBoolean(context.getString(R.string.cloud_sensor_data), false);
     }
 
     @Override
     public void setSensorUploadEnabled(boolean sensorUploadEnabled) {
-        preferences.edit().putBoolean(PreferenceKeys.SENSOR_UPLOAD_ENABLED, sensorUploadEnabled).apply();
+        preferences.edit().putBoolean(context.getString(R.string.cloud_sensor_data), sensorUploadEnabled).apply();
     }
 
     @Override
     public boolean isDataDonateEnabled() {
-        return preferences.getBoolean(PreferenceKeys.DATA_DONATE, false);
+        return preferences.getBoolean(context.getString(R.string.data_donate), false);
     }
 
     @Override
     public boolean isMongoUploadEnabled() {
-        return preferences.getBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED, false);
+        return preferences.getBoolean(context.getString(R.string.mongo_enable), false);
     }
 
     @Override
     public void setDataDonateEnabled(boolean toDonate) {
-        preferences.edit().putBoolean(PreferenceKeys.DATA_DONATE, toDonate).apply();
+        preferences.edit().putBoolean(context.getString(R.string.data_donate), toDonate).apply();
     }
 
     @Override
     public String getMongoClientUri() {
-        return preferences.getString(PreferenceKeys.MONGO_URI, "");
+        return preferences.getString(context.getString(R.string.mongo_uri), "");
     }
 
     @Override
     public String getMongoCollection() {
-        return preferences.getString(PreferenceKeys.MONGO_COLLECTION,
+        return preferences.getString(context.getString(R.string.mongo_entries_collection),
                 getDefaultMongoCollection());
     }
 
     @Override
     public String getMongoDeviceStatusCollection() {
-        String result = preferences.getString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION,
+        String result = preferences.getString(context.getString(R.string.mongo_devicestatus_collection),
                 getDefaultMongoDeviceStatusCollection());
         return result.equals("") ? getDefaultMongoDeviceStatusCollection() : result;
     }
 
     @Override
     public boolean isMqttEnabled() {
-        return preferences.getBoolean(PreferenceKeys.MQTT_ENABLED, false);
+        return preferences.getBoolean(context.getString(R.string.mqtt_enable), false);
     }
 
     @Override
     public void setMqttUploadEnabled(boolean mqttUploadEnabled) {
-        preferences.edit().putBoolean(PreferenceKeys.MQTT_ENABLED, mqttUploadEnabled).apply();
+        preferences.edit().putBoolean(context.getString(R.string.mqtt_enable), mqttUploadEnabled).apply();
     }
 
     @Override
     public String getMqttEndpoint() {
-        return preferences.getString(PreferenceKeys.MQTT_ENDPOINT, "");
+        return preferences.getString(context.getString(R.string.mqtt_endpoint), "");
     }
 
     @Override
     public void setMqttEndpoint(String endpoint) {
-        preferences.edit().putString(PreferenceKeys.MQTT_ENDPOINT, endpoint).apply();
+        preferences.edit().putString(context.getString(R.string.mqtt_endpoint), endpoint).apply();
     }
 
     @Override
     public String getMqttUser() {
-        return preferences.getString(PreferenceKeys.MQTT_USER, "");
+        return preferences.getString(context.getString(R.string.mqtt_user), "");
     }
 
     @Override
     public String getMqttPass() {
-        return preferences.getString(PreferenceKeys.MQTT_PASS, "");
+        return preferences.getString(context.getString(R.string.mqtt_pass), "");
     }
 
     public void setMqttUser(String mqttUser) {
-        preferences.edit().putString(PreferenceKeys.MQTT_USER, mqttUser).apply();
+        preferences.edit().putString(context.getString(R.string.mqtt_user), mqttUser).apply();
     }
 
     // TODO: (klee) look into how to securely store this information
     public void setMqttPass(String mqttPass) {
-        preferences.edit().putString(PreferenceKeys.MQTT_PASS, mqttPass).apply();
+        preferences.edit().putString(context.getString(R.string.mqtt_pass), mqttPass).apply();
     }
 
 
@@ -137,12 +138,12 @@ public class AndroidPreferences implements NightscoutPreferences {
      */
     @Override
     public void setMongoUploadEnabled(boolean mongoUploadEnabled) {
-        preferences.edit().putBoolean(PreferenceKeys.MONGO_UPLOADER_ENABLED, mongoUploadEnabled).apply();
+        preferences.edit().putBoolean(context.getString(R.string.mongo_enable), mongoUploadEnabled).apply();
     }
 
     @Override
     public void setRestApiEnabled(boolean restApiEnabled) {
-        preferences.edit().putBoolean(PreferenceKeys.API_UPLOADER_ENABLED, restApiEnabled).apply();
+        preferences.edit().putBoolean(context.getString(R.string.rest_enable), restApiEnabled).apply();
     }
 
     private String getDefaultMongoCollection() {
@@ -155,107 +156,177 @@ public class AndroidPreferences implements NightscoutPreferences {
 
     @Override
     public GlucoseUnit getPreferredUnits() {
-        return preferences.getString(PreferenceKeys.PREFERRED_UNITS, "0").equals("0")
+        return preferences.getString(context.getString(R.string.preferred_units), "0").equals("0")
                 ? GlucoseUnit.MGDL : GlucoseUnit.MMOL;
     }
 
     @Override
     public void setPreferredUnits(GlucoseUnit units) {
         String unitString = (units == GlucoseUnit.MGDL) ? "0" : "1";
-        preferences.edit().putString(PreferenceKeys.PREFERRED_UNITS, unitString).apply();
+        preferences.edit().putString(context.getString(R.string.preferred_units), unitString).apply();
     }
 
     @Override
     public String getPwdName() {
-        return preferences.getString(PreferenceKeys.PWD_NAME, context.getString(R.string.default_pwd_name));
+        return preferences.getString(context.getString(R.string.pwd_name), context.getString(R.string.default_pwd_name));
     }
 
     @Override
     public void setPwdName(String pwdName) {
-        preferences.edit().putString(PreferenceKeys.PWD_NAME, pwdName).apply();
+        preferences.edit().putString(context.getString(R.string.pwd_name), pwdName).apply();
     }
 
     @Override
     public boolean hasAskedForData() {
-        return preferences.getBoolean(PreferenceKeys.DONATE_DATA_QUERY, false);
+        return preferences.getBoolean(context.getString(R.string.donate_data_query), false);
     }
 
     @Override
     public void setAskedForData(boolean askedForData) {
-        preferences.edit().putBoolean(PreferenceKeys.DONATE_DATA_QUERY, askedForData).apply();
+        preferences.edit().putBoolean(context.getString(R.string.donate_data_query), askedForData).apply();
     }
 
     @Override
     public void setMongoClientUri(String mongoClientUri) {
-        preferences.edit().putString(PreferenceKeys.MONGO_URI, mongoClientUri).apply();
+        preferences.edit().putString(context.getString(R.string.mongo_uri), mongoClientUri).apply();
     }
 
     @Override
     public void setMongoDeviceStatusCollection(String deviceStatusCollection) {
-        preferences.edit().putString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION, deviceStatusCollection).apply();
+        preferences.edit().putString(context.getString(R.string.mongo_devicestatus_collection), deviceStatusCollection).apply();
     }
 
     @Override
     public void setMongoCollection(String sgvCollection) {
-        preferences.edit().putString(PreferenceKeys.MONGO_COLLECTION, sgvCollection).apply();
+        preferences.edit().putString(context.getString(R.string.mongo_entries_collection), sgvCollection).apply();
     }
 
     @Override
     public boolean getIUnderstand() {
-        return preferences.getBoolean(PreferenceKeys.I_UNDERSTAND, false);
+        return preferences.getBoolean(context.getString(R.string.i_understand), false);
     }
 
     @Override
     public void setIUnderstand(boolean bool) {
-        preferences.edit().putBoolean(PreferenceKeys.I_UNDERSTAND, bool).apply();
+        preferences.edit().putBoolean(context.getString(R.string.i_understand), bool).apply();
     }
 
     @Override
     public void setRestApiBaseUris(List<String> uris) {
-        preferences.edit().putString(PreferenceKeys.API_URIS, Joiner.on(' ').join(uris)).apply();
+        preferences.edit().putString(context.getString(R.string.rest_uris), Joiner.on(' ').join(uris)).apply();
     }
 
     public boolean isRootEnabled() {
-        return preferences.getBoolean(PreferenceKeys.ROOT_ENABLED, false);
+        return preferences.getBoolean(context.getString(R.string.root_enable), false);
     }
 
     public void setRootEnabled(boolean enabled) {
-        preferences.edit().putBoolean(PreferenceKeys.ROOT_ENABLED, enabled).apply();
+        preferences.edit().putBoolean(context.getString(R.string.root_enable), enabled).apply();
     }
 
-    @SuppressLint("CommitPrefEdits")
     public void setLastEgvMqttUpload(long timestamp) {
-        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_EGV_TIME, timestamp).commit();
+        preferences.edit().putLong(context.getString(R.string.last_mqtt_egv_time), timestamp).apply();
     }
 
-    @SuppressLint("CommitPrefEdits")
     public void setLastSensorMqttUpload(long timestamp) {
-        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_SENSOR_TIME, timestamp).commit();
+        preferences.edit().putLong(context.getString(R.string.last_mqtt_sensor_time), timestamp).apply();
     }
 
-    @SuppressLint("CommitPrefEdits")
     public void setLastCalMqttUpload(long timestamp) {
-        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_CAL_TIME, timestamp).commit();
+        preferences.edit().putLong(context.getString(R.string.last_mqtt_cal_time), timestamp).apply();
     }
 
-    @SuppressLint("CommitPrefEdits")
     public void setLastMeterMqttUpload(long timestamp) {
-        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_METER_TIME, timestamp).commit();
+        preferences.edit().putLong(context.getString(R.string.last_mqtt_meter_time), timestamp).apply();
     }
 
     public long getLastEgvMqttUpload() {
-        return preferences.getLong(PreferenceKeys.MQTT_LAST_EGV_TIME, 0);
+        return preferences.getLong(context.getString(R.string.last_mqtt_egv_time), 0);
     }
 
     public long getLastSensorMqttUpload() {
-        return preferences.getLong(PreferenceKeys.MQTT_LAST_SENSOR_TIME, 0);
+        return preferences.getLong(context.getString(R.string.last_mqtt_sensor_time), 0);
     }
 
     public long getLastCalMqttUpload() {
-        return preferences.getLong(PreferenceKeys.MQTT_LAST_CAL_TIME, 0);
+        return preferences.getLong(context.getString(R.string.last_mqtt_cal_time), 0);
     }
 
     public long getLastMeterMqttUpload() {
-        return preferences.getLong(PreferenceKeys.MQTT_LAST_METER_TIME, 0);
+        return preferences.getLong(context.getString(R.string.last_mqtt_meter_time), 0);
     }
+
+    public long getLastRecordTime(String recType, String uploadType) {
+        String key = "last_" + uploadType + "_" + recType + "_time";
+        return preferences.getLong(key, 0);
+    }
+
+    public void setLastRecordTime(String recType, String uploadType, long timestamp) {
+        String key = "last_" + uploadType + "_" + recType + "_time";
+        preferences.edit().putLong(key, timestamp).apply();
+    }
+
+    @Override
+    public void setBluetoothDevice(String btDeviceName, String btAddress) {
+        preferences.edit().putString(context.getString(R.string.share_bluetooth_device), btDeviceName).apply();
+        preferences.edit().putString(context.getString(R.string.share_bluetooth_address), btAddress).apply();
+    }
+
+    @Override
+    public String getBtAddress() {
+        return preferences.getString(context.getString(R.string.share_bluetooth_address), "");
+    }
+
+    @Override
+    public SupportedDevices getDeviceType() {
+        String value = preferences.getString(context.getString(R.string.dexcom_device_type), "0");
+        if (value.equals("0")) {
+            return SupportedDevices.DEXCOM_G4;
+        }
+        if (value.equals("1")) {
+            return SupportedDevices.DEXCOM_G4_SHARE2;
+        }
+        return SupportedDevices.UNKNOWN;
+    }
+
+    @Override
+    public String getShareSerial() {
+        return preferences.getString(context.getString(R.string.share2_serial), "");
+    }
+
+    @Override
+    public void setShareSerial(String serialNumber) {
+        preferences.edit().putString(context.getString(R.string.share2_serial), serialNumber).apply();
+    }
+
+    @Override
+    public boolean isMeterUploadEnabled() {
+        return preferences.getBoolean(context.getString(R.string.cloud_mbg_data), false);
+    }
+
+    @Override
+    public void setMeterUploadEnabled(boolean enabled) {
+        preferences.edit().putBoolean(context.getString(R.string.cloud_mbg_data), enabled).apply();
+    }
+
+    @Override
+    public boolean isInsertionUploadEnabled() {
+//        return preferences.getBoolean(PreferenceKeys.INSERTION_UPLOAD_ENABLED, false);
+        return preferences.getBoolean(context.getString(R.string.insert_data_enabled), false);
+    }
+
+    @Override
+    public void setInsertionUploadEnabled(boolean enabled) {
+        preferences.edit().putBoolean(context.getString(R.string.insert_data_enabled), enabled).apply();
+    }
+
+    public void setLabsEnabled(boolean enabled) {
+        preferences.edit().putBoolean(context.getString(R.string.labs_enable), enabled).apply();
+    }
+
+    public boolean areLabsEnabled() {
+        return preferences.getBoolean(context.getString(R.string.labs_enable), false);
+
+    }
+
 }

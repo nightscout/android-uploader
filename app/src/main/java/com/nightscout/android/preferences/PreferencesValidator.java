@@ -1,14 +1,17 @@
 package com.nightscout.android.preferences;
 
 import android.content.Context;
+import android.util.Log;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Strings;
 import com.mongodb.MongoClientURI;
 import com.nightscout.android.R;
 import com.nightscout.core.utils.RestUriUtils;
 
+import net.tribe7.common.base.Optional;
+import net.tribe7.common.base.Strings;
+
 import java.net.URI;
+import java.net.URLEncoder;
 
 public class PreferencesValidator {
     /**
@@ -39,7 +42,9 @@ public class PreferencesValidator {
         URI uri;
         try {
             uri = URI.create(restApiUri);
+            URLEncoder.encode(uri.getAuthority(), "UTF-8");
         } catch (Exception e) {
+            Log.e("XXX", "Exception: " + e.getMessage());
             return Optional.of(context.getString(R.string.invalid_rest_uri, restApiUri));
         }
         if (RestUriUtils.isV1Uri(uri)) {
@@ -62,4 +67,17 @@ public class PreferencesValidator {
         return Optional.absent();
 
     }
+
+    public static Optional<String> validateShareSerial(Context context, String serialNum) {
+        if (Strings.isNullOrEmpty(serialNum)) {
+            return Optional.of(context.getString(R.string.invalid_share2_serial, serialNum));
+        }
+        Log.d("XXX", "Serial Number: " + serialNum.toUpperCase());
+        if (!serialNum.toUpperCase().startsWith("SM") || (serialNum.length() < 10)) {
+            return Optional.of(context.getString(R.string.invalid_share2_serial, serialNum));
+        }
+        return Optional.absent();
+    }
+
+    ;
 }
