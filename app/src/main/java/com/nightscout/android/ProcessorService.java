@@ -77,13 +77,6 @@ public class ProcessorService extends Service {
         bus.register(this);
         uploader = new Uploader(getApplicationContext(), preferences);
         setupMqtt();
-//        if (preferences.isMqttEnabled()) {
-//            mqttManager = setupMqtt(preferences.getMqttUser(), preferences.getMqttPass(), preferences.getMqttEndpoint());
-//            if (mqttManager != null) {
-//                mqttManager.connect();
-//                initalized = true;
-//            }
-//        }
         tracker = ((Nightscout) getApplicationContext()).getTracker();
         reportUploadMethods();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -102,7 +95,7 @@ public class ProcessorService extends Service {
                         Log.d(TAG, "defined: " + ul.getIdentifier());
                     }
                 } else if (key.equals(getApplicationContext().getString(R.string.mqtt_enable))) {
-                // Assume that MQTT already has the information needed and set it up.
+                    // Assume that MQTT already has the information needed and set it up.
                     setupMqtt();
                     if (mqttManager != null && mqttManager.isConnected()) {
                         mqttManager.setShouldReconnect(false);
@@ -259,8 +252,6 @@ public class ProcessorService extends Service {
                 .uploader_battery(download.uploader_battery)
                 .build();
 
-        Log.wtf("XXX", "Transmitter Id: " + download.transmitter_id);
-        Log.wtf("XXX", "Receiver Id: " + download.receiver_id);
         long refTime = DateTime.parse(download.download_timestamp).getMillis();
         long rcvrTime = download.receiver_system_time_sec;
         EGVRecord recentRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), rcvrTime, refTime);
