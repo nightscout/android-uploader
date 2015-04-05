@@ -155,7 +155,7 @@ public class SettingsActivity extends FragmentActivity {
             setupBtScanner();
             setupDeviceOptions();
             AndroidPreferences prefs = new AndroidPreferences(getActivity());
-            boolean enable = !PreferencesValidator.validateShareSerial(getActivity(), prefs.getShareSerial()).isPresent();
+            boolean enable = !prefs.getShareSerial().equals("");
             toggleBtScan(enable);
             ListPreference deviceType = (ListPreference) findPreference("dexcom_device_type");
             // FIXME Problem with robolectric. Seems to return null
@@ -223,7 +223,6 @@ public class SettingsActivity extends FragmentActivity {
             findPreference("dexcom_device_type").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
-//                    preference.setSummary(((ListPreference) preference).getEntry());
                     ListPreference listPref = (ListPreference) preference;
                     String summary = listPref.getEntries()[Integer.valueOf((String) newValue)].toString();
                     preference.setSummary(summary);
@@ -281,11 +280,7 @@ public class SettingsActivity extends FragmentActivity {
 
         private void toggleBtScan(boolean enable) {
             Preference pref = findPreference(getString(R.string.bt_scan_share2));
-            if (enable) {
-                pref.setEnabled(false);
-            } else {
-                pref.setEnabled(true);
-            }
+            pref.setEnabled(enable);
         }
 
         private void setupValidation() {
@@ -339,10 +334,17 @@ public class SettingsActivity extends FragmentActivity {
                         @Override
                         public boolean onPreferenceChange(Preference preference, Object newValue) {
                             Optional<String> error = PreferencesValidator.validateShareSerial(getActivity(), (String) newValue);
-                            toggleBtScan(error.isPresent());
+                            AndroidPreferences prefs = new AndroidPreferences(getActivity());
                             if (error.isPresent()) {
+                                if (!prefs.getShareSerial().equals("")) {
+                                    toggleBtScan(true);
+                                } else {
+                                    toggleBtScan(false);
+                                }
                                 showValidationError(getActivity(), error.get());
-                                return true;
+                                return false;
+                            } else {
+                                toggleBtScan(true);
                             }
                             return true;
                         }
