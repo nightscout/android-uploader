@@ -29,7 +29,6 @@ import com.nightscout.android.R;
 import com.nightscout.android.events.UserEventPanelActivity;
 import com.nightscout.android.exceptions.FeedbackDialog;
 import com.nightscout.android.preferences.AndroidPreferences;
-import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.core.BusProvider;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
@@ -195,27 +194,16 @@ public class MonitorFragment extends Fragment {
         if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE2) {
             receiverButton.setBackgroundResource(R.drawable.ic_noble);
         }
-//        if (savedInstanceState != null) {
-//            log.info("Saved state exists!");
-//            if (savedInstanceState.containsKey("deviceState")) {
-//                log.info("Saved state for device exists!");
-//                setReceiverButtonRes(savedInstanceState.getInt("deviceState"));
-//            }
-//            if (savedInstanceState.containsKey("syncState")) {
-//                log.info("Saved state for sync exists!");
-//                setSyncButtonRes(savedInstanceState.getInt("syncState"));
-//            }
-//        }
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.OnSharedPreferenceChangeListener prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if (key.equals(PreferenceKeys.DEXCOM_DEVICE_TYPE)) {
+                if (key.equals(getString(R.string.dexcom_device_type))) {
                     log.debug("Receiver type was changed...");
                     int res = preferences.getDeviceType() == SupportedDevices.DEXCOM_G4 ? R.drawable.ic_nousb : R.drawable.ic_noble;
                     setReceiverButtonRes(res);
                 }
-                if (key.equals(PreferenceKeys.PREFERRED_UNITS)) {
+                if (key.equals(getString(R.string.preferred_units))) {
                     log.debug("Preferred units type was changed...");
                     mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(preferences.getPreferredUnits() == GlucoseUnit.MMOL) + ")");
                     restoreSgvText();

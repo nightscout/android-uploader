@@ -1,23 +1,18 @@
 package com.nightscout.core.dexcom.records;
 
 import com.nightscout.core.dexcom.TrendArrow;
-import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.model.SensorEntry;
 import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.nightscout.core.utils.GlucoseReading;
+import com.squareup.wire.Message;
 
 import org.joda.time.DateTime;
 
-public class GlucoseDataSet {
+public class GlucoseDataSet extends GenericTimestampRecord {
 
-    private DateTime systemTime;
-    private DateTime displayTime;
-    private DateTime wallTime;
-    private long rawSysemTimeEgv;
-    private long rawDisplayTimeEgv;
-    private long rawSysemTimeSensor;
-    private long rawDisplayTimeSensor;
+    private long sensorRawSystemTime;
+    private long sensorRawDisplayTime;
     private GlucoseReading reading;
     private TrendArrow trend;
     private int noise;
@@ -26,71 +21,63 @@ public class GlucoseDataSet {
     private int rssi;
 
     public GlucoseDataSet(SensorGlucoseValueEntry egvRecord, long receiverTime, long referenceTime) {
-        systemTime = Utils.receiverTimeToDate(egvRecord.sys_timestamp_sec);
-        displayTime = Utils.receiverTimeToDate(egvRecord.disp_timestamp_sec);
-        rawSysemTimeEgv = egvRecord.sys_timestamp_sec;
-        rawDisplayTimeEgv = egvRecord.disp_timestamp_sec;
-        wallTime = Utils.systemTimeToWallTime(egvRecord.sys_timestamp_sec, receiverTime, referenceTime);
+        super(egvRecord.sys_timestamp_sec, egvRecord.disp_timestamp_sec, receiverTime, receiverTime);
         reading = new GlucoseReading(egvRecord.sgv_mgdl, GlucoseUnit.MGDL);
         trend = TrendArrow.values()[egvRecord.trend.ordinal()];
         noise = egvRecord.noise.ordinal();
+        setRecordType();
     }
 
     public GlucoseDataSet(EGVRecord egvRecord) {
-        systemTime = egvRecord.getSystemTime();
-        rawSysemTimeEgv = egvRecord.getRawSystemTimeSeconds();
-        displayTime = egvRecord.getDisplayTime();
-        rawDisplayTimeEgv = egvRecord.getRawDisplayTimeSeconds();
-        wallTime = egvRecord.getWallTime();
+        super(egvRecord.getSystemTime(), egvRecord.getDisplayTime(), egvRecord.getWallTime());
         reading = egvRecord.getReading();
         trend = egvRecord.getTrend();
         noise = egvRecord.getNoiseMode().ordinal();
+        setRecordType();
     }
 
     public boolean areRecordsMatched() {
-        return Math.abs(rawSysemTimeSensor - rawSysemTimeEgv) <= 10;
+        return Math.abs(sensorRawSystemTime - rawSystemTimeSeconds) <= 10;
     }
 
     public long getRawDisplayTimeEgv() {
-        return rawDisplayTimeEgv;
+        return rawDisplayTimeSeconds;
     }
 
     public long getRawSysemTimeEgv() {
-        return rawSysemTimeEgv;
+        return rawSystemTimeSeconds;
     }
 
-    public long getRawSysemTimeSensor() {
-        return rawSysemTimeSensor;
+    public long getSensorRawSystemTime() {
+        return sensorRawSystemTime;
     }
 
-    public long getRawDisplayTimeSensor() {
-        return rawDisplayTimeSensor;
+    public long getSensorRawDisplayTime() {
+        return sensorRawDisplayTime;
     }
 
     public GlucoseDataSet(EGVRecord egvRecord, SensorRecord sensorRecord) {
         this(egvRecord);
-        this.rawSysemTimeSensor = sensorRecord.getRawSystemTimeSeconds();
-        this.rawDisplayTimeSensor = sensorRecord.getRawDisplayTimeSeconds();
+        this.sensorRawSystemTime = sensorRecord.getRawSystemTimeSeconds();
+        this.sensorRawDisplayTime = sensorRecord.getRawDisplayTimeSeconds();
         // TODO check times match between record
         unfiltered = sensorRecord.getUnfiltered();
         filtered = sensorRecord.getFiltered();
         rssi = sensorRecord.getRssi();
+        setRecordType();
     }
 
     public GlucoseDataSet(SensorGlucoseValueEntry egvRecord, SensorEntry sensorRecord, long receiverTimestamp, long referenceTime) {
-        this.wallTime = Utils.systemTimeToWallTime(egvRecord.sys_timestamp_sec, receiverTimestamp, referenceTime);
-        this.systemTime = Utils.receiverTimeToDate(egvRecord.sys_timestamp_sec);
-        this.rawSysemTimeEgv = egvRecord.sys_timestamp_sec;
-        this.displayTime = Utils.receiverTimeToDate(egvRecord.disp_timestamp_sec);
-        this.rawDisplayTimeEgv = egvRecord.disp_timestamp_sec;
-        this.rawSysemTimeSensor = sensorRecord.sys_timestamp_sec;
-        this.rawDisplayTimeSensor = sensorRecord.disp_timestamp_sec;
+        super(egvRecord.disp_timestamp_sec, egvRecord.sys_timestamp_sec, receiverTimestamp, referenceTime);
+        this.sensorRawSystemTime = sensorRecord.sys_timestamp_sec;
+        this.sensorRawDisplayTime = sensorRecord.disp_timestamp_sec;
         this.reading = new GlucoseReading(egvRecord.sgv_mgdl, GlucoseUnit.MGDL);
         this.trend = TrendArrow.values()[egvRecord.trend.ordinal()];
         this.noise = egvRecord.noise.ordinal();
         this.unfiltered = sensorRecord.unfiltered;
         this.filtered = sensorRecord.filtered;
         this.rssi = sensorRecord.rssi;
+        setRecordType();
     }
 
     public DateTime getSystemTime() {
@@ -135,5 +122,15 @@ public class GlucoseDataSet {
 
     public DateTime getWallTime() {
         return wallTime;
+    }
+
+    @Override
+    protected Message toProtobuf() {
+        return null;
+    }
+
+    @Override
+    protected void setRecordType() {
+        this.recordType = "sgv";
     }
 }

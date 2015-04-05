@@ -22,7 +22,6 @@ import com.nightscout.android.BuildConfig;
 import com.nightscout.android.R;
 import com.nightscout.android.barcode.AndroidBarcode;
 import com.nightscout.android.preferences.AndroidPreferences;
-import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.preferences.PreferencesValidator;
 import com.nightscout.core.barcode.NSBarcodeConfig;
 import com.nightscout.core.utils.RestUriUtils;
@@ -65,6 +64,7 @@ public class SettingsActivity extends FragmentActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        Log.d(TAG, "Option selected: " + item.getTitle());
         if (id == R.id.home) {
             NavUtils.navigateUpFromSameTask(this);
             return true;
@@ -154,6 +154,9 @@ public class SettingsActivity extends FragmentActivity {
             setupVersionNumbers();
             setupBtScanner();
             setupDeviceOptions();
+            AndroidPreferences prefs = new AndroidPreferences(getActivity());
+            boolean enable = !PreferencesValidator.validateShareSerial(getActivity(), prefs.getShareSerial()).isPresent();
+            toggleBtScan(enable);
             ListPreference deviceType = (ListPreference) findPreference("dexcom_device_type");
             // FIXME Problem with robolectric. Seems to return null
             CharSequence entry = deviceType.getEntry();
@@ -276,8 +279,17 @@ public class SettingsActivity extends FragmentActivity {
 
         }
 
+        private void toggleBtScan(boolean enable) {
+            Preference pref = findPreference(getString(R.string.bt_scan_share2));
+            if (enable) {
+                pref.setEnabled(false);
+            } else {
+                pref.setEnabled(true);
+            }
+        }
+
         private void setupValidation() {
-            findPreference(PreferenceKeys.API_URIS).setOnPreferenceChangeListener(
+            findPreference(getActivity().getString(R.string.rest_uris)).setOnPreferenceChangeListener(
                     new Preference.OnPreferenceChangeListener() {
                         @Override
                         public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -294,7 +306,7 @@ public class SettingsActivity extends FragmentActivity {
                             return true;
                         }
                     });
-            findPreference(PreferenceKeys.MONGO_URI).setOnPreferenceChangeListener(
+            findPreference(getString(R.string.mongo_uri)).setOnPreferenceChangeListener(
                     new Preference.OnPreferenceChangeListener() {
                         @Override
                         public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -308,7 +320,7 @@ public class SettingsActivity extends FragmentActivity {
                             return true;
                         }
                     });
-            findPreference(PreferenceKeys.MQTT_ENDPOINT).setOnPreferenceChangeListener(
+            findPreference(getString(R.string.mqtt_endpoint)).setOnPreferenceChangeListener(
                     new Preference.OnPreferenceChangeListener() {
                         @Override
                         public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -318,6 +330,19 @@ public class SettingsActivity extends FragmentActivity {
                             if (error.isPresent()) {
                                 showValidationError(getActivity(), error.get());
                                 return false;
+                            }
+                            return true;
+                        }
+                    });
+            findPreference(getString(R.string.share2_serial)).setOnPreferenceChangeListener(
+                    new Preference.OnPreferenceChangeListener() {
+                        @Override
+                        public boolean onPreferenceChange(Preference preference, Object newValue) {
+                            Optional<String> error = PreferencesValidator.validateShareSerial(getActivity(), (String) newValue);
+                            toggleBtScan(error.isPresent());
+                            if (error.isPresent()) {
+                                showValidationError(getActivity(), error.get());
+                                return true;
                             }
                             return true;
                         }

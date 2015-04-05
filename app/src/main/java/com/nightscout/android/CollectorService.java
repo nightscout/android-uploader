@@ -24,7 +24,6 @@ import com.nightscout.android.drivers.USB.CdcAcmSerialDriver;
 import com.nightscout.android.drivers.USB.UsbSerialProber;
 import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
-import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.core.BusProvider;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.records.EGVRecord;
@@ -97,7 +96,7 @@ public class CollectorService extends Service {
         prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if (key.equals(PreferenceKeys.DEXCOM_DEVICE_TYPE)) {
+                if (key.equals(getString(R.string.dexcom_device_type))) {
                     Log.d(TAG, "Interesting value changed! " + key);
                     if (driver != null && driver.isConnected()) {
                         try {
@@ -213,18 +212,9 @@ public class CollectorService extends Service {
             try {
                 download = (G4Download) device.download();
 
-//                Uploader uploader = new Uploader(getApplicationContext(), preferences);
-//                boolean uploadStatus;
-//                if (numOfPages < 20) {
-//                    uploadStatus = uploader.upload(download, 1);
-//                } else {
-//                    uploadStatus = uploader.upload(download);
-//                }
                 if (download != null) {
                     bus.post(download);
                 }
-//                Intent uploaderIntent = new Intent(getApplicationContext(), ProcessorService.class);
-//                getApplicationContext().startService(uploaderIntent);
 
             } catch (ArrayIndexOutOfBoundsException e) {
                 reporter.report(EventType.DEVICE, EventSeverity.ERROR,

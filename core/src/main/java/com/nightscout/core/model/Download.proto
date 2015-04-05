@@ -13,8 +13,9 @@ message G4Download {
     repeated MeterEntry meter = 8;
     repeated SensorEntry sensor = 9;
     repeated CalibrationEntry cal = 10;
-    optional string receiver_id = 11;
-    optional string transmitter_id = 12;
+    repeated InsertionEntry insert = 11;
+    optional string receiver_id = 12;
+    optional string transmitter_id = 13;
 }
 
 enum GlucoseUnit {
@@ -55,6 +56,20 @@ enum G4Noise {
     MAX = 6;
 }
 
+enum G4Insertion {
+    INSERTION_NONE = 0;
+    REMOVED = 1;
+    EXPIRED = 2;
+    RESIDUAL_DEVIATION = 3;
+    COUNTS_DEVIATION = 4;
+    SECOND_SESSION = 5;
+    OFF_TIME_LOSS = 6;
+    STARTED = 7;
+    BAD_TRANSMITTER = 8;
+    MANUFACTURING_MODE = 9;
+    MAX_VALUE = 10;
+}
+
 enum ReceiverStatus {
     RECEIVER_CONNECTED = 0; // The receiver is connected to the uploader
     RECEIVER_DISCONNECTED = 1; // The receiver is not connected to the uploader
@@ -73,7 +88,6 @@ message MeterEntry {
     optional uint32 meter_time = 2;
     optional uint64 sys_timestamp_sec = 3; // System timestamp - Timestamp representing the internal clock of the receiver
     optional uint64 disp_timestamp_sec = 4; // Display timestamp - Timestamp representing the user configured time displayed on the receiver
-
 }
 
 message SensorEntry {
@@ -82,7 +96,12 @@ message SensorEntry {
     optional uint32 rssi = 3;
     optional uint64 sys_timestamp_sec = 4; // System timestamp - Timestamp representing the internal clock of the receiver
     optional uint64 disp_timestamp_sec = 5; // Display timestamp - Timestamp representing the user configured time displayed on the receiver
+}
 
+message InsertionEntry {
+    required G4Insertion state = 1;
+    optional uint64 sys_timestamp_sec = 2; // System timestamp - Timestamp representing the internal clock of the receiver
+    optional uint64 disp_timestamp_sec = 3; // Display timestamp - Timestamp representing the user configured time displayed on the receiver
 }
 
 message CalibrationEntry {

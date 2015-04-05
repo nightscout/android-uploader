@@ -79,7 +79,6 @@
     <string name="nightscout_icon">Nightscout Icon</string>
     <string name="pref_about_hash">Git hash</string>
     <string name="event_fail_upload">Upload to %s has failed</string>
-    <string name="event_mongo_invalid_credentials">Please double check your Mongo username and password.</string>
     <string name="device_log_menu">Device logs</string>
     <string name="upload_log_menu">Upload Logs</string>
     <string name="mqtt_mgr_not_initialized">MQTT connection has not been initialized.</string>
@@ -102,4 +101,7 @@
     <string name="pref_bt_scan_summary">Scan for bluetooth G4 Share receivers</string>
     <string name="menu_clear_log">Clear</string>
     <string name="warn_disabled_bluetooth">Bluetooth must be enabled to access the Share system</string>
+    <string name="pref_title_insertion_data">Insertion Data</string>
+    <string name="pref_summary_insertion_data">Sensor insertion history</string>
+    <string name="invalid_share2_serial">Please double check the Share2 serial number provided %s. It does not match the expected pattern</string>
 </resources>

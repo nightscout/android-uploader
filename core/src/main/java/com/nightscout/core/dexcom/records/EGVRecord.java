@@ -30,12 +30,13 @@ public class EGVRecord extends GenericTimestampRecord {
                     ". Expected size: " + RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
         }
         int bGValue = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8) & Constants.EGV_VALUE_MASK;
-        reading = new GlucoseReading(bGValue, GlucoseUnit.MGDL);
+        this.reading = new GlucoseReading(bGValue, GlucoseUnit.MGDL);
         byte trendAndNoise = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).get(10);
         int trendValue = trendAndNoise & Constants.EGV_TREND_ARROW_MASK;
         byte noiseValue = (byte) ((trendAndNoise & Constants.EGV_NOISE_MASK) >> 4);
-        trend = TrendArrow.values()[trendValue];
-        noiseMode = G4Noise.values()[noiseValue];
+        this.trend = TrendArrow.values()[trendValue];
+        this.noiseMode = G4Noise.values()[noiseValue];
+        setRecordType();
     }
 
     public EGVRecord(int bGValueMgdl, TrendArrow trend, DateTime displayTime, DateTime systemTime, G4Noise noise, DateTime wallTime) {
@@ -43,6 +44,7 @@ public class EGVRecord extends GenericTimestampRecord {
         this.reading = new GlucoseReading(bGValueMgdl, GlucoseUnit.MGDL);
         this.trend = trend;
         this.noiseMode = noise;
+        setRecordType();
     }
 
     public EGVRecord(int bGValueMgdl, TrendArrow trend, long displayTime, long systemTime, G4Noise noise, long rcvrTime, long refTime) {
@@ -50,6 +52,7 @@ public class EGVRecord extends GenericTimestampRecord {
         this.reading = new GlucoseReading(bGValueMgdl, GlucoseUnit.MGDL);
         this.trend = trend;
         this.noiseMode = noise;
+        setRecordType();
     }
 
     public EGVRecord(SensorGlucoseValueEntry sgv, long rcvrTime, long refTime) {
@@ -57,6 +60,11 @@ public class EGVRecord extends GenericTimestampRecord {
         this.reading = new GlucoseReading(sgv.sgv_mgdl, GlucoseUnit.MGDL);
         this.trend = TrendArrow.values()[sgv.trend.ordinal()];
         this.noiseMode = sgv.noise;
+        setRecordType();
+    }
+
+    protected void setRecordType() {
+        this.recordType = "sgv";
     }
 
     public int getBgMgdl() {

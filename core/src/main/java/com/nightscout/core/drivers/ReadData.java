@@ -9,6 +9,7 @@ import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.dexcom.records.GenericTimestampRecord;
+import com.nightscout.core.dexcom.records.InsertionRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.PageHeader;
 import com.nightscout.core.dexcom.records.SensorRecord;
@@ -53,6 +54,12 @@ public class ReadData {
         int endPage = readDataBasePageRange(RecordType.EGV_DATA);
         byte[] data = readDataBasePage(RecordType.EGV_DATA, endPage);
         return parsePage(data, EGVRecord.class, rcvrTime, refTime);
+    }
+
+    public List<InsertionRecord> getRecentInsertion(long rcvrTime, long refTime) throws IOException {
+        int endPage = readDataBasePageRange(RecordType.INSERTION_TIME);
+        byte[] data = readDataBasePage(RecordType.INSERTION_TIME, endPage);
+        return parsePage(data, InsertionRecord.class, rcvrTime, refTime);
     }
 
     public List<EGVRecord> getRecentEGVsPages(int numOfRecentPages, long rcvrTime, long refTime) throws IOException {
@@ -156,6 +163,7 @@ public class ReadData {
             String raw = new String(packet);
             String xml = raw.substring(raw.indexOf('<'), raw.lastIndexOf('>') + 1);
             try {
+                log.debug("Manufacturing Response size: " + packet.length);
                 log.debug("Manufacturing data: " + xml);
                 log.debug("Manufacturing data: " + new String(packet));
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -277,6 +285,10 @@ public class ReadData {
                     case SENSOR_DATA:
                         startIdx = PageHeader.HEADER_SIZE + (SensorRecord.RECORD_SIZE + 1) * i;
                         records.add(clazz.cast(new SensorRecord(Arrays.copyOfRange(data, startIdx, startIdx + SensorRecord.RECORD_SIZE), rcvrTime, refTime)));
+                        break;
+                    case INSERTION_TIME:
+                        startIdx = PageHeader.HEADER_SIZE + (InsertionRecord.RECORD_SIZE + 1) * i;
+                        records.add(clazz.cast(new InsertionRecord(Arrays.copyOfRange(data, startIdx, startIdx + InsertionRecord.RECORD_SIZE), rcvrTime, refTime)));
                         break;
                     default:
                         throw new IllegalArgumentException(String.format("Unknown record type: %s", pageHeader.getRecordType().name()));

@@ -46,7 +46,7 @@ public final class Utils {
     // TODO: probably not the right way to do this but it seems to do the trick. Need to revisit this to fully understand what is going on during DST change
     public static DateTime receiverTimeToDateTime(long deltaInSeconds) {
         int offset = DateTimeZone.getDefault().getOffset(DEXCOM_EPOCH) - DateTimeZone.getDefault().getOffset(Instant.now());
-        return DEXCOM_EPOCH.plus(offset).plus(standardSeconds(deltaInSeconds)).withZone(DateTimeZone.UTC);
+        return DEXCOM_EPOCH.plus(offset).plus(standardSeconds(deltaInSeconds));
     }
 
     public static DateTime receiverTimeToDate(long delta) {

@@ -2,6 +2,7 @@ package com.nightscout.core.upload;
 
 import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
+import com.nightscout.core.dexcom.records.InsertionRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.preferences.NightscoutPreferences;
@@ -99,6 +100,16 @@ public class RestV1Uploader extends AbstractRestUploader {
         return json;
     }
 
+    private JSONObject toJSONObject(InsertionRecord insertionRecord) throws JSONException {
+        JSONObject output = new JSONObject();
+        output.put("sysTime", insertionRecord.getRawSystemTimeSeconds());
+        output.put("date", insertionRecord.getWallTime().getMillis());
+        output.put("dateString", insertionRecord.getWallTime().toString());
+        output.put("state", insertionRecord.getState().name());
+        output.put("type", insertionRecord.getRecordType());
+        return output;
+    }
+
     private JSONObject toJSONObject(AbstractUploaderDevice deviceStatus, int rcvrBat) throws JSONException {
         JSONObject json = new JSONObject();
         json.put("uploaderBattery", deviceStatus.getBatteryLevel());
@@ -153,6 +164,20 @@ public class RestV1Uploader extends AbstractRestUploader {
             // TODO(trhodeos): in Uploader.java, this method still used 'entries' as the endpoint,
             // but this seems like a bug to me.
             return doPost("entries", toJSONObject(calRecord));
+        } catch (JSONException e) {
+            log.error("Could not create JSON object for rest v1 cal record.", e);
+            return false;
+        }
+    }
+
+    @Override
+    protected boolean doUpload(InsertionRecord insertionRecord) throws IOException {
+        try {
+            // TODO(trhodeos): in Uploader.java, this method still used 'entries' as the endpoint,
+            // but this seems like a bug to me.
+            JSONObject json = toJSONObject(insertionRecord);
+            log.info("Insertion JSON object to upload: {}", json.toString());
+            return doPost("entries", toJSONObject(insertionRecord));
         } catch (JSONException e) {
             log.error("Could not create JSON object for rest v1 cal record.", e);
             return false;

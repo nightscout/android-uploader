@@ -85,5 +85,9 @@ public interface NightscoutPreferences {
 
     void setMeterUploadEnabled(boolean enabled);
 
+    boolean isInsertionUploadEnabled();
+
+    void setInsertionUploadEnabled(boolean enabled);
+
 
 }

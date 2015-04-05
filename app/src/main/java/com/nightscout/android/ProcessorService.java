@@ -15,7 +15,6 @@ import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.mqtt.AndroidMqttPinger;
 import com.nightscout.android.mqtt.AndroidMqttTimer;
 import com.nightscout.android.preferences.AndroidPreferences;
-import com.nightscout.android.preferences.PreferenceKeys;
 import com.nightscout.android.upload.Uploader;
 import com.nightscout.android.wearables.Pebble;
 import com.nightscout.core.BusProvider;
@@ -24,6 +23,7 @@ import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.model.G4Download;
+import com.nightscout.core.model.InsertionEntry;
 import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.model.SensorEntry;
 import com.nightscout.core.model.SensorGlucoseValueEntry;
@@ -90,14 +90,18 @@ public class ProcessorService extends Service {
         prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                String[] prefKeys = {PreferenceKeys.API_UPLOADER_ENABLED, PreferenceKeys.API_URIS, PreferenceKeys.MONGO_UPLOADER_ENABLED,
-                        PreferenceKeys.MONGO_URI, PreferenceKeys.MONGO_COLLECTION, PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION};
+                String[] prefKeys = {getApplicationContext().getString(R.string.rest_enable),
+                        getApplicationContext().getString(R.string.rest_uris),
+                        getApplicationContext().getString(R.string.mongo_enable),
+                        getApplicationContext().getString(R.string.mongo_uri),
+                        getApplicationContext().getString(R.string.mongo_entries_collection),
+                        getApplicationContext().getString(R.string.mongo_devicestatus_collection)};
                 if (Arrays.asList(prefKeys).contains(key)) {
                     uploader = new Uploader(getApplicationContext(), preferences);
                     for (BaseUploader ul : uploader.getUploaders()) {
                         Log.d(TAG, "defined: " + ul.getIdentifier());
                     }
-                } else if (key.equals(PreferenceKeys.MQTT_ENABLED)) {
+                } else if (key.equals(getApplicationContext().getString(R.string.mqtt_enable))) {
                 // Assume that MQTT already has the information needed and set it up.
                     setupMqtt();
                     if (mqttManager != null && mqttManager.isConnected()) {
@@ -111,7 +115,7 @@ public class ProcessorService extends Service {
 
 
                 // Assume that MQTT is already enabled and the MQTT endpoint and credentials are just changing
-                prefKeys = new String[]{PreferenceKeys.MQTT_ENDPOINT, PreferenceKeys.MQTT_PASS, PreferenceKeys.MQTT_USER};
+                prefKeys = new String[]{getApplicationContext().getString(R.string.mqtt_endpoint), getApplicationContext().getString(R.string.mqtt_pass), getApplicationContext().getString(R.string.mqtt_user)};
                 if (preferences.isMqttEnabled() && Arrays.asList(prefKeys).contains(key)) {
                     setupMqtt();
                     Log.d(TAG, "MQTT change detected. Restarting MQTT");
@@ -121,7 +125,7 @@ public class ProcessorService extends Service {
                         mqttManager.setShouldReconnect(true);
                     }
                 }
-                if (key.equals(PreferenceKeys.PREFERRED_UNITS)) {
+                if (key.equals(getString(R.string.preferred_units))) {
                     pebble.config(preferences.getPwdName(), preferences.getPreferredUnits(), getApplicationContext());
                 }
             }
@@ -242,13 +246,14 @@ public class ProcessorService extends Service {
 
         G4Download filteredDownload = downloadBuilder.download_status(download.download_status)
                 .download_timestamp(download.download_timestamp)
+                .sensor(filterRecords(download.sensor, SensorEntry.class, preferences.getLastSensorMqttUpload()))
+                .sgv(filterRecords(download.sgv, SensorGlucoseValueEntry.class, preferences.getLastEgvMqttUpload()))
                 .cal(filterRecords(download.cal, CalibrationEntry.class, preferences.getLastCalMqttUpload()))
                 .meter(filterRecords(download.meter, MeterEntry.class, preferences.getLastMeterMqttUpload()))
+                .insert(filterRecords(download.insert, InsertionEntry.class, preferences.getLastRecordTime("ins", "mqtt")))
                 .receiver_battery(download.receiver_battery)
                 .receiver_id(download.receiver_id)
                 .receiver_system_time_sec(download.receiver_system_time_sec)
-                .sensor(filterRecords(download.sensor, SensorEntry.class, preferences.getLastSensorMqttUpload()))
-                .sgv(filterRecords(download.sgv, SensorGlucoseValueEntry.class, preferences.getLastEgvMqttUpload()))
                 .transmitter_id(download.transmitter_id)
                 .units(download.units)
                 .uploader_battery(download.uploader_battery)
@@ -281,6 +286,10 @@ public class ProcessorService extends Service {
                 if (filteredDownload.cal.size() > 0) {
                     Log.d(TAG, "Publishing " + filteredDownload.cal.size() + " cal records");
                     preferences.setLastCalMqttUpload(filteredDownload.cal.get(filteredDownload.cal.size() - 1).sys_timestamp_sec);
+                }
+                if (filteredDownload.insert.size() > 0) {
+                    Log.d(TAG, "Publishing " + filteredDownload.insert.size() + " insert records");
+                    preferences.setLastRecordTime("ins", "mqtt", filteredDownload.cal.get(filteredDownload.insert.size() - 1).sys_timestamp_sec);
                 }
             } else {
                 reporter.report(EventType.UPLOADER, EventSeverity.ERROR, "Expected MQTT to be connected but it is not");

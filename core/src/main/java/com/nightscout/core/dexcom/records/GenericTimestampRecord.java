@@ -21,6 +21,7 @@ abstract public class GenericTimestampRecord {
     protected DateTime displayTime;
     protected long rawDisplayTimeSeconds;
     protected DateTime wallTime;
+    protected String recordType = "unknown";
 
     public GenericTimestampRecord(byte[] packet, long rcvrTime, long refTime) {
         rawSystemTimeSeconds = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(OFFSET_SYS_TIME);
@@ -83,6 +84,12 @@ abstract public class GenericTimestampRecord {
         }
         return results;
     }
+
+    public String getRecordType() {
+        return recordType;
+    }
+
+    abstract protected void setRecordType();
 
     @Override
     public boolean equals(Object o) {

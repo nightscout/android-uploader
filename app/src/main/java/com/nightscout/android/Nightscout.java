@@ -29,7 +29,7 @@ import dagger.ObjectGraph;
         resDialogTitle = R.string.feedback_dialog_title,
         resDialogCommentPrompt = R.string.feedback_dialog_comment_prompt,
         resDialogOkToast = R.string.feedback_dialog_ok_toast,
-        excludeMatchingSharedPreferencesKeys = {"cloud_storage_mongodb_uri", "cloud_storage_api_base"},
+        excludeMatchingSharedPreferencesKeys = {"cloud_storage_mongodb_uri", "cloud_storage_api_base", "cloud_storage_mqtt_user", "cloud_storage_mqtt_pass"},
         mode = ReportingInteractionMode.TOAST,
         logcatArguments = {"-t", "500", "-v", "time"}
 )

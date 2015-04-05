@@ -6,17 +6,24 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import com.mongodb.MongoException;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
 import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
+import com.nightscout.core.dexcom.records.InsertionRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.events.EventReporter;
+import com.nightscout.core.events.EventSeverity;
+import com.nightscout.core.events.EventType;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
@@ -30,9 +37,12 @@ public class MongoUploader extends BaseUploader {
     private DBCollection collection;
     private DBCollection deviceStatusCollection;
     private MongoClient client;
+    private EventReporter reporter;
+    protected ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle",
+            Locale.getDefault());
 
     public MongoUploader(NightscoutPreferences preferences, MongoClientURI dbURI,
-                         String collectionName, String dsCollectionName) {
+                         String collectionName, String dsCollectionName, EventReporter reporter) {
         super(preferences);
         checkNotNull(dbURI);
         checkNotNull(collectionName);
@@ -41,6 +51,7 @@ public class MongoUploader extends BaseUploader {
         this.dbUri = dbURI;
         this.collectionName = collectionName.trim();
         this.dsCollectionName = dsCollectionName.trim();
+        this.reporter = reporter;
     }
 
     public MongoClient getClient() throws IOException {
@@ -137,6 +148,16 @@ public class MongoUploader extends BaseUploader {
         return output;
     }
 
+    private BasicDBObject toBasicDBObject(InsertionRecord insertionRecord) {
+        BasicDBObject output = new BasicDBObject();
+        output.put("sysTime", insertionRecord.getSystemTime());
+        output.put("date", insertionRecord.getWallTime());
+        output.put("dateString", insertionRecord.getWallTime().toString());
+        output.put("state", insertionRecord.getState().name());
+        output.put("type", insertionRecord.getRecordType());
+        return output;
+    }
+
     private BasicDBObject toBasicDBObject(AbstractUploaderDevice deviceStatus, int rcvrBat) {
         BasicDBObject output = new BasicDBObject();
         output.put("uploaderBattery", deviceStatus.getBatteryLevel());
@@ -154,9 +175,20 @@ public class MongoUploader extends BaseUploader {
         log.warn("Query: " + query.toString());
         log.warn("Data: " + dbObject.toString());
         log.error("Collection: {}", collection.toString());
-        WriteResult result = collection.update(query, dbObject, true, false,
-                WriteConcern.UNACKNOWLEDGED);
-        return result.getError() == null;
+        try {
+            WriteResult result = collection.update(query, dbObject, true, false,
+                    WriteConcern.UNACKNOWLEDGED);
+            return result.getError() == null;
+        } catch (MongoException e) {
+            // Credentials error - user name or password is incorrect.
+            if (e.getCode() == 18) {
+                reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
+                        messages.getString("event_mongo_invalid_credentials"));
+            }
+            log.error("Exception({}): {}", e.getCode(), e.getMessage());
+            return false;
+
+        }
     }
 
     private BasicDBObject toBasicDBObjectQuery(String recordType, long systemTime) {
@@ -214,6 +246,12 @@ public class MongoUploader extends BaseUploader {
     protected boolean doUpload(CalRecord calRecord) throws IOException {
         BasicDBObject query = toBasicDBObjectQuery("cal", calRecord.getRawSystemTimeSeconds());
         return upsert(query, toBasicDBObject(calRecord));
+    }
+
+    @Override
+    protected boolean doUpload(InsertionRecord insertionRecord) throws IOException {
+        BasicDBObject query = toBasicDBObjectQuery(insertionRecord.getRecordType(), insertionRecord.getRawSystemTimeSeconds());
+        return upsert(query, toBasicDBObject(insertionRecord));
     }
 
     @Override

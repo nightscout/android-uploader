@@ -48,12 +48,12 @@ public class CalRecord extends GenericTimestampRecord {
                 new DateTime(getDisplayTime())).toStandardDuration().getMillis();
         int start = 44;
         for (int i = 0; i < numRecords; i++) {
-            LOG.debug("Loop #" + i);
             byte[] temp = new byte[SUB_LEN];
             System.arraycopy(packet, start, temp, 0, temp.length);
             calSubrecords.add(new CalSubrecord(temp, displayTimeOffset));
             start += SUB_LEN;
         }
+        setRecordType();
     }
 
     public CalRecord(double intercept, double slope, double scale, double decay, DateTime displayTime, DateTime systemTime, List<CalSubrecord> subrecord, DateTime wallTime) {
@@ -64,6 +64,7 @@ public class CalRecord extends GenericTimestampRecord {
         this.decay = decay;
         this.numRecords = subrecord.size();
         this.calSubrecords = subrecord;
+        setRecordType();
     }
 
     public CalRecord(double intercept, double slope, double scale, double decay, long displayTime, int systemTime, List<CalSubrecord> subrecord, long rcvrTime, long refTime) {
@@ -74,6 +75,7 @@ public class CalRecord extends GenericTimestampRecord {
         this.decay = decay;
         this.numRecords = subrecord.size();
         this.calSubrecords = subrecord;
+        setRecordType();
     }
 
     public CalRecord(CalibrationEntry cal, long rcvrTime, long refTime) {
@@ -84,6 +86,7 @@ public class CalRecord extends GenericTimestampRecord {
         this.decay = cal.decay;
         this.numRecords = 0;
         this.calSubrecords = new ArrayList<>();
+        setRecordType();
     }
 
     @Override
@@ -148,6 +151,11 @@ public class CalRecord extends GenericTimestampRecord {
             return false;
 
         return true;
+    }
+
+    @Override
+    protected void setRecordType() {
+        this.recordType = "cal";
     }
 
     public CalibrationEntry toProtoBuf() {

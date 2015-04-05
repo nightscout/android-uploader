@@ -3,6 +3,7 @@ package com.nightscout.core.upload;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
+import com.nightscout.core.dexcom.records.InsertionRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.preferences.NightscoutPreferences;
@@ -35,6 +36,7 @@ public class BaseUploaderTest {
         public List<CalRecord> calRecords;
         public List<GlucoseDataSet> glucoseDataSets;
         public List<MeterRecord> meterRecords;
+        public List<InsertionRecord> insertionRecords;
 
         public MockUploader(NightscoutPreferences preferences) {
             super(preferences);
@@ -64,6 +66,13 @@ public class BaseUploaderTest {
             calRecords.add(calRecord);
             return true;
         }
+
+        @Override
+        protected boolean doUpload(InsertionRecord insertionRecord) throws IOException {
+            insertionRecords.add(insertionRecord);
+            return true;
+        }
+
     }
 
     class ExceptionThrowingUploader extends BaseUploader {
@@ -84,6 +93,11 @@ public class BaseUploaderTest {
         @Override
         protected boolean doUpload(CalRecord calRecord) throws IOException {
             throw new IOException("cal");
+        }
+
+        @Override
+        protected boolean doUpload(InsertionRecord insertionRecord) throws IOException {
+            throw new IOException("insertion");
         }
 
         @Override

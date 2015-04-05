@@ -8,6 +8,9 @@ import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.events.EventReporter;
+import com.nightscout.core.events.EventSeverity;
+import com.nightscout.core.events.EventType;
 import com.nightscout.core.preferences.TestPreferences;
 
 import org.junit.Before;
@@ -37,16 +40,23 @@ public class MongoUploaderTest {
     DBCollection mockCollection;
     ArgumentCaptor<BasicDBObject> captor;
     private TestPreferences preferences;
+    private EventReporter reporter;
 
     @Before
     public void setUp() throws Exception {
         mockCollection = mock(DBCollection.class);
         preferences = new TestPreferences();
+        reporter = new EventReporter() {
+            @Override
+            public void report(EventType type, EventSeverity severity, String message) {
+                // This is a stub
+            }
+        };
         mongoUploader = new MongoUploader(
                 preferences,
                 new MongoClientURI("mongodb://localhost"),
                 "collection",
-                "dsCollection");
+                "dsCollection", reporter);
         mongoUploader.setCollection(mockCollection);
         mongoUploader.setDeviceStatusCollection(mockCollection);
         setUpUpsertCapture();
@@ -154,7 +164,7 @@ public class MongoUploaderTest {
                 preferences,
                 new MongoClientURI("mongodb://foobar/db"),
                 "collection",
-                "dsCollection");
+                "dsCollection", reporter);
         AbstractUploaderDevice deviceStatus = mockDeviceStatus();
         assertThat(mongoUploader.uploadDeviceStatus(deviceStatus, 100), is(false));
     }

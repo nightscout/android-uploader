@@ -3,6 +3,7 @@ package com.nightscout.core.drivers;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.EGVRecord;
+import com.nightscout.core.dexcom.records.InsertionRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.SensorRecord;
 import com.nightscout.core.events.EventSeverity;
@@ -11,6 +12,7 @@ import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.model.DownloadStatus;
 import com.nightscout.core.model.G4Download;
 import com.nightscout.core.model.GlucoseUnit;
+import com.nightscout.core.model.InsertionEntry;
 import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.model.SensorEntry;
 import com.nightscout.core.model.SensorGlucoseValueEntry;
@@ -105,6 +107,7 @@ public class DexcomG4 extends AbstractDevice {
         List<MeterRecord> meterRecords = new ArrayList<>();
         List<SensorRecord> sensorRecords = new ArrayList<>();
         List<CalRecord> calRecords = new ArrayList<>();
+        List<InsertionRecord> insertionRecords = new ArrayList<>();
         int batLevel = 100;
         long systemTime = 0;
         try {
@@ -131,6 +134,11 @@ public class DexcomG4 extends AbstractDevice {
 
             if (preferences.isCalibrationUploadEnabled()) {
                 calRecords = readData.getRecentCalRecords(systemTime, dateTime.getMillis());
+            }
+            if (preferences.isInsertionUploadEnabled()) {
+                log.debug("Reading insertions");
+                insertionRecords = readData.getRecentInsertion(systemTime, dateTime.getMillis());
+                log.debug("Number of insertion records: {}", insertionRecords.size());
             }
             if (recentRecords.size() == 0) {
                 status = DownloadStatus.NO_DATA;
@@ -161,11 +169,16 @@ public class DexcomG4 extends AbstractDevice {
         List<MeterEntry> cookieMonsterG4Meters = MeterRecord.toProtobufList(meterRecords);
         List<SensorEntry> cookieMonsterG4Sensors =
                 SensorRecord.toProtobufList(sensorRecords);
+        List<InsertionEntry> cookieMonsterG4Inserts =
+                InsertionRecord.toProtobufList(insertionRecords);
+        log.debug("Number of insertion records (protobuf): {}", cookieMonsterG4Inserts.size());
+
 
         downloadBuilder.sgv(cookieMonsterG4SGVs)
                 .cal(cookieMonsterG4Cals)
                 .sensor(cookieMonsterG4Sensors)
                 .meter(cookieMonsterG4Meters)
+                .insert(cookieMonsterG4Inserts)
                 .receiver_system_time_sec(systemTime)
                 .download_timestamp(dateTime.toString())
                 .download_status(status)

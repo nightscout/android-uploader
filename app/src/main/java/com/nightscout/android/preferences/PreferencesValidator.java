@@ -67,4 +67,17 @@ public class PreferencesValidator {
         return Optional.absent();
 
     }
+
+    public static Optional<String> validateShareSerial(Context context, String serialNum) {
+        if (Strings.isNullOrEmpty(serialNum)) {
+            return Optional.of(context.getString(R.string.invalid_share2_serial, serialNum));
+        }
+        Log.d("XXX", "Serial Number: " + serialNum.toUpperCase());
+        if (!serialNum.toUpperCase().startsWith("SM") || (serialNum.length() < 10)) {
+            return Optional.of(context.getString(R.string.invalid_share2_serial, serialNum));
+        }
+        return Optional.absent();
+    }
+
+    ;
 }

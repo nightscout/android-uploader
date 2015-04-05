@@ -26,32 +26,42 @@ public class MeterRecord extends GenericTimestampRecord {
         int meterBG = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8);
         reading = new GlucoseReading(meterBG, GlucoseUnit.MGDL);
         meterTime = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(10);
+        setRecordType();
     }
 
     public MeterRecord(int meterBgMgdl, int meterTime, DateTime displayTime, DateTime systemTime, DateTime wallTime) {
         super(displayTime, systemTime, wallTime);
         this.reading = new GlucoseReading(meterBgMgdl, GlucoseUnit.MGDL);
         this.meterTime = meterTime;
+        setRecordType();
     }
 
     public MeterRecord(int meterBgMgdl, int meterTime, long displayTime, long systemTime, long rcvrTime, long refTime) {
         super(displayTime, systemTime, rcvrTime, refTime);
         this.reading = new GlucoseReading(meterBgMgdl, GlucoseUnit.MGDL);
         this.meterTime = meterTime;
+        setRecordType();
     }
 
     public MeterRecord(MeterEntry meter, long recieverTime, long refTime) {
         super(meter.disp_timestamp_sec, meter.sys_timestamp_sec, recieverTime, refTime);
         this.reading = new GlucoseReading(meter.meter_bg_mgdl, GlucoseUnit.MGDL);
         this.meterTime = meter.meter_time;
+        setRecordType();
     }
 
     public MeterRecord(int meterBgMgdl, int meterTime, long systemTime) {
         super(systemTime);
         this.reading = new GlucoseReading(meterBgMgdl, GlucoseUnit.MGDL);
         this.meterTime = meterTime;
+        setRecordType();
     }
 
+
+    @Override
+    protected void setRecordType() {
+        this.recordType = "meter";
+    }
 
     public GlucoseReading getMeterBG() {
         return reading;

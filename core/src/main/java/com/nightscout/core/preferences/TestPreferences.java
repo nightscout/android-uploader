@@ -222,6 +222,16 @@ public class TestPreferences implements NightscoutPreferences {
     }
 
     @Override
+    public boolean isInsertionUploadEnabled() {
+        return false;
+    }
+
+    @Override
+    public void setInsertionUploadEnabled(boolean enabled) {
+
+    }
+
+    @Override
     public String getPwdName() {
         return pwdName;
     }
