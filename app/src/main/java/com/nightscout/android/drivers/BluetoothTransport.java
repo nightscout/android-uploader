@@ -89,10 +89,11 @@ public class BluetoothTransport implements DeviceTransport {
     private Boolean shouldBeOpen = false;
 
     public BluetoothTransport(Context context) {
-//        final IntentFilter bondIntent = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
         this.mContext = context;
-//        context.registerReceiver(mPairReceiver, bondIntent);
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        mContext.registerReceiver(bluetoothStatusChangeReceiver, filter);
     }
 
     private AlarmManager alarmManager;
@@ -109,8 +110,39 @@ public class BluetoothTransport implements DeviceTransport {
         }
     };
 
+    private final BroadcastReceiver bluetoothStatusChangeReceiver = new BroadcastReceiver() {
+
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+                Log.d(TAG, "Bluetooth toggled...");
+                if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
+                        == BluetoothAdapter.STATE_OFF) {
+                    try {
+                        boolean tmp = shouldBeOpen;
+                        close();
+                        shouldBeOpen = tmp;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
+                        == BluetoothAdapter.STATE_ON) {
+                    try {
+                        if (shouldBeOpen) {
+                            open();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    };
+
     @Override
     public void open() throws IOException {
+        shouldBeOpen = true;
+        Log.d(TAG, "Starting open");
         AndroidPreferences prefs = new AndroidPreferences(mContext);
         mBluetoothDeviceAddress = prefs.getBtAddress();
         if (mBluetoothDeviceAddress.equals("")) {
@@ -130,14 +162,16 @@ public class BluetoothTransport implements DeviceTransport {
             }
         }
         if (System.currentTimeMillis() + CONNECT_TIMEOUT < System.currentTimeMillis()) {
+            Log.e(TAG, "Timeout while opening BLE connection to receiver");
             throw new IOException("Timeout while opening BLE connection to receiver");
         }
+        Log.d(TAG, "Successfully made it to the end of open");
 //        Observable.just(true).subscribe(connectionStateListener);
-        shouldBeOpen = true;
     }
 
     @Override
     public void close() throws IOException {
+        Log.d(TAG, "Closing connection");
         if (mBluetoothGatt == null) {
             return;
         }
@@ -397,9 +431,6 @@ public class BluetoothTransport implements DeviceTransport {
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             Log.w(TAG, "Gatt state change status: " + status + " new state: " + newState);
             writeStatusConnectionFailures(status);
-            if (status == 133) {
-                Log.e(TAG, "Got the status 133 bug, GROSS!!");
-            }
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 mBluetoothGatt = gatt;
                 device = mBluetoothGatt.getDevice();
@@ -411,13 +442,13 @@ public class BluetoothTransport implements DeviceTransport {
                     Log.w(TAG, "discovering failed");
                 }
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.w(TAG, "Disconnected from GATT server.");
+                Log.w(TAG, "Disconnected from GATT server. Should be open: " + shouldBeOpen);
                 Observable.just(false).subscribe(connectionStateListener);
                 mConnectionState = STATE_DISCONNECTED;
-                if (shouldBeOpen) {
+//                if (shouldBeOpen) {
                     Log.w(TAG, "Connection was unexpectedly lost. Attempting to reconnect");
                     delayedReconnect(15000);
-                }
+//                }
 
             } else {
                 Log.w(TAG, "Gatt callback... strange state.");
@@ -557,12 +588,13 @@ public class BluetoothTransport implements DeviceTransport {
             e.printStackTrace();
         }
         Log.d(TAG, "Attempting to re-open connection");
-        attemptConnection();
+        open();
+//        attemptConnection();
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public void delayedReconnect(long millis) {
-        Log.d(TAG, "Setting next poll with Alarm for " + millis + " ms from now.");
+        Log.d(TAG, "Setting reconnecting in " + millis + " ms from now.");
         Intent reconnectIntent = new Intent(RECONNECT_INTENT);
         reconnectPendingIntent = PendingIntent.getBroadcast(mContext.getApplicationContext(), 1, reconnectIntent, 0);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

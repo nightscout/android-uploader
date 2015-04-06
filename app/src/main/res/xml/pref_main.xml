@@ -186,6 +186,12 @@
             android:defaultValue="false" />
     </PreferenceScreen>
 
+    <com.nightscout.android.settings.CustomSwitchPreference
+        android:title="@string/pref_title_camping_enabled"
+        android:key="@string/camping_enable"
+        android:disableDependentsState="false"
+        android:summary="@string/pref_summary_camping_enabled" />
+
     <PreferenceCategory android:title="@string/pref_header_display_options">
         <ListPreference
             android:title="@string/pref_title_chart_units_options"

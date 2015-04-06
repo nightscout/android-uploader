@@ -3,6 +3,7 @@ package com.nightscout.android.preferences;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.nightscout.android.R;
 import com.nightscout.core.drivers.SupportedDevices;
@@ -12,7 +13,15 @@ import com.nightscout.core.utils.RestUriUtils;
 
 import net.tribe7.common.base.Joiner;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
+import java.util.Map;
 
 public class AndroidPreferences implements NightscoutPreferences {
     private final SharedPreferences preferences;
@@ -338,8 +347,89 @@ public class AndroidPreferences implements NightscoutPreferences {
         return preferences.getBoolean(context.getString(R.string.labs_enable), false);
     }
 
+    public boolean isCampingModeEnabled() {
+        return preferences.getBoolean(context.getString(R.string.camping_enable), false);
+    }
+
     public void deleteKey(String key) {
         preferences.edit().remove(key).apply();
+    }
+
+    public boolean saveSharedPreferencesToFile(File dst) {
+        boolean res = false;
+        ObjectOutputStream output = null;
+        try {
+            output = new ObjectOutputStream(new FileOutputStream(dst));
+            SharedPreferences pref =
+                    PreferenceManager.getDefaultSharedPreferences(context);
+            output.writeObject(pref.getAll());
+
+            res = true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (output != null) {
+                    output.flush();
+                    output.close();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return res;
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public boolean loadSharedPreferencesFromFile(File src) {
+        boolean res = false;
+        ObjectInputStream input = null;
+        try {
+            input = new ObjectInputStream(new FileInputStream(src));
+            SharedPreferences.Editor prefEdit = PreferenceManager.getDefaultSharedPreferences(context).edit();
+//            prefEdit.clear();
+            Map<String, ?> entries = (Map<String, ?>) input.readObject();
+            for (Map.Entry<String, ?> entry : entries.entrySet()) {
+                Object v = entry.getValue();
+                String key = entry.getKey();
+
+                if (v instanceof Boolean) {
+                    prefEdit.putBoolean(key, ((Boolean) v).booleanValue());
+                    Log.d("XXX", "Restoring " + key + ": " + ((Boolean) v).booleanValue());
+                } else if (v instanceof Float) {
+                    prefEdit.putFloat(key, ((Float) v).floatValue());
+                    Log.d("XXX", "Restoring " + key + ": " + ((Float) v).floatValue());
+                } else if (v instanceof Integer) {
+                    prefEdit.putInt(key, ((Integer) v).intValue());
+                    Log.d("XXX", "Restoring " + key + ": " + ((Integer) v).intValue());
+                } else if (v instanceof Long) {
+                    prefEdit.putLong(key, ((Long) v).longValue());
+                    Log.d("XXX", "Restoring " + key + ": " + ((Long) v).longValue());
+                } else if (v instanceof String) {
+                    prefEdit.putString(key, ((String) v));
+                    Log.d("XXX", "Restoring " + key + ": " + v);
+                }
+            }
+            prefEdit.apply();
+            res = true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (input != null) {
+                    input.close();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return res;
     }
 
 }

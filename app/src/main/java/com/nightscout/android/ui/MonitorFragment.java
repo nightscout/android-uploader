@@ -77,7 +77,7 @@ public class MonitorFragment extends Fragment {
     ImageButton uploadButton;
     @InjectView(R.id.usbButton)
     ImageButton receiverButton;
-    Bus bus = BusProvider.getInstance();
+    private Bus bus = BusProvider.getInstance();
 
     private String mJSONData;
     //    private AndroidPreferences preferences;
@@ -93,6 +93,7 @@ public class MonitorFragment extends Fragment {
     private CollectorService mCollectorService;
     private ProcessorService mProcessorService;
     private boolean mBound = false;
+//    private Handler mHandler;
 
     private ServiceConnection mCollectorConnection = new ServiceConnection() {
 
@@ -211,8 +212,6 @@ public class MonitorFragment extends Fragment {
             }
         };
         prefs.registerOnSharedPreferenceChangeListener(prefListener);
-
-
         return view;
     }
 

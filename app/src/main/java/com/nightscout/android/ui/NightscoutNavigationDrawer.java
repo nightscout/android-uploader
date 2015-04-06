@@ -3,6 +3,7 @@ package com.nightscout.android.ui;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
@@ -19,6 +20,8 @@ import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
+
+import java.io.File;
 
 import javax.inject.Inject;
 
@@ -92,7 +95,6 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
         });
         addSection(gapSync);
 
-
         MaterialSection allLog = newSection("Event logs", EventFragment.newAllLogPanel());
         addSection(allLog);
 
@@ -108,10 +110,29 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
 //        MaterialSection settings = newSection("Settings", android.R.drawable.ic_menu_preferences, new SettingsActivity.MainPreferenceFragment());
         addBottomSection(settings);
 
-        allowArrowAnimation();
-        disableLearningPattern();
-        setBackPattern(MaterialNavigationDrawer.BACKPATTERN_BACK_TO_FIRST);
-        enableToolbarElevation();
+        MaterialSection save = newSection("Save Config", new MaterialSectionListener() {
+            @Override
+            public void onClick(MaterialSection materialSection) {
+                File path = Environment.getExternalStorageDirectory();
+                File config = new File(path, "nightscout.conf");
+                AndroidPreferences prefs = new AndroidPreferences(getApplicationContext());
+                prefs.saveSharedPreferencesToFile(config);
+            }
+        });
+        addSection(save);
+
+        MaterialSection load = newSection("Load Config", new MaterialSectionListener() {
+            @Override
+            public void onClick(MaterialSection materialSection) {
+                File path = Environment.getExternalStorageDirectory();
+                File config = new File(path, "nightscout.conf");
+                if (config.exists()) {
+                    AndroidPreferences prefs = new AndroidPreferences(getApplicationContext());
+                    prefs.loadSharedPreferencesFromFile(config);
+                }
+            }
+        });
+        addSection(load);
         Log.d(TAG, "Attempting to start service");
         Intent uploadIntent = new Intent(getBaseContext(), ProcessorService.class);
         getApplicationContext().startService(uploadIntent);
@@ -120,6 +141,23 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
         getApplicationContext().startService(syncIntent);
 
         Log.d(TAG, "Service should be started");
+
+        MaterialSection close = newSection("Close", new MaterialSectionListener() {
+            @Override
+            public void onClick(MaterialSection materialSection) {
+                Intent collectorIntent = new Intent(getApplicationContext(), CollectorService.class);
+                getApplicationContext().stopService(collectorIntent);
+                Intent processorIntent = new Intent(getApplicationContext(), ProcessorService.class);
+                getApplicationContext().stopService(processorIntent);
+                finish();
+            }
+        });
+        addSection(close);
+
+        allowArrowAnimation();
+        disableLearningPattern();
+        setBackPattern(MaterialNavigationDrawer.BACKPATTERN_BACK_TO_FIRST);
+        enableToolbarElevation();
 
     }
 

@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.preferences.PreferencesValidator;
@@ -13,10 +12,15 @@ import com.nightscout.android.ui.NightscoutNavigationDrawer;
 import net.tribe7.common.base.Joiner;
 import net.tribe7.common.base.Splitter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class UpgradeReceiver extends BroadcastReceiver {
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+
     private AndroidPreferences preferences;
     private Context context;
 
@@ -40,7 +44,7 @@ public class UpgradeReceiver extends BroadcastReceiver {
 
     private void migrateToRawEnable() {
         if (preferences.isCalibrationUploadEnabled() || preferences.isSensorUploadEnabled()) {
-            Log.d("XXX", "Enabling raw upload");
+            log.debug("Enabling raw upload");
             preferences.setRawEnabled(true);
         }
         preferences.deleteKey(context.getString(R.string.cloud_cal_data));
@@ -48,7 +52,7 @@ public class UpgradeReceiver extends BroadcastReceiver {
     }
 
     private void migrateToNewStyleRestUris() {
-        Log.d("XXX", "Looking for legacy Rest style URIs to update");
+        log.debug("Looking for legacy Rest style URIs to update");
         List<String> newUris = new ArrayList<>();
         for (String uriString : preferences.getRestApiBaseUris()) {
             if (uriString.contains("@http")) {

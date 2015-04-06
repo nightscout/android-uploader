@@ -118,6 +118,7 @@ public class Pebble {
         }
     }
 
+    // FIXME - Suspect this may be causing a problem with share ble connectivity?
     public Boolean isConnected() {
         return PebbleKit.isWatchConnected(context) && PebbleKit.areAppMessagesSupported(context);
     }

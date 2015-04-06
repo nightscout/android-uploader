@@ -27,6 +27,8 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="com.nightscout.android.dexcom.action.SYNC" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 
     <application
@@ -73,7 +75,7 @@
             android:name=".SyncReceiver"
             android:enabled="true"
             android:exported="false">
-        <intent-filter>
+            <intent-filter>
                 <action android:name="com.nightscout.android.dexcom.action.SYNC" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

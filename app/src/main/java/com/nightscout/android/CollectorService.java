@@ -73,6 +73,7 @@ public class CollectorService extends Service {
     private PendingIntent syncManager;
 
     private final IBinder mBinder = new LocalBinder();
+    private long nextPoll = 0;
 
     @Override
     public void onCreate() {
@@ -124,7 +125,7 @@ public class CollectorService extends Service {
 
     private void setDriver() {
         SupportedDevices deviceType = preferences.getDeviceType();
-        if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4) {
+        if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4 || preferences.getDeviceType() == SupportedDevices.UNKNOWN) {
             driver = UsbSerialProber.acquire(
                     (UsbManager) getSystemService(USB_SERVICE), getApplicationContext());
         } else if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE2) {
@@ -287,10 +288,15 @@ public class CollectorService extends Service {
         return device.getDeviceConnectionStatus();
     }
 
+    public long getNextPoll() {
+        return nextPoll - System.currentTimeMillis();
+    }
+
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public void setNextPoll(long millis) {
         Log.d(TAG, "Setting next poll with Alarm for " + millis + " ms from now.");
+        nextPoll = System.currentTimeMillis() + millis;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + millis, syncManager);
         } else {
@@ -300,6 +306,7 @@ public class CollectorService extends Service {
 
     public void cancelPoll() {
         Log.d(TAG, "Canceling next alarm poll.");
+        nextPoll = 0;
         alarmManager.cancel(syncManager);
     }
 

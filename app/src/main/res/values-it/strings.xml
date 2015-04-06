@@ -108,4 +108,6 @@
     <string name="invalid_share2_serial">Please double check the Share2 serial number provided %s. It does not match the expected pattern</string>
     <string name="pref_title_raw_data">Raw Data</string>
     <string name="pref_summary_raw_data">Data required to calculate raw values</string>
+    <string name="pref_summary_camping_enabled">Enable camping mode</string>
+    <string name="pref_title_camping_enabled">Camping mode</string>
 </resources>

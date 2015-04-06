@@ -1,5 +1,6 @@
 package com.nightscout.core.drivers;
 
+import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.EGVRecord;
@@ -160,6 +161,14 @@ public class DexcomG4 extends AbstractDevice {
             reporter.report(EventType.DEVICE, EventSeverity.ERROR, "Application error " + e.getMessage());
             log.error("Application error " + e);
             status = DownloadStatus.APPLICATION_ERROR;
+        } catch (CRCFailError e) {
+            // FIXME: may consider localizing this catch at a lower level (like ReadData) so that
+            // if the CRC check fails on one type of record we can capture the values if it
+            // doesn't fail on other types of records. This means we'd need to broadcast back
+            // partial results to the UI. Adding it to a lower level could make the ReadData class
+            // more difficult to maintain - needs discussion.
+            log.error("CRC failed", e);
+            reporter.report(EventType.DEVICE, EventSeverity.ERROR, "CRC failed " + e);
         }
 
         List<SensorGlucoseValueEntry> cookieMonsterG4SGVs = EGVRecord.toProtobufList(recentRecords);

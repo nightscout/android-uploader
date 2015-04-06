@@ -39,7 +39,7 @@ import javax.xml.parsers.ParserConfigurationException;
 public class ReadData {
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
-    private static final int IO_TIMEOUT = 15000;
+    private static final int IO_TIMEOUT = 25000;
     private static final int MIN_LEN = 256;
     private DeviceTransport mSerialDevice;
 
@@ -221,7 +221,8 @@ public class ReadData {
         payload.add(pageInt[0]);
         payload.add(numOfPages);
         writeCommand(Command.READ_DATABASE_PAGES, payload);
-        return read(534).getData();
+        int expectedSize = (recordType == RecordType.MANUFACTURING_DATA) ? 528 : 534;
+        return read(expectedSize).getData();
     }
 
     private void writeCommand(Command command, List<Byte> payload) throws IOException {

@@ -71,9 +71,11 @@ public class ProcessorService extends Service {
         Log.d(TAG, "Starting processor service");
         preferences = new AndroidPreferences(getApplicationContext());
         reporter = AndroidEventReporter.getReporter(getApplicationContext());
-        pebble = new Pebble(getApplicationContext());
-        pebble.setUnits(preferences.getPreferredUnits());
-        pebble.setPwdName(preferences.getPwdName());
+        if (preferences.isCampingModeEnabled()) {
+            pebble = new Pebble(getApplicationContext());
+            pebble.setUnits(preferences.getPreferredUnits());
+            pebble.setPwdName(preferences.getPwdName());
+        }
         bus.register(this);
         uploader = new Uploader(getApplicationContext(), preferences);
         setupMqtt();
@@ -118,7 +120,7 @@ public class ProcessorService extends Service {
                         mqttManager.setShouldReconnect(true);
                     }
                 }
-                if (key.equals(getString(R.string.preferred_units))) {
+                if (key.equals(getString(R.string.preferred_units)) && preferences.isCampingModeEnabled()) {
                     pebble.config(preferences.getPwdName(), preferences.getPreferredUnits(), getApplicationContext());
                 }
             }
