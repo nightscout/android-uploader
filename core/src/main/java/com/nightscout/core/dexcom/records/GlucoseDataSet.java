@@ -21,7 +21,7 @@ public class GlucoseDataSet extends GenericTimestampRecord {
     private int rssi;
 
     public GlucoseDataSet(SensorGlucoseValueEntry egvRecord, long receiverTime, long referenceTime) {
-        super(egvRecord.sys_timestamp_sec, egvRecord.disp_timestamp_sec, receiverTime, receiverTime);
+        super(egvRecord.sys_timestamp_sec, egvRecord.disp_timestamp_sec, receiverTime, referenceTime);
         reading = new GlucoseReading(egvRecord.sgv_mgdl, GlucoseUnit.MGDL);
         trend = TrendArrow.values()[egvRecord.trend.ordinal()];
         noise = egvRecord.noise.ordinal();
