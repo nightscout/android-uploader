@@ -31,22 +31,22 @@ public class ReadPacketTest {
     };
 
     @Test
-    public void testReadPacket_command() {
+    public void testReadPacket_command() throws Exception {
         assertThat(new ReadPacket(testPacket).getCommand().getValue(), is((byte) 0x05));
     }
 
     @Test
-    public void testReadPacket_data() {
+    public void testReadPacket_data()  throws Exception {
         assertThat(new ReadPacket(testPacket).getData(), is(new byte[]{0x10, 0x15}));
     }
 
     @Test
-    public void testReadPacket_noDataPacket_command() {
+    public void testReadPacket_noDataPacket_command()  throws Exception {
         assertThat(new ReadPacket(testPacketNoData).getCommand().getValue(), is((byte) 0x1A));
     }
 
     @Test
-    public void testReadPacket_noDataPacket_emptyData() {
+    public void testReadPacket_noDataPacket_emptyData()  throws Exception {
         assertThat(new ReadPacket(testPacketNoData).getData(), is(new byte[]{}));
     }
 
