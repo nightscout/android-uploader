@@ -93,5 +93,11 @@ public interface NightscoutPreferences {
 
     void setInsertionUploadEnabled(boolean enabled);
 
+    long getLastMeterSysTime();
 
+    void setLastMeterSysTime(long meterSysTime);
+
+    long getLastEgvSysTime();
+
+    void setLastEgvSysTime(long egvSysTime);
 }

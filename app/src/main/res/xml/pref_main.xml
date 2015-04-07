@@ -218,6 +218,18 @@
             android:dialogMessage="@string/acra_user_email_dialog_message" />
     </PreferenceScreen>
 
+    <PreferenceCategory android:title="@string/pref_category_title_config_backup">
+        <Preference
+            android:key="@string/pref_backup_config_key"
+            android:title="@string/pref_backup_title"
+            android:positiveButtonText="@string/ok"
+            android:negativeButtonText="@null" />
+        <Preference
+            android:key="@string/pref_restore_config_key"
+            android:title="@string/pref_restore_title"
+            android:positiveButtonText="@string/ok"
+            android:negativeButtonText="@null" />
+    </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_header_about">
         <Preference

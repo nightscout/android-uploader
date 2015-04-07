@@ -3,6 +3,7 @@ package com.nightscout.core.dexcom;
 
 import net.tribe7.common.base.Optional;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 public class ReadPacket {
@@ -13,7 +14,10 @@ public class ReadPacket {
     private int OFFSET_DATA = 4;
     private int CRC_LEN = 2;
 
-    public ReadPacket(byte[] readPacket) {
+    public ReadPacket(byte[] readPacket) throws IOException {
+        if (readPacket.length <= OFFSET_CMD) {
+            throw new IOException("Insufficient data in reading");
+        }
         Optional<Command> optCmd = Command.getCommandByValue(readPacket[OFFSET_CMD]);
         if (optCmd.isPresent()) {
             this.command = optCmd.get();

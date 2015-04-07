@@ -91,9 +91,9 @@ public class BluetoothTransport implements DeviceTransport {
     public BluetoothTransport(Context context) {
         this.mContext = context;
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
-        mContext.registerReceiver(bluetoothStatusChangeReceiver, filter);
+//        IntentFilter filter = new IntentFilter();
+//        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+//        mContext.registerReceiver(bluetoothStatusChangeReceiver, filter);
     }
 
     private AlarmManager alarmManager;
@@ -152,6 +152,10 @@ public class BluetoothTransport implements DeviceTransport {
         mContext.registerReceiver(mPairReceiver, bondIntent);
         final IntentFilter reconnectIntent = new IntentFilter(RECONNECT_INTENT);
         mContext.registerReceiver(reconnectReceiver, reconnectIntent);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        mContext.registerReceiver(bluetoothStatusChangeReceiver, filter);
+
 
         attemptConnection();
 
@@ -178,6 +182,7 @@ public class BluetoothTransport implements DeviceTransport {
         shouldBeOpen = false;
         mContext.unregisterReceiver(mPairReceiver);
         mContext.unregisterReceiver(reconnectReceiver);
+        mContext.unregisterReceiver(bluetoothStatusChangeReceiver);
         mBluetoothGatt.close();
         mBluetoothGatt = null;
         mConnectionState = STATE_DISCONNECTED;

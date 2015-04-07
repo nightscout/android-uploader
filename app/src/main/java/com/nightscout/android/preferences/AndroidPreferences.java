@@ -351,6 +351,26 @@ public class AndroidPreferences implements NightscoutPreferences {
         return preferences.getBoolean(context.getString(R.string.camping_enable), false);
     }
 
+    @Override
+    public long getLastMeterSysTime() {
+        return preferences.getLong(context.getString(R.string.last_download_meter_sys_time), 0);
+    }
+
+    @Override
+    public void setLastMeterSysTime(long meterSysTime) {
+        preferences.edit().putLong(context.getString(R.string.last_download_meter_sys_time), meterSysTime).apply();
+    }
+
+    @Override
+    public long getLastEgvSysTime() {
+        return preferences.getLong(context.getString(R.string.last_download_egv_sys_time), 0);
+    }
+
+    @Override
+    public void setLastEgvSysTime(long egvSysTime) {
+        preferences.edit().putLong(context.getString(R.string.last_download_egv_sys_time), egvSysTime).apply();
+    }
+
     public void deleteKey(String key) {
         preferences.edit().remove(key).apply();
     }

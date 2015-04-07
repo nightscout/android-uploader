@@ -34,9 +34,9 @@ import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.drivers.DeviceConnectionStatus;
+import com.nightscout.core.drivers.DexcomG4;
 import com.nightscout.core.drivers.SupportedDevices;
 import com.nightscout.core.events.EventType;
-import com.nightscout.core.model.G4Download;
 import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
@@ -383,8 +383,8 @@ public class MonitorFragment extends Fragment {
 
 
     @Subscribe
-    public void incomingData(final G4Download download) {
-        if (download == null) {
+    public void incomingData(final DexcomG4.UIDownload uiDownload) {
+        if (uiDownload.download == null) {
             log.info("Download is NULL");
             return;
         }
@@ -395,15 +395,15 @@ public class MonitorFragment extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                long refTime = DateTime.parse(download.download_timestamp).getMillis();
-                if (download.sgv.size() > 0) {
-                    lastRecordTime = new DateTime().getMillis() - Duration.standardSeconds(download.receiver_system_time_sec - download.sgv.get(download.sgv.size() - 1).sys_timestamp_sec).getMillis();
+                long refTime = DateTime.parse(uiDownload.download.download_timestamp).getMillis();
+                if (uiDownload.download.sgv.size() > 0) {
+                    lastRecordTime = new DateTime().getMillis() - Duration.standardSeconds(uiDownload.download.receiver_system_time_sec - uiDownload.download.sgv.get(uiDownload.download.sgv.size() - 1).sys_timestamp_sec).getMillis();
                     EGVRecord recentRecord = null;
-                    if (download.sgv.size() > 0) {
-                        recentRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), download.receiver_system_time_sec, refTime);
+                    if (uiDownload.download.sgv.size() > 0) {
+                        recentRecord = new EGVRecord(uiDownload.download.sgv.get(uiDownload.download.sgv.size() - 1), uiDownload.download.receiver_system_time_sec, refTime);
                         // Reload d3 chart with new data
                         JSONArray array = new JSONArray();
-                        for (SensorGlucoseValueEntry sgve : download.sgv) {
+                        for (SensorGlucoseValueEntry sgve : uiDownload.download.sgv) {
                             try {
                                 EGVRecord record = new EGVRecord(sgve, sgve.sys_timestamp_sec, refTime);
                                 array.put(record.toJSON());
@@ -417,7 +417,7 @@ public class MonitorFragment extends Fragment {
 
                         String timeAgoStr = "---";
                         if (recentRecord.getRawSystemTimeSeconds() > 0) {
-                            timeAgoStr = Utils.getTimeString(download.receiver_system_time_sec - recentRecord.getRawSystemTimeSeconds());
+                            timeAgoStr = Utils.getTimeString(uiDownload.download.receiver_system_time_sec - recentRecord.getRawSystemTimeSeconds());
                         }
 
                         mTextTimestamp.setText(timeAgoStr);

@@ -1,5 +1,6 @@
 package com.nightscout.core.drivers;
 
+import com.nightscout.core.BusProvider;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.records.CalRecord;
@@ -12,12 +13,12 @@ import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.model.DownloadStatus;
 import com.nightscout.core.model.G4Download;
-import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.model.InsertionEntry;
 import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.model.SensorEntry;
 import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.squareup.otto.Bus;
 
 import org.joda.time.DateTime;
 
@@ -104,34 +105,79 @@ public class DexcomG4 extends AbstractDevice {
         DownloadStatus status = DownloadStatus.SUCCESS;
         ReadData readData = new ReadData(transport);
 
-        List<EGVRecord> recentRecords = new ArrayList<>();
+        List<EGVRecord> recentRecords;
         List<MeterRecord> meterRecords = new ArrayList<>();
         List<SensorRecord> sensorRecords = new ArrayList<>();
         List<CalRecord> calRecords = new ArrayList<>();
         List<InsertionRecord> insertionRecords = new ArrayList<>();
+
+        List<SensorGlucoseValueEntry> cookieMonsterG4SGVs;
+        List<SensorEntry> cookieMonsterG4Sensors;
+        Bus bus = BusProvider.getInstance();
+
         int batLevel = 100;
         long systemTime = 0;
         try {
-//            String receiverId = readData.readSerialNumber();
             if (receiverId.equals("")) {
                 receiverId = readData.readSerialNumber();
                 log.debug("ReceiverId: {}", receiverId);
+            } else {
+                log.warn("Using receiverId from session: {}", receiverId);
             }
             if (transmitterId.equals("")) {
                 transmitterId = readData.readTrasmitterId();
                 log.debug("TransmitterId: {}", transmitterId);
+            } else {
+                log.warn("Using TransmitterId from session: {}", transmitterId);
             }
 
             systemTime = readData.readSystemTime();
 
             dateTime = new DateTime();
             recentRecords = readData.getRecentEGVsPages(numOfPages, systemTime, dateTime.getMillis());
+            if (recentRecords.size() > 0) {
+                EGVRecord lastEgvRecord = recentRecords.get(recentRecords.size() - 1);
+                cookieMonsterG4SGVs = EGVRecord.toProtobufList(recentRecords);
+
+                UIDownload uiDownload = new UIDownload();
+                uiDownload.download = downloadBuilder.sgv(cookieMonsterG4SGVs)
+                        .download_timestamp(dateTime.toString())
+                        .receiver_system_time_sec(systemTime)
+                        .build();
+                bus.post(uiDownload);
+
+                if (preferences.isRawEnabled()) {
+                    sensorRecords = readData.getRecentSensorRecords(numOfPages, systemTime, dateTime.getMillis());
+                    preferences.setLastEgvSysTime(lastEgvRecord.getRawSystemTimeSeconds());
+                } else {
+                    log.warn("Seems to be no new egv data. Assuming no sensor data either");
+                }
+                cookieMonsterG4Sensors = SensorRecord.toProtobufList(sensorRecords);
+
+                G4Download download = downloadBuilder.sgv(cookieMonsterG4SGVs)
+                        .sensor(cookieMonsterG4Sensors)
+                        .receiver_system_time_sec(systemTime)
+                        .download_timestamp(dateTime.toString())
+                        .download_status(status)
+                        .receiver_id(receiverId)
+                        .transmitter_id(transmitterId)
+                        .build();
+                bus.post(download);
+            }
+            boolean hasCalData = false;
             if (preferences.isMeterUploadEnabled()) {
                 meterRecords = readData.getRecentMeterRecords(systemTime, dateTime.getMillis());
+                if (meterRecords.size() > 0) {
+                    MeterRecord lastMeterRecord = meterRecords.get(meterRecords.size() - 1);
+                    hasCalData = (lastMeterRecord.getRawSystemTimeSeconds() > preferences.getLastMeterSysTime());
+                    preferences.setLastMeterSysTime(lastMeterRecord.getRawSystemTimeSeconds());
+                }
             }
-            if (preferences.isRawEnabled()) {
-                sensorRecords = readData.getRecentSensorRecords(numOfPages, systemTime, dateTime.getMillis());
+
+            if (preferences.isRawEnabled() && (hasCalData || !preferences.isMeterUploadEnabled())) {
                 calRecords = readData.getRecentCalRecords(systemTime, dateTime.getMillis());
+            } else {
+                log.warn("Seems to be no new new meter data or meter data is disabled. Assuming no meter data");
             }
 
             if (preferences.isInsertionUploadEnabled()) {
@@ -171,19 +217,18 @@ public class DexcomG4 extends AbstractDevice {
             reporter.report(EventType.DEVICE, EventSeverity.ERROR, "CRC failed " + e);
         }
 
-        List<SensorGlucoseValueEntry> cookieMonsterG4SGVs = EGVRecord.toProtobufList(recentRecords);
+//        List<SensorGlucoseValueEntry> cookieMonsterG4SGVs = EGVRecord.toProtobufList(recentRecords);
+//        List<SensorEntry> cookieMonsterG4Sensors = SensorRecord.toProtobufList(sensorRecords);
+
         List<CalibrationEntry> cookieMonsterG4Cals = CalRecord.toProtobufList(calRecords);
         List<MeterEntry> cookieMonsterG4Meters = MeterRecord.toProtobufList(meterRecords);
-        List<SensorEntry> cookieMonsterG4Sensors =
-                SensorRecord.toProtobufList(sensorRecords);
         List<InsertionEntry> cookieMonsterG4Inserts =
                 InsertionRecord.toProtobufList(insertionRecords);
         log.debug("Number of insertion records (protobuf): {}", cookieMonsterG4Inserts.size());
 
 
-        downloadBuilder.sgv(cookieMonsterG4SGVs)
-                .cal(cookieMonsterG4Cals)
-                .sensor(cookieMonsterG4Sensors)
+//        downloadBuilder.sgv(cookieMonsterG4SGVs)
+        downloadBuilder.cal(cookieMonsterG4Cals)
                 .meter(cookieMonsterG4Meters)
                 .insert(cookieMonsterG4Inserts)
                 .receiver_system_time_sec(systemTime)
@@ -192,9 +237,12 @@ public class DexcomG4 extends AbstractDevice {
                 .uploader_battery(uploaderDevice.getBatteryLevel())
                 .receiver_battery(batLevel)
                 .receiver_id(receiverId)
-                .transmitter_id(transmitterId)
-                .units(GlucoseUnit.MGDL);
+                .transmitter_id(transmitterId);
         return downloadBuilder.build();
+    }
+
+    public class UIDownload {
+        public G4Download download;
     }
 
     public void setNumOfPages(int numOfPages) {

@@ -152,7 +152,7 @@ public class ReadData {
 
     public String readTrasmitterId() throws IOException {
         writeCommand(Command.READ_TRANSMITTER_ID);
-        byte[] data = read(MIN_LEN).getData();
+        byte[] data = read(11).getData();
         return new String(data);
     }
 
@@ -204,6 +204,7 @@ public class ReadData {
         payload.add((byte) recordType.ordinal());
         writeCommand(Command.READ_DATABASE_PAGE_RANGE, payload);
         byte[] readData = read(14).getData();
+        log.debug("Length of readData: {}", readData.length);
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt(4);
     }
 
@@ -221,8 +222,8 @@ public class ReadData {
         payload.add(pageInt[0]);
         payload.add(numOfPages);
         writeCommand(Command.READ_DATABASE_PAGES, payload);
-        int expectedSize = (recordType == RecordType.MANUFACTURING_DATA) ? 528 : 534;
-        return read(expectedSize).getData();
+//        int expectedSize = (recordType == RecordType.MANUFACTURING_DATA) ? 528 : 534;
+        return read(534).getData();
     }
 
     private void writeCommand(Command command, List<Byte> payload) throws IOException {

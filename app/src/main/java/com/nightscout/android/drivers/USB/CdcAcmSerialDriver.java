@@ -121,13 +121,22 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
     }
 
     public byte[] read(int size, int timeoutMillis) throws IOException {
+//        timeoutMillis = 2000;
+//        size = 2122;
+        if (size < 2122) {
+            Log.i(TAG, "Adjusting requested size of " + size + " to 2122");
+            size = 2122;
+        }
         byte[] data = new byte[size];
+
         int readSize = read(data, timeoutMillis);
         return Arrays.copyOfRange(data, 0, readSize);
     }
 
     @Override
     public int read(byte[] dest, int timeoutMillis) throws IOException {
+        Log.w(TAG, "Dest: " + dest.length + " Buffer: " + mReadBuffer.length);
+
         final int numBytesRead;
         synchronized (mReadBufferLock) {
             int readAmt = Math.min(dest.length, mReadBuffer.length);

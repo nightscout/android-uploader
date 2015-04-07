@@ -50,7 +50,7 @@ abstract public class AbstractDevice {
             return download;
         } catch (Exception e) {
             reporter.report(EventType.DEVICE, EventSeverity.ERROR, "Unknown error - " + e.getMessage());
-            log.error("Exception: {} - {}", e.getMessage());
+            log.error("Exception: {} - {}", e.getMessage(), e);
             e.printStackTrace();
         }
         return new G4Download.Builder().download_status(DownloadStatus.APPLICATION_ERROR)

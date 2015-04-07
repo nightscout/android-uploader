@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -28,6 +29,7 @@ import com.nightscout.core.utils.RestUriUtils;
 
 import net.tribe7.common.base.Optional;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.List;
@@ -165,6 +167,7 @@ public class SettingsActivity extends FragmentActivity {
                 setShareOptions(deviceType.getValue());
             }
             setupLabs();
+            setupBackup();
 
             if (getActivity().getActionBar() != null) {
                 getActivity().getActionBar().show();
@@ -263,6 +266,37 @@ public class SettingsActivity extends FragmentActivity {
                 }
             });
         }
+
+        private void setupBackup() {
+            findPreference(getString(R.string.pref_backup_config_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    File path = Environment.getExternalStorageDirectory();
+                    File config = new File(path, "nightscout.conf");
+                    AndroidPreferences prefs = new AndroidPreferences(getActivity());
+                    prefs.saveSharedPreferencesToFile(config);
+                    Toast.makeText(getActivity(), getString(R.string.backup_saved_message), Toast.LENGTH_LONG).show();
+                    return true;
+                }
+            });
+            findPreference(getString(R.string.pref_restore_config_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    File path = Environment.getExternalStorageDirectory();
+                    File config = new File(path, "nightscout.conf");
+                    if (config.exists()) {
+                        AndroidPreferences prefs = new AndroidPreferences(getActivity());
+                        prefs.loadSharedPreferencesFromFile(config);
+                        Toast.makeText(getActivity(), getString(R.string.backup_restored_message), Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getActivity(), getString(R.string.backup_not_found_message), Toast.LENGTH_LONG).show();
+                    }
+                    return true;
+                }
+            });
+
+        }
+
 
         @Override
         public void onDetach() {

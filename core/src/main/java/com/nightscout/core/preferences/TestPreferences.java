@@ -243,6 +243,26 @@ public class TestPreferences implements NightscoutPreferences {
     }
 
     @Override
+    public long getLastMeterSysTime() {
+        return 0;
+    }
+
+    @Override
+    public void setLastMeterSysTime(long meterSysTime) {
+
+    }
+
+    @Override
+    public long getLastEgvSysTime() {
+        return 0;
+    }
+
+    @Override
+    public void setLastEgvSysTime(long egvSysTime) {
+
+    }
+
+    @Override
     public String getPwdName() {
         return pwdName;
     }

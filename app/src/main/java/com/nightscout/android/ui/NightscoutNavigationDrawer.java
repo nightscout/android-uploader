@@ -3,7 +3,6 @@ package com.nightscout.android.ui;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
@@ -20,8 +19,6 @@ import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
-
-import java.io.File;
 
 import javax.inject.Inject;
 
@@ -72,7 +69,7 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
                 Intent syncIntent = new Intent(getApplicationContext(), CollectorService.class);
                 syncIntent.putExtra("requested", true);
                 syncIntent.setAction(CollectorService.ACTION_POLL);
-                syncIntent.putExtra(CollectorService.NUM_PAGES, 2);
+                syncIntent.putExtra(CollectorService.NUM_PAGES, 1);
                 syncIntent.putExtra(CollectorService.SYNC_TYPE, CollectorService.STD_SYNC);
                 getApplicationContext().startService(syncIntent);
             }
@@ -110,29 +107,6 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
 //        MaterialSection settings = newSection("Settings", android.R.drawable.ic_menu_preferences, new SettingsActivity.MainPreferenceFragment());
         addBottomSection(settings);
 
-        MaterialSection save = newSection("Save Config", new MaterialSectionListener() {
-            @Override
-            public void onClick(MaterialSection materialSection) {
-                File path = Environment.getExternalStorageDirectory();
-                File config = new File(path, "nightscout.conf");
-                AndroidPreferences prefs = new AndroidPreferences(getApplicationContext());
-                prefs.saveSharedPreferencesToFile(config);
-            }
-        });
-        addSection(save);
-
-        MaterialSection load = newSection("Load Config", new MaterialSectionListener() {
-            @Override
-            public void onClick(MaterialSection materialSection) {
-                File path = Environment.getExternalStorageDirectory();
-                File config = new File(path, "nightscout.conf");
-                if (config.exists()) {
-                    AndroidPreferences prefs = new AndroidPreferences(getApplicationContext());
-                    prefs.loadSharedPreferencesFromFile(config);
-                }
-            }
-        });
-        addSection(load);
         Log.d(TAG, "Attempting to start service");
         Intent uploadIntent = new Intent(getBaseContext(), ProcessorService.class);
         getApplicationContext().startService(uploadIntent);

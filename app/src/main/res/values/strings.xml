@@ -108,4 +108,10 @@
     <string name="pref_summary_raw_data">Data required to calculate raw values</string>
     <string name="pref_summary_camping_enabled">Enable camping mode</string>
     <string name="pref_title_camping_enabled">Camping mode</string>
+    <string name="pref_category_title_config_backup">Configuration backups</string>
+    <string name="pref_backup_title">Backup configuration</string>
+    <string name="pref_restore_title">Restore configuration</string>
+    <string name="backup_saved_message">A backup of your configuration has been saved</string>
+    <string name="backup_restored_message">Your configuration has been restored</string>
+    <string name="backup_not_found_message">No backups of your configuration found =(</string>
 </resources>
