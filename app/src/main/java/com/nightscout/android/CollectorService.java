@@ -106,7 +106,7 @@ public class CollectorService extends Service {
                             e.printStackTrace();
                         }
                     }
-                    setDriver();
+//                    setDriver();
                 } else {
                     Log.d(TAG, "Meh... something uninteresting changed");
                 }
@@ -144,20 +144,20 @@ public class CollectorService extends Service {
                         DexcomG4.PROTOCOL);
             }
         }
-        try {
-            if (driver == null) {
-                Log.d("Last hope", "Driver is NULL?!");
-                return;
-            }
-            if ((deviceType == SupportedDevices.DEXCOM_G4 && driver.isConnected())
-                    || deviceType == SupportedDevices.DEXCOM_G4_SHARE2) {
-                driver.open();
-            }
-        } catch (IOException e) {
-            Log.e(TAG, "IOException: " + e.getMessage());
-            //TODO record this in the event log later
-//            status = DownloadStatus.IO_ERROR;
-        }
+//        try {
+//            if (driver == null) {
+//                Log.d(TAG, "Driver is NULL?!");
+//                return;
+//            }
+//            if ((deviceType == SupportedDevices.DEXCOM_G4 && driver.isConnected())
+//                    || deviceType == SupportedDevices.DEXCOM_G4_SHARE2) {
+//                driver.open();
+//            }
+//        } catch (IOException e) {
+//            Log.e(TAG, "IOException: " + e.getMessage());
+//            //TODO record this in the event log later
+////            status = DownloadStatus.IO_ERROR;
+//        }
     }
 
     @Override
@@ -180,21 +180,21 @@ public class CollectorService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "Starting service");
-        if (device == null) {
-            Log.d(TAG, "Device is null!");
+//        if (device == null) {
+//            Log.d(TAG, "Device is null!");
 //            ACRA.getErrorReporter().handleException(null);
-            return START_STICKY;
-        }
+//            return START_STICKY;
+//        }
         if (intent == null) {
             Log.d(TAG, "Intent is null!");
 //            ACRA.getErrorReporter().handleException(null);
             return START_STICKY;
         }
-        if (device.isConnected() || intent.getBooleanExtra("requested", false)) {
+//        if (device.isConnected()) {
             int numOfPages = intent.getIntExtra(NUM_PAGES, 2);
             int syncType = intent.getStringExtra(SYNC_TYPE).equals(STD_SYNC) ? 0 : 1;
             new AsyncDownload().execute(numOfPages, syncType);
-        }
+//        }
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -202,6 +202,21 @@ public class CollectorService extends Service {
 
         @Override
         protected G4Download doInBackground(Integer... params) {
+            if (driver == null) {
+                Log.w(TAG, "Driver is null");
+                return null;
+            }
+            if (!device.isConnected()) {
+                Log.e(TAG, "Device is not connected");
+                try {
+                    driver.open();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            } else {
+                Log.e(TAG, "Device is connected");
+            }
             int numOfPages = params[0];
             String syncType = params[1] == 0 ? STD_SYNC : GAP_SYNC;
             ((DexcomG4) device).setNumOfPages(numOfPages);

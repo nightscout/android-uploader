@@ -31,7 +31,12 @@ import com.nightscout.core.events.EventType;
 import net.tribe7.common.primitives.Bytes;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.UUID;
 
 import rx.Observable;
@@ -51,7 +56,9 @@ public class BluetoothTransport implements DeviceTransport {
     private AsyncReader asyncReader;
     private boolean readNotifySet = false;
     private boolean authenticated = false;
-    private boolean finalCallback = false;
+    private Boolean finalCallback = false;
+    private Queue<Request> mInitQueue;
+    private boolean mInitInProgress;
 
     public final static int CONNECT_TIMEOUT = 30000;
     public final static int READ_TIMEOUT = 5000;
@@ -91,6 +98,7 @@ public class BluetoothTransport implements DeviceTransport {
     public BluetoothTransport(Context context) {
         this.mContext = context;
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+//        mHandler = new Handler();
 //        IntentFilter filter = new IntentFilter();
 //        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
 //        mContext.registerReceiver(bluetoothStatusChangeReceiver, filter);
@@ -118,13 +126,9 @@ public class BluetoothTransport implements DeviceTransport {
                 Log.d(TAG, "Bluetooth toggled...");
                 if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
                         == BluetoothAdapter.STATE_OFF) {
-                    try {
-                        boolean tmp = shouldBeOpen;
-                        close();
-                        shouldBeOpen = tmp;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    boolean tmp = shouldBeOpen;
+//                        close();
+                    shouldBeOpen = tmp;
                 } else if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
                         == BluetoothAdapter.STATE_ON) {
                     try {
@@ -146,31 +150,31 @@ public class BluetoothTransport implements DeviceTransport {
         AndroidPreferences prefs = new AndroidPreferences(mContext);
         mBluetoothDeviceAddress = prefs.getBtAddress();
         if (mBluetoothDeviceAddress.equals("")) {
-            return;
+            throw new IOException("Invalid bluetooth address");
         }
         final IntentFilter bondIntent = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        mContext.registerReceiver(mPairReceiver, bondIntent);
+        mContext.registerReceiver(mBondingBroadcastReceiver, bondIntent);
         final IntentFilter reconnectIntent = new IntentFilter(RECONNECT_INTENT);
         mContext.registerReceiver(reconnectReceiver, reconnectIntent);
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         mContext.registerReceiver(bluetoothStatusChangeReceiver, filter);
 
-
         attemptConnection();
 
-        while (System.currentTimeMillis() + CONNECT_TIMEOUT < System.currentTimeMillis()) {
-//            if (finalCallback) {
-            if (finalCallback && authenticated && readNotifySet && mConnectionState == STATE_CONNECTED) {
+        long endTime = System.currentTimeMillis() + CONNECT_TIMEOUT;
+        while (System.currentTimeMillis() < endTime) {
+            if (finalCallback) {
+                Log.e(TAG, "Indicator of success found!");
+//            if (finalCallback && authenticated && readNotifySet && mConnectionState == STATE_CONNECTED) {
                 break;
             }
         }
-        if (System.currentTimeMillis() + CONNECT_TIMEOUT < System.currentTimeMillis()) {
+        if (endTime < System.currentTimeMillis()) {
             Log.e(TAG, "Timeout while opening BLE connection to receiver");
             throw new IOException("Timeout while opening BLE connection to receiver");
         }
         Log.d(TAG, "Successfully made it to the end of open");
-//        Observable.just(true).subscribe(connectionStateListener);
     }
 
     @Override
@@ -180,7 +184,7 @@ public class BluetoothTransport implements DeviceTransport {
             return;
         }
         shouldBeOpen = false;
-        mContext.unregisterReceiver(mPairReceiver);
+        mContext.unregisterReceiver(mBondingBroadcastReceiver);
         mContext.unregisterReceiver(reconnectReceiver);
         mContext.unregisterReceiver(bluetoothStatusChangeReceiver);
         mBluetoothGatt.close();
@@ -231,13 +235,13 @@ public class BluetoothTransport implements DeviceTransport {
             throw new IOException("Disconnected from device. Unable to read");
         }
 
-        long startTime = System.currentTimeMillis();
-        while (startTime + timeoutMillis > System.currentTimeMillis()) {
+        long endTime = System.currentTimeMillis() + timeoutMillis;
+        while (endTime > System.currentTimeMillis()) {
             if (asyncReader.getResponse().length >= size) {
                 break;
             }
         }
-        if (startTime + timeoutMillis < System.currentTimeMillis()) {
+        if (endTime < System.currentTimeMillis()) {
             Log.d(TAG, "Timeout occurred while reading");
             throw new IOException("Timeout while reading from bluetooth address " + device.getAddress());
         }
@@ -289,13 +293,6 @@ public class BluetoothTransport implements DeviceTransport {
             reporter.report(EventType.DEVICE, EventSeverity.WARN, mContext.getString(R.string.warn_disabled_bluetooth));
         }
 
-//        if (device == null) {
-//            throw new IOException("Unable to open connection to receiver");
-//        }
-//        int state = mBluetoothManager.getConnectionState(device, BluetoothGatt.GATT);
-//        if ((state != BluetoothProfile.STATE_CONNECTED) && (state != BluetoothProfile.STATE_CONNECTING)) {
-//            throw new IOException("Unable to open connection to receiver");
-//        }
         Log.d(TAG, "Connection state: " + mConnectionState);
     }
 
@@ -315,8 +312,6 @@ public class BluetoothTransport implements DeviceTransport {
             Log.d(TAG, "Bluetooth Gatt closed.");
         }
 
-        /////////////////////////////////////////////////////////////////////////////////////////////
-        // needs some cleanup
         for (BluetoothDevice bluetoothDevice : mBluetoothAdapter.getBondedDevices()) {
             if (bluetoothDevice.getAddress().compareTo(address) == 0) {
                 Log.d(TAG, "Bluetooth device found and already bonded, so going to connect...");
@@ -326,107 +321,59 @@ public class BluetoothTransport implements DeviceTransport {
                     Log.d(TAG, "Bluetooth device connected.");
                 }
                 return isConnected();
-//                    return mBluetoothGatt.getConnectionState(device) == BluetoothProfile.STATE_CONNECTED;
-
-//                    return true;
             }
         }
 
         device = mBluetoothAdapter.getRemoteDevice(address);
         bondDevice();
-        Log.w(TAG, "Trying to create a new connection with an unbonded device.");
-        mBluetoothGatt = device.connectGatt(mContext.getApplicationContext(), false, mGattCallback);
-        mConnectionState = STATE_CONNECTING;
-        /////////////////////////////////////////////////////////////////////////////////////////////
         return true;
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
-    public void authenticateConnection() {
-
-        Log.w(TAG, "Trying to authenticate the share...");
-
+    private byte[] getHandshakeKey() {
         AndroidPreferences prefs = new AndroidPreferences(mContext);
         String receiverSn = prefs.getShareSerial().toUpperCase() + "000000";
         Log.d(TAG, "Receiver serial: " + receiverSn + "(" + Utils.bytesToHex(receiverSn.getBytes(StandardCharsets.US_ASCII)) + ")");
 
         if (receiverSn.compareTo("SM00000000000000") == 0 || receiverSn.equals("")) {
             // If they have not set their serial number, don't bond!
-            return;
+            return new byte[0];
         }
 
-        byte[] bondKey = (receiverSn).getBytes(StandardCharsets.US_ASCII);
-
-        if (mBluetoothGatt != null) {
-            if (mShareService != null) {
-                mAuthenticationCharacteristic = mShareService.getCharacteristic(DexShareAttributes.AuthenticationCode2);
-            }
-            if (mAuthenticationCharacteristic != null) {
-                Log.d(TAG, "Authentication Characteristic found: " + mAuthenticationCharacteristic.toString());
-                if (mAuthenticationCharacteristic.setValue(bondKey)) {
-                    mBluetoothGatt.writeCharacteristic(mAuthenticationCharacteristic);
-                }
-            } else {
-                Log.d(TAG, "Authentication Characteristic is NULL");
-            }
-        }
+        return (receiverSn).getBytes(StandardCharsets.US_ASCII);
     }
 
-    public void assignCharacteristics() {
-        Log.d(TAG, "Setting #1 characteristics");
-        mSendDataCharacteristic = mShareService.getCharacteristic(DexShareAttributes.ShareMessageReceiver2);
-        mReceiveDataCharacteristic = mShareService.getCharacteristic(DexShareAttributes.ShareMessageResponse2);
-        mCommandCharacteristic = mShareService.getCharacteristic(DexShareAttributes.Command2);
-        mResponseCharacteristic = mShareService.getCharacteristic(DexShareAttributes.Response2);
-        mHeartBeatCharacteristic = mShareService.getCharacteristic(DexShareAttributes.HeartBeat2);
-    }
+    private BroadcastReceiver mBondingBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            final BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            final int bondState = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1);
+            final int previousBondState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, -1);
 
-    public void setCharacteristicNotification(BluetoothGattCharacteristic characteristic) {
-        setCharacteristicNotification(characteristic, true);
-    }
-
-    public void setCharacteristicNotification(BluetoothGattCharacteristic characteristic, boolean enabled) {
-        Log.w(TAG, "Characteristic setting notification");
-        mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
-        BluetoothGattDescriptor descriptor = characteristic.getDescriptor(UUID.fromString(DexShareAttributes.CLIENT_CHARACTERISTIC_CONFIG));
-        Log.w(TAG, "Descriptor found: " + descriptor.getUuid());
-        descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-        mBluetoothGatt.writeDescriptor(descriptor);
-    }
-
-    public void setCharacteristicIndication(BluetoothGattCharacteristic characteristic) {
-        setCharacteristicIndication(characteristic, true);
-    }
-
-    public void setCharacteristicIndication(BluetoothGattCharacteristic characteristic, boolean enabled) {
-        Log.w(TAG, "Characteristic setting indication");
-        mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
-        BluetoothGattDescriptor descriptor = characteristic.getDescriptor(UUID.fromString(DexShareAttributes.CLIENT_CHARACTERISTIC_CONFIG));
-        Log.w(TAG, "Descriptor found: " + descriptor.getUuid());
-        descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
-        mBluetoothGatt.writeDescriptor(descriptor);
-    }
-
-    private final BroadcastReceiver mPairReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            final BluetoothDevice bondDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-
-            if (!bondDevice.getAddress().equals(mBluetoothGatt.getDevice().getAddress())) {
-                Log.d(TAG, "Bond state with wrong device, not going to pair.");
+            // Skip other devices
+            if (mBluetoothGatt == null || !device.getAddress().equals(mBluetoothGatt.getDevice().getAddress()))
                 return;
-            }
 
-            if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
-                final int state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR);
-                if (state == BluetoothDevice.BOND_BONDED) {
-                    Log.d(TAG, "Callback received: Bonded.");
-                    authenticateConnection();
-                } else if (state == BluetoothDevice.BOND_NONE) {
-                    Log.d(TAG, "Callback received: Not Bonded.");
-                } else if (state == BluetoothDevice.BOND_BONDING) {
-                    Log.d(TAG, "Callback received:  Bonding in progress...");
-                }
+            Log.i(TAG, "Bond state changed for: " + device.getName() + " new state: " + bondState + " previous: " + previousBondState);
+
+            switch (bondState) {
+                case BluetoothDevice.BOND_BONDING:
+                    Log.v(TAG, "Bond state: Bonding...");
+//                    mCallbacks.onBondingRequired();
+                    break;
+                case BluetoothDevice.BOND_BONDED:
+                    Log.i(TAG, "Bond state: Bonded");
+//                    mCallbacks.onBonded();
+
+                    // Start initializing again.
+                    // In fact, bonding forces additional, internal service discovery (at least on Nexus devices), so this method may safely be used to start this process again.
+                    Log.v(TAG, "Discovering Services...");
+                    Log.d(TAG, "gatt.discoverServices()");
+                    mInitQueue = null;
+                    mInitInProgress = true;
+                    mInitQueue = initGatt(getHandshakeKey());
+                    mBluetoothGatt.discoverServices();
+                    break;
             }
         }
     };
@@ -434,17 +381,44 @@ public class BluetoothTransport implements DeviceTransport {
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            Log.w(TAG, "Gatt state change status: " + status + " new state: " + newState);
+            String state = (newState == BluetoothProfile.STATE_CONNECTED) ? "connected" : "disconnected";
+            String connectionStatus = (status == BluetoothGatt.GATT_SUCCESS) ? "success" : "fail";
+            Log.w(TAG, "Gatt state change status: " + connectionStatus + " new state: " + state);
             writeStatusConnectionFailures(status);
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                mBluetoothGatt = gatt;
-                device = mBluetoothGatt.getDevice();
-                mConnectionState = STATE_CONNECTED;
-                Log.w(TAG, "Connected to GATT server.");
-                Observable.just(true).subscribe(connectionStateListener);
-                Log.w(TAG, "discovering services");
-                if (!mBluetoothGatt.discoverServices()) {
-                    Log.w(TAG, "discovering failed");
+                if (status == BluetoothGatt.GATT_SUCCESS) {
+                    mBluetoothGatt = gatt;
+                    device = mBluetoothGatt.getDevice();
+                    mConnectionState = STATE_CONNECTED;
+                    Log.w(TAG, "Connected to GATT server.");
+                    try {
+                        Thread.sleep(600);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if (mBluetoothGatt.getDevice().getBondState() != BluetoothDevice.BOND_BONDING) {
+                        Log.v(TAG, "Discovering Services...");
+                        Log.e(TAG, "gatt.discoverServices()");
+                        mBluetoothGatt.discoverServices();
+                    }
+                } else if ((status & BluetoothGatt.GATT_INSUFFICIENT_AUTHENTICATION) == BluetoothGatt.GATT_INSUFFICIENT_AUTHENTICATION) {
+                    int bondState = gatt.getDevice().getBondState();
+                    Log.w(TAG, "Insufficient authentication checking bond state (" + bondState + ")");
+                    if (bondState == BluetoothDevice.BOND_NONE) {
+                        Log.w(TAG, "Unbonded. Attempting to bond");
+                        device = gatt.getDevice();
+                        bondDevice();
+                    } else if (bondState == BluetoothDevice.BOND_BONDING) {
+                        Log.w(TAG, "Seems to be stuck bonding. Attempting to initiate bond again");
+                        cancelBond();
+                        removeBond();
+                        bondDevice();
+                    } else if (bondState == BluetoothDevice.BOND_BONDED) {
+                        Log.e(TAG, "Reporting bonded but received insufficient authentication. Attempting to rebond");
+                        cancelBond();
+                        removeBond();
+                        bondDevice();
+                    }
                 }
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.w(TAG, "Disconnected from GATT server. Should be open: " + shouldBeOpen);
@@ -461,13 +435,41 @@ public class BluetoothTransport implements DeviceTransport {
         }
 
         @Override
+        public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
+            Log.e(TAG, "MTU = " + mtu + " status: " + status);
+            super.onMtuChanged(gatt, mtu, status);
+        }
+
+        @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             Log.d(TAG, "Services discovered with status: " + status);
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 mShareService = mBluetoothGatt.getService(DexShareAttributes.CradleService2);
-                assignCharacteristics();
-                authenticateConnection();
-                setCharacteristicNotification(mReceiveDataCharacteristic);
+                Log.e(TAG, "Number of services: " + mShareService.getIncludedServices().size());
+                Log.e(TAG, "Number of characteristics: " + mShareService.getCharacteristics().size());
+                if (mShareService != null) {
+                    Log.i(TAG, "Getting characteristics");
+                    mSendDataCharacteristic = mShareService.getCharacteristic(DexShareAttributes.ShareMessageReceiver2);
+                    mReceiveDataCharacteristic = mShareService.getCharacteristic(DexShareAttributes.ShareMessageResponse2);
+                    mCommandCharacteristic = mShareService.getCharacteristic(DexShareAttributes.Command2);
+                    mResponseCharacteristic = mShareService.getCharacteristic(DexShareAttributes.Response2);
+                    mHeartBeatCharacteristic = mShareService.getCharacteristic(DexShareAttributes.HeartBeat2);
+                    mAuthenticationCharacteristic = mShareService.getCharacteristic(DexShareAttributes.AuthenticationCode2);
+                    if (mAuthenticationCharacteristic == null) {
+                        Log.e(TAG, "Something is wrong. Auth characteristic is null");
+                    }
+                    Log.d(TAG, "Authentication characteristic: " + mAuthenticationCharacteristic.getUuid().toString());
+
+                    mInitInProgress = true;
+                    mInitQueue = initGatt(getHandshakeKey());
+                    nextRequest();
+                    if (ensureServiceChangedEnabled(gatt)) {
+                        Log.e(TAG, "Returning in onServices discovered");
+                        return;
+                    }
+                } else {
+                    Log.e(TAG, "Unsupported device");
+                }
                 readNotifySet = true;
             } else {
                 Log.w(TAG, "No Services Discovered.");
@@ -479,10 +481,13 @@ public class BluetoothTransport implements DeviceTransport {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.d(TAG, "Characteristic Read " + characteristic.getUuid());
                 if (mHeartBeatCharacteristic.getUuid().equals(characteristic.getUuid())) {
-                    Log.v(TAG, "Characteristic Read " + characteristic.getUuid() + " " + characteristic.getValue());
-                    setCharacteristicNotification(mHeartBeatCharacteristic);
+                    Log.v(TAG, "Characteristic Read " + characteristic.getUuid() + " value: " + Utils.bytesToHex(characteristic.getValue()));
+//                    setCharacteristicNotification(mHeartBeatCharacteristic);
+                    enableNotifications(mHeartBeatCharacteristic);
+                } else {
+                    mBluetoothGatt.readCharacteristic(mHeartBeatCharacteristic);
                 }
-                mBluetoothGatt.readCharacteristic(mHeartBeatCharacteristic);
+//                nextRequest();
             } else {
                 Log.e(TAG, "Characteristic failed to read");
             }
@@ -490,6 +495,7 @@ public class BluetoothTransport implements DeviceTransport {
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+            Log.v(TAG, "Characteristic changed (" + characteristic.getUuid().toString() + ")");
             UUID charUuid = characteristic.getUuid();
             if (charUuid.compareTo(mReceiveDataCharacteristic.getUuid()) == 0) {
                 byte[] value = characteristic.getValue();
@@ -501,33 +507,37 @@ public class BluetoothTransport implements DeviceTransport {
 
         @Override
         public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+            BluetoothGattCharacteristic characteristic = descriptor.getCharacteristic();
+            Log.w(TAG, "Characteristic onDescriptorWrite ch " + characteristic.getUuid() + " status: " + status);
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                BluetoothGattCharacteristic characteristic = descriptor.getCharacteristic();
-                Log.d(TAG, "Characteristic onDescriptorWrite ch " + characteristic.getUuid());
-                if (mHeartBeatCharacteristic.getUuid().equals(characteristic.getUuid())) {
-                    setCharacteristicIndication(mReceiveDataCharacteristic);
-                }
-                if (mReceiveDataCharacteristic.getUuid().equals(characteristic.getUuid())) {
-                    setCharacteristicIndication(mResponseCharacteristic);
-                }
-                if (mResponseCharacteristic.getUuid().equals(characteristic.getUuid())) {
-                    finalCallback = true;
-                }
-            } else if (status == BluetoothGatt.GATT_INSUFFICIENT_AUTHENTICATION) {
-                if (gatt.getDevice().getBondState() == BluetoothDevice.BOND_NONE) {
+                nextRequest();
+            } else if ((status & BluetoothGatt.GATT_INSUFFICIENT_AUTHENTICATION) == BluetoothGatt.GATT_INSUFFICIENT_AUTHENTICATION) {
+                int bondState = device.getBondState();
+                if (bondState == BluetoothDevice.BOND_NONE) {
+                    Log.w(TAG, "Unbonded. Attempting to bond");
                     device = gatt.getDevice();
                     bondDevice();
-                } else {
-                    Log.e(TAG, "The phone is trying to read from paired device without encryption. Android Bug?");
+                } else if (bondState == BluetoothDevice.BOND_BONDING) {
+                    Log.w(TAG, "Seems to be stuck bonding. Attempting to initiate bond again");
+                    cancelBond();
+                    removeBond();
+                    bondDevice();
+                } else if (bondState == BluetoothDevice.BOND_BONDED) {
+                    Log.e(TAG, "Reporting bonded but received insufficient authentication. Attempting to rebond");
+                    cancelBond();
+                    removeBond();
+                    bondDevice();
                 }
             } else {
                 Log.e(TAG, "Unknown error writing descriptor");
+                writeStatusConnectionFailures(status);
             }
         }
 
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             Log.d(TAG, "characteristic wrote " + status);
+            writeStatusConnectionFailures(status);
 
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.d(TAG, "Wrote a characteristic successfully " + characteristic.getUuid());
@@ -536,15 +546,26 @@ public class BluetoothTransport implements DeviceTransport {
                     authenticated = true;
                 }
             } else if ((status & BluetoothGatt.GATT_INSUFFICIENT_AUTHENTICATION) == BluetoothGatt.GATT_INSUFFICIENT_AUTHENTICATION) {
-                if (gatt.getDevice().getBondState() == BluetoothDevice.BOND_NONE) {
+                int bondState = device.getBondState();
+                if (bondState == BluetoothDevice.BOND_NONE) {
+                    Log.w(TAG, "Unbonded. Attempting to bond");
                     device = gatt.getDevice();
                     bondDevice();
-                } else {
-                    Log.e(TAG, "The phone is trying to read from paired device without encryption. Android Bug?");
+                } else if (bondState == BluetoothDevice.BOND_BONDING) {
+                    Log.w(TAG, "Seems to be stuck bonding. Attempting to initiate bond again");
+                    cancelBond();
+                    removeBond();
+                    bondDevice();
+                } else if (bondState == BluetoothDevice.BOND_BONDED) {
+                    Log.e(TAG, "Reporting bonded but received insufficient authentication. Attempting to rebond");
+                    cancelBond();
+                    removeBond();
+                    bondDevice();
                 }
             } else {
                 Log.e(TAG, "Unknown error writing Characteristic");
             }
+            nextRequest();
         }
     };
 
@@ -552,23 +573,63 @@ public class BluetoothTransport implements DeviceTransport {
     public void bondDevice() {
         Log.d(TAG, "Attempting to bond with remote device");
         final IntentFilter bondIntent = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        mContext.registerReceiver(mPairReceiver, bondIntent);
+        mContext.registerReceiver(mBondingBroadcastReceiver, bondIntent);
 
         if (!device.createBond()) {
             Log.d(TAG, "Problem creating bond");
         }
     }
 
+    public void removeBond() {
+        Log.w(TAG, "Attempting to remove bond");
+        try {
+            Method m = device.getClass()
+                    .getMethod("removeBond", (Class[]) null);
+            m.invoke(device, (Object[]) null);
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+    }
+
+    public void cancelBond() {
+        Log.w(TAG, "Attempting to cancel bond");
+        try {
+            Method m = device.getClass()
+                    .getMethod("cancelBondProcess", (Class[]) null);
+            m.invoke(device, (Object[]) null);
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+    }
+
+
     private void writeStatusConnectionFailures(int status) {
         if (status != 0) {
-            Log.e(TAG, "ERROR: GATT_WRITE_NOT_PERMITTED " + (status & BluetoothGatt.GATT_WRITE_NOT_PERMITTED));
-            Log.e(TAG, "ERROR: GATT_INSUFFICIENT_AUTHENTICATION " + (status & BluetoothGatt.GATT_INSUFFICIENT_AUTHENTICATION));
-            Log.e(TAG, "ERROR: GATT_REQUEST_NOT_SUPPORTED " + (status & BluetoothGatt.GATT_REQUEST_NOT_SUPPORTED));
-            Log.e(TAG, "ERROR: GATT_INSUFFICIENT_ENCRYPTION " + (status & BluetoothGatt.GATT_INSUFFICIENT_ENCRYPTION));
-            Log.e(TAG, "ERROR: GATT_INVALID_OFFSET " + (status & BluetoothGatt.GATT_INVALID_OFFSET));
-            Log.e(TAG, "ERROR: GATT_FAILURE " + (status & BluetoothGatt.GATT_FAILURE));
-            Log.e(TAG, "ERROR: GATT_INVALID_ATTRIBUTE_LENGTH " + (status & BluetoothGatt.GATT_INVALID_ATTRIBUTE_LENGTH));
-            Log.e(TAG, "ERROR: GATT_READ_NOT_PERMITTED " + (status & BluetoothGatt.GATT_READ_NOT_PERMITTED));
+            Log.e(TAG, "Connection Failure status: " + status);
+            if ((status & BluetoothGatt.GATT_WRITE_NOT_PERMITTED) != 0) {
+                Log.e(TAG, "ERROR: GATT_WRITE_NOT_PERMITTED");
+            }
+            if ((status & BluetoothGatt.GATT_INSUFFICIENT_AUTHENTICATION) != 0) {
+                Log.e(TAG, "ERROR: GATT_INSUFFICIENT_AUTHENTICATION");
+            }
+            if ((status & BluetoothGatt.GATT_REQUEST_NOT_SUPPORTED) != 0) {
+                Log.e(TAG, "ERROR: GATT_REQUEST_NOT_SUPPORTED");
+            }
+            if ((status & BluetoothGatt.GATT_INSUFFICIENT_ENCRYPTION) != 0) {
+                Log.e(TAG, "ERROR: GATT_INSUFFICIENT_ENCRYPTION");
+            }
+            if ((status & BluetoothGatt.GATT_INVALID_OFFSET) != 0) {
+                Log.e(TAG, "ERROR: GATT_INVALID_OFFSET");
+            }
+            if ((status & BluetoothGatt.GATT_FAILURE) != 0) {
+                Log.e(TAG, "ERROR: GATT_FAILURE");
+            }
+            if ((status & BluetoothGatt.GATT_INVALID_ATTRIBUTE_LENGTH) != 0) {
+                Log.e(TAG, "ERROR: GATT_INVALID_ATTRIBUTE_LENGTH");
+            }
+            if ((status & BluetoothGatt.GATT_READ_NOT_PERMITTED) != 0) {
+                Log.e(TAG, "ERROR: GATT_READ_NOT_PERMITTED");
+            }
         }
     }
 
@@ -612,6 +673,266 @@ public class BluetoothTransport implements DeviceTransport {
     public void cancelReconnect() {
         Log.d(TAG, "Canceling reconnect.");
         alarmManager.cancel(reconnectPendingIntent);
+    }
+
+    private boolean ensureServiceChangedEnabled(final BluetoothGatt gatt) {
+        if (gatt == null) {
+            Log.d(TAG, "Returning false for ensureServiceChangedEnabled due to null gatt");
+            return false;
+        }
+
+        // The Service Changed indications have sense only on bonded devices
+        final BluetoothDevice device = gatt.getDevice();
+        if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
+            Log.d(TAG, "Returning false for ensureServiceChangedEnabled due unbonded device");
+            return false;
+        }
+
+        final BluetoothGattService gaService = gatt.getService(DexShareAttributes.GENERIC_ATTRIBUTE_SERVICE);
+        if (gaService == null) {
+            Log.d(TAG, "Returning false for ensureServiceChangedEnabled due being unable to read Generic attribute service");
+            return false;
+        }
+
+        final BluetoothGattCharacteristic scCharacteristic = gaService.getCharacteristic(DexShareAttributes.SERVICE_CHANGED_CHARACTERISTIC);
+        if (scCharacteristic == null) {
+            Log.d(TAG, "Returning false for ensureServiceChangedEnabled due being unable to get service changed characteristic");
+            return false;
+        }
+
+        return enableIndications(scCharacteristic);
+    }
+
+    protected final boolean enableIndications(final BluetoothGattCharacteristic characteristic) {
+        final BluetoothGatt gatt = mBluetoothGatt;
+        if (gatt == null || characteristic == null) {
+            Log.d(TAG, "Returning false due to null gatt or characteristic");
+            return false;
+        }
+
+        // Check characteristic property
+        final int properties = characteristic.getProperties();
+        if ((properties & BluetoothGattCharacteristic.PROPERTY_INDICATE) == 0) {
+            Log.d(TAG, "Returning false because Indicate property does not seem to exist for " + characteristic.getUuid().toString() + ". Properties that exist: " + propertiesAvailable(properties));
+            return false;
+        }
+
+        gatt.setCharacteristicNotification(characteristic, true);
+        final BluetoothGattDescriptor descriptor = characteristic.getDescriptor(DexShareAttributes.CLIENT_CHARACTERISTIC_CONFIG);
+        if (descriptor != null) {
+            descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
+            Log.v(TAG, "Enabling indications for " + characteristic.getUuid());
+            Log.d(TAG, "gatt.writeDescriptor(" + DexShareAttributes.CLIENT_CHARACTERISTIC_CONFIG.toString() + ", value=0x02-00)");
+            return gatt.writeDescriptor(descriptor);
+        }
+        return false;
+    }
+
+    protected final boolean enableNotifications(final BluetoothGattCharacteristic characteristic) {
+        final BluetoothGatt gatt = mBluetoothGatt;
+        if (gatt == null || characteristic == null) {
+            Log.e(TAG, "Returning false due to null gatt or characteristic");
+            return false;
+        }
+
+        // Check characteristic property
+        final int properties = characteristic.getProperties();
+        if ((properties & BluetoothGattCharacteristic.PROPERTY_NOTIFY) == 0) {
+            Log.d(TAG, "Returning false because Notification property does not seem to exist for " + characteristic.getUuid().toString() + ". Properties that exist: " + propertiesAvailable(properties));
+
+            return false;
+        }
+
+        gatt.setCharacteristicNotification(characteristic, true);
+        final BluetoothGattDescriptor descriptor = characteristic.getDescriptor(DexShareAttributes.CLIENT_CHARACTERISTIC_CONFIG);
+        if (descriptor != null) {
+            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+            Log.v(TAG, "Enabling notifications for " + characteristic.getUuid());
+            Log.d(TAG, "gatt.writeDescriptor(" + DexShareAttributes.CLIENT_CHARACTERISTIC_CONFIG + ", value=0x01-00)");
+            try {
+                Thread.sleep(600);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return gatt.writeDescriptor(descriptor);
+        }
+        return false;
+    }
+
+    private boolean isPropertySet(int propertyToCheckFor, int properties) {
+        return (properties & propertyToCheckFor) == propertyToCheckFor;
+    }
+
+    private List<String> propertiesAvailable(int properties) {
+        List<String> availProperties = new ArrayList<>();
+        if (isPropertySet(BluetoothGattCharacteristic.PROPERTY_BROADCAST, properties)) {
+            availProperties.add("Broadcast");
+        }
+        if (isPropertySet(BluetoothGattCharacteristic.PROPERTY_EXTENDED_PROPS, properties)) {
+            availProperties.add("Extended Properties");
+        }
+        if (isPropertySet(BluetoothGattCharacteristic.PROPERTY_INDICATE, properties)) {
+            availProperties.add("Indicate");
+        }
+        if (isPropertySet(BluetoothGattCharacteristic.PROPERTY_NOTIFY, properties)) {
+            availProperties.add("Notify");
+        }
+        if (isPropertySet(BluetoothGattCharacteristic.PROPERTY_READ, properties)) {
+            availProperties.add("Read");
+        }
+        if (isPropertySet(BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE, properties)) {
+            availProperties.add("Signed Write");
+        }
+        if (isPropertySet(BluetoothGattCharacteristic.PROPERTY_WRITE, properties)) {
+            availProperties.add("Write");
+        }
+        if (isPropertySet(BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE, properties)) {
+            availProperties.add("Write no response");
+        }
+        return availProperties;
+//            BluetoothGattCharacteristic.PROPERTY_BROADCAST;
+//            BluetoothGattCharacteristic.PROPERTY_EXTENDED_PROPS;
+//            BluetoothGattCharacteristic.PROPERTY_INDICATE;
+//            BluetoothGattCharacteristic.PROPERTY_NOTIFY;
+//            BluetoothGattCharacteristic.PROPERTY_READ;
+//            BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE;
+//            BluetoothGattCharacteristic.PROPERTY_WRITE;
+//            BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE;
+    }
+
+
+    private Queue<Request> initGatt(byte[] bondKey) {
+        LinkedList<Request> req = new LinkedList<>();
+        req.push(Request.newEnableIndicationsRequest(mReceiveDataCharacteristic));
+        req.push(Request.newEnableIndicationsRequest(mResponseCharacteristic));
+        req.push(Request.newEnableNotificationsRequest(mResponseCharacteristic));
+        req.push(Request.newEnableIndicationsRequest(mHeartBeatCharacteristic));
+        req.push(Request.newWriteRequest(mAuthenticationCharacteristic, bondKey));
+        return req;
+    }
+
+    protected static final class Request {
+        private enum Type {
+            WRITE,
+            READ,
+            ENABLE_NOTIFICATIONS,
+            ENABLE_INDICATIONS
+        }
+
+        private final Type type;
+        private final BluetoothGattCharacteristic characteristic;
+        private final byte[] value;
+
+        private Request(final Type type, final BluetoothGattCharacteristic characteristic) {
+            this.type = type;
+            this.characteristic = characteristic;
+            this.value = null;
+        }
+
+        private Request(final Type type, final BluetoothGattCharacteristic characteristic, final byte[] value) {
+            this.type = type;
+            this.characteristic = characteristic;
+            this.value = value;
+        }
+
+        public static Request newReadRequest(final BluetoothGattCharacteristic characteristic) {
+            return new Request(Type.READ, characteristic);
+        }
+
+        public static Request newWriteRequest(final BluetoothGattCharacteristic characteristic, final byte[] value) {
+            return new Request(Type.WRITE, characteristic, value);
+        }
+
+        public static Request newEnableNotificationsRequest(final BluetoothGattCharacteristic characteristic) {
+            return new Request(Type.ENABLE_NOTIFICATIONS, characteristic);
+        }
+
+        public static Request newEnableIndicationsRequest(final BluetoothGattCharacteristic characteristic) {
+            return new Request(Type.ENABLE_INDICATIONS, characteristic);
+        }
+    }
+
+    private void nextRequest() {
+        Log.i(TAG, "nextRequest called");
+        final Queue<Request> requests = mInitQueue;
+        if (requests == null) {
+            Log.e(TAG, "Requests object has not been initialized");
+            return;
+        }
+
+        // Get the first request from the queue
+        final Request request = requests.poll();
+        Log.v(TAG, "Queue size: " + requests.size());
+
+        // Are we done?
+        if (request == null) {
+            if (mInitInProgress) {
+                mInitInProgress = false;
+                Log.w(TAG, "Device should be ready now");
+                Observable.just(true).subscribe(connectionStateListener);
+                finalCallback = true;
+            }
+            return;
+        }
+
+        switch (request.type) {
+            case READ: {
+                Log.v(TAG, "Reading characteristic (from queued commands) " + request.characteristic.getUuid().toString());
+                readCharacteristic(request.characteristic);
+                break;
+            }
+            case WRITE: {
+                if (request.characteristic == null) {
+                    Log.e(TAG, "Characteristic is null");
+                }
+
+                Log.v(TAG, "Writing characteristic (from queued commands) " + request.characteristic.getUuid().toString() + " " + new String(request.value));
+                final BluetoothGattCharacteristic characteristic = request.characteristic;
+                characteristic.setValue(request.value);
+                writeCharacteristic(characteristic);
+                break;
+            }
+            case ENABLE_NOTIFICATIONS: {
+                Log.v(TAG, "Enabling notifications on characteristic (from queued commands) " + request.characteristic.getUuid().toString());
+                Log.v(TAG, "Notification status: " + enableNotifications(request.characteristic));
+                break;
+            }
+            case ENABLE_INDICATIONS: {
+                Log.v(TAG, "Enabling indications on characteristic (from queued commands) " + request.characteristic.getUuid().toString());
+                Log.v(TAG, "Indication status: " + enableIndications(request.characteristic));
+                break;
+            }
+        }
+    }
+
+    protected final boolean readCharacteristic(final BluetoothGattCharacteristic characteristic) {
+        final BluetoothGatt gatt = mBluetoothGatt;
+        if (gatt == null || characteristic == null)
+            return false;
+
+        // Check characteristic property
+        final int properties = characteristic.getProperties();
+        if ((properties & BluetoothGattCharacteristic.PROPERTY_READ) == 0)
+            return false;
+
+        Log.v(TAG, "Reading characteristic " + characteristic.getUuid());
+        Log.d(TAG, "gatt.readCharacteristic(" + characteristic.getUuid() + ")");
+        return gatt.readCharacteristic(characteristic);
+    }
+
+    protected final boolean writeCharacteristic(final BluetoothGattCharacteristic characteristic) {
+        final BluetoothGatt gatt = mBluetoothGatt;
+        if (gatt == null || characteristic == null)
+            return false;
+
+        // Check characteristic property
+        final int properties = characteristic.getProperties();
+        if ((properties & (BluetoothGattCharacteristic.PROPERTY_WRITE | BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)) == 0)
+            return false;
+
+        Log.v(TAG, "Writing characteristic " + characteristic.getUuid());
+        Log.d(TAG, "gatt.writeCharacteristic(" + characteristic.getUuid() + ")");
+        return gatt.writeCharacteristic(characteristic);
     }
 
 }

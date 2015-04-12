@@ -78,9 +78,9 @@ public class DexcomG4 extends AbstractDevice {
 //        ReadData readData = new ReadData(transport);
 //        try {
 //            receiverId = readData.readSerialNumber();
-//            transmitterId = readData.readTrasmitterId();
 //            log.debug("ReceiverId: {}", receiverId);
-//            log.debug("TransmitterId: {}", transmitterId);
+////            transmitterId = readData.readTrasmitterId();
+////            log.debug("TransmitterId: {}", transmitterId);
 //        } catch (IOException e) {
 //            log.error("Exception {}", e);
 //            e.printStackTrace();
