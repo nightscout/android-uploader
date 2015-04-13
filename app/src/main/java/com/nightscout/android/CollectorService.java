@@ -26,7 +26,9 @@ import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.core.BusProvider;
 import com.nightscout.core.dexcom.CRCFailError;
+import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.EGVRecord;
+import com.nightscout.core.dexcom.records.SensorRecord;
 import com.nightscout.core.drivers.AbstractDevice;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.drivers.DeviceConnectionStatus;
@@ -38,6 +40,7 @@ import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.G4Download;
+import com.nightscout.core.utils.IsigReading;
 import com.squareup.otto.Bus;
 
 import org.joda.time.DateTime;
@@ -56,7 +59,6 @@ public class CollectorService extends Service {
     public static final String NUM_PAGES = "NUM_PAGES";
     public static final String STD_SYNC = "STD_SYNC";
     public static final String GAP_SYNC = "GAP_SYNC";
-    public static final String NON_SYNC = "NON_SYNC";
     public static final String SYNC_TYPE = "SYNC_TYPE";
 
     private EventReporter reporter;
@@ -227,6 +229,30 @@ public class CollectorService extends Service {
 
             try {
                 download = (G4Download) device.download();
+                SensorRecord lastSensorRecord = null;
+                CalRecord lastCalRecord = null;
+                EGVRecord lastEgvRecord = null;
+                long downloadEpoch = DateTime.parse(download.download_timestamp).getMillis();
+                long rcvrTime = download.receiver_system_time_sec;
+                if (download.sensor.size() > 0) {
+                    lastSensorRecord = new SensorRecord(download.sensor.get(download.sensor.size() - 1), rcvrTime, downloadEpoch);
+                } else {
+                    Log.e(TAG, "No sensor records to calculate EGV using isig");
+                }
+                if (download.cal.size() > 0) {
+                    lastCalRecord = new CalRecord(download.cal.get(download.cal.size() - 1), rcvrTime, downloadEpoch);
+                } else {
+                    Log.e(TAG, "No cal records to calculate EGV using isig");
+                }
+                if (download.sgv.size() > 0) {
+                    lastEgvRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), rcvrTime, downloadEpoch);
+                } else {
+                    Log.e(TAG, "No egv records to calculate EGV using isig");
+                }
+                if (lastSensorRecord != null && lastCalRecord != null && lastEgvRecord != null) {
+                    IsigReading isigReading = new IsigReading(lastSensorRecord, lastCalRecord, lastEgvRecord);
+                    Log.e(TAG, "Calculated EGV using isig values: " + isigReading.asMgdl());
+                }
 
                 if (download != null) {
                     bus.post(download);
@@ -304,7 +330,8 @@ public class CollectorService extends Service {
     }
 
     public long getNextPoll() {
-        return nextPoll - System.currentTimeMillis();
+//        return nextPoll - System.currentTimeMillis();
+        return 1000 * 60 * 5 - (nextPoll - System.currentTimeMillis());
     }
 
 

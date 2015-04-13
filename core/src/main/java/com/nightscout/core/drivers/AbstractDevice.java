@@ -90,7 +90,7 @@ abstract public class AbstractDevice {
     }
 
     public DeviceConnectionStatus getDeviceConnectionStatus() {
-        log.warn("Device type from device: {}", deviceType);
+//        log.warn("Device type from device: {}", deviceType);
         return new DeviceConnectionStatus(deviceType, connectionStatus);
     }
 

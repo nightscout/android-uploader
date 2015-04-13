@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,6 +21,7 @@ import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.nightscout.android.CollectorService;
@@ -46,6 +48,7 @@ import com.squareup.otto.Subscribe;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
+import org.joda.time.Minutes;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.slf4j.Logger;
@@ -77,6 +80,9 @@ public class MonitorFragment extends Fragment {
     ImageButton uploadButton;
     @InjectView(R.id.usbButton)
     ImageButton receiverButton;
+
+    @InjectView(R.id.circularProgressbar)
+    ProgressBar progressBar;
     private Bus bus = BusProvider.getInstance();
 
     private String mJSONData;
@@ -153,6 +159,8 @@ public class MonitorFragment extends Fragment {
         bus.register(this);
 
 
+        progressBar.setMax((int) Minutes.minutes(5).toStandardDuration().getMillis());
+        progressBar.setProgress(0);
         preferences = new AndroidPreferences(getActivity());
         mTextSGV.setTag(R.string.display_sgv, -1);
         mTextSGV.setTag(R.string.display_trend, preferences.getPreferredUnits().ordinal());
@@ -212,14 +220,33 @@ public class MonitorFragment extends Fragment {
             }
         };
         prefs.registerOnSharedPreferenceChangeListener(prefListener);
+
+        mHandler.post(updateProgress);
         return view;
     }
+
+    private Runnable updateProgress = new Runnable() {
+        @Override
+        public void run() {
+            Log.e("XXX", "Updating progress bar");
+            Intent intent = new Intent(getActivity(), CollectorService.class);
+            getActivity().bindService(intent, mCollectorConnection, Context.BIND_AUTO_CREATE);
+            if (mBound) {
+                int progress = (int) mCollectorService.getNextPoll();
+                Log.e("XXX", "Max: " + progressBar.getMax() + " Current: " + progress);
+                progressBar.setProgress(progress);
+                getActivity().unbindService(mCollectorConnection);
+            }
+            mHandler.postDelayed(updateProgress, 2000);
+        }
+    };
 
     @Override
     public void onPause() {
         mWebView.pauseTimers();
         mWebView.onPause();
         mHandler.removeCallbacks(updateTimeAgo);
+        mHandler.removeCallbacks(updateProgress);
         super.onPause();
     }
 
@@ -247,6 +274,7 @@ public class MonitorFragment extends Fragment {
         mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(preferences.getPreferredUnits() == GlucoseUnit.MMOL) + ")");
 
         mHandler.post(updateTimeAgo);
+        mHandler.post(updateProgress);
         restoreSgvText();
         super.onResume();
     }

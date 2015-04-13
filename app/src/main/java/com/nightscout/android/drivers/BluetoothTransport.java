@@ -853,7 +853,7 @@ public class BluetoothTransport implements DeviceTransport {
     }
 
     private void nextRequest() {
-        Log.i(TAG, "nextRequest called");
+        Log.v(TAG, "nextRequest called");
         final Queue<Request> requests = mInitQueue;
         if (requests == null) {
             Log.e(TAG, "Requests object has not been initialized");
