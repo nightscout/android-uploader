@@ -78,7 +78,12 @@ public class ProcessorService extends Service {
         }
         bus.register(this);
         uploader = new Uploader(getApplicationContext(), preferences);
-        setupMqtt();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                setupMqtt();
+            }
+        }).start();
         tracker = ((Nightscout) getApplicationContext()).getTracker();
         reportUploadMethods();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -98,12 +103,17 @@ public class ProcessorService extends Service {
                     }
                 } else if (key.equals(getApplicationContext().getString(R.string.mqtt_enable))) {
                     // Assume that MQTT already has the information needed and set it up.
-                    setupMqtt();
-                    if (mqttManager != null && mqttManager.isConnected()) {
-                        mqttManager.setShouldReconnect(false);
-                        mqttManager.disconnect();
-                        mqttManager.setShouldReconnect(true);
-                    }
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setupMqtt();
+                            if (mqttManager != null && mqttManager.isConnected()) {
+                                mqttManager.setShouldReconnect(false);
+                                mqttManager.disconnect();
+                                mqttManager.setShouldReconnect(true);
+                            }
+                        }
+                    }).start();
                 } else {
                     Log.d(TAG, "Meh... something uninteresting changed");
                 }
@@ -112,13 +122,19 @@ public class ProcessorService extends Service {
                 // Assume that MQTT is already enabled and the MQTT endpoint and credentials are just changing
                 prefKeys = new String[]{getApplicationContext().getString(R.string.mqtt_endpoint), getApplicationContext().getString(R.string.mqtt_pass), getApplicationContext().getString(R.string.mqtt_user)};
                 if (preferences.isMqttEnabled() && Arrays.asList(prefKeys).contains(key)) {
-                    setupMqtt();
-                    Log.d(TAG, "MQTT change detected. Restarting MQTT");
-                    if (mqttManager != null && mqttManager.isConnected()) {
-                        mqttManager.setShouldReconnect(false);
-                        mqttManager.disconnect();
-                        mqttManager.setShouldReconnect(true);
-                    }
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setupMqtt();
+                            Log.d(TAG, "MQTT change detected. Restarting MQTT");
+                            if (mqttManager != null && mqttManager.isConnected()) {
+                                mqttManager.setShouldReconnect(false);
+                                mqttManager.disconnect();
+                                mqttManager.setShouldReconnect(true);
+                            }
+                        }
+                    }).start();
                 }
                 if (key.equals(getString(R.string.preferred_units)) && preferences.isCampingModeEnabled()) {
                     pebble.config(preferences.getPwdName(), preferences.getPreferredUnits(), getApplicationContext());
@@ -191,7 +207,7 @@ public class ProcessorService extends Service {
         }
         try {
             MqttConnectOptions mqttOptions = new MqttConnectOptions();
-            mqttOptions.setCleanSession(false);
+            mqttOptions.setCleanSession(true);
             mqttOptions.setKeepAliveInterval(150000);
             mqttOptions.setUserName(user);
             mqttOptions.setPassword(pass.toCharArray());

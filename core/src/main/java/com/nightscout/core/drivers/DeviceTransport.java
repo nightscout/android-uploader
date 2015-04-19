@@ -52,5 +52,5 @@ public interface DeviceTransport {
 
     public boolean isConnected();
 
-    public void registerConnectionListener(Action1<Boolean> connectionListener);
+    public void registerConnectionListener(Action1<G4ConnectionState> connectionListener);
 }

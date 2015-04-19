@@ -54,7 +54,6 @@ public class AndroidMqttPinger implements MqttPinger, MqttPingerObservable {
 
     @Override
     public void ping() {
-        Log.i(TAG, "Ping");
         if (!isActive()) {
             Log.d(TAG, "Can't ping because connection is not active");
             return;

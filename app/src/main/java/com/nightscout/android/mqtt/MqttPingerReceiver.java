@@ -19,9 +19,8 @@ public class MqttPingerReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, "Received a broadcast: " + intent.getAction());
         if (intent.getAction().equals(Constants.KEEPALIVE_INTENT_FILTER)) {
-            Log.d(TAG, "Received a request to perform an MQTT keepalive operation on " + intent.getExtras().get("device"));
+            Log.v(TAG, "Received a request to perform an MQTT keepalive operation on " + intent.getExtras().get("device"));
             pinger.ping();
         }
     }

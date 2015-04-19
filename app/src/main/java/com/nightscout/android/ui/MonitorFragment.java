@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -228,15 +227,15 @@ public class MonitorFragment extends Fragment {
     private Runnable updateProgress = new Runnable() {
         @Override
         public void run() {
-            Log.e("XXX", "Updating progress bar");
+            log.debug("Updating progress bar");
             Intent intent = new Intent(getActivity(), CollectorService.class);
             getActivity().bindService(intent, mCollectorConnection, Context.BIND_AUTO_CREATE);
             if (mBound) {
                 int progress = (int) mCollectorService.getNextPoll();
-                Log.e("XXX", "Max: " + progressBar.getMax() + " Current: " + progress);
                 progressBar.setProgress(progress);
                 getActivity().unbindService(mCollectorConnection);
             }
+            mHandler.removeCallbacks(updateProgress);
             mHandler.postDelayed(updateProgress, 2000);
         }
     };
@@ -357,10 +356,12 @@ public class MonitorFragment extends Fragment {
             case CONNECTED:
                 res = (status.deviceType == SupportedDevices.DEXCOM_G4) ? R.drawable.ic_usb : R.drawable.ic_ble;
                 break;
-            case DISCONNECTED:
+            case CLOSED:
                 res = (status.deviceType == SupportedDevices.DEXCOM_G4) ? R.drawable.ic_nousb : R.drawable.ic_noble;
                 break;
-            case ACTIVE:
+            case READING:
+            case WRITING:
+            case CONNECTING:
                 res = (status.deviceType == SupportedDevices.DEXCOM_G4) ? R.drawable.ic_usb : R.drawable.ble_read;
                 break;
         }

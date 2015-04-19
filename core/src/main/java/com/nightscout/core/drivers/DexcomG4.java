@@ -44,14 +44,32 @@ public class DexcomG4 extends AbstractDevice {
     protected List<SensorRecord> lastSensorRecords;
     protected List<CalRecord> lastCalRecords;
 
-    protected Action1<Boolean> connectionStateListener = new Action1<Boolean>() {
+    protected Action1<G4ConnectionState> connectionStateListener = new Action1<G4ConnectionState>() {
 
         @Override
-        public void call(Boolean connected) {
-            if (connected) {
-                onConnect();
-            } else {
-                onDisconnect();
+        public void call(G4ConnectionState connected) {
+            switch (connected) {
+                case CONNECTING:
+                    onConnecting();
+                    break;
+                case CONNECTED:
+                    onConnect();
+                    break;
+                case CLOSED:
+                    onDisconnect();
+                    break;
+                case CLOSING:
+                    onDisconnecting();
+                    break;
+                case READING:
+                    onReading();
+                    break;
+                case WRITING:
+                    onWriting();
+                    break;
+                default:
+                    break;
+
             }
         }
     };

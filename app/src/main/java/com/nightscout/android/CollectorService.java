@@ -32,9 +32,9 @@ import com.nightscout.core.dexcom.records.SensorRecord;
 import com.nightscout.core.drivers.AbstractDevice;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.drivers.DeviceConnectionStatus;
-import com.nightscout.core.drivers.DeviceState;
 import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DexcomG4;
+import com.nightscout.core.drivers.G4ConnectionState;
 import com.nightscout.core.drivers.SupportedDevices;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
@@ -229,6 +229,9 @@ public class CollectorService extends Service {
 
             try {
                 download = (G4Download) device.download();
+                if (download == null || download.download_timestamp == null || download.receiver_system_time_sec == null) {
+                    return null;
+                }
                 SensorRecord lastSensorRecord = null;
                 CalRecord lastCalRecord = null;
                 EGVRecord lastEgvRecord = null;
@@ -323,7 +326,7 @@ public class CollectorService extends Service {
 
     public DeviceConnectionStatus getDeviceConnectionStatus() {
         if (device == null) {
-            return new DeviceConnectionStatus(preferences.getDeviceType(), DeviceState.DISCONNECTED);
+            return new DeviceConnectionStatus(preferences.getDeviceType(), G4ConnectionState.CLOSED);
         }
         Log.d(TAG, "From service: " + device.getDeviceConnectionStatus().deviceType.name());
         return device.getDeviceConnectionStatus();

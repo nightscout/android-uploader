@@ -3,7 +3,6 @@ package com.nightscout.android.preferences;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.nightscout.android.R;
 import com.nightscout.core.drivers.SupportedDevices;
@@ -12,6 +11,9 @@ import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.RestUriUtils;
 
 import net.tribe7.common.base.Joiner;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 public class AndroidPreferences implements NightscoutPreferences {
+    protected final Logger log = LoggerFactory.getLogger(AndroidPreferences.class);
+
     private final SharedPreferences preferences;
     private Context context;
 
@@ -417,19 +421,19 @@ public class AndroidPreferences implements NightscoutPreferences {
 
                 if (v instanceof Boolean) {
                     prefEdit.putBoolean(key, ((Boolean) v).booleanValue());
-                    Log.d("XXX", "Restoring " + key + ": " + ((Boolean) v).booleanValue());
+                    log.debug("Restoring {}: {}", key, ((Boolean) v).booleanValue());
                 } else if (v instanceof Float) {
                     prefEdit.putFloat(key, ((Float) v).floatValue());
-                    Log.d("XXX", "Restoring " + key + ": " + ((Float) v).floatValue());
+                    log.debug("Restoring {}: {}", key, ((Float) v).floatValue());
                 } else if (v instanceof Integer) {
                     prefEdit.putInt(key, ((Integer) v).intValue());
-                    Log.d("XXX", "Restoring " + key + ": " + ((Integer) v).intValue());
+                    log.debug("Restoring {}: {}", key, ((Integer) v).intValue());
                 } else if (v instanceof Long) {
                     prefEdit.putLong(key, ((Long) v).longValue());
-                    Log.d("XXX", "Restoring " + key + ": " + ((Long) v).longValue());
+                    log.debug("Restoring {}: {}", key, ((Long) v).longValue());
                 } else if (v instanceof String) {
                     prefEdit.putString(key, ((String) v));
-                    Log.d("XXX", "Restoring " + key + ": " + v);
+                    log.debug("Restoring {}: {}", key, v);
                 }
             }
             prefEdit.apply();
