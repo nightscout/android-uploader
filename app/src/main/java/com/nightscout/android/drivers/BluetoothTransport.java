@@ -74,6 +74,8 @@ public class BluetoothTransport implements DeviceTransport {
     private static final int STATE_CONNECTED = BluetoothProfile.STATE_CONNECTED;
 
     private final String RECONNECT_INTENT = "org.nightscout.uploader.RECONNECT";
+    private final static int RECONNECT_SHORT = 20000;
+    private final static int RECONNECT_LONG = 300000;
 
     // Current Bluetooth connection state
     private int mConnectionState = BluetoothProfile.STATE_DISCONNECTED;
@@ -147,6 +149,7 @@ public class BluetoothTransport implements DeviceTransport {
 
     @Override
     public void open() throws IOException {
+        cancelReconnect();
         setConnectionState(G4ConnectionState.CONNECTING);
         shouldBeOpen = true;
         Log.d(TAG, "Starting open");
@@ -154,6 +157,7 @@ public class BluetoothTransport implements DeviceTransport {
         mBluetoothDeviceAddress = prefs.getBtAddress();
         if (mBluetoothDeviceAddress.equals("")) {
             setConnectionState(G4ConnectionState.CLOSED);
+            delayedReconnect(RECONNECT_LONG);
             throw new IOException("Invalid bluetooth address");
         }
         final IntentFilter bondIntent = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
@@ -177,6 +181,7 @@ public class BluetoothTransport implements DeviceTransport {
         if (!finalCallback) {
             Log.e(TAG, "Timeout while opening BLE connection to receiver");
             setConnectionState(G4ConnectionState.CLOSED);
+            delayedReconnect(RECONNECT_LONG);
             throw new IOException("Timeout while opening BLE connection to receiver");
         }
         Log.d(TAG, "Successfully made it to the end of open");
@@ -207,6 +212,7 @@ public class BluetoothTransport implements DeviceTransport {
         if (!isConnected()) {
             Log.e(TAG, "Unable to write to device. Device not connected");
             setConnectionState(G4ConnectionState.CLOSED);
+            delayedReconnect(RECONNECT_SHORT);
             throw new IOException("Unable to write to device. Device not connected");
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -242,6 +248,7 @@ public class BluetoothTransport implements DeviceTransport {
         if (!isConnected()) {
             Log.d(TAG, "Unable to read. Disconnected from receiver.");
             setConnectionState(G4ConnectionState.CLOSED);
+            delayedReconnect(RECONNECT_SHORT);
             throw new IOException("Disconnected from device. Unable to read");
         }
         setConnectionState(G4ConnectionState.READING);
@@ -319,6 +326,7 @@ public class BluetoothTransport implements DeviceTransport {
         if (mBluetoothAdapter == null || address == null) {
             Log.d(TAG, "BluetoothAdapter not initialized or unspecified address.");
             setConnectionState(G4ConnectionState.CLOSED);
+            delayedReconnect(RECONNECT_LONG);
             return false;
         }
 
@@ -328,6 +336,8 @@ public class BluetoothTransport implements DeviceTransport {
             mBluetoothGatt.close();
             mBluetoothGatt = null;
             Log.d(TAG, "Bluetooth Gatt closed.");
+            delayedReconnect(RECONNECT_LONG);
+            return false;
         }
 
         for (BluetoothDevice bluetoothDevice : mBluetoothAdapter.getBondedDevices()) {
@@ -445,7 +455,7 @@ public class BluetoothTransport implements DeviceTransport {
                 setConnectionState(G4ConnectionState.CLOSED);
                 mConnectionState = STATE_DISCONNECTED;
                 Log.w(TAG, "Connection was unexpectedly lost. Attempting to reconnect");
-
+                delayedReconnect(RECONNECT_SHORT);
             } else {
                 Log.w(TAG, "Gatt callback... strange state.");
             }
