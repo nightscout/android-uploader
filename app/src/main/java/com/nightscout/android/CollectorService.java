@@ -208,17 +208,22 @@ public class CollectorService extends Service {
                 Log.w(TAG, "Driver is null");
                 return null;
             }
+
+            long nextUploadTime = Minutes.minutes(2).toStandardDuration().getMillis();
             if (!device.isConnected()) {
                 Log.e(TAG, "Device is not connected");
                 try {
                     driver.open();
+                    Log.i(TAG, "Device was opened for download");
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "Unable to open device, will keep trying", e);
+                    setNextPoll(nextUploadTime);
                     return null;
                 }
             } else {
                 Log.e(TAG, "Device is connected");
             }
+
             int numOfPages = params[0];
             String syncType = params[1] == 0 ? STD_SYNC : GAP_SYNC;
             ((DexcomG4) device).setNumOfPages(numOfPages);
@@ -230,6 +235,8 @@ public class CollectorService extends Service {
             try {
                 download = (G4Download) device.download();
                 if (download == null || download.download_timestamp == null || download.receiver_system_time_sec == null) {
+                    Log.e(TAG, "Bad download, will try again");
+                    setNextPoll(nextUploadTime);
                     return null;
                 }
                 SensorRecord lastSensorRecord = null;
@@ -304,17 +311,16 @@ public class CollectorService extends Service {
             }
             wl.release();
 
-            if (syncType.equals(GAP_SYNC)) {
-                return download;
+            if (!syncType.equals(GAP_SYNC)) {
+                if (download != null && download.sgv.size() > 0) {
+                    long rcvrTime = download.receiver_system_time_sec;
+                    long refTime = DateTime.parse(download.download_timestamp).getMillis();
+                    EGVRecord lastEgvRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), download.receiver_system_time_sec, refTime);
+                    nextUploadTime = Duration.standardSeconds(Minutes.minutes(5).toStandardSeconds().getSeconds() - ((rcvrTime - lastEgvRecord.getRawSystemTimeSeconds()) % Minutes.minutes(5).toStandardSeconds().getSeconds())).getMillis();
+                }
+                setNextPoll(nextUploadTime);
             }
-            long nextUploadTime = Minutes.minutes(2).toStandardDuration().getMillis();
-            if (download != null && download.sgv.size() > 0) {
-                long rcvrTime = download.receiver_system_time_sec;
-                long refTime = DateTime.parse(download.download_timestamp).getMillis();
-                EGVRecord lastEgvRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), download.receiver_system_time_sec, refTime);
-                nextUploadTime = Duration.standardSeconds(Minutes.minutes(5).toStandardSeconds().getSeconds() - ((rcvrTime - lastEgvRecord.getRawSystemTimeSeconds()) % Minutes.minutes(5).toStandardSeconds().getSeconds())).getMillis();
-            }
-            setNextPoll(nextUploadTime);
+
             return download;
         }
     }
