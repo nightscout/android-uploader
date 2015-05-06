@@ -21,11 +21,11 @@ public class MqttTimerReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals(Constants.RECONNECT_INTENT_FILTER)) {
+//        if (intent.getAction().equals(Constants.RECONNECT_INTENT_FILTER)) {
             Log.d(TAG, "Received broadcast to that time is up. Observers: " + observers.size());
             for (MqttTimerObserver observer : observers) {
                 observer.timerUp();
             }
-        }
+//        }
     }
 }
