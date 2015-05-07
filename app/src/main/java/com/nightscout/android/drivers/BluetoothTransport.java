@@ -216,7 +216,7 @@ public class BluetoothTransport implements DeviceTransport {
             throw new IOException("Unable to write to device. Device not connected");
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mBluetoothGatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH);
+            requestConnectionPriority();
         }
         setConnectionState(G4ConnectionState.WRITING);
         // TODO: The bluetooth protocol has 2 additional bytes, a message index and message count,
@@ -264,10 +264,15 @@ public class BluetoothTransport implements DeviceTransport {
         }
         Log.d(TAG, "From asyncReader observable: " + Utils.bytesToHex(asyncReader.getResponse()));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mBluetoothGatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_BALANCED);
+            requestConnectionPriority();
         }
         setConnectionState(G4ConnectionState.CONNECTED);
         return asyncReader.getResponse();
+    }
+
+    @TargetApi(21)
+    private void requestConnectionPriority() {
+        mBluetoothGatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH);
     }
 
     public boolean isConnected() {
