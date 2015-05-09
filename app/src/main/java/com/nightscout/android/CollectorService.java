@@ -210,7 +210,19 @@ public class CollectorService extends Service {
             }
 
             long nextUploadTime = Minutes.minutes(2).toStandardDuration().getMillis();
-            if (!device.isConnected()) {
+
+            SupportedDevices deviceType = preferences.getDeviceType();
+
+            if (deviceType == SupportedDevices.DEXCOM_G4) {
+                try {
+                    driver.open();
+                    Log.i(TAG, "DEXCOM_G4 was opened for download");
+                } catch (IOException e) {
+                    Log.e(TAG, "Unable to open DEXCOM_G4, will keep trying", e);
+                    setNextPoll(nextUploadTime);
+                    return null;
+                }
+            } else if (!device.isConnected()) {
                 Log.e(TAG, "Device is not connected");
                 try {
                     driver.open();
