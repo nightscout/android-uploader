@@ -45,9 +45,9 @@ public class AndroidMqttTimer implements MqttTimer {
         alarmIntent.putExtra("device", Id);
         pendingAlarmIntent = PendingIntent.getBroadcast(context, 61 + Id, alarmIntent, 0);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            alarmMgr.setExact(AlarmManager.RTC_WAKEUP, new Date().getTime() + delayMs, pendingAlarmIntent);
+            alarmMgr.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayMs, pendingAlarmIntent);
         } else {
-            alarmMgr.set(AlarmManager.RTC_WAKEUP, new Date().getTime() + delayMs, pendingAlarmIntent);
+            alarmMgr.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayMs, pendingAlarmIntent);
         }
     }
 

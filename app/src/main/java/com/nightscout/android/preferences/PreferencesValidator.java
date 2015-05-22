@@ -44,7 +44,6 @@ public class PreferencesValidator {
             uri = URI.create(restApiUri);
             URLEncoder.encode(uri.getAuthority(), "UTF-8");
         } catch (Exception e) {
-            Log.e("XXX", "Exception: " + e.getMessage());
             return Optional.of(context.getString(R.string.invalid_rest_uri, restApiUri));
         }
         if (RestUriUtils.isV1Uri(uri)) {

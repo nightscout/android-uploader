@@ -41,15 +41,35 @@ public class DexcomG4 extends AbstractDevice {
     protected DeviceTransport transport;
     protected String receiverId = "";
     protected String transmitterId = "";
+    protected List<SensorRecord> lastSensorRecords;
+    protected List<CalRecord> lastCalRecords;
 
-    protected Action1<Boolean> connectionStateListener = new Action1<Boolean>() {
+    protected Action1<G4ConnectionState> connectionStateListener = new Action1<G4ConnectionState>() {
 
         @Override
-        public void call(Boolean connected) {
-            if (connected) {
-                onConnect();
-            } else {
-                onDisconnect();
+        public void call(G4ConnectionState connected) {
+            switch (connected) {
+                case CONNECTING:
+                    onConnecting();
+                    break;
+                case CONNECTED:
+                    onConnect();
+                    break;
+                case CLOSED:
+                    onDisconnect();
+                    break;
+                case CLOSING:
+                    onDisconnecting();
+                    break;
+                case READING:
+                    onReading();
+                    break;
+                case WRITING:
+                    onWriting();
+                    break;
+                default:
+                    break;
+
             }
         }
     };
@@ -78,9 +98,9 @@ public class DexcomG4 extends AbstractDevice {
 //        ReadData readData = new ReadData(transport);
 //        try {
 //            receiverId = readData.readSerialNumber();
-//            transmitterId = readData.readTrasmitterId();
 //            log.debug("ReceiverId: {}", receiverId);
-//            log.debug("TransmitterId: {}", transmitterId);
+////            transmitterId = readData.readTrasmitterId();
+////            log.debug("TransmitterId: {}", transmitterId);
 //        } catch (IOException e) {
 //            log.error("Exception {}", e);
 //            e.printStackTrace();
@@ -138,6 +158,9 @@ public class DexcomG4 extends AbstractDevice {
             if (recentRecords.size() > 0) {
                 EGVRecord lastEgvRecord = recentRecords.get(recentRecords.size() - 1);
                 cookieMonsterG4SGVs = EGVRecord.toProtobufList(recentRecords);
+                boolean hasSensorData = (lastEgvRecord.getRawSystemTimeSeconds() > preferences.getLastEgvSysTime());
+                preferences.setLastEgvSysTime(lastEgvRecord.getRawSystemTimeSeconds());
+
 
                 UIDownload uiDownload = new UIDownload();
                 uiDownload.download = downloadBuilder.sgv(cookieMonsterG4SGVs)
@@ -146,10 +169,11 @@ public class DexcomG4 extends AbstractDevice {
                         .build();
                 bus.post(uiDownload);
 
-                if (preferences.isRawEnabled()) {
+                if ((preferences.isRawEnabled() && hasSensorData) || (preferences.isRawEnabled() && lastSensorRecords == null)) {
                     sensorRecords = readData.getRecentSensorRecords(numOfPages, systemTime, dateTime.getMillis());
-                    preferences.setLastEgvSysTime(lastEgvRecord.getRawSystemTimeSeconds());
+                    lastSensorRecords = sensorRecords;
                 } else {
+                    sensorRecords = lastSensorRecords;
                     log.warn("Seems to be no new egv data. Assuming no sensor data either");
                 }
                 cookieMonsterG4Sensors = SensorRecord.toProtobufList(sensorRecords);
@@ -170,14 +194,19 @@ public class DexcomG4 extends AbstractDevice {
                 if (meterRecords.size() > 0) {
                     MeterRecord lastMeterRecord = meterRecords.get(meterRecords.size() - 1);
                     hasCalData = (lastMeterRecord.getRawSystemTimeSeconds() > preferences.getLastMeterSysTime());
+//                    hasCalData = true;
                     preferences.setLastMeterSysTime(lastMeterRecord.getRawSystemTimeSeconds());
                 }
+            } else {
+                hasCalData = true;
             }
 
-            if (preferences.isRawEnabled() && (hasCalData || !preferences.isMeterUploadEnabled())) {
+            if ((preferences.isRawEnabled() && hasCalData) || (preferences.isRawEnabled() && lastCalRecords == null)) {
                 calRecords = readData.getRecentCalRecords(systemTime, dateTime.getMillis());
+                lastCalRecords = calRecords;
             } else {
-                log.warn("Seems to be no new new meter data or meter data is disabled. Assuming no meter data");
+                calRecords = lastCalRecords;
+                log.warn("Seems to be no new new meter data or meter data is disabled. Assuming no cal data");
             }
 
             if (preferences.isInsertionUploadEnabled()) {

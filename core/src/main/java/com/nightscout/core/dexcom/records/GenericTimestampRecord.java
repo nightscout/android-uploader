@@ -78,7 +78,9 @@ abstract public class GenericTimestampRecord {
     public static <T extends Message, S extends GenericTimestampRecord> List<T> toProtobufList(
             List<S> list, Class<T> clazz) {
         List<T> results = new ArrayList<>();
-
+        if (list == null) {
+            return new ArrayList<>();
+        }
         for (GenericTimestampRecord record : list) {
             results.add(clazz.cast(record.toProtobuf()));
         }

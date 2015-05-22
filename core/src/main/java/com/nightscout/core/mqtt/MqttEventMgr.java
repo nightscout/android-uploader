@@ -107,14 +107,20 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
     }
 
     public void reconnect() {
-        if (pinger.isNetworkActive()) {
+//        if (pinger.isNetworkActive()) {
             log.info("MQTT issuing reconnect");
             disconnect();
-            connect();
-        } else {
-            reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
-                    messages.getString("mqtt_reconnect_fail"));
-        }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    connect();
+                }
+            }).start();
+//        } else {
+//            reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
+//                    messages.getString("mqtt_reconnect_fail"));
+//            delayedReconnect();
+//        }
     }
 
     public void disconnect() {

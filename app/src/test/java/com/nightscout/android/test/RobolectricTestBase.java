@@ -1,18 +1,18 @@
 package com.nightscout.android.test;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.*;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.nightscout.android.BuildConfig;
 
+import com.nightscout.android.CollectorService;
+import com.nightscout.android.ProcessorService;
 import net.tribe7.common.base.Function;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
@@ -33,11 +33,21 @@ public class RobolectricTestBase {
         // https://github.com/robolectric/robolectric/issues/1075
         getShadowApplication().declareActionUnbindable("com.google.android.gms.analytics.service.START");
         GoogleAnalytics.getInstance(getContext()).setAppOptOut(true);
+        mockServices();
     }
 
     @Test
     public void doSomething() {
 
+    }
+
+    private void mockServices(){
+        CollectorService.LocalBinder collectorBinder = Mockito.mock(CollectorService.LocalBinder.class);
+        Mockito.when(collectorBinder.getService()).thenReturn(Mockito.mock(CollectorService.class));
+        getShadowApplication().setComponentNameAndServiceForBindService(new ComponentName("com.nightscout.android", "CollectorService"), collectorBinder);
+        ProcessorService.LocalBinder processorBinder = Mockito.mock(ProcessorService.LocalBinder.class);
+        Mockito.when(processorBinder.getService()).thenReturn(Mockito.mock(ProcessorService.class));
+        getShadowApplication().setComponentNameAndServiceForBindService(new ComponentName("com.nightscout.android", "ProcessorService"), collectorBinder);
     }
 
     public void whenOnBroadcastReceived(String intentKey, final Function<Intent, Void> verifyCallback) {

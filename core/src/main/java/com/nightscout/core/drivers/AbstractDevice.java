@@ -27,7 +27,7 @@ abstract public class AbstractDevice {
     protected EventReporter reporter;
     protected ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle",
             Locale.getDefault());
-    protected DeviceState connectionStatus = DeviceState.DISCONNECTED;
+    protected G4ConnectionState connectionStatus = G4ConnectionState.CLOSED;
 
     public abstract boolean isConnected();
 
@@ -42,11 +42,9 @@ abstract public class AbstractDevice {
 
     public final Message download() {
         try {
-            onActivity(true);
             Message download = doDownload();
             // TODO figure out a way to not make this specific to the G4
             onDownload(((G4Download) download).download_status == DownloadStatus.SUCCESS);
-            onActivity(false);
             return download;
         } catch (Exception e) {
             reporter.report(EventType.DEVICE, EventSeverity.ERROR, "Unknown error - " + e.getMessage());
@@ -67,7 +65,13 @@ abstract public class AbstractDevice {
         log.debug("Connection detected in abstract class");
         reporter.report(EventType.DEVICE, EventSeverity.INFO,
                 messages.getString("g4_connected"));
-        connectionStatus = DeviceState.CONNECTED;
+        connectionStatus = G4ConnectionState.CONNECTED;
+        postConnectionStatus();
+    }
+
+    protected void onConnecting() {
+        log.debug("Connecting to device");
+        connectionStatus = G4ConnectionState.CONNECTING;
         postConnectionStatus();
     }
 
@@ -75,22 +79,40 @@ abstract public class AbstractDevice {
         log.debug("Disconnection detected in abstract class");
         reporter.report(EventType.DEVICE, EventSeverity.INFO,
                 messages.getString("g4_disconnected"));
-        connectionStatus = DeviceState.DISCONNECTED;
+        connectionStatus = G4ConnectionState.CLOSED;
         postConnectionStatus();
     }
 
-    public void onActivity(boolean enabled) {
-        log.debug("Activity change detected for device: {}", enabled);
-        if (enabled) {
-            connectionStatus = DeviceState.ACTIVE;
-        } else {
-            connectionStatus = (isConnected()) ? DeviceState.CONNECTED : DeviceState.DISCONNECTED;
-        }
+    protected void onDisconnecting() {
+        log.debug("Disconnecting from device");
+        connectionStatus = G4ConnectionState.CLOSING;
         postConnectionStatus();
     }
+
+    protected void onReading() {
+        log.debug("Reading from device");
+        connectionStatus = G4ConnectionState.READING;
+        postConnectionStatus();
+    }
+
+    protected void onWriting() {
+        log.debug("Writing to device");
+        connectionStatus = G4ConnectionState.WRITING;
+        postConnectionStatus();
+    }
+
+//    public void onActivity(boolean enabled) {
+//        log.debug("Activity change detected for device: {}", enabled);
+//        if (enabled) {
+//            connectionStatus = G4ConnectionState.ACTIVE;
+//        } else {
+//            connectionStatus = (isConnected()) ? DeviceState.CONNECTED : DeviceState.DISCONNECTED;
+//        }
+//        postConnectionStatus();
+//    }
 
     public DeviceConnectionStatus getDeviceConnectionStatus() {
-        log.warn("Device type from device: {}", deviceType);
+//        log.warn("Device type from device: {}", deviceType);
         return new DeviceConnectionStatus(deviceType, connectionStatus);
     }
 

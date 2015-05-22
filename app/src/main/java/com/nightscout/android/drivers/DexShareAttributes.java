@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class DexShareAttributes {
 
-    public static String CLIENT_CHARACTERISTIC_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
+    public static final UUID CLIENT_CHARACTERISTIC_CONFIG = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
     //Share Characteristic Strings
     public static final UUID AuthenticationCode = UUID.fromString("F0ABACAC-EBFA-F96F-28DA-076C35A521DB");
@@ -22,6 +22,9 @@ public class DexShareAttributes {
     public static final UUID Command2 = UUID.fromString("F0ACB0CC-EBFA-F96F-28DA-076C35A521DB"); // read, write
     public static final UUID Response2 = UUID.fromString("F0ACB0CD-EBFA-F96F-28DA-076C35A521DB"); // indicate, read, write
     public static final UUID HeartBeat2 = UUID.fromString("F0AC2B18-EBFA-F96F-28DA-076C35A521DB"); // notify, read
+    public final static UUID GENERIC_ATTRIBUTE_SERVICE = UUID.fromString("00001801-0000-1000-8000-00805f9b34fb");
+    public final static UUID SERVICE_CHANGED_CHARACTERISTIC = UUID.fromString("00002A05-0000-1000-8000-00805f9b34fb");
+
 
     //Device Info
     public static final UUID DeviceService = UUID.fromString("00001804-0000-1000-8000-00805f9b34fb");

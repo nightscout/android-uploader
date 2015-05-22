@@ -67,7 +67,6 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
             @Override
             public void onClick(MaterialSection materialSection) {
                 Intent syncIntent = new Intent(getApplicationContext(), CollectorService.class);
-                syncIntent.putExtra("requested", true);
                 syncIntent.setAction(CollectorService.ACTION_POLL);
                 syncIntent.putExtra(CollectorService.NUM_PAGES, 1);
                 syncIntent.putExtra(CollectorService.SYNC_TYPE, CollectorService.STD_SYNC);
@@ -81,7 +80,6 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
             public void onClick(MaterialSection materialSection) {
                 Log.d(TAG, "Sync requested");
                 Intent syncIntent = new Intent(getApplicationContext(), CollectorService.class);
-                syncIntent.putExtra("requested", true);
                 syncIntent.setAction(CollectorService.ACTION_POLL);
                 syncIntent.putExtra(CollectorService.NUM_PAGES, 20);
                 syncIntent.putExtra(CollectorService.SYNC_TYPE, CollectorService.GAP_SYNC);
@@ -111,7 +109,7 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
         Intent uploadIntent = new Intent(getBaseContext(), ProcessorService.class);
         getApplicationContext().startService(uploadIntent);
         syncIntent = new Intent(getApplicationContext(), CollectorService.class);
-        syncIntent.putExtra(CollectorService.SYNC_TYPE, CollectorService.NON_SYNC);
+        syncIntent.putExtra(CollectorService.SYNC_TYPE, CollectorService.STD_SYNC);
         getApplicationContext().startService(syncIntent);
 
         Log.d(TAG, "Service should be started");

@@ -26,18 +26,21 @@ import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.core.BusProvider;
 import com.nightscout.core.dexcom.CRCFailError;
+import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.EGVRecord;
+import com.nightscout.core.dexcom.records.SensorRecord;
 import com.nightscout.core.drivers.AbstractDevice;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.drivers.DeviceConnectionStatus;
-import com.nightscout.core.drivers.DeviceState;
 import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DexcomG4;
+import com.nightscout.core.drivers.G4ConnectionState;
 import com.nightscout.core.drivers.SupportedDevices;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.G4Download;
+import com.nightscout.core.utils.IsigReading;
 import com.squareup.otto.Bus;
 
 import org.joda.time.DateTime;
@@ -56,7 +59,6 @@ public class CollectorService extends Service {
     public static final String NUM_PAGES = "NUM_PAGES";
     public static final String STD_SYNC = "STD_SYNC";
     public static final String GAP_SYNC = "GAP_SYNC";
-    public static final String NON_SYNC = "NON_SYNC";
     public static final String SYNC_TYPE = "SYNC_TYPE";
 
     private EventReporter reporter;
@@ -106,7 +108,7 @@ public class CollectorService extends Service {
                             e.printStackTrace();
                         }
                     }
-                    setDriver();
+//                    setDriver();
                 } else {
                     Log.d(TAG, "Meh... something uninteresting changed");
                 }
@@ -144,20 +146,20 @@ public class CollectorService extends Service {
                         DexcomG4.PROTOCOL);
             }
         }
-        try {
-            if (driver == null) {
-                Log.d("Last hope", "Driver is NULL?!");
-                return;
-            }
-            if ((deviceType == SupportedDevices.DEXCOM_G4 && driver.isConnected())
-                    || deviceType == SupportedDevices.DEXCOM_G4_SHARE2) {
-                driver.open();
-            }
-        } catch (IOException e) {
-            Log.e(TAG, "IOException: " + e.getMessage());
-            //TODO record this in the event log later
-//            status = DownloadStatus.IO_ERROR;
-        }
+//        try {
+//            if (driver == null) {
+//                Log.d(TAG, "Driver is NULL?!");
+//                return;
+//            }
+//            if ((deviceType == SupportedDevices.DEXCOM_G4 && driver.isConnected())
+//                    || deviceType == SupportedDevices.DEXCOM_G4_SHARE2) {
+//                driver.open();
+//            }
+//        } catch (IOException e) {
+//            Log.e(TAG, "IOException: " + e.getMessage());
+//            //TODO record this in the event log later
+////            status = DownloadStatus.IO_ERROR;
+//        }
     }
 
     @Override
@@ -180,21 +182,21 @@ public class CollectorService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "Starting service");
-        if (device == null) {
-            Log.d(TAG, "Device is null!");
+//        if (device == null) {
+//            Log.d(TAG, "Device is null!");
 //            ACRA.getErrorReporter().handleException(null);
-            return START_STICKY;
-        }
+//            return START_STICKY;
+//        }
         if (intent == null) {
             Log.d(TAG, "Intent is null!");
 //            ACRA.getErrorReporter().handleException(null);
             return START_STICKY;
         }
-        if (device.isConnected() || intent.getBooleanExtra("requested", false)) {
+//        if (device.isConnected()) {
             int numOfPages = intent.getIntExtra(NUM_PAGES, 2);
             int syncType = intent.getStringExtra(SYNC_TYPE).equals(STD_SYNC) ? 0 : 1;
             new AsyncDownload().execute(numOfPages, syncType);
-        }
+//        }
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -202,6 +204,38 @@ public class CollectorService extends Service {
 
         @Override
         protected G4Download doInBackground(Integer... params) {
+            if (driver == null) {
+                Log.w(TAG, "Driver is null");
+                return null;
+            }
+
+            long nextUploadTime = Minutes.minutes(2).toStandardDuration().getMillis();
+
+            SupportedDevices deviceType = preferences.getDeviceType();
+
+            if (deviceType == SupportedDevices.DEXCOM_G4) {
+                try {
+                    driver.open();
+                    Log.i(TAG, "DEXCOM_G4 was opened for download");
+                } catch (IOException e) {
+                    Log.e(TAG, "Unable to open DEXCOM_G4, will keep trying", e);
+                    setNextPoll(nextUploadTime);
+                    return null;
+                }
+            } else if (!device.isConnected()) {
+                Log.e(TAG, "Device is not connected");
+                try {
+                    driver.open();
+                    Log.i(TAG, "Device was opened for download");
+                } catch (IOException e) {
+                    Log.e(TAG, "Unable to open device, will keep trying", e);
+                    setNextPoll(nextUploadTime);
+                    return null;
+                }
+            } else {
+                Log.e(TAG, "Device is connected");
+            }
+
             int numOfPages = params[0];
             String syncType = params[1] == 0 ? STD_SYNC : GAP_SYNC;
             ((DexcomG4) device).setNumOfPages(numOfPages);
@@ -212,6 +246,35 @@ public class CollectorService extends Service {
 
             try {
                 download = (G4Download) device.download();
+                if (download == null || download.download_timestamp == null || download.receiver_system_time_sec == null) {
+                    Log.e(TAG, "Bad download, will try again");
+                    setNextPoll(nextUploadTime);
+                    return null;
+                }
+                SensorRecord lastSensorRecord = null;
+                CalRecord lastCalRecord = null;
+                EGVRecord lastEgvRecord = null;
+                long downloadEpoch = DateTime.parse(download.download_timestamp).getMillis();
+                long rcvrTime = download.receiver_system_time_sec;
+                if (download.sensor.size() > 0) {
+                    lastSensorRecord = new SensorRecord(download.sensor.get(download.sensor.size() - 1), rcvrTime, downloadEpoch);
+                } else {
+                    Log.e(TAG, "No sensor records to calculate EGV using isig");
+                }
+                if (download.cal.size() > 0) {
+                    lastCalRecord = new CalRecord(download.cal.get(download.cal.size() - 1), rcvrTime, downloadEpoch);
+                } else {
+                    Log.e(TAG, "No cal records to calculate EGV using isig");
+                }
+                if (download.sgv.size() > 0) {
+                    lastEgvRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), rcvrTime, downloadEpoch);
+                } else {
+                    Log.e(TAG, "No egv records to calculate EGV using isig");
+                }
+                if (lastSensorRecord != null && lastCalRecord != null && lastEgvRecord != null) {
+                    IsigReading isigReading = new IsigReading(lastSensorRecord, lastCalRecord, lastEgvRecord);
+                    Log.e(TAG, "Calculated EGV using isig values: " + isigReading.asMgdl());
+                }
 
                 if (download != null) {
                     bus.post(download);
@@ -260,17 +323,16 @@ public class CollectorService extends Service {
             }
             wl.release();
 
-            if (syncType.equals(GAP_SYNC)) {
-                return download;
+            if (!syncType.equals(GAP_SYNC)) {
+                if (download != null && download.sgv.size() > 0) {
+                    long rcvrTime = download.receiver_system_time_sec;
+                    long refTime = DateTime.parse(download.download_timestamp).getMillis();
+                    EGVRecord lastEgvRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), download.receiver_system_time_sec, refTime);
+                    nextUploadTime = Duration.standardSeconds(Minutes.minutes(5).toStandardSeconds().getSeconds() - ((rcvrTime - lastEgvRecord.getRawSystemTimeSeconds()) % Minutes.minutes(5).toStandardSeconds().getSeconds())).getMillis();
+                }
+                setNextPoll(nextUploadTime);
             }
-            long nextUploadTime = Minutes.minutes(2).toStandardDuration().getMillis();
-            if (download != null && download.sgv.size() > 0) {
-                long rcvrTime = download.receiver_system_time_sec;
-                long refTime = DateTime.parse(download.download_timestamp).getMillis();
-                EGVRecord lastEgvRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), download.receiver_system_time_sec, refTime);
-                nextUploadTime = Duration.standardSeconds(Minutes.minutes(5).toStandardSeconds().getSeconds() - ((rcvrTime - lastEgvRecord.getRawSystemTimeSeconds()) % Minutes.minutes(5).toStandardSeconds().getSeconds())).getMillis();
-            }
-            setNextPoll(nextUploadTime);
+
             return download;
         }
     }
@@ -282,14 +344,15 @@ public class CollectorService extends Service {
 
     public DeviceConnectionStatus getDeviceConnectionStatus() {
         if (device == null) {
-            return new DeviceConnectionStatus(preferences.getDeviceType(), DeviceState.DISCONNECTED);
+            return new DeviceConnectionStatus(preferences.getDeviceType(), G4ConnectionState.CLOSED);
         }
         Log.d(TAG, "From service: " + device.getDeviceConnectionStatus().deviceType.name());
         return device.getDeviceConnectionStatus();
     }
 
     public long getNextPoll() {
-        return nextPoll - System.currentTimeMillis();
+//        return nextPoll - System.currentTimeMillis();
+        return 1000 * 60 * 5 - (nextPoll - System.currentTimeMillis());
     }
 
 
