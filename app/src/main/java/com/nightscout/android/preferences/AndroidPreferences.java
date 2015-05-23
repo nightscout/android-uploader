@@ -356,7 +356,7 @@ public class AndroidPreferences implements NightscoutPreferences {
     }
 
     public boolean isBroadcastEnabled() {
-        return preferences.getBoolean(context.getString(R.string.camping_enable), false);
+        return preferences.getBoolean(context.getString(R.string.broadcast_enable), false);
     }
 
     @Override
