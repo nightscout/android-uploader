@@ -110,6 +110,8 @@
     <string name="pref_summary_raw_data">Data required to calculate raw values</string>
     <string name="pref_summary_camping_enabled">Enable camping mode</string>
     <string name="pref_title_camping_enabled">Camping mode</string>
+    <string name="pref_summary_broadcast_enabled">Enable broadcast of data so other apps can receive it</string>
+    <string name="pref_title_broadcast_enabled">Broadcast data</string>
     <string name="pref_category_title_config_backup">Configuration backups</string>
     <string name="pref_backup_title">Backup configuration</string>
     <string name="pref_restore_title">Restore configuration</string>

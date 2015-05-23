@@ -355,6 +355,10 @@ public class AndroidPreferences implements NightscoutPreferences {
         return preferences.getBoolean(context.getString(R.string.camping_enable), false);
     }
 
+    public boolean isBroadcastEnabled() {
+        return preferences.getBoolean(context.getString(R.string.camping_enable), false);
+    }
+
     @Override
     public long getLastMeterSysTime() {
         return preferences.getLong(context.getString(R.string.last_download_meter_sys_time), 0);
