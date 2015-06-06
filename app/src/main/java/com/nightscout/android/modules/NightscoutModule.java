@@ -20,15 +20,16 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module(
-        includes = {
-                PreferencesModule.class,
-                UiModule.class
-        },
-        injects = {
-                Nightscout.class,
-                MonitorFragment.class,
-                NightscoutNavigationDrawer.class
-        }
+    includes = {
+        PreferencesModule.class,
+        UiModule.class
+    },
+    injects = {
+        Nightscout.class,
+        MonitorFragment.class,
+        NightscoutNavigationDrawer.class
+    },
+    library = true
 )
 public class NightscoutModule {
 
