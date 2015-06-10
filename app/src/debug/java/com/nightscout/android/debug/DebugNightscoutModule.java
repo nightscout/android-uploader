@@ -19,13 +19,14 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module(
-        addsTo = NightscoutModule.class,
-        injects = {
-                MonitorFragment.class,
-                DebugAppContainer.class,
-                NightscoutNavigationDrawer.class
-        },
-        overrides = true
+    addsTo = NightscoutModule.class,
+    injects = {
+        MonitorFragment.class,
+        DebugAppContainer.class,
+        NightscoutNavigationDrawer.class
+    },
+    overrides = true,
+    library = true
 )
 public final class DebugNightscoutModule {
     @Provides

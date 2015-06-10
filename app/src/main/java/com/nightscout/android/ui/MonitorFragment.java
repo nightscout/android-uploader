@@ -6,12 +6,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -28,8 +26,6 @@ import com.nightscout.android.Nightscout;
 import com.nightscout.android.ProcessorService;
 import com.nightscout.android.R;
 import com.nightscout.android.events.UserEventPanelActivity;
-import com.nightscout.android.exceptions.FeedbackDialog;
-import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.core.BusProvider;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
@@ -65,7 +61,7 @@ import static com.nightscout.core.dexcom.SpecialValue.isSpecialValue;
 import static org.joda.time.Duration.standardMinutes;
 
 public class MonitorFragment extends Fragment {
-    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+    protected static final Logger log = LoggerFactory.getLogger(MonitorFragment.class);
 
     private Handler mHandler = new Handler();
     // UI components
@@ -84,21 +80,14 @@ public class MonitorFragment extends Fragment {
     ProgressBar progressBar;
     private Bus bus = BusProvider.getInstance();
 
-    private String mJSONData;
-    //    private AndroidPreferences preferences;
     private long lastRecordTime;
 
     @Inject
     NightscoutPreferences preferences;
-    @Inject
-    AppContainer appContainer;
-    @Inject
-    FeedbackDialog feedbackDialog;
 
     private CollectorService mCollectorService;
     private ProcessorService mProcessorService;
     private boolean mBound = false;
-//    private Handler mHandler;
 
     private ServiceConnection mCollectorConnection = new ServiceConnection() {
 
@@ -160,7 +149,6 @@ public class MonitorFragment extends Fragment {
 
         progressBar.setMax((int) Minutes.minutes(5).toStandardDuration().getMillis());
         progressBar.setProgress(0);
-        preferences = new AndroidPreferences(getActivity());
         mTextSGV.setTag(R.string.display_sgv, -1);
         mTextSGV.setTag(R.string.display_trend, preferences.getPreferredUnits().ordinal());
         mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -199,29 +187,26 @@ public class MonitorFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE2) {
-            receiverButton.setBackgroundResource(R.drawable.ic_noble);
-        }
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        SharedPreferences.OnSharedPreferenceChangeListener prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if (key.equals(getString(R.string.dexcom_device_type))) {
-                    log.debug("Receiver type was changed...");
-                    int res = preferences.getDeviceType() == SupportedDevices.DEXCOM_G4 ? R.drawable.ic_nousb : R.drawable.ic_noble;
-                    setReceiverButtonRes(res);
-                }
-                if (key.equals(getString(R.string.preferred_units))) {
-                    log.debug("Preferred units type was changed...");
-                    mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(preferences.getPreferredUnits() == GlucoseUnit.MMOL) + ")");
-                    restoreSgvText();
-                }
-            }
-        };
-        prefs.registerOnSharedPreferenceChangeListener(prefListener);
+
+        refreshSettingBoundUis();
 
         mHandler.post(updateProgress);
         return view;
+    }
+
+    private void refreshSettingBoundUis() {
+      refreshDeviceType();
+      refreshUnits();
+    }
+
+    private void refreshDeviceType() {
+      int res = preferences.getDeviceType() == SupportedDevices.DEXCOM_G4 ? R.drawable.ic_nousb : R.drawable.ic_noble;
+      setReceiverButtonRes(res);
+    }
+
+    private void refreshUnits() {
+      mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(preferences.getPreferredUnits() == GlucoseUnit.MMOL) + ")");
+      restoreSgvText();
     }
 
     private Runnable updateProgress = new Runnable() {
@@ -270,11 +255,9 @@ public class MonitorFragment extends Fragment {
 
         }
 
-        mWebView.loadUrl("javascript:updateUnits(" + Boolean.toString(preferences.getPreferredUnits() == GlucoseUnit.MMOL) + ")");
-
         mHandler.post(updateTimeAgo);
         mHandler.post(updateProgress);
-        restoreSgvText();
+        refreshSettingBoundUis();
         super.onResume();
     }
 
@@ -293,18 +276,10 @@ public class MonitorFragment extends Fragment {
         setSgvText(reading, TrendArrow.values()[(int) mTextSGV.getTag(R.string.display_trend)]);
     }
 
-//    private String getSGVStringByUnit(GlucoseReading sgv, TrendArrow trend) {
-//        String sgvStr = sgv.asStr(preferences.getPreferredUnits());
-//        return (sgv.asMgdl() != -1) ?
-//                (isSpecialValue(sgv)) ?
-//                        getEGVSpecialValue(sgv).get().toString() : sgvStr + " " + trend.symbol() : "---";
-//    }
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mWebView.saveState(outState);
-        outState.putString("saveJSONData", mJSONData);
         outState.putString("saveTextSGV", mTextSGV.getText().toString());
         outState.putString("saveTextTimestamp", mTextTimestamp.getText().toString());
         if (receiverButton.getTag() != null) {
@@ -427,7 +402,7 @@ public class MonitorFragment extends Fragment {
                 long refTime = DateTime.parse(uiDownload.download.download_timestamp).getMillis();
                 if (uiDownload.download.sgv.size() > 0) {
                     lastRecordTime = new DateTime().getMillis() - Duration.standardSeconds(uiDownload.download.receiver_system_time_sec - uiDownload.download.sgv.get(uiDownload.download.sgv.size() - 1).sys_timestamp_sec).getMillis();
-                    EGVRecord recentRecord = null;
+                    EGVRecord recentRecord;
                     if (uiDownload.download.sgv.size() > 0) {
                         recentRecord = new EGVRecord(uiDownload.download.sgv.get(uiDownload.download.sgv.size() - 1), uiDownload.download.receiver_system_time_sec, refTime);
                         // Reload d3 chart with new data
