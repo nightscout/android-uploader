@@ -4,6 +4,7 @@ import com.nightscout.core.drivers.SupportedDevices;
 import com.nightscout.core.model.GlucoseUnit;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class TestPreferences implements NightscoutPreferences {
@@ -27,6 +28,8 @@ public class TestPreferences implements NightscoutPreferences {
     private boolean mgbUploadEnabled = false;
     private String btAddress = null;
     private String btDeviceName = null;
+    private HashMap<String, HashMap<String, Long>> lastUpload;
+    private SupportedDevices deviceType = SupportedDevices.UNKNOWN;
 
     @Override
     public boolean isRestApiEnabled() {
@@ -193,20 +196,21 @@ public class TestPreferences implements NightscoutPreferences {
         this.askedForData = askedForData;
     }
 
-    // TODO Implement these
     @Override
     public SupportedDevices getDeviceType() {
-        return SupportedDevices.UNKNOWN;
+        return deviceType;
     }
 
-    // TODO Implement these
+    public void setDeviceType(SupportedDevices deviceType) {
+        this.deviceType = deviceType;
+    }
+
     @Override
     public void setBluetoothDevice(String btDeviceName, String btAddress) {
         this.btAddress = btAddress;
         this.btDeviceName = btDeviceName;
     }
 
-    // TODO Implement these
     @Override
     public String getBtAddress() {
         return this.btAddress;
@@ -244,22 +248,136 @@ public class TestPreferences implements NightscoutPreferences {
 
     @Override
     public long getLastMeterSysTime() {
-        return 0;
+        return getLastBaseUpload("ui", "meter");
     }
 
     @Override
     public void setLastMeterSysTime(long meterSysTime) {
-
+        setLastBaseUpload(meterSysTime, "ui", "meter");
     }
 
     @Override
     public long getLastEgvSysTime() {
-        return 0;
+        return getLastBaseUpload("ui", "egv");
     }
 
     @Override
     public void setLastEgvSysTime(long egvSysTime) {
+        setLastBaseUpload(egvSysTime, "ui", "egv");
+    }
 
+    @Override
+    public void setLastEgvMqttUpload(long timestamp) {
+        setLastBaseUpload(timestamp, "mqtt", "egv");
+    }
+
+    @Override
+    public void setLastSensorMqttUpload(long timestamp) {
+        setLastBaseUpload(timestamp, "mqtt", "sensor");
+    }
+
+    @Override
+    public void setLastCalMqttUpload(long timestamp) {
+        setLastBaseUpload(timestamp, "mqtt", "cal");
+    }
+
+    @Override
+    public void setLastMeterMqttUpload(long timestamp) {
+        setLastBaseUpload(timestamp, "mqtt", "meter");
+    }
+
+    @Override
+    public void setLastInsMqttUpload(long timestamp) {
+        setLastBaseUpload(timestamp, "mqtt", "ins");
+    }
+
+    @Override
+    public long getLastEgvMqttUpload() {
+        return getLastBaseUpload("mqtt", "egv");
+    }
+
+    @Override
+    public long getLastSensorMqttUpload() {
+        return getLastBaseUpload("mqtt", "sensor");
+    }
+
+    @Override
+    public long getLastCalMqttUpload() {
+        return getLastBaseUpload("mqtt", "cal");
+    }
+
+    @Override
+    public long getLastMeterMqttUpload() {
+        return getLastBaseUpload("mqtt", "meter");
+    }
+
+    @Override
+    public long getLastInsMqttUpload() {
+        return getLastBaseUpload("mqtt", "ins");
+    }
+
+    @Override
+    public void setLastEgvBaseUpload(long timestamp, String postfix) {
+        setLastBaseUpload(timestamp, postfix, "egv");
+    }
+
+    @Override
+    public void setLastSensorBaseUpload(long timestamp, String postfix) {
+        setLastBaseUpload(timestamp, postfix, "sensor");
+    }
+
+    @Override
+    public void setLastCalBaseUpload(long timestamp, String postfix) {
+        setLastBaseUpload(timestamp, postfix, "cal");
+    }
+
+    @Override
+    public void setLastMeterBaseUpload(long timestamp, String postfix) {
+        setLastBaseUpload(timestamp, postfix, "meter");
+    }
+
+    @Override
+    public void setLastInsBaseUpload(long timestamp, String postfix) {
+        setLastBaseUpload(timestamp, postfix, "ins");
+    }
+
+    @Override
+    public long getLastEgvBaseUpload(String postfix) {
+        return getLastBaseUpload(postfix, "egv");
+    }
+
+    @Override
+    public long getLastSensorBaseUpload(String postfix) {
+        return getLastBaseUpload(postfix, "sensor");
+    }
+
+    @Override
+    public long getLastCalBaseUpload(String postfix) {
+        return getLastBaseUpload(postfix, "cal");
+    }
+
+    @Override
+    public long getLastMeterBaseUpload(String postfix) {
+        return getLastBaseUpload(postfix, "meter");
+    }
+
+    @Override
+    public long getLastInsBaseUpload(String postfix) {
+        return getLastBaseUpload(postfix, "ins");
+    }
+
+    private void setLastBaseUpload(long value, String postfix, String recordType) {
+        HashMap<String, Long> record = new HashMap<>();
+        record.put(recordType, value);
+        lastUpload.put(postfix, record);
+    }
+
+    private long getLastBaseUpload(String postfix, String recordType) {
+        if (lastUpload.containsKey(postfix) && lastUpload.get(postfix).containsKey(recordType)) {
+            return lastUpload.get(postfix).get(recordType);
+        } else {
+            return 0;
+        }
     }
 
     @Override

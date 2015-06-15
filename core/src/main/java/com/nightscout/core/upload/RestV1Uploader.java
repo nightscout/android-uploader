@@ -124,22 +124,19 @@ public class RestV1Uploader extends AbstractRestUploader {
             JSONObject json = toJSONObjectEgv(glucoseDataSet);
             log.error("Json: {}", json);
             if (!preferences.isRawEnabled()) {
-                log.error("Not enabled Json: {}", json);
+                log.debug("Raw not enabled. JSON: {}", json);
                 return doPost("entries", json);
             } else {
                 if (glucoseDataSet.areRecordsMatched()) {
-                    log.error("Records matched Json: {}", json);
-                    return doPost("entries", toJSONObjectSensor(glucoseDataSet, json));
+                    json = toJSONObjectSensor(glucoseDataSet, json);
+                    log.debug("Records matched Json: {}", json);
+                    return doPost("entries", json);
                 } else {
                     log.error("Records not matched Json: {}", json);
                     boolean result = doPost("entries", json);
-                    json = new JSONObject();
-                    json.put("type", "sgv");
-                    result &= doPost("entries", json);
                     return result;
                 }
             }
-//            return doPost("entries", toJSONObject(glucoseDataSet));
         } catch (JSONException e) {
             log.error("Could not create JSON object for rest v1 glucose data set.", e);
             return false;

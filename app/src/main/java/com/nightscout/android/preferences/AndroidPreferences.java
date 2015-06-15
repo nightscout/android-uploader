@@ -247,36 +247,104 @@ public class AndroidPreferences implements NightscoutPreferences {
         preferences.edit().putBoolean(context.getString(R.string.root_enable), enabled).apply();
     }
 
+    @Override
     public void setLastEgvMqttUpload(long timestamp) {
         preferences.edit().putLong(context.getString(R.string.last_mqtt_egv_time), timestamp).apply();
     }
 
+    @Override
     public void setLastSensorMqttUpload(long timestamp) {
         preferences.edit().putLong(context.getString(R.string.last_mqtt_sensor_time), timestamp).apply();
     }
 
+    @Override
     public void setLastCalMqttUpload(long timestamp) {
         preferences.edit().putLong(context.getString(R.string.last_mqtt_cal_time), timestamp).apply();
     }
 
+    @Override
     public void setLastMeterMqttUpload(long timestamp) {
         preferences.edit().putLong(context.getString(R.string.last_mqtt_meter_time), timestamp).apply();
     }
 
+    @Override
+    public void setLastInsMqttUpload(long timestamp) {
+        preferences.edit().putLong(context.getString(R.string.last_mqtt_ins_time), timestamp).apply();
+    }
+
+    @Override
     public long getLastEgvMqttUpload() {
         return preferences.getLong(context.getString(R.string.last_mqtt_egv_time), 0);
     }
 
+    @Override
     public long getLastSensorMqttUpload() {
         return preferences.getLong(context.getString(R.string.last_mqtt_sensor_time), 0);
     }
 
+    @Override
     public long getLastCalMqttUpload() {
         return preferences.getLong(context.getString(R.string.last_mqtt_cal_time), 0);
     }
 
+    @Override
     public long getLastMeterMqttUpload() {
         return preferences.getLong(context.getString(R.string.last_mqtt_meter_time), 0);
+    }
+
+    @Override
+    public long getLastInsMqttUpload() {
+        return preferences.getLong(context.getString(R.string.last_mqtt_ins_time), 0);
+    }
+
+    @Override
+    public void setLastEgvBaseUpload(long timestamp, String postfix) {
+        preferences.edit().putLong(context.getString(R.string.last_uploader_egv_time_prefix) + postfix, timestamp).apply();
+    }
+
+    @Override
+    public void setLastSensorBaseUpload(long timestamp, String postfix) {
+        preferences.edit().putLong(context.getString(R.string.last_uploader_sensor_time_prefix) + postfix, timestamp).apply();
+    }
+
+    @Override
+    public void setLastCalBaseUpload(long timestamp, String postfix) {
+        preferences.edit().putLong(context.getString(R.string.last_uploader_cal_time_prefix) + postfix, timestamp).apply();
+    }
+
+    @Override
+    public void setLastMeterBaseUpload(long timestamp, String postfix) {
+        preferences.edit().putLong(context.getString(R.string.last_uploader_meter_time_prefix) + postfix, timestamp).apply();
+    }
+
+    @Override
+    public void setLastInsBaseUpload(long timestamp, String postfix) {
+        preferences.edit().putLong(context.getString(R.string.last_uploader_ins_time_prefix) + postfix, timestamp).apply();
+    }
+
+    @Override
+    public long getLastEgvBaseUpload(String postfix) {
+        return preferences.getLong(context.getString(R.string.last_uploader_egv_time_prefix) + postfix, 0);
+    }
+
+    @Override
+    public long getLastSensorBaseUpload(String postfix) {
+        return preferences.getLong(context.getString(R.string.last_uploader_sensor_time_prefix) + postfix, 0);
+    }
+
+    @Override
+    public long getLastCalBaseUpload(String postfix) {
+        return preferences.getLong(context.getString(R.string.last_uploader_cal_time_prefix) + postfix, 0);
+    }
+
+    @Override
+    public long getLastMeterBaseUpload(String postfix) {
+        return preferences.getLong(context.getString(R.string.last_uploader_meter_time_prefix) + postfix, 0);
+    }
+
+    @Override
+    public long getLastInsBaseUpload(String postfix) {
+        return preferences.getLong(context.getString(R.string.last_uploader_ins_time_prefix) + postfix, 0);
     }
 
     public long getLastRecordTime(String recType, String uploadType) {

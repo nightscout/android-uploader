@@ -182,21 +182,13 @@ public class CollectorService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "Starting service");
-//        if (device == null) {
-//            Log.d(TAG, "Device is null!");
-//            ACRA.getErrorReporter().handleException(null);
-//            return START_STICKY;
-//        }
         if (intent == null) {
             Log.d(TAG, "Intent is null!");
-//            ACRA.getErrorReporter().handleException(null);
             return START_STICKY;
         }
-//        if (device.isConnected()) {
-            int numOfPages = intent.getIntExtra(NUM_PAGES, 2);
-            int syncType = intent.getStringExtra(SYNC_TYPE).equals(STD_SYNC) ? 0 : 1;
-            new AsyncDownload().execute(numOfPages, syncType);
-//        }
+        int numOfPages = intent.getIntExtra(NUM_PAGES, 2);
+        int syncType = intent.getStringExtra(SYNC_TYPE).equals(STD_SYNC) ? 0 : 1;
+        new AsyncDownload().execute(numOfPages, syncType);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -219,6 +211,7 @@ public class CollectorService extends Service {
                     Log.i(TAG, "DEXCOM_G4 was opened for download");
                 } catch (IOException e) {
                     Log.e(TAG, "Unable to open DEXCOM_G4, will keep trying", e);
+                    Log.w(TAG, "Next poll setting to default #1");
                     setNextPoll(nextUploadTime);
                     return null;
                 }
@@ -229,6 +222,7 @@ public class CollectorService extends Service {
                     Log.i(TAG, "Device was opened for download");
                 } catch (IOException e) {
                     Log.e(TAG, "Unable to open device, will keep trying", e);
+                    Log.w(TAG, "Next poll setting to default #2");
                     setNextPoll(nextUploadTime);
                     return null;
                 }
@@ -248,6 +242,7 @@ public class CollectorService extends Service {
                 download = (G4Download) device.download();
                 if (download == null || download.download_timestamp == null || download.receiver_system_time_sec == null) {
                     Log.e(TAG, "Bad download, will try again");
+                    Log.w(TAG, "Next poll setting to default #3");
                     setNextPoll(nextUploadTime);
                     return null;
                 }
@@ -329,7 +324,9 @@ public class CollectorService extends Service {
                     long refTime = DateTime.parse(download.download_timestamp).getMillis();
                     EGVRecord lastEgvRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), download.receiver_system_time_sec, refTime);
                     nextUploadTime = Duration.standardSeconds(Minutes.minutes(5).toStandardSeconds().getSeconds() - ((rcvrTime - lastEgvRecord.getRawSystemTimeSeconds()) % Minutes.minutes(5).toStandardSeconds().getSeconds())).getMillis();
+                    Log.w(TAG, "Actually set next poll");
                 }
+                Log.w(TAG, "Next poll setting to a value #1");
                 setNextPoll(nextUploadTime);
             }
 

@@ -212,7 +212,6 @@ public class MonitorFragment extends Fragment {
     private Runnable updateProgress = new Runnable() {
         @Override
         public void run() {
-            log.debug("Updating progress bar");
             Intent intent = new Intent(getActivity(), CollectorService.class);
             getActivity().bindService(intent, mCollectorConnection, Context.BIND_AUTO_CREATE);
             if (mBound) {
@@ -282,14 +281,6 @@ public class MonitorFragment extends Fragment {
         mWebView.saveState(outState);
         outState.putString("saveTextSGV", mTextSGV.getText().toString());
         outState.putString("saveTextTimestamp", mTextTimestamp.getText().toString());
-        if (receiverButton.getTag() != null) {
-            log.info("Saving device state");
-            outState.putInt("deviceState", (int) receiverButton.getTag());
-        }
-        if (uploadButton.getTag() != null) {
-            log.info("Saving sync state");
-            outState.putInt("syncState", (int) uploadButton.getTag());
-        }
     }
 
     @Override

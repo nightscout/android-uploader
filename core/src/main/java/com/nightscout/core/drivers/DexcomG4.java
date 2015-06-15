@@ -95,16 +95,6 @@ public class DexcomG4 extends AbstractDevice {
     public void onConnect() {
         super.onConnect();
         log.debug("onConnect Called DexcomG4 connection");
-//        ReadData readData = new ReadData(transport);
-//        try {
-//            receiverId = readData.readSerialNumber();
-//            log.debug("ReceiverId: {}", receiverId);
-////            transmitterId = readData.readTrasmitterId();
-////            log.debug("TransmitterId: {}", transmitterId);
-//        } catch (IOException e) {
-//            log.error("Exception {}", e);
-//            e.printStackTrace();
-//        }
     }
 
     @Override
@@ -152,6 +142,13 @@ public class DexcomG4 extends AbstractDevice {
             }
 
             systemTime = readData.readSystemTime();
+            // FIXME: readData.readBatteryLevel() seems to flake out on battery level reads via serial.
+            // Removing for now.
+            if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4) {
+                batLevel = 100;
+            } else if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE2) {
+                batLevel = readData.readBatteryLevel();
+            }
 
             dateTime = new DateTime();
             recentRecords = readData.getRecentEGVsPages(numOfPages, systemTime, dateTime.getMillis());
@@ -161,7 +158,6 @@ public class DexcomG4 extends AbstractDevice {
                 boolean hasSensorData = (lastEgvRecord.getRawSystemTimeSeconds() > preferences.getLastEgvSysTime());
                 preferences.setLastEgvSysTime(lastEgvRecord.getRawSystemTimeSeconds());
 
-
                 UIDownload uiDownload = new UIDownload();
                 uiDownload.download = downloadBuilder.sgv(cookieMonsterG4SGVs)
                         .download_timestamp(dateTime.toString())
@@ -170,7 +166,7 @@ public class DexcomG4 extends AbstractDevice {
                 bus.post(uiDownload);
 
                 if ((preferences.isRawEnabled() && hasSensorData) || (preferences.isRawEnabled() && lastSensorRecords == null)) {
-                    sensorRecords = readData.getRecentSensorRecords(numOfPages, systemTime, dateTime.getMillis());
+                    sensorRecords = readData.getRecentSensorRecords(numOfPages * 2, systemTime, dateTime.getMillis());
                     lastSensorRecords = sensorRecords;
                 } else {
                     sensorRecords = lastSensorRecords;
@@ -184,8 +180,14 @@ public class DexcomG4 extends AbstractDevice {
                         .download_timestamp(dateTime.toString())
                         .download_status(status)
                         .receiver_id(receiverId)
+                        .receiver_battery(batLevel)
                         .transmitter_id(transmitterId)
                         .build();
+                // FIXME - hack put in place to get data to the UI as soon as possible.
+                // Problem was it would take 1+ minutes for BLE to respond with all datasets
+                // enabled. This gets the data to the user as quickly as possible but
+                // spreads the bus posts across multiple classes. This should be managed by
+                // the collector service and not the download implementation.
                 bus.post(download);
             }
             boolean hasCalData = false;
@@ -194,7 +196,6 @@ public class DexcomG4 extends AbstractDevice {
                 if (meterRecords.size() > 0) {
                     MeterRecord lastMeterRecord = meterRecords.get(meterRecords.size() - 1);
                     hasCalData = (lastMeterRecord.getRawSystemTimeSeconds() > preferences.getLastMeterSysTime());
-//                    hasCalData = true;
                     preferences.setLastMeterSysTime(lastMeterRecord.getRawSystemTimeSeconds());
                 }
             } else {
@@ -218,13 +219,6 @@ public class DexcomG4 extends AbstractDevice {
                 status = DownloadStatus.NO_DATA;
             }
 
-            // FIXME: readData.readBatteryLevel() seems to flake out on battery level reads via serial.
-            // Removing for now.
-            if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4) {
-                batLevel = 100;
-            } else if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE2) {
-                batLevel = readData.readBatteryLevel();
-            }
             // TODO pull in other exceptions once we have the analytics/acra reporters
         } catch (IOException e) {
             //TODO record this in the event log later
@@ -246,9 +240,6 @@ public class DexcomG4 extends AbstractDevice {
             reporter.report(EventType.DEVICE, EventSeverity.ERROR, "CRC failed " + e);
         }
 
-//        List<SensorGlucoseValueEntry> cookieMonsterG4SGVs = EGVRecord.toProtobufList(recentRecords);
-//        List<SensorEntry> cookieMonsterG4Sensors = SensorRecord.toProtobufList(sensorRecords);
-
         List<CalibrationEntry> cookieMonsterG4Cals = CalRecord.toProtobufList(calRecords);
         List<MeterEntry> cookieMonsterG4Meters = MeterRecord.toProtobufList(meterRecords);
         List<InsertionEntry> cookieMonsterG4Inserts =
@@ -256,7 +247,7 @@ public class DexcomG4 extends AbstractDevice {
         log.debug("Number of insertion records (protobuf): {}", cookieMonsterG4Inserts.size());
 
 
-//        downloadBuilder.sgv(cookieMonsterG4SGVs)
+//        downloadBuilder = new G4Download.Builder();
         downloadBuilder.cal(cookieMonsterG4Cals)
                 .meter(cookieMonsterG4Meters)
                 .insert(cookieMonsterG4Inserts)

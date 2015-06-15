@@ -9,6 +9,7 @@ import com.nightscout.android.drivers.AndroidUploaderDevice;
 import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.CalRecord;
+import com.nightscout.core.dexcom.records.GenericTimestampRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.InsertionRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
@@ -180,6 +181,7 @@ public class Uploader {
         List<InsertionRecord> insertionRecords = asRecordList(download.insert, InsertionRecord.class, download.receiver_system_time_sec, refTime);
 
         return upload(glucoseDataSets, meterRecords, calRecords, insertionRecords, download.receiver_battery);
+//        return upload(glucoseDataSets, meterRecords, calRecords, insertionRecords, 0);
     }
 
     private boolean upload(List<GlucoseDataSet> glucoseDataSets,
@@ -192,10 +194,36 @@ public class Uploader {
         boolean successful = true;
         for (BaseUploader uploader : uploaders) {
             try {
-                successful = uploader.uploadRecords(glucoseDataSets, meterRecords, calRecords, insertionRecords, deviceStatus, rcvrBat);
+                String id = uploader.getIdentifier();
+                long lastGlucoseDataSetUpload = preferences.getLastEgvBaseUpload(id);
+                long lastMeterRecordsUpload = preferences.getLastMeterBaseUpload(id);
+                long lastCalRecordsUpload = preferences.getLastCalBaseUpload(id);
+                long lastInsRecordsUpload = preferences.getLastInsBaseUpload(id);
+                List<GlucoseDataSet> filteredGlucoseDataSet = filterRecords(glucoseDataSets, lastGlucoseDataSetUpload);
+                List<MeterRecord> filteredMeterRecords = filterRecords(meterRecords, lastMeterRecordsUpload);
+                List<CalRecord> filteredCalRecords = filterRecords(calRecords, lastCalRecordsUpload);
+                List<InsertionRecord> filteredInsRecords = filterRecords(insertionRecords, lastInsRecordsUpload);
+                successful = uploader.uploadRecords(filteredGlucoseDataSet, filteredMeterRecords, filteredCalRecords, filteredInsRecords, deviceStatus, rcvrBat);
+                if (successful) {
+                    if (filteredGlucoseDataSet.size() > 0) {
+                        log.debug("Uploaded {} merged records (EGV and Sensor)", filteredGlucoseDataSet.size());
+                        preferences.setLastEgvBaseUpload(filteredGlucoseDataSet.get(filteredGlucoseDataSet.size() - 1).getRawSysemTimeEgv(), id);
+                    }
+                    if (filteredMeterRecords.size() > 0) {
+                        log.debug("Uploaded {} meter records", filteredMeterRecords.size());
+                        preferences.setLastMeterBaseUpload(filteredMeterRecords.get(filteredMeterRecords.size() - 1).getRawSystemTimeSeconds(), id);
+                    }
+                    if (filteredCalRecords.size() > 0) {
+                        log.debug("Uploaded {} calibration records", filteredCalRecords.size());
+                        preferences.setLastCalBaseUpload(filteredCalRecords.get(filteredCalRecords.size() - 1).getRawSystemTimeSeconds(), id);
+                    }
+                    if (filteredInsRecords.size() > 0) {
+                        log.debug("Uploaded {} insertion records", filteredInsRecords.size());
+                        preferences.setLastInsBaseUpload(filteredInsRecords.get(filteredInsRecords.size() - 1).getRawSystemTimeSeconds(), id);
+                    }
+                }
                 allSuccessful &= successful;
             } catch (Exception e) {
-                // Bad practice but need to capture any uploader exceptions here..
                 allSuccessful &= false;
             }
             if (successful) {
@@ -219,4 +247,19 @@ public class Uploader {
     protected boolean areAllUploadersInitialized() {
         return allUploadersInitalized;
     }
+
+    private <T extends GenericTimestampRecord> List<T> filterRecords(List<? extends GenericTimestampRecord> recordList, long lastSysTime) {
+        List<T> results = new ArrayList<>();
+        for (GenericTimestampRecord record : recordList) {
+            log.error("Comparing record time stamp {} to last recorded {}", record.getRawSystemTimeSeconds(), lastSysTime);
+            if (record.getRawSystemTimeSeconds() > lastSysTime) {
+                log.error("Comparing: Adding record");
+                results.add((T) record);
+            } else {
+                log.error("Comparing: Not adding record");
+            }
+        }
+        return results;
+    }
+
 }

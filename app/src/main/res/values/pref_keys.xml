@@ -19,6 +19,12 @@
     <string name="last_mqtt_sensor_time" translatable="false">last_mqtt_sensor_time</string>
     <string name="last_mqtt_cal_time" translatable="false">last_mqtt_cal_time</string>
     <string name="last_mqtt_meter_time" translatable="false">last_mqtt_meter_time</string>
+    <string name="last_mqtt_ins_time" translatable="false">last_mqtt_ins_time</string>
+    <string name="last_uploader_egv_time_prefix" translatable="false">last_uploader_egv_time</string>
+    <string name="last_uploader_sensor_time_prefix" translatable="false">last_uploader_sensor_time</string>
+    <string name="last_uploader_cal_time_prefix" translatable="false">last_uploader_cal_time</string>
+    <string name="last_uploader_meter_time_prefix" translatable="false">last_uploader_meter_time</string>
+    <string name="last_uploader_ins_time_prefix" translatable="false">last_uploader_ins_time</string>
     <string name="labs_enable" translatable="false">enable_labs</string>
     <string name="root_enable" translatable="false">root_support_enabled</string>
     <string name="data_donate" translatable="false">data_donate</string>
