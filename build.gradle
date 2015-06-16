@@ -16,6 +16,11 @@ allprojects {
     }
 }
 
+
+// Force 'app:test' to run after 'core:test'. This way, we fail fast if something is broken with
+// core.
+tasks.getByPath(':app:test').mustRunAfter ':core:test'
+
 subprojects {
     tasks.withType(Test) {
         beforeTest { desc ->
