@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.robolectric:robolectric-gradle-plugin:1.0.1'
+        classpath 'org.robolectric:robolectric-gradle-plugin:1.1.0'
     }
 }
 
@@ -112,10 +112,6 @@ idea {
     }
 }
 
-// Force 'app:test' to run after 'core:test'. This way, we fail fast if something is broken with
-// core.
-//test.mustRunAfter ":core:test"
-
 apply plugin: 'jacoco'
 
 jacoco {
@@ -127,10 +123,6 @@ sourceSets {
     main {
         java.srcDirs = ['src']
     }
-//    test {
-//        java.srcDir file('src/test/java')
-//        resources.srcDir file('src/test/resources')
-//    }
 }
 
 def coverageSourceDirs = [
