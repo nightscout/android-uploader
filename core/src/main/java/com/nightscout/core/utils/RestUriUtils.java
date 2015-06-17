@@ -15,7 +15,8 @@ import static net.tribe7.common.base.Preconditions.checkNotNull;
 
 public class RestUriUtils {
     public static boolean isV1Uri(URI uri) {
-        return uri != null && (uri.getPath().endsWith("v1") || uri.getPath().endsWith("v1/"));
+        return uri != null && uri.getPath() != null &&
+               (uri.getPath().endsWith("v1") || uri.getPath().endsWith("v1/"));
     }
 
     public static boolean hasToken(URI uri) {

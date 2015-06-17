@@ -41,6 +41,11 @@ public class RestUriUtilsTest {
     }
 
     @Test
+    public void testIsV1Uri_withNullPath() {
+        assertThat(RestUriUtils.isV1Uri(URI.create("http://example.com")), is(false));
+    }
+
+    @Test
     public void testHasToken_withNone() {
         assertThat(RestUriUtils.hasToken(URI.create("http://example.com")), is(false));
     }
