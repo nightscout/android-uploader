@@ -315,6 +315,18 @@ public class ProcessorService extends Service {
         response.success = uploadSuccess && initalized && uploader.areAllUploadersInitalized() && uploadersDefined;
         lastUploadStatus = (response.success) ? 1 : 2;
         bus.post(response);
+
+        if (preferences.isBroadcastEnabled()) {
+            // TODO: make this work for gap sync or a way to request for data (having a db for this would be great)
+            Intent broadcastIntent = new Intent();
+            broadcastIntent.setAction("com.nightscout.action.PROCESS_RESPONSE");
+            broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+            SensorGlucoseValueEntry sgv = download.sgv.get(download.sgv.size() - 1);
+            EGVRecord currentEGVrecord = new EGVRecord(sgv, rcvrTime, refTime);
+            broadcastIntent.putExtra("nsSgv", currentEGVrecord.getBgMgdl());
+            broadcastIntent.putExtra("nsTimestampMs", currentEGVrecord.getDisplayTime().getMillis());
+            sendBroadcast(broadcastIntent);
+        }
     }
 
     private <T extends Message> List<T> filterRecords(List<T> recordList, Class clazz, long lastSysTime) {

@@ -32,6 +32,7 @@
     <string name="share_bluetooth_address" translatable="false">share_bluetooth_address</string>
     <string name="bt_scan_share2" translatable="false">bt_scan_share2</string>
     <string name="camping_enable" translatable="false">camping_enable</string>
+    <string name="broadcast_enable" translatable="false">broadcast_enable</string>
     <string name="pref_backup_config_key" translatable="false">backup_conf</string>
     <string name="pref_restore_config_key" translatable="false">restore_config</string>
     <string name="last_download_meter_sys_time" translatable="false">last_download_meter_sys_time</string>
