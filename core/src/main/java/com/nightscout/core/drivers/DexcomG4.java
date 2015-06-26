@@ -181,6 +181,7 @@ public class DexcomG4 extends AbstractDevice {
                         .download_status(status)
                         .receiver_id(receiverId)
                         .receiver_battery(batLevel)
+                        .uploader_battery(uploaderDevice.getBatteryLevel())
                         .transmitter_id(transmitterId)
                         .build();
                 // FIXME - hack put in place to get data to the UI as soon as possible.
