@@ -4,8 +4,10 @@ import com.nightscout.core.BusProvider;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
+import com.nightscout.core.model.Download;
 import com.nightscout.core.model.DownloadStatus;
-import com.nightscout.core.model.G4Download;
+import com.nightscout.core.model.ReceiverState;
+import com.nightscout.core.model.ReceiverStatus;
 import com.squareup.otto.Bus;
 import com.squareup.wire.Message;
 
@@ -28,6 +30,7 @@ abstract public class AbstractDevice {
     protected ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle",
             Locale.getDefault());
     protected G4ConnectionState connectionStatus = G4ConnectionState.CLOSED;
+    protected ReceiverState receiverState;
 
     public abstract boolean isConnected();
 
@@ -44,14 +47,14 @@ abstract public class AbstractDevice {
         try {
             Message download = doDownload();
             // TODO figure out a way to not make this specific to the G4
-            onDownload(((G4Download) download).download_status == DownloadStatus.SUCCESS);
+            onDownload(((Download) download).download_status == DownloadStatus.SUCCESS);
             return download;
         } catch (Exception e) {
             reporter.report(EventType.DEVICE, EventSeverity.ERROR, "Unknown error - " + e.getMessage());
             log.error("Exception: {} - {}", e.getMessage(), e);
             e.printStackTrace();
         }
-        return new G4Download.Builder().download_status(DownloadStatus.APPLICATION_ERROR)
+        return new Download.Builder().download_status(DownloadStatus.APPLICATION_ERROR)
                 .download_timestamp(new DateTime().toString()).build();
     }
 
@@ -67,6 +70,14 @@ abstract public class AbstractDevice {
                 messages.getString("g4_connected"));
         connectionStatus = G4ConnectionState.CONNECTED;
         postConnectionStatus();
+        receiverState = new ReceiverState(new DateTime().getMillis(), ReceiverStatus.RECEIVER_CONNECTED);
+//        postReceiverState(receiverState);
+    }
+
+    private void postReceiverState(ReceiverState receiverState) {
+        Download.Builder downloadBuilder = new Download.Builder();
+        log.error("Posting receiver State: {}", receiverState.event.name() + " @ " + new DateTime(receiverState.timestamp_ms).toString());
+        bus.post(downloadBuilder.receiver_state(receiverState).download_timestamp(new DateTime().toString()).build());
     }
 
     protected void onConnecting() {
@@ -81,6 +92,8 @@ abstract public class AbstractDevice {
                 messages.getString("g4_disconnected"));
         connectionStatus = G4ConnectionState.CLOSED;
         postConnectionStatus();
+        receiverState = new ReceiverState(new DateTime().getMillis(), ReceiverStatus.RECEIVER_DISCONNECTED);
+        postReceiverState(receiverState);
     }
 
     protected void onDisconnecting() {

@@ -6,26 +6,26 @@ import com.squareup.wire.ProtoEnum;
 
 public enum G4Insertion
         implements ProtoEnum {
-    INSERTION_NONE(0),
-    REMOVED(1),
-    EXPIRED(2),
-    RESIDUAL_DEVIATION(3),
-    COUNTS_DEVIATION(4),
-    SECOND_SESSION(5),
-    OFF_TIME_LOSS(6),
-    STARTED(7),
-    BAD_TRANSMITTER(8),
-    MANUFACTURING_MODE(9),
-    MAX_VALUE(10);
+  INSERTION_NONE(0),
+  REMOVED(1),
+  EXPIRED(2),
+  RESIDUAL_DEVIATION(3),
+  COUNTS_DEVIATION(4),
+  SECOND_SESSION(5),
+  OFF_TIME_LOSS(6),
+  STARTED(7),
+  BAD_TRANSMITTER(8),
+  MANUFACTURING_MODE(9),
+  MAX_VALUE(10);
 
-    private final int value;
+  private final int value;
 
-    private G4Insertion(int value) {
-        this.value = value;
-    }
+  private G4Insertion(int value) {
+    this.value = value;
+  }
 
-    @Override
-    public int getValue() {
-        return value;
-    }
+  @Override
+  public int getValue() {
+    return value;
+  }
 }

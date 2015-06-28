@@ -18,7 +18,7 @@ import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.CalibrationEntry;
-import com.nightscout.core.model.G4Download;
+import com.nightscout.core.model.Download;
 import com.nightscout.core.model.InsertionEntry;
 import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
@@ -134,7 +134,7 @@ public class Uploader {
         return allInitialized;
     }
 
-    public boolean upload(G4Download download, int numRecords) {
+    public boolean upload(Download download, int numRecords) {
         long refTime = DateTime.parse(download.download_timestamp).getMillis();
         List<CalibrationEntry> calList = Utils.filterRecords(numRecords, download.cal);
         List<MeterEntry> meterList = Utils.filterRecords(numRecords, download.meter);
@@ -173,7 +173,7 @@ public class Uploader {
         return result;
     }
 
-    public boolean upload(G4Download download) {
+    public boolean upload(Download download) {
         long refTime = DateTime.parse(download.download_timestamp).getMillis();
         List<GlucoseDataSet> glucoseDataSets = Utils.mergeGlucoseDataRecords(download.sgv, download.sensor, download.receiver_system_time_sec, refTime);
         List<MeterRecord> meterRecords = asRecordList(download.meter, MeterRecord.class, download.receiver_system_time_sec, refTime);

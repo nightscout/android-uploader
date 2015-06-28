@@ -11,94 +11,94 @@ import static com.squareup.wire.Message.Label.REQUIRED;
 
 public final class InsertionEntry extends Message {
 
-    public static final G4Insertion DEFAULT_STATE = G4Insertion.INSERTION_NONE;
-    public static final Long DEFAULT_SYS_TIMESTAMP_SEC = 0L;
-    public static final Long DEFAULT_DISP_TIMESTAMP_SEC = 0L;
+  public static final G4Insertion DEFAULT_STATE = G4Insertion.INSERTION_NONE;
+  public static final Long DEFAULT_SYS_TIMESTAMP_SEC = 0L;
+  public static final Long DEFAULT_DISP_TIMESTAMP_SEC = 0L;
 
-    @ProtoField(tag = 1, type = ENUM, label = REQUIRED)
-    public final G4Insertion state;
+  @ProtoField(tag = 1, type = ENUM, label = REQUIRED)
+  public final G4Insertion state;
 
-    @ProtoField(tag = 2, type = UINT64)
-    public final Long sys_timestamp_sec;
+  @ProtoField(tag = 2, type = UINT64)
+  public final Long sys_timestamp_sec;
+
+  /**
+   * System timestamp - Timestamp representing the internal clock of the receiver
+   */
+  @ProtoField(tag = 3, type = UINT64)
+  public final Long disp_timestamp_sec;
+
+  public InsertionEntry(G4Insertion state, Long sys_timestamp_sec, Long disp_timestamp_sec) {
+    this.state = state;
+    this.sys_timestamp_sec = sys_timestamp_sec;
+    this.disp_timestamp_sec = disp_timestamp_sec;
+  }
+
+  private InsertionEntry(Builder builder) {
+    this(builder.state, builder.sys_timestamp_sec, builder.disp_timestamp_sec);
+    setBuilder(builder);
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other == this) return true;
+    if (!(other instanceof InsertionEntry)) return false;
+    InsertionEntry o = (InsertionEntry) other;
+    return equals(state, o.state)
+            && equals(sys_timestamp_sec, o.sys_timestamp_sec)
+            && equals(disp_timestamp_sec, o.disp_timestamp_sec);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = hashCode;
+    if (result == 0) {
+      result = state != null ? state.hashCode() : 0;
+      result = result * 37 + (sys_timestamp_sec != null ? sys_timestamp_sec.hashCode() : 0);
+      result = result * 37 + (disp_timestamp_sec != null ? disp_timestamp_sec.hashCode() : 0);
+      hashCode = result;
+    }
+    return result;
+  }
+
+  public static final class Builder extends Message.Builder<InsertionEntry> {
+
+    public G4Insertion state;
+    public Long sys_timestamp_sec;
+    public Long disp_timestamp_sec;
+
+    public Builder() {
+    }
+
+    public Builder(InsertionEntry message) {
+      super(message);
+      if (message == null) return;
+      this.state = message.state;
+      this.sys_timestamp_sec = message.sys_timestamp_sec;
+      this.disp_timestamp_sec = message.disp_timestamp_sec;
+    }
+
+    public Builder state(G4Insertion state) {
+      this.state = state;
+      return this;
+    }
+
+    public Builder sys_timestamp_sec(Long sys_timestamp_sec) {
+      this.sys_timestamp_sec = sys_timestamp_sec;
+      return this;
+    }
 
     /**
      * System timestamp - Timestamp representing the internal clock of the receiver
      */
-    @ProtoField(tag = 3, type = UINT64)
-    public final Long disp_timestamp_sec;
-
-    public InsertionEntry(G4Insertion state, Long sys_timestamp_sec, Long disp_timestamp_sec) {
-        this.state = state;
-        this.sys_timestamp_sec = sys_timestamp_sec;
-        this.disp_timestamp_sec = disp_timestamp_sec;
-    }
-
-    private InsertionEntry(Builder builder) {
-        this(builder.state, builder.sys_timestamp_sec, builder.disp_timestamp_sec);
-        setBuilder(builder);
+    public Builder disp_timestamp_sec(Long disp_timestamp_sec) {
+      this.disp_timestamp_sec = disp_timestamp_sec;
+      return this;
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other == this) return true;
-        if (!(other instanceof InsertionEntry)) return false;
-        InsertionEntry o = (InsertionEntry) other;
-        return equals(state, o.state)
-                && equals(sys_timestamp_sec, o.sys_timestamp_sec)
-                && equals(disp_timestamp_sec, o.disp_timestamp_sec);
+    public InsertionEntry build() {
+      checkRequiredFields();
+      return new InsertionEntry(this);
     }
-
-    @Override
-    public int hashCode() {
-        int result = hashCode;
-        if (result == 0) {
-            result = state != null ? state.hashCode() : 0;
-            result = result * 37 + (sys_timestamp_sec != null ? sys_timestamp_sec.hashCode() : 0);
-            result = result * 37 + (disp_timestamp_sec != null ? disp_timestamp_sec.hashCode() : 0);
-            hashCode = result;
-        }
-        return result;
-    }
-
-    public static final class Builder extends Message.Builder<InsertionEntry> {
-
-        public G4Insertion state;
-        public Long sys_timestamp_sec;
-        public Long disp_timestamp_sec;
-
-        public Builder() {
-        }
-
-        public Builder(InsertionEntry message) {
-            super(message);
-            if (message == null) return;
-            this.state = message.state;
-            this.sys_timestamp_sec = message.sys_timestamp_sec;
-            this.disp_timestamp_sec = message.disp_timestamp_sec;
-        }
-
-        public Builder state(G4Insertion state) {
-            this.state = state;
-            return this;
-        }
-
-        public Builder sys_timestamp_sec(Long sys_timestamp_sec) {
-            this.sys_timestamp_sec = sys_timestamp_sec;
-            return this;
-        }
-
-        /**
-         * System timestamp - Timestamp representing the internal clock of the receiver
-         */
-        public Builder disp_timestamp_sec(Long disp_timestamp_sec) {
-            this.disp_timestamp_sec = disp_timestamp_sec;
-            return this;
-        }
-
-        @Override
-        public InsertionEntry build() {
-            checkRequiredFields();
-            return new InsertionEntry(this);
-        }
-    }
+  }
 }

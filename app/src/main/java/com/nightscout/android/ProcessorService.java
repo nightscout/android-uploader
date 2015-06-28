@@ -22,7 +22,7 @@ import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.CalibrationEntry;
-import com.nightscout.core.model.G4Download;
+import com.nightscout.core.model.Download;
 import com.nightscout.core.model.InsertionEntry;
 import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.model.SensorEntry;
@@ -241,7 +241,7 @@ public class ProcessorService extends Service {
     }
 
     @Subscribe
-    public void incomingData(G4Download download) {
+    public void incomingData(Download download) {
         reportDeviceTypes();
         uploadersDefined = verifyUploaders();
         // TODO - Eventually collapse all of these to a single loop to process the download.
@@ -250,12 +250,12 @@ public class ProcessorService extends Service {
         if (uploader != null && uploader.getUploaders().size() > 0) {
             uploadSuccess = uploader.upload(download);
         }
-        if (download.sgv.size() <= 0) {
-            return;
-        }
-        G4Download.Builder downloadBuilder = new G4Download.Builder();
+//        if (download.sgv.size() <= 0) {
+//            return;
+//        }
+        Download.Builder downloadBuilder = new Download.Builder();
 
-        G4Download filteredDownload = downloadBuilder.download_status(download.download_status)
+        Download filteredDownload = downloadBuilder.download_status(download.download_status)
                 .download_timestamp(download.download_timestamp)
                 .sensor(filterRecords(download.sensor, SensorEntry.class, preferences.getLastSensorMqttUpload()))
                 .sgv(filterRecords(download.sgv, SensorGlucoseValueEntry.class, preferences.getLastEgvMqttUpload()))
@@ -268,13 +268,18 @@ public class ProcessorService extends Service {
                 .transmitter_id(download.transmitter_id)
                 .units(download.units)
                 .uploader_battery(download.uploader_battery)
+                .receiver_state(download.receiver_state)
                 .build();
 
+        Log.e(TAG, "Publishing receiver state: " + download.receiver_state.event.name() + " @ " + new DateTime(download.receiver_state.timestamp_ms).toString());
+
         long refTime = DateTime.parse(download.download_timestamp).getMillis();
-        long rcvrTime = download.receiver_system_time_sec;
-        EGVRecord recentRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), rcvrTime, refTime);
-        if (pebble != null && pebble.isConnected()) {
-            pebble.sendDownload(recentRecord.getReading(), recentRecord.getTrend(), recentRecord.getWallTime().getMillis(), getApplicationContext());
+        if (download.receiver_system_time_sec != null) {
+            long rcvrTime = download.receiver_system_time_sec;
+            EGVRecord recentRecord = new EGVRecord(download.sgv.get(download.sgv.size() - 1), rcvrTime, refTime);
+            if (pebble != null && pebble.isConnected()) {
+                pebble.sendDownload(recentRecord.getReading(), recentRecord.getTrend(), recentRecord.getWallTime().getMillis(), getApplicationContext());
+            }
         }
         if (preferences.isMqttEnabled()) {
             if (mqttManager != null && mqttManager.isConnected()) {

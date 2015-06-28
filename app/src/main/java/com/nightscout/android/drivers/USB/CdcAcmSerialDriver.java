@@ -149,7 +149,7 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
 
     @Override
     public int read(byte[] dest, int timeoutMillis) throws IOException {
-        if (connectionState != G4ConnectionState.CONNECTED) {
+        if (connectionState != G4ConnectionState.CONNECTED && connectionState != G4ConnectionState.IDLE) {
             throw new IOException("Attempted to read while not connected. Current state: " + connectionState.name());
         }
         setConnectionState(G4ConnectionState.READING);
@@ -171,13 +171,13 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
             }
             System.arraycopy(mReadBuffer, 0, dest, 0, numBytesRead);
         }
-        setConnectionState(G4ConnectionState.CONNECTED);
+        setConnectionState(G4ConnectionState.IDLE);
         return numBytesRead;
     }
 
     @Override
     public int write(byte[] src, int timeoutMillis) throws IOException {
-        if (connectionState != G4ConnectionState.CONNECTED) {
+        if (connectionState != G4ConnectionState.CONNECTED && connectionState != G4ConnectionState.IDLE) {
             throw new IOException("Attempted to write while not connected. Current state: " + connectionState.name());
         }
         setConnectionState(G4ConnectionState.WRITING);
@@ -210,7 +210,7 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
             Log.d(TAG, "Wrote amt=" + amtWritten + " attempted=" + writeLength);
             offset += amtWritten;
         }
-        setConnectionState(G4ConnectionState.CONNECTED);
+        setConnectionState(G4ConnectionState.IDLE);
 
         return offset;
     }

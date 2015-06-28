@@ -6,20 +6,20 @@ import com.squareup.wire.ProtoEnum;
 
 public enum ReceiverStatus
         implements ProtoEnum {
-    RECEIVER_CONNECTED(0),
-    /**
-     * The receiver is connected to the uploader
-     */
-    RECEIVER_DISCONNECTED(1);
+  RECEIVER_CONNECTED(0),
+  /**
+   * The receiver is connected to the uploader
+   */
+  RECEIVER_DISCONNECTED(1);
 
-    private final int value;
+  private final int value;
 
-    private ReceiverStatus(int value) {
-        this.value = value;
-    }
+  private ReceiverStatus(int value) {
+    this.value = value;
+  }
 
-    @Override
-    public int getValue() {
-        return value;
-    }
+  @Override
+  public int getValue() {
+    return value;
+  }
 }

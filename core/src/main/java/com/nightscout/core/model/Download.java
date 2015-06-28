@@ -15,7 +15,7 @@ import static com.squareup.wire.Message.Datatype.UINT64;
 import static com.squareup.wire.Message.Label.REPEATED;
 import static com.squareup.wire.Message.Label.REQUIRED;
 
-public final class G4Download extends Message {
+public final class Download extends Message {
 
     public static final List<SensorGlucoseValueEntry> DEFAULT_SGV = Collections.emptyList();
     public static final GlucoseUnit DEFAULT_UNITS = GlucoseUnit.MGDL;
@@ -91,7 +91,10 @@ public final class G4Download extends Message {
     @ProtoField(tag = 13, type = STRING)
     public final String transmitter_id;
 
-    public G4Download(List<SensorGlucoseValueEntry> sgv, GlucoseUnit units, String download_timestamp, Long receiver_system_time_sec, DownloadStatus download_status, Integer receiver_battery, Integer uploader_battery, List<MeterEntry> meter, List<SensorEntry> sensor, List<CalibrationEntry> cal, List<InsertionEntry> insert, String receiver_id, String transmitter_id) {
+    @ProtoField(tag = 14)
+    public final ReceiverState receiver_state;
+
+    public Download(List<SensorGlucoseValueEntry> sgv, GlucoseUnit units, String download_timestamp, Long receiver_system_time_sec, DownloadStatus download_status, Integer receiver_battery, Integer uploader_battery, List<MeterEntry> meter, List<SensorEntry> sensor, List<CalibrationEntry> cal, List<InsertionEntry> insert, String receiver_id, String transmitter_id, ReceiverState receiver_state) {
         this.sgv = immutableCopyOf(sgv);
         this.units = units;
         this.download_timestamp = download_timestamp;
@@ -105,18 +108,19 @@ public final class G4Download extends Message {
         this.insert = immutableCopyOf(insert);
         this.receiver_id = receiver_id;
         this.transmitter_id = transmitter_id;
+        this.receiver_state = receiver_state;
     }
 
-    private G4Download(Builder builder) {
-        this(builder.sgv, builder.units, builder.download_timestamp, builder.receiver_system_time_sec, builder.download_status, builder.receiver_battery, builder.uploader_battery, builder.meter, builder.sensor, builder.cal, builder.insert, builder.receiver_id, builder.transmitter_id);
+    private Download(Builder builder) {
+        this(builder.sgv, builder.units, builder.download_timestamp, builder.receiver_system_time_sec, builder.download_status, builder.receiver_battery, builder.uploader_battery, builder.meter, builder.sensor, builder.cal, builder.insert, builder.receiver_id, builder.transmitter_id, builder.receiver_state);
         setBuilder(builder);
     }
 
     @Override
     public boolean equals(Object other) {
         if (other == this) return true;
-        if (!(other instanceof G4Download)) return false;
-        G4Download o = (G4Download) other;
+        if (!(other instanceof Download)) return false;
+        Download o = (Download) other;
         return equals(sgv, o.sgv)
                 && equals(units, o.units)
                 && equals(download_timestamp, o.download_timestamp)
@@ -129,7 +133,8 @@ public final class G4Download extends Message {
                 && equals(cal, o.cal)
                 && equals(insert, o.insert)
                 && equals(receiver_id, o.receiver_id)
-                && equals(transmitter_id, o.transmitter_id);
+                && equals(transmitter_id, o.transmitter_id)
+                && equals(receiver_state, o.receiver_state);
     }
 
     @Override
@@ -149,12 +154,13 @@ public final class G4Download extends Message {
             result = result * 37 + (insert != null ? insert.hashCode() : 1);
             result = result * 37 + (receiver_id != null ? receiver_id.hashCode() : 0);
             result = result * 37 + (transmitter_id != null ? transmitter_id.hashCode() : 0);
+            result = result * 37 + (receiver_state != null ? receiver_state.hashCode() : 0);
             hashCode = result;
         }
         return result;
     }
 
-    public static final class Builder extends Message.Builder<G4Download> {
+    public static final class Builder extends Message.Builder<Download> {
 
         public List<SensorGlucoseValueEntry> sgv;
         public GlucoseUnit units;
@@ -169,11 +175,12 @@ public final class G4Download extends Message {
         public List<InsertionEntry> insert;
         public String receiver_id;
         public String transmitter_id;
+        public ReceiverState receiver_state;
 
         public Builder() {
         }
 
-        public Builder(G4Download message) {
+        public Builder(Download message) {
             super(message);
             if (message == null) return;
             this.sgv = copyOf(message.sgv);
@@ -189,6 +196,7 @@ public final class G4Download extends Message {
             this.insert = copyOf(message.insert);
             this.receiver_id = message.receiver_id;
             this.transmitter_id = message.transmitter_id;
+            this.receiver_state = message.receiver_state;
         }
 
         public Builder sgv(List<SensorGlucoseValueEntry> sgv) {
@@ -277,10 +285,15 @@ public final class G4Download extends Message {
             return this;
         }
 
+        public Builder receiver_state(ReceiverState receiver_state) {
+            this.receiver_state = receiver_state;
+            return this;
+        }
+
         @Override
-        public G4Download build() {
+        public Download build() {
             checkRequiredFields();
-            return new G4Download(this);
+            return new Download(this);
         }
     }
 }

@@ -1,8 +1,8 @@
 option java_package = "com.nightscout.core.model";
 
-option java_outer_classname = "G4Download";
+option java_outer_classname = "Download";
 
-message G4Download {
+message Download {
     repeated SensorGlucoseValueEntry sgv = 1; // Glucose records as reported by the G4
     optional GlucoseUnit units = 2; // Units reported by the device
     required string download_timestamp = 3; // ISO8601 timestamp reported by uploader
@@ -16,6 +16,7 @@ message G4Download {
     repeated InsertionEntry insert = 11;
     optional string receiver_id = 12;
     optional string transmitter_id = 13;
+    optional ReceiverState receiver_state = 14;
 }
 
 enum GlucoseUnit {
@@ -115,5 +116,5 @@ message CalibrationEntry {
 
 message ReceiverState {
     required uint64 timestamp_ms = 1;
-    repeated ReceiverStatus event = 2;
+    optional ReceiverStatus event = 2;
 }

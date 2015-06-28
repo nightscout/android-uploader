@@ -6,17 +6,17 @@ import com.squareup.wire.ProtoEnum;
 
 public enum GlucoseUnit
         implements ProtoEnum {
-    MGDL(0),
-    MMOL(1);
+  MGDL(0),
+  MMOL(1);
 
-    private final int value;
+  private final int value;
 
-    private GlucoseUnit(int value) {
-        this.value = value;
-    }
+  private GlucoseUnit(int value) {
+    this.value = value;
+  }
 
-    @Override
-    public int getValue() {
-        return value;
-    }
+  @Override
+  public int getValue() {
+    return value;
+  }
 }

@@ -1,7 +1,7 @@
 package com.nightscout.core.dexcom;
 
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
-import com.nightscout.core.model.G4Download;
+import com.nightscout.core.model.Download;
 import com.nightscout.core.model.SensorEntry;
 import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.squareup.wire.Message;
@@ -100,7 +100,7 @@ public final class Utils {
         return (timeAgoString.equals("") ? "--" : timeAgoString + "ago");
     }
 
-    public static List<GlucoseDataSet> mergeGlucoseDataRecords(G4Download download, int numRecords) {
+    public static List<GlucoseDataSet> mergeGlucoseDataRecords(Download download, int numRecords) {
         List<SensorGlucoseValueEntry> sgvList = filterRecords(numRecords, download.sgv);
 //        List<CalibrationEntry> calList = filterRecords(numRecords, download.cal);
 //        List<MeterEntry> meterList = filterRecords(numRecords, download.meter);

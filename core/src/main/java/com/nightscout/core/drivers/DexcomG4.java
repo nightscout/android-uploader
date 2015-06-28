@@ -11,8 +11,8 @@ import com.nightscout.core.dexcom.records.SensorRecord;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.CalibrationEntry;
+import com.nightscout.core.model.Download;
 import com.nightscout.core.model.DownloadStatus;
-import com.nightscout.core.model.G4Download;
 import com.nightscout.core.model.InsertionEntry;
 import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.model.SensorEntry;
@@ -43,6 +43,8 @@ public class DexcomG4 extends AbstractDevice {
     protected String transmitterId = "";
     protected List<SensorRecord> lastSensorRecords;
     protected List<CalRecord> lastCalRecords;
+    private Bus bus;
+
 
     protected Action1<G4ConnectionState> connectionStateListener = new Action1<G4ConnectionState>() {
 
@@ -81,6 +83,7 @@ public class DexcomG4 extends AbstractDevice {
         this.uploaderDevice = uploaderDevice;
         this.deviceName = "DexcomG4";
         this.deviceType = preferences.getDeviceType();
+        this.bus = BusProvider.getInstance();
         log.debug("New device being created: {}", this.deviceType);
         if (transport != null) {
             this.transport.registerConnectionListener(connectionStateListener);
@@ -103,8 +106,8 @@ public class DexcomG4 extends AbstractDevice {
     }
 
     @Override
-    protected G4Download doDownload() {
-        G4Download.Builder downloadBuilder = new G4Download.Builder();
+    protected Download doDownload() {
+        Download.Builder downloadBuilder = new Download.Builder();
 
         DateTime dateTime = new DateTime();
         if (!isConnected()) {
@@ -123,7 +126,7 @@ public class DexcomG4 extends AbstractDevice {
 
         List<SensorGlucoseValueEntry> cookieMonsterG4SGVs;
         List<SensorEntry> cookieMonsterG4Sensors;
-        Bus bus = BusProvider.getInstance();
+//        Bus bus = BusProvider.getInstance();
 
         int batLevel = 100;
         long systemTime = 0;
@@ -173,23 +176,25 @@ public class DexcomG4 extends AbstractDevice {
                     log.warn("Seems to be no new egv data. Assuming no sensor data either");
                 }
                 cookieMonsterG4Sensors = SensorRecord.toProtobufList(sensorRecords);
+                downloadBuilder.sgv(cookieMonsterG4SGVs)
+                        .sensor(cookieMonsterG4Sensors);
 
-                G4Download download = downloadBuilder.sgv(cookieMonsterG4SGVs)
-                        .sensor(cookieMonsterG4Sensors)
-                        .receiver_system_time_sec(systemTime)
-                        .download_timestamp(dateTime.toString())
-                        .download_status(status)
-                        .receiver_id(receiverId)
-                        .receiver_battery(batLevel)
-                        .uploader_battery(uploaderDevice.getBatteryLevel())
-                        .transmitter_id(transmitterId)
-                        .build();
-                // FIXME - hack put in place to get data to the UI as soon as possible.
-                // Problem was it would take 1+ minutes for BLE to respond with all datasets
-                // enabled. This gets the data to the user as quickly as possible but
-                // spreads the bus posts across multiple classes. This should be managed by
-                // the collector service and not the download implementation.
-                bus.post(download);
+//                G4Download download = downloadBuilder.sgv(cookieMonsterG4SGVs)
+//                        .sensor(cookieMonsterG4Sensors)
+//                        .receiver_system_time_sec(systemTime)
+//                        .download_timestamp(dateTime.toString())
+//                        .download_status(status)
+//                        .receiver_id(receiverId)
+//                        .receiver_battery(batLevel)
+//                        .uploader_battery(uploaderDevice.getBatteryLevel())
+//                        .transmitter_id(transmitterId)
+//                        .build();
+//                // FIXME - hack put in place to get data to the UI as soon as possible.
+//                // Problem was it would take 1+ minutes for BLE to respond with all datasets
+//                // enabled. This gets the data to the user as quickly as possible but
+//                // spreads the bus posts across multiple classes. This should be managed by
+//                // the collector service and not the download implementation.
+//                bus.post(download);
             }
             boolean hasCalData = false;
             if (preferences.isMeterUploadEnabled()) {
@@ -258,12 +263,13 @@ public class DexcomG4 extends AbstractDevice {
                 .uploader_battery(uploaderDevice.getBatteryLevel())
                 .receiver_battery(batLevel)
                 .receiver_id(receiverId)
+                .receiver_state(receiverState)
                 .transmitter_id(transmitterId);
         return downloadBuilder.build();
     }
 
     public class UIDownload {
-        public G4Download download;
+        public Download download;
     }
 
     public void setNumOfPages(int numOfPages) {
