@@ -247,8 +247,8 @@ public class ProcessorService extends Service {
         // TODO - Eventually collapse all of these to a single loop to process the download.
         // Requires a single interface for everything to determine how to process a download.
         boolean uploadSuccess = false;
-        if (uploader != null) {
-            uploadSuccess = uploader.upload(download, 1);
+        if (uploader != null && uploader.getUploaders().size() > 0) {
+            uploadSuccess = uploader.upload(download);
         }
         if (download.sgv.size() <= 0) {
             return;
@@ -261,7 +261,7 @@ public class ProcessorService extends Service {
                 .sgv(filterRecords(download.sgv, SensorGlucoseValueEntry.class, preferences.getLastEgvMqttUpload()))
                 .cal(filterRecords(download.cal, CalibrationEntry.class, preferences.getLastCalMqttUpload()))
                 .meter(filterRecords(download.meter, MeterEntry.class, preferences.getLastMeterMqttUpload()))
-                .insert(filterRecords(download.insert, InsertionEntry.class, preferences.getLastRecordTime("ins", "mqtt")))
+                .insert(filterRecords(download.insert, InsertionEntry.class, preferences.getLastInsMqttUpload()))
                 .receiver_battery(download.receiver_battery)
                 .receiver_id(download.receiver_id)
                 .receiver_system_time_sec(download.receiver_system_time_sec)
@@ -298,7 +298,7 @@ public class ProcessorService extends Service {
                 }
                 if (filteredDownload.insert.size() > 0) {
                     Log.d(TAG, "Publishing " + filteredDownload.insert.size() + " insert records");
-                    preferences.setLastRecordTime("ins", "mqtt", filteredDownload.cal.get(filteredDownload.insert.size() - 1).sys_timestamp_sec);
+                    preferences.setLastInsMqttUpload(filteredDownload.cal.get(filteredDownload.insert.size() - 1).sys_timestamp_sec);
                 }
             } else {
                 reporter.report(EventType.UPLOADER, EventSeverity.ERROR, "Expected MQTT to be connected but it is not");

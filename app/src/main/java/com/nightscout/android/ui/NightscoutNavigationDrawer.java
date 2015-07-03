@@ -20,6 +20,8 @@ import com.nightscout.android.settings.SettingsActivity;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
 
+import java.net.URI;
+
 import javax.inject.Inject;
 
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
@@ -78,7 +80,7 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
         MaterialSection gapSync = newSection("Gap sync", new MaterialSectionListener() {
             @Override
             public void onClick(MaterialSection materialSection) {
-                Log.d(TAG, "Sync requested");
+                setupGapSync();
                 Intent syncIntent = new Intent(getApplicationContext(), CollectorService.class);
                 syncIntent.setAction(CollectorService.ACTION_POLL);
                 syncIntent.putExtra(CollectorService.NUM_PAGES, 20);
@@ -131,6 +133,40 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
         setBackPattern(MaterialNavigationDrawer.BACKPATTERN_BACK_TO_FIRST);
         enableToolbarElevation();
 
+    }
+
+    // FIXME - Hack to enable full gap sync
+    // Sets the last upload time for each counter to 0 so that everything is uploaded
+    private void setupGapSync() {
+        preferences.setLastEgvSysTime(0);
+        preferences.setLastMeterSysTime(0);
+        if (preferences.isMqttEnabled()) {
+            preferences.setLastEgvMqttUpload(0);
+            preferences.setLastMeterMqttUpload(0);
+            preferences.setLastSensorMqttUpload(0);
+            preferences.setLastCalMqttUpload(0);
+            preferences.setLastInsMqttUpload(0);
+        }
+        // Note: A service on a different port could potentially write to a different
+        // database but we're only going to treat each each unique host as a different endpoint.
+        if (preferences.isRestApiEnabled()) {
+            for (String endPoint : preferences.getRestApiBaseUris()) {
+                URI uri = URI.create(endPoint);
+                String id = uri.getHost();
+                preferences.setLastEgvBaseUpload(0, id);
+                preferences.setLastMeterBaseUpload(0, id);
+                preferences.setLastSensorBaseUpload(0, id);
+                preferences.setLastCalBaseUpload(0, id);
+                preferences.setLastInsBaseUpload(0, id);
+            }
+        }
+        if (preferences.isMongoUploadEnabled()) {
+            preferences.setLastEgvBaseUpload(0, "MongoDB");
+            preferences.setLastMeterBaseUpload(0, "MongoDB");
+            preferences.setLastSensorBaseUpload(0, "MongoDB");
+            preferences.setLastCalBaseUpload(0, "MongoDB");
+            preferences.setLastInsBaseUpload(0, "MongoDB");
+        }
     }
 
 

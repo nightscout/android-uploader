@@ -57,7 +57,9 @@ public abstract class BaseUploader {
             return true;
         }
         boolean output = true;
+        int counter = 0;
         for (GlucoseDataSet glucoseDataSet : glucoseDataSets) {
+            counter += 1;
             try {
                 output &= doUpload(glucoseDataSet);
             } catch (IOException e) {

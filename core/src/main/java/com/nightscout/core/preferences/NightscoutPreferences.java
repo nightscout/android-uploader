@@ -100,4 +100,44 @@ public interface NightscoutPreferences {
     long getLastEgvSysTime();
 
     void setLastEgvSysTime(long egvSysTime);
+
+    public void setLastEgvMqttUpload(long timestamp);
+
+    public void setLastSensorMqttUpload(long timestamp);
+
+    public void setLastCalMqttUpload(long timestamp);
+
+    public void setLastMeterMqttUpload(long timestamp);
+
+    public void setLastInsMqttUpload(long timestamp);
+
+    public long getLastEgvMqttUpload();
+
+    public long getLastSensorMqttUpload();
+
+    public long getLastCalMqttUpload();
+
+    public long getLastMeterMqttUpload();
+
+    public long getLastInsMqttUpload();
+
+    public void setLastEgvBaseUpload(long timestamp, String postfix);
+
+    public void setLastSensorBaseUpload(long timestamp, String postfix);
+
+    public void setLastCalBaseUpload(long timestamp, String postfix);
+
+    public void setLastMeterBaseUpload(long timestamp, String postfix);
+
+    public void setLastInsBaseUpload(long timestamp, String postfix);
+
+    public long getLastEgvBaseUpload(String postfix);
+
+    public long getLastSensorBaseUpload(String postfix);
+
+    public long getLastCalBaseUpload(String postfix);
+
+    public long getLastMeterBaseUpload(String postfix);
+
+    public long getLastInsBaseUpload(String postfix);
 }
