@@ -45,7 +45,6 @@ public class DexcomG4 extends AbstractDevice {
     protected List<CalRecord> lastCalRecords;
     private Bus bus;
 
-
     protected Action1<G4ConnectionState> connectionStateListener = new Action1<G4ConnectionState>() {
 
         @Override
@@ -126,7 +125,6 @@ public class DexcomG4 extends AbstractDevice {
 
         List<SensorGlucoseValueEntry> cookieMonsterG4SGVs;
         List<SensorEntry> cookieMonsterG4Sensors;
-//        Bus bus = BusProvider.getInstance();
 
         int batLevel = 100;
         long systemTime = 0;

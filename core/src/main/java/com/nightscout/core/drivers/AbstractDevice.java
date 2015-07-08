@@ -114,18 +114,7 @@ abstract public class AbstractDevice {
         postConnectionStatus();
     }
 
-//    public void onActivity(boolean enabled) {
-//        log.debug("Activity change detected for device: {}", enabled);
-//        if (enabled) {
-//            connectionStatus = G4ConnectionState.ACTIVE;
-//        } else {
-//            connectionStatus = (isConnected()) ? DeviceState.CONNECTED : DeviceState.DISCONNECTED;
-//        }
-//        postConnectionStatus();
-//    }
-
     public DeviceConnectionStatus getDeviceConnectionStatus() {
-//        log.warn("Device type from device: {}", deviceType);
         return new DeviceConnectionStatus(deviceType, connectionStatus);
     }
 

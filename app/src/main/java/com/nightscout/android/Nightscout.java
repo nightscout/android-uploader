@@ -18,9 +18,6 @@ import javax.inject.Inject;
 
 import dagger.ObjectGraph;
 
-//import com.nightscout.android.exceptions.AcraFeedbackDialog;
-//import net.danlew.android.joda.JodaTimeAndroid;
-
 @ReportsCrashes(
         formUri = "https://collector.tracepot.com/a64e4a51",
         resToastText = R.string.crash_toast_text,
