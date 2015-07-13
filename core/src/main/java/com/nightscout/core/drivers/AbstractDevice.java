@@ -71,7 +71,6 @@ abstract public class AbstractDevice {
         connectionStatus = G4ConnectionState.CONNECTED;
         postConnectionStatus();
         receiverState = new ReceiverState(new DateTime().getMillis(), ReceiverStatus.RECEIVER_CONNECTED);
-//        postReceiverState(receiverState);
     }
 
     private void postReceiverState(ReceiverState receiverState) {
