@@ -284,7 +284,6 @@ public class ProcessorService extends Service {
         if (preferences.isMqttEnabled()) {
             if (mqttManager != null && mqttManager.isConnected()) {
                 Log.d(TAG, "Publishing");
-                mqttManager.publish(filteredDownload.toByteArray(), "/downloads/protobuf");
                 mqttManager.publish(filteredDownload.toByteArray(), "/downloads/" + preferences.getMqttUser() + "/protobuf");
                 if (filteredDownload.sgv.size() > 0) {
                     Log.d(TAG, "Publishing " + filteredDownload.sgv.size() + " sgv records");
