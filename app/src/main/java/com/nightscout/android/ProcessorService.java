@@ -285,6 +285,7 @@ public class ProcessorService extends Service {
             if (mqttManager != null && mqttManager.isConnected()) {
                 Log.d(TAG, "Publishing");
                 mqttManager.publish(filteredDownload.toByteArray(), "/downloads/" + preferences.getMqttUser() + "/protobuf");
+                uploadSuccess = true;
                 if (filteredDownload.sgv.size() > 0) {
                     Log.d(TAG, "Publishing " + filteredDownload.sgv.size() + " sgv records");
                     preferences.setLastEgvMqttUpload(filteredDownload.sgv.get(filteredDownload.sgv.size() - 1).sys_timestamp_sec);
