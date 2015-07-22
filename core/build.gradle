@@ -1,6 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'maven'
-group='com.github.mgranberry'
+group='com.github.nightscout'
 
 sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
