@@ -1,4 +1,6 @@
 apply plugin: 'java'
+apply plugin: 'maven'
+group='com.github.mgranberry'
 
 sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
@@ -59,4 +61,19 @@ jacocoTestReport {
         xml.enabled = true
         csv.enabled = false
     }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
 }
