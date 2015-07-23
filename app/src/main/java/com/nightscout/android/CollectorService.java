@@ -39,7 +39,7 @@ import com.nightscout.core.drivers.SupportedDevices;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
-import com.nightscout.core.model.G4Download;
+import com.nightscout.core.model.Download;
 import com.nightscout.core.utils.IsigReading;
 import com.squareup.otto.Bus;
 
@@ -50,8 +50,6 @@ import org.joda.time.Minutes;
 import java.io.IOException;
 
 public class CollectorService extends Service {
-//    protected final Logger log = LoggerFactory.getLogger(this.getClass());
-
     private final String TAG = CollectorService.class.getSimpleName();
     public static final String ACTION_SYNC = "com.nightscout.android.dexcom.action.SYNC";
     public static final String ACTION_POLL = "com.nightscout.android.dexcom.action.POLL";
@@ -108,7 +106,6 @@ public class CollectorService extends Service {
                             e.printStackTrace();
                         }
                     }
-//                    setDriver();
                 } else {
                     Log.d(TAG, "Meh... something uninteresting changed");
                 }
@@ -146,20 +143,6 @@ public class CollectorService extends Service {
                         DexcomG4.PROTOCOL);
             }
         }
-//        try {
-//            if (driver == null) {
-//                Log.d(TAG, "Driver is NULL?!");
-//                return;
-//            }
-//            if ((deviceType == SupportedDevices.DEXCOM_G4 && driver.isConnected())
-//                    || deviceType == SupportedDevices.DEXCOM_G4_SHARE2) {
-//                driver.open();
-//            }
-//        } catch (IOException e) {
-//            Log.e(TAG, "IOException: " + e.getMessage());
-//            //TODO record this in the event log later
-////            status = DownloadStatus.IO_ERROR;
-//        }
     }
 
     @Override
@@ -192,10 +175,10 @@ public class CollectorService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private class AsyncDownload extends AsyncTask<Integer, Integer, G4Download> {
+    private class AsyncDownload extends AsyncTask<Integer, Integer, Download> {
 
         @Override
-        protected G4Download doInBackground(Integer... params) {
+        protected Download doInBackground(Integer... params) {
             if (driver == null) {
                 Log.w(TAG, "Driver is null");
                 return null;
@@ -236,10 +219,10 @@ public class CollectorService extends Service {
             PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NSDownload");
             wl.acquire();
 
-            G4Download download = null;
+            Download download = null;
 
             try {
-                download = (G4Download) device.download();
+                download = (Download) device.download();
                 if (download == null || download.download_timestamp == null || download.receiver_system_time_sec == null) {
                     Log.e(TAG, "Bad download, will try again");
                     Log.w(TAG, "Next poll setting to default #3");
@@ -348,7 +331,6 @@ public class CollectorService extends Service {
     }
 
     public long getNextPoll() {
-//        return nextPoll - System.currentTimeMillis();
         return 1000 * 60 * 5 - (nextPoll - System.currentTimeMillis());
     }
 

@@ -6,22 +6,22 @@ import com.squareup.wire.ProtoEnum;
 
 public enum G4Noise
         implements ProtoEnum {
-    NOISE_NONE(0),
-    CLEAN(1),
-    LIGHT(2),
-    MEDIUM(3),
-    HEAVY(4),
-    NOT_COMPUTED(5),
-    MAX(6);
+  NOISE_NONE(0),
+  CLEAN(1),
+  LIGHT(2),
+  MEDIUM(3),
+  HEAVY(4),
+  NOT_COMPUTED(5),
+  MAX(6);
 
-    private final int value;
+  private final int value;
 
-    private G4Noise(int value) {
-        this.value = value;
-    }
+  private G4Noise(int value) {
+    this.value = value;
+  }
 
-    @Override
-    public int getValue() {
-        return value;
-    }
+  @Override
+  public int getValue() {
+    return value;
+  }
 }

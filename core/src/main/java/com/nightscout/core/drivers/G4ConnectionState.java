@@ -6,5 +6,6 @@ public enum G4ConnectionState {
     CLOSING,
     CLOSED,
     READING,
-    WRITING
+    WRITING,
+    IDLE
 }
