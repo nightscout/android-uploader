@@ -157,15 +157,14 @@ public class ReadData {
     }
 
     private Optional<String> getManufacturingAttribute(String attribute) throws IOException {
-        String result = null;
+        String result;
         if (manufacturingDataXml == null) {
             byte[] packet = readDataBasePage(RecordType.MANUFACTURING_DATA, 0);
             String raw = new String(packet);
             String xml = raw.substring(raw.indexOf('<'), raw.lastIndexOf('>') + 1);
             try {
-                log.debug("Manufacturing Response size: " + packet.length);
-                log.debug("Manufacturing data: " + xml);
-                log.debug("Manufacturing data: " + new String(packet));
+                log.debug("Manufacturing Response size: {}", packet.length);
+                log.debug("Manufacturing data: {}", xml);
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder builder = factory.newDocumentBuilder();
                 manufacturingDataXml = builder.parse(new InputSource(new StringReader(xml)));
