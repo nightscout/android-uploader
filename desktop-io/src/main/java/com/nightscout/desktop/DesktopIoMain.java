@@ -4,11 +4,11 @@ import com.embeddedunveiled.serial.SerialComManager;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DexcomG4;
-import com.nightscout.core.drivers.ReadData;
 import com.nightscout.core.drivers.SupportedDevices;
 import com.nightscout.core.events.LoggingEventReporter;
 import com.nightscout.core.model.G4Download;
 import com.nightscout.core.preferences.TestPreferences;
+import com.squareup.wire.Message;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,9 +46,9 @@ public class DesktopIoMain {
     });
     dexcomG4.setNumOfPages(20);
     dexcomG4.setReporter(new LoggingEventReporter());
-    G4Download download = (G4Download)dexcomG4.download();
+    Message download = dexcomG4.download();
 
-    log.info("Most recent reading: {}", download.sgv.get(download.sgv.size() - 1).sgv_mgdl);
+    log.info("Results: {}", download.toString());
     transport.close();
   }
 }

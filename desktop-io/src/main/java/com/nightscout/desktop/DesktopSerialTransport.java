@@ -41,8 +41,10 @@ public class DesktopSerialTransport implements DeviceTransport {
     int bytesRead = 0;
     while (bytesRead < size) {
       byte[] read = scm.readBytes(handle, size - bytesRead);
-      System.arraycopy(read, 0, output, bytesRead, read.length);
-      bytesRead += read.length;
+      if (read != null) {
+        System.arraycopy(read, 0, output, bytesRead, read.length);
+        bytesRead += read.length;
+      }
     }
     return output;
   }
