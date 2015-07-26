@@ -19,8 +19,6 @@ import java.util.Arrays;
 
 import rx.Observable;
 
-//import com.hoho.android.usbserial.driver.UsbId;
-
 /**
  * USB CDC/ACM serial driver implementation.
  *
@@ -129,9 +127,8 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
         setConnectionState(G4ConnectionState.CLOSED);
     }
 
+    @Override
     public byte[] read(int size, int timeoutMillis) throws IOException {
-//        timeoutMillis = 2000;
-//        size = 2122;
         if (size < 2122) {
             Log.i(TAG, "Adjusting requested size of " + size + " to 2122");
             size = 2122;
@@ -147,8 +144,7 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
         Observable.just(connectionState).subscribe(connectionStateListener);
     }
 
-    @Override
-    public int read(byte[] dest, int timeoutMillis) throws IOException {
+    private int read(byte[] dest, int timeoutMillis) throws IOException {
         if (connectionState != G4ConnectionState.CONNECTED) {
             throw new IOException("Attempted to read while not connected. Current state: " + connectionState.name());
         }

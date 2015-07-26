@@ -11,24 +11,14 @@ public interface DeviceTransport {
      *
      * @throws java.io.IOException on error opening or initializing the device.
      */
-    public void open() throws IOException;
+    void open() throws IOException;
 
     /**
      * Closes the serial device.
      *
      * @throws java.io.IOException on error closing the device.
      */
-    public void close() throws IOException;
-
-    /**
-     * Reads as many bytes as possible into the destination buffer.
-     *
-     * @param dest          the destination byte buffer
-     * @param timeoutMillis the timeout for reading
-     * @return the actual number of bytes read
-     * @throws java.io.IOException if an error occurred during reading
-     */
-    public int read(final byte[] dest, final int timeoutMillis) throws IOException;
+    void close() throws IOException;
 
     /**
      * Reads as many bytes as possible into the destination buffer.
@@ -38,7 +28,7 @@ public interface DeviceTransport {
      * @return the actual number of bytes read
      * @throws java.io.IOException if an error occurred during reading
      */
-    public byte[] read(int size, final int timeoutMillis) throws IOException;
+    byte[] read(int size, final int timeoutMillis) throws IOException;
 
     /**
      * Writes as many bytes as possible from the source buffer.
@@ -48,9 +38,9 @@ public interface DeviceTransport {
      * @return the actual number of bytes written
      * @throws java.io.IOException if an error occurred during writing
      */
-    public int write(final byte[] src, final int timeoutMillis) throws IOException;
+    int write(final byte[] src, final int timeoutMillis) throws IOException;
 
-    public boolean isConnected();
+    boolean isConnected();
 
-    public void registerConnectionListener(Action1<G4ConnectionState> connectionListener);
+    void registerConnectionListener(Action1<G4ConnectionState> connectionListener);
 }

@@ -27,9 +27,10 @@ public class TestPreferences implements NightscoutPreferences {
     private String serialNumber;
     private boolean mgbUploadEnabled = false;
     private String btAddress = null;
-    private String btDeviceName = null;
-    private HashMap<String, HashMap<String, Long>> lastUpload;
+    private String btDeviceName;
+    private HashMap<String, HashMap<String, Long>> lastUpload = new HashMap<>();
     private SupportedDevices deviceType = SupportedDevices.UNKNOWN;
+    private boolean insertionEnabled;
 
     @Override
     public boolean isRestApiEnabled() {
@@ -238,12 +239,12 @@ public class TestPreferences implements NightscoutPreferences {
 
     @Override
     public boolean isInsertionUploadEnabled() {
-        return false;
+        return insertionEnabled;
     }
 
     @Override
     public void setInsertionUploadEnabled(boolean enabled) {
-
+        insertionEnabled = enabled;
     }
 
     @Override

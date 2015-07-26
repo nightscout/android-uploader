@@ -1,18 +1,20 @@
 package com.nightscout.core.dexcom;
 
-
 import net.tribe7.common.base.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
 
 public class ReadPacket {
+    private static final Logger log = LoggerFactory.getLogger(ReadPacket.class);
     private Command command;
     private byte[] data;
-    private byte[] crc;
-    private int OFFSET_CMD = 3;
-    private int OFFSET_DATA = 4;
-    private int CRC_LEN = 2;
+    private static final int OFFSET_CMD = 3;
+    private static final int OFFSET_DATA = 4;
+    private static final int CRC_LEN = 2;
 
     public ReadPacket(byte[] readPacket) throws IOException {
         if (readPacket.length <= OFFSET_CMD) {
@@ -20,15 +22,18 @@ public class ReadPacket {
         }
         Optional<Command> optCmd = Command.getCommandByValue(readPacket[OFFSET_CMD]);
         if (optCmd.isPresent()) {
-            this.command = optCmd.get();
+            command = optCmd.get();
         } else {
             throw new IllegalArgumentException("Unknown command: " + readPacket[OFFSET_CMD]);
         }
+        log.debug("Initialize read packet of type {}", command.name());
         this.data = Arrays.copyOfRange(readPacket, OFFSET_DATA, readPacket.length - CRC_LEN);
-        this.crc = Arrays.copyOfRange(readPacket, readPacket.length - CRC_LEN, readPacket.length);
-        byte[] crc_calc = CRC16.calculate(readPacket, 0, readPacket.length - 2);
-        if (!Arrays.equals(this.crc, crc_calc)) {
-            throw new CRCFailError("CRC check failed. Was: " + Utils.bytesToHex(this.crc) + " Expected: " + Utils.bytesToHex(crc_calc));
+        byte[] crc = Arrays.copyOfRange(readPacket, readPacket.length - CRC_LEN, readPacket.length);
+        byte[] crc_calc = CRC16.calculate(readPacket, 0, readPacket.length - CRC_LEN);
+        if (!Arrays.equals(crc, crc_calc)) {
+            log.error("CRC check failed for command {}. Was {}, expected {}. Read packet length {}.",
+                      command.name(), Utils.bytesToHex(crc), Utils.bytesToHex(crc_calc), readPacket.length);
+            throw new CRCFailError("CRC check failed. Was: " + Utils.bytesToHex(crc) + " Expected: " + Utils.bytesToHex(crc_calc));
         }
     }
 

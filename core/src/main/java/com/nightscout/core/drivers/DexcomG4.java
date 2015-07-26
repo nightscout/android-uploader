@@ -43,6 +43,7 @@ public class DexcomG4 extends AbstractDevice {
     protected String transmitterId = "";
     protected List<SensorRecord> lastSensorRecords;
     protected List<CalRecord> lastCalRecords;
+    private ReadData readData;
 
     protected Action1<G4ConnectionState> connectionStateListener = new Action1<G4ConnectionState>() {
 
@@ -84,11 +85,8 @@ public class DexcomG4 extends AbstractDevice {
         log.debug("New device being created: {}", this.deviceType);
         if (transport != null) {
             this.transport.registerConnectionListener(connectionStateListener);
+            readData = new ReadData(this.transport);
         }
-    }
-
-    public String getReceiverId() {
-        return receiverId;
     }
 
     @Override
@@ -108,12 +106,14 @@ public class DexcomG4 extends AbstractDevice {
 
         DateTime dateTime = new DateTime();
         if (!isConnected()) {
-            reporter.report(EventType.DEVICE, EventSeverity.WARN, messages.getString("event_g4_not_connected"));
+            if (reporter != null) {
+                reporter.report(EventType.DEVICE, EventSeverity.WARN,
+                                messages.getString("event_g4_not_connected"));
+            }
             return downloadBuilder.download_timestamp(dateTime.toString())
                     .download_status(DownloadStatus.DEVICE_NOT_FOUND).build();
         }
         DownloadStatus status = DownloadStatus.SUCCESS;
-        ReadData readData = new ReadData(transport);
 
         List<EGVRecord> recentRecords;
         List<MeterRecord> meterRecords = new ArrayList<>();
@@ -128,18 +128,8 @@ public class DexcomG4 extends AbstractDevice {
         int batLevel = 100;
         long systemTime = 0;
         try {
-            if (receiverId.equals("")) {
-                receiverId = readData.readSerialNumber();
-                log.debug("ReceiverId: {}", receiverId);
-            } else {
-                log.warn("Using receiverId from session: {}", receiverId);
-            }
-            if (transmitterId.equals("")) {
-                transmitterId = readData.readTrasmitterId();
-                log.debug("TransmitterId: {}", transmitterId);
-            } else {
-                log.warn("Using TransmitterId from session: {}", transmitterId);
-            }
+            initializeReceiverId();
+            initializeTransmitterId();
 
             systemTime = readData.readSystemTime();
             // FIXME: readData.readBatteryLevel() seems to flake out on battery level reads via serial.
@@ -212,7 +202,6 @@ public class DexcomG4 extends AbstractDevice {
             }
 
             if (preferences.isInsertionUploadEnabled()) {
-                log.debug("Reading insertions");
                 insertionRecords = readData.getRecentInsertion(systemTime, dateTime.getMillis());
                 log.debug("Number of insertion records: {}", insertionRecords.size());
             }
@@ -245,10 +234,8 @@ public class DexcomG4 extends AbstractDevice {
         List<MeterEntry> cookieMonsterG4Meters = MeterRecord.toProtobufList(meterRecords);
         List<InsertionEntry> cookieMonsterG4Inserts =
                 InsertionRecord.toProtobufList(insertionRecords);
-        log.debug("Number of insertion records (protobuf): {}", cookieMonsterG4Inserts.size());
 
 
-//        downloadBuilder = new G4Download.Builder();
         downloadBuilder.cal(cookieMonsterG4Cals)
                 .meter(cookieMonsterG4Meters)
                 .insert(cookieMonsterG4Inserts)
@@ -260,6 +247,24 @@ public class DexcomG4 extends AbstractDevice {
                 .receiver_id(receiverId)
                 .transmitter_id(transmitterId);
         return downloadBuilder.build();
+    }
+
+    private void initializeTransmitterId() throws IOException {
+        if (transmitterId.equals("")) {
+            transmitterId = readData.readTrasmitterId();
+            log.debug("TransmitterId: {}", transmitterId);
+        } else {
+            log.info("Using TransmitterId from session: {}", transmitterId);
+        }
+    }
+
+    private void initializeReceiverId() throws IOException {
+        if (receiverId.equals("")) {
+            receiverId = readData.readSerialNumber();
+            log.debug("ReceiverId: {}", receiverId);
+        } else {
+            log.info("Using receiverId from session: {}", receiverId);
+        }
     }
 
     public class UIDownload {

@@ -127,9 +127,6 @@ abstract class CommonUsbSerialDriver implements UsbSerialDriver {
     public abstract void close() throws IOException;
 
     @Override
-    public abstract int read(final byte[] dest, final int timeoutMillis) throws IOException;
-
-    @Override
     public abstract int write(final byte[] src, final int timeoutMillis) throws IOException;
 
     @Override

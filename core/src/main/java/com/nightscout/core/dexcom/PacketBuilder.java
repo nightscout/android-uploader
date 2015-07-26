@@ -1,7 +1,5 @@
 package com.nightscout.core.dexcom;
 
-//import com.google.common.primitives.Bytes;
-
 import net.tribe7.common.primitives.Bytes;
 
 import java.util.ArrayList;
@@ -25,7 +23,7 @@ public class PacketBuilder {
     private List<Byte> payload;
 
     public PacketBuilder(Command command) {
-        this.command = command;
+        this(command, null);
     }
 
     public PacketBuilder(Command command, List<Byte> payload) {
@@ -38,14 +36,14 @@ public class PacketBuilder {
         packet.add(OFFSET_SOF, SOF);
         packet.add(OFFSET_LENGTH, getLength());
         packet.add(OFFSET_NULL, NULL);
-        packet.add(OFFSET_CMD, (byte) command.getValue());
-        if (this.payload != null) {
-            this.packet.addAll(OFFSET_PAYLOAD, this.payload);
+        packet.add(OFFSET_CMD, command.getValue());
+        if (payload != null) {
+            packet.addAll(OFFSET_PAYLOAD, this.payload);
         }
         byte[] crc16 = CRC16.calculate(toBytes(), 0, this.packet.size());
-        this.packet.add(crc16[0]);
-        this.packet.add(crc16[1]);
-        return this.toBytes();
+        packet.add(crc16[0]);
+        packet.add(crc16[1]);
+        return toBytes();
     }
 
     private byte getLength() {

@@ -239,11 +239,6 @@ public class BluetoothTransport implements DeviceTransport {
     }
 
     @Override
-    public int read(byte[] dest, int timeoutMillis) throws IOException {
-        return 0;
-    }
-
-    @Override
     public byte[] read(int size, int timeoutMillis) throws IOException {
         if (!isConnected()) {
             Log.d(TAG, "Unable to read. Disconnected from receiver.");

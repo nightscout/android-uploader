@@ -26,7 +26,7 @@ abstract public class AbstractDevice {
     private Bus bus = BusProvider.getInstance();
     protected EventReporter reporter;
     protected ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle",
-            Locale.getDefault());
+                                                                 Locale.getDefault());
     protected G4ConnectionState connectionStatus = G4ConnectionState.CLOSED;
 
     public abstract boolean isConnected();
@@ -34,9 +34,10 @@ abstract public class AbstractDevice {
     // Not sure that I'll need this in the general device. This may be required for only push based
     // devices.
     protected void onDownload(boolean successful) {
-        if (successful) {
+        log.debug("onDownload with {} called.", successful);
+        if (successful && reporter != null) {
             reporter.report(EventType.DEVICE, EventSeverity.INFO,
-                    messages.getString("event_sync_log"));
+                            messages.getString("event_sync_log"));
         }
     }
 
@@ -47,12 +48,14 @@ abstract public class AbstractDevice {
             onDownload(((G4Download) download).download_status == DownloadStatus.SUCCESS);
             return download;
         } catch (Exception e) {
-            reporter.report(EventType.DEVICE, EventSeverity.ERROR, "Unknown error - " + e.getMessage());
+            if (reporter != null) {
+                reporter.report(EventType.DEVICE, EventSeverity.ERROR,
+                                "Unknown error - " + e.getMessage());
+            }
             log.error("Exception: {} - {}", e.getMessage(), e);
-            e.printStackTrace();
         }
         return new G4Download.Builder().download_status(DownloadStatus.APPLICATION_ERROR)
-                .download_timestamp(new DateTime().toString()).build();
+            .download_timestamp(new DateTime().toString()).build();
     }
 
     public String getDeviceName() {
@@ -63,8 +66,11 @@ abstract public class AbstractDevice {
 
     protected void onConnect() {
         log.debug("Connection detected in abstract class");
-        reporter.report(EventType.DEVICE, EventSeverity.INFO,
-                messages.getString("g4_connected"));
+        if (reporter != null) {
+            reporter.report(EventType.DEVICE, EventSeverity.INFO,
+                            messages.getString("g4_connected"));
+
+        }
         connectionStatus = G4ConnectionState.CONNECTED;
         postConnectionStatus();
     }
@@ -77,8 +83,10 @@ abstract public class AbstractDevice {
 
     protected void onDisconnect() {
         log.debug("Disconnection detected in abstract class");
-        reporter.report(EventType.DEVICE, EventSeverity.INFO,
-                messages.getString("g4_disconnected"));
+        if (reporter != null) {
+            reporter.report(EventType.DEVICE, EventSeverity.INFO,
+                            messages.getString("g4_disconnected"));
+        }
         connectionStatus = G4ConnectionState.CLOSED;
         postConnectionStatus();
     }
@@ -101,25 +109,13 @@ abstract public class AbstractDevice {
         postConnectionStatus();
     }
 
-//    public void onActivity(boolean enabled) {
-//        log.debug("Activity change detected for device: {}", enabled);
-//        if (enabled) {
-//            connectionStatus = G4ConnectionState.ACTIVE;
-//        } else {
-//            connectionStatus = (isConnected()) ? DeviceState.CONNECTED : DeviceState.DISCONNECTED;
-//        }
-//        postConnectionStatus();
-//    }
-
     public DeviceConnectionStatus getDeviceConnectionStatus() {
-//        log.warn("Device type from device: {}", deviceType);
         return new DeviceConnectionStatus(deviceType, connectionStatus);
     }
 
     private void postConnectionStatus() {
         bus.post(new DeviceConnectionStatus(deviceType, connectionStatus));
     }
-
 
     public void setReporter(EventReporter reporter) {
         this.reporter = reporter;

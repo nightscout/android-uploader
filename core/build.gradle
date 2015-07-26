@@ -11,7 +11,6 @@ repositories {
 
 dependencies {
     compile 'joda-time:joda-time:2.5'
-//    compile 'com.google.guava:guava:18.0'
     compile 'net.tribe7.seeds:seeds-functional:16.0.1'
     compile 'net.tribe7.seeds:seeds-hash:16.0.1'
     compile 'net.tribe7.seeds:seeds-strings:16.0.1'
