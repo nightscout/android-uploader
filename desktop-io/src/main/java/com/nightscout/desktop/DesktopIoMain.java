@@ -31,12 +31,6 @@ public class DesktopIoMain {
     log.info("Using com port {}.", comPort);
     DeviceTransport transport = new DesktopSerialTransport(comPort);
     transport.open();
-    ReadData readData = new ReadData(transport);
-    log.info("Battery level: {}", readData.readBatteryLevel());
-    log.info("Transmitter id: {}", readData.readTrasmitterId());
-    log.info("Serial number: {}", readData.readSerialNumber());
-    log.info("Display time offset: {}", readData.readDisplayTimeOffset());
-    log.info("System time: {}", readData.readSystemTime());
     TestPreferences preferences = new TestPreferences();
     preferences.setCalibrationUploadEnabled(true);
     preferences.setDeviceType(SupportedDevices.DEXCOM_G4);
