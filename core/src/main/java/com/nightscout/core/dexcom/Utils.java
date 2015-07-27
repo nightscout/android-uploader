@@ -137,7 +137,6 @@ public final class Utils {
         return glucoseDataSets;
     }
 
-
     public static String bytesToHex(byte[] bytes) {
         if (bytes == null || bytes.length == 0) {
             return "";
