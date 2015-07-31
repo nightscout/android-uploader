@@ -1,11 +1,10 @@
 package com.nightscout.core.drivers;
 
 import net.tribe7.common.base.Optional;
+import net.tribe7.common.io.BaseEncoding;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Base64;
 
 public class DeviceInteraction {
 
@@ -47,7 +46,7 @@ public class DeviceInteraction {
   public JSONObject toJson() throws JSONException {
     JSONObject jsonObject = new JSONObject();
     jsonObject.put("action", action.ordinal());
-    jsonObject.put("byteArray", Base64.getEncoder().encode(byteArray));
+    jsonObject.put("byteArray", BaseEncoding.base64().encode(byteArray));
     jsonObject.put("byteLength", byteLength);
     jsonObject.put("executionTimeMs", executionTimeMs);
     return jsonObject;
@@ -56,7 +55,7 @@ public class DeviceInteraction {
   public Optional<DeviceInteraction> fromJson(JSONObject jsonObject) {
     try {
       Type type = Type.values()[jsonObject.getInt("action")];
-      byte[] bytes = Base64.getDecoder().decode(jsonObject.getString("byteArray"));
+      byte[] bytes = BaseEncoding.base64().decode(jsonObject.getString("byteArray"));
       int len = jsonObject.getInt("byteLength");
       long execTimeMs = jsonObject.getLong("executionTimeMs");
       return Optional.of(new DeviceInteraction(type, bytes, len, execTimeMs));
