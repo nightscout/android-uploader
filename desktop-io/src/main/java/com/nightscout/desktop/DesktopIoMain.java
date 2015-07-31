@@ -6,7 +6,6 @@ import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DexcomG4;
 import com.nightscout.core.drivers.SupportedDevices;
 import com.nightscout.core.events.LoggingEventReporter;
-import com.nightscout.core.model.G4Download;
 import com.nightscout.core.preferences.TestPreferences;
 import com.squareup.wire.Message;
 

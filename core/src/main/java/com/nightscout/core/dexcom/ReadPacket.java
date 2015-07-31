@@ -1,5 +1,8 @@
 package com.nightscout.core.dexcom;
 
+import com.nightscout.core.drivers.PacketTooSmallException;
+import com.nightscout.core.drivers.UnknownG4CommandException;
+
 import net.tribe7.common.base.Optional;
 
 import org.slf4j.Logger;
@@ -18,13 +21,13 @@ public class ReadPacket {
 
     public ReadPacket(byte[] readPacket) throws IOException {
         if (readPacket.length <= OFFSET_CMD) {
-            throw new IOException("Insufficient data in reading");
+            throw new PacketTooSmallException("Insufficient data in reading");
         }
         Optional<Command> optCmd = Command.getCommandByValue(readPacket[OFFSET_CMD]);
         if (optCmd.isPresent()) {
             command = optCmd.get();
         } else {
-            throw new IllegalArgumentException("Unknown command: " + readPacket[OFFSET_CMD]);
+            throw new UnknownG4CommandException("Unknown command: " + readPacket[OFFSET_CMD]);
         }
         log.debug("Initialize read packet of type {}", command.name());
         this.data = Arrays.copyOfRange(readPacket, OFFSET_DATA, readPacket.length - CRC_LEN);

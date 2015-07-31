@@ -1,0 +1,27 @@
+package nightscout.model.v2;
+
+import "g4_data.proto";
+
+option java_package = "com.nightscout.core.model.v2";
+
+// Next tag: 7
+enum DownloadStatus {
+    SUCCESS = 0;
+    NO_DATA = 1;
+    DEVICE_NOT_FOUND = 2;
+    IO_ERROR = 3;
+    APPLICATION_ERROR = 4;
+    UNKNOWN = 5;
+    NOT_APPLICABLE = 6;
+}
+
+// Next tag: 4
+message Download {
+    optional DownloadStatus status = 1 [default = SUCCESS];
+
+    // ISO8601 timestamp of when the uploader initiated this download.
+    optional string timestamp = 2;
+
+    // Data from a Dexcom G4.
+    optional G4Data g4_data = 3;
+}

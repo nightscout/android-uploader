@@ -13,9 +13,9 @@ public class SensorRecord extends GenericTimestampRecord {
     private long unfiltered;
     private long filtered;
     private int rssi;
-    private int OFFSET_UNFILTERED = 8;
-    private int OFFSET_FILTERED = 12;
-    private int OFFSET_RSSI = 16;
+    private static final int OFFSET_UNFILTERED = 8;
+    private static final int OFFSET_FILTERED = 12;
+    private static final int OFFSET_RSSI = 16;
 
     public SensorRecord(byte[] packet, long rcvrTime, long refTime) {
         super(packet, rcvrTime, refTime);
