@@ -3,7 +3,6 @@ package com.nightscout.core.drivers;
 import net.tribe7.common.base.Stopwatch;
 import net.tribe7.common.collect.Lists;
 
-
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;

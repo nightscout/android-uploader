@@ -1,8 +1,9 @@
 package com.nightscout.core.drivers;
 
+import net.tribe7.common.io.BaseEncoding;
+
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 
 import rx.functions.Action1;
@@ -50,7 +51,7 @@ public class ReplayingDeviceTransport implements DeviceTransport {
   }
 
   private String b64(byte[] bytes) {
-    return Base64.getEncoder().encodeToString(bytes);
+    return BaseEncoding.base64().encode(bytes);
   }
 
   @Override
