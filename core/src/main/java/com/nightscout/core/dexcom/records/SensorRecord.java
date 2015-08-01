@@ -3,6 +3,10 @@ package com.nightscout.core.dexcom.records;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.model.SensorEntry;
+import com.nightscout.core.model.v2.G4Timestamp;
+import com.nightscout.core.model.v2.RawSensorReading;
+
+import net.tribe7.common.base.Function;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -74,6 +78,21 @@ public class SensorRecord extends GenericTimestampRecord {
 
     public static List<SensorEntry> toProtobufList(List<SensorRecord> list) {
         return toProtobufList(list, SensorEntry.class);
+    }
+
+    public static Function<SensorRecord, RawSensorReading> v2ModelConverter() {
+        return new Function<SensorRecord, RawSensorReading>() {
+            @Override
+            public RawSensorReading apply(SensorRecord input) {
+                return new RawSensorReading.Builder()
+                    .rssi(input.rssi)
+                    .filtered(input.filtered)
+                    .unfiltered(input.unfiltered)
+                    .timestamp(new G4Timestamp(input.getRawSystemTimeSeconds(),
+                                               input.getRawDisplayTimeSeconds()))
+                    .build();
+            }
+        };
     }
 
 

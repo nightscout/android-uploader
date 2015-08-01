@@ -7,7 +7,13 @@ import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.model.G4Noise;
 import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.model.SensorGlucoseValueEntry;
+import com.nightscout.core.model.v2.G4Timestamp;
+import com.nightscout.core.model.v2.Noise;
+import com.nightscout.core.model.v2.SensorGlucoseValue;
+import com.nightscout.core.model.v2.Trend;
 import com.nightscout.core.utils.GlucoseReading;
+
+import net.tribe7.common.base.Function;
 
 import org.joda.time.DateTime;
 import org.json.JSONException;
@@ -20,6 +26,8 @@ import java.util.List;
 public class EGVRecord extends GenericTimestampRecord {
     public final static int RECORD_SIZE = 12;
     private GlucoseReading reading;
+    private byte noiseValue;
+    private int trendValue;
     private TrendArrow trend;
     private G4Noise noiseMode;
 
@@ -32,8 +40,8 @@ public class EGVRecord extends GenericTimestampRecord {
         int bGValue = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8) & Constants.EGV_VALUE_MASK;
         this.reading = new GlucoseReading(bGValue, GlucoseUnit.MGDL);
         byte trendAndNoise = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).get(10);
-        int trendValue = trendAndNoise & Constants.EGV_TREND_ARROW_MASK;
-        byte noiseValue = (byte) ((trendAndNoise & Constants.EGV_NOISE_MASK) >> 4);
+        trendValue = trendAndNoise & Constants.EGV_TREND_ARROW_MASK;
+        noiseValue = (byte) ((trendAndNoise & Constants.EGV_NOISE_MASK) >> 4);
         this.trend = TrendArrow.values()[trendValue];
         this.noiseMode = G4Noise.values()[noiseValue];
         setRecordType();
@@ -99,6 +107,20 @@ public class EGVRecord extends GenericTimestampRecord {
 
     public static List<SensorGlucoseValueEntry> toProtobufList(List<EGVRecord> list) {
         return toProtobufList(list, SensorGlucoseValueEntry.class);
+    }
+
+    public static Function<EGVRecord, SensorGlucoseValue> v2ModelConverter() {
+        return new Function<EGVRecord, SensorGlucoseValue>() {
+            @Override
+            public SensorGlucoseValue apply(EGVRecord input) {
+                return new SensorGlucoseValue.Builder()
+                    .glucose_mgdl(input.getBgMgdl())
+                    .timestamp(new G4Timestamp(input.getRawSystemTimeSeconds(), input.getRawDisplayTimeSeconds()))
+                    .noise(Noise.values()[input.noiseValue])
+                    .trend(Trend.values()[input.trendValue])
+                    .build();
+            }
+        };
     }
 
     public GlucoseReading getReading() {

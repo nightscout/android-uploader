@@ -1,40 +1,36 @@
 package com.nightscout.core.utils;
 
-import com.nightscout.core.dexcom.records.CalRecord;
-import com.nightscout.core.dexcom.records.EGVRecord;
-import com.nightscout.core.dexcom.records.SensorRecord;
-import com.nightscout.core.model.G4Noise;
-import com.nightscout.core.model.GlucoseUnit;
+import com.nightscout.core.model.v2.Calibration;
+import com.nightscout.core.model.v2.RawSensorReading;
+import com.nightscout.core.model.v2.SensorGlucoseValue;
 
-public class IsigReading extends GlucoseReading {
-    protected SensorRecord sensorRecord;
-    protected CalRecord calRecord;
-    protected EGVRecord egvRecord;
+import net.tribe7.common.base.Optional;
 
-    public IsigReading(SensorRecord sensorRecord, CalRecord calRecord, EGVRecord egvRecord) {
-        this.sensorRecord = sensorRecord;
-        this.calRecord = calRecord;
-        this.egvRecord = egvRecord;
-        if (calRecord.getSlope() == 0 || calRecord.getSlope() == 0 || sensorRecord.getUnfiltered() == 0) {
-            this.valueMgdl = 0;
-        } else if (sensorRecord.getFiltered() == 0) {
-            valueMgdl = (int) (calRecord.getScale() * (sensorRecord.getUnfiltered() - calRecord.getIntercept()) / calRecord.getSlope());
-        } else {
-            double ratio = calRecord.getScale() * (sensorRecord.getFiltered() - calRecord.getIntercept()) / calRecord.getSlope() / egvRecord.getBgMgdl();
-            valueMgdl = (int) (calRecord.getScale() * (sensorRecord.getUnfiltered() - calRecord.getIntercept()) / calRecord.getSlope() / ratio);
+public final class IsigReading {
+    private IsigReading() {}
+
+    private static final Double EPSILON = 0.01;
+
+    private static double calculateEstimatedGlucoseValue(long rawValue, Calibration calibration) {
+        return calibration.scale * (rawValue - calibration.intercept) / calibration.slope;
+    }
+
+    public static Optional<GlucoseReading> calculate(Optional<SensorGlucoseValue> glucoseValue,
+                                                     Optional<Calibration> calibration,
+                                                     Optional<RawSensorReading> rawSensorReading) {
+        if (!glucoseValue.isPresent() || !calibration.isPresent() || !rawSensorReading.isPresent() ||
+            Math.abs(calibration.get().slope) < EPSILON || rawSensorReading.get().unfiltered == 0) {
+            return Optional.absent();
         }
-    }
 
-    protected IsigReading() {
-        this.valueMgdl = 0;
+        double estimatedUnfilteredBasedValue = calculateEstimatedGlucoseValue(
+            rawSensorReading.get().unfiltered, calibration.get());
+        double estimatedFilteredBasedValue = 1;
+        if (rawSensorReading.get().filtered != 0) {
+            estimatedFilteredBasedValue = calculateEstimatedGlucoseValue(rawSensorReading.get().filtered, calibration.get());
+        }
+        return Optional.of(GlucoseReading.mgdl(
+            glucoseValue.get().glucose_mgdl * estimatedUnfilteredBasedValue
+            / estimatedFilteredBasedValue));
     }
-
-    protected IsigReading(int valueMgdl, GlucoseUnit unit) {
-        super(valueMgdl, unit);
-    }
-
-    public G4Noise getNoise() {
-        return egvRecord.getNoiseMode();
-    }
-
 }

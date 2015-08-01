@@ -32,7 +32,7 @@ import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.drivers.DeviceConnectionStatus;
 import com.nightscout.core.drivers.DexcomG4;
-import com.nightscout.core.drivers.SupportedDevices;
+import com.nightscout.core.drivers.DeviceType;
 import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.model.SensorGlucoseValueEntry;
@@ -200,7 +200,7 @@ public class MonitorFragment extends Fragment {
     }
 
     private void refreshDeviceType() {
-      int res = preferences.getDeviceType() == SupportedDevices.DEXCOM_G4 ? R.drawable.ic_nousb : R.drawable.ic_noble;
+      int res = preferences.getDeviceType() == DeviceType.DEXCOM_G4 ? R.drawable.ic_nousb : R.drawable.ic_noble;
       setReceiverButtonRes(res);
     }
 
@@ -320,15 +320,15 @@ public class MonitorFragment extends Fragment {
         log.info("Device Type: " + status.deviceType + " Device State: " + status.deviceState.name());
         switch (status.deviceState) {
             case CONNECTED:
-                res = (status.deviceType == SupportedDevices.DEXCOM_G4) ? R.drawable.ic_usb : R.drawable.ic_ble;
+                res = (status.deviceType == DeviceType.DEXCOM_G4) ? R.drawable.ic_usb : R.drawable.ic_ble;
                 break;
             case CLOSED:
-                res = (status.deviceType == SupportedDevices.DEXCOM_G4) ? R.drawable.ic_nousb : R.drawable.ic_noble;
+                res = (status.deviceType == DeviceType.DEXCOM_G4) ? R.drawable.ic_nousb : R.drawable.ic_noble;
                 break;
             case READING:
             case WRITING:
             case CONNECTING:
-                res = (status.deviceType == SupportedDevices.DEXCOM_G4) ? R.drawable.ic_usb : R.drawable.ble_read;
+                res = (status.deviceType == DeviceType.DEXCOM_G4) ? R.drawable.ic_usb : R.drawable.ble_read;
                 break;
         }
         return res;

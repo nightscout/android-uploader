@@ -11,10 +11,6 @@ public class GlucoseReading {
                 Math.round(value) : Math.round(value * Constants.MMOL_L_TO_MG_DL);
     }
 
-    protected GlucoseReading() {
-        this.valueMgdl = 0;
-    }
-
     public float asMmol() {
         return valueMgdl * Constants.MG_DL_TO_MMOL_L;
     }
@@ -25,6 +21,10 @@ public class GlucoseReading {
 
     public int asMgdl() {
         return valueMgdl;
+    }
+
+    public static GlucoseReading mgdl(double mgdl) {
+        return new GlucoseReading((float)mgdl, GlucoseUnit.MGDL);
     }
 
     public String asMgdlStr() {

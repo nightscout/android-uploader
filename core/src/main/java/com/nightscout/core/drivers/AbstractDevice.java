@@ -19,7 +19,7 @@ import java.util.ResourceBundle;
  */
 abstract public class AbstractDevice {
     protected final Logger log = LoggerFactory.getLogger(AbstractDevice.class);
-    protected SupportedDevices deviceType = SupportedDevices.UNKNOWN;
+    protected DeviceType deviceType = DeviceType.UNKNOWN;
     private Bus bus = BusProvider.getInstance();
     protected EventReporter reporter;
     protected ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle",

@@ -3,6 +3,11 @@ package com.nightscout.core.dexcom.records;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.model.CalibrationEntry;
+import com.nightscout.core.model.v2.Calibration;
+import com.nightscout.core.model.v2.G4Timestamp;
+
+import net.tribe7.common.base.Function;
+import net.tribe7.common.collect.Lists;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
@@ -104,6 +109,22 @@ public class CalRecord extends GenericTimestampRecord {
 
     public static List<CalibrationEntry> toProtobufList(List<CalRecord> list) {
         return toProtobufList(list, CalibrationEntry.class);
+    }
+
+    public static Function<CalRecord, Calibration> v2ModelConverter() {
+        return new Function<CalRecord, Calibration>() {
+            @Override
+            public Calibration apply(CalRecord input) {
+                return new Calibration.Builder()
+                    .decay(input.decay)
+                    .intercept(input.intercept)
+                    .scale(input.scale)
+                    .slope(input.slope)
+                    .timestamp(new G4Timestamp(input.getRawSystemTimeSeconds(),
+                                               input.getRawDisplayTimeSeconds()))
+                    .build();
+            }
+        };
     }
 
 

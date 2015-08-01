@@ -4,7 +4,7 @@ import com.embeddedunveiled.serial.SerialComManager;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DexcomG4;
-import com.nightscout.core.drivers.SupportedDevices;
+import com.nightscout.core.drivers.DeviceType;
 import com.nightscout.core.events.LoggingEventReporter;
 import com.nightscout.core.preferences.TestPreferences;
 import com.squareup.wire.Message;
@@ -32,7 +32,7 @@ public class DesktopIoMain {
     transport.open();
     TestPreferences preferences = new TestPreferences();
     preferences.setCalibrationUploadEnabled(true);
-    preferences.setDeviceType(SupportedDevices.DEXCOM_G4);
+    preferences.setDeviceType(DeviceType.DEXCOM_G4);
     preferences.setRawEnabled(true);
     preferences.setMeterUploadEnabled(true);
     preferences.setInsertionUploadEnabled(true);

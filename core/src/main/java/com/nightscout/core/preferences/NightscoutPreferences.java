@@ -1,6 +1,6 @@
 package com.nightscout.core.preferences;
 
-import com.nightscout.core.drivers.SupportedDevices;
+import com.nightscout.core.drivers.DeviceType;
 import com.nightscout.core.model.GlucoseUnit;
 
 import java.util.List;
@@ -75,7 +75,7 @@ public interface NightscoutPreferences {
 
     void setAskedForData(boolean askedForData);
 
-    SupportedDevices getDeviceType();
+    DeviceType getDeviceType();
 
     void setBluetoothDevice(String btDeviceName, String btAddress);
 

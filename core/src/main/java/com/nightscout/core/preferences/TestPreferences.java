@@ -1,6 +1,6 @@
 package com.nightscout.core.preferences;
 
-import com.nightscout.core.drivers.SupportedDevices;
+import com.nightscout.core.drivers.DeviceType;
 import com.nightscout.core.model.GlucoseUnit;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class TestPreferences implements NightscoutPreferences {
     private String btAddress = null;
     private String btDeviceName;
     private HashMap<String, HashMap<String, Long>> lastUpload = new HashMap<>();
-    private SupportedDevices deviceType = SupportedDevices.UNKNOWN;
+    private DeviceType deviceType = DeviceType.UNKNOWN;
     private boolean insertionEnabled;
 
     @Override
@@ -198,11 +198,11 @@ public class TestPreferences implements NightscoutPreferences {
     }
 
     @Override
-    public SupportedDevices getDeviceType() {
+    public DeviceType getDeviceType() {
         return deviceType;
     }
 
-    public void setDeviceType(SupportedDevices deviceType) {
+    public void setDeviceType(DeviceType deviceType) {
         this.deviceType = deviceType;
     }
 

@@ -36,20 +36,26 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 public class ReadData {
+    private static final Logger log = LoggerFactory.getLogger(ReadData.class);
 
     public static final int EXPECTED_PAGE_SIZE_BYTES = 534;
     public static final int EXPECTED_PAGE_RANGE_SIZE_BYTES = 14;
 
-    protected final Logger log = LoggerFactory.getLogger(this.getClass());
     private static final int TIMEOUT_MS = 25000;
     private static final int MIN_LEN = 256;
-    private DeviceTransport mSerialDevice;
+    private Provider<Optional<DeviceTransport>> deviceTransportProvider;
 
     // Storing this to reduce the number of reads from the device for other attributes
     private Document manufacturingDataXml;
+    private String transmitterId;
 
-    public ReadData(DeviceTransport device) {
-        mSerialDevice = device;
+    public ReadData(Provider<Optional<DeviceTransport>> provider) {
+        deviceTransportProvider = provider;
+    }
+
+    public boolean isConnected() {
+        Optional<DeviceTransport> transportOptional = deviceTransportProvider.get();
+        return transportOptional.isPresent() && transportOptional.get().isConnected();
     }
 
     public List<InsertionRecord> getRecentInsertion(long rcvrTime, long refTime) throws IOException {
@@ -121,9 +127,12 @@ public class ReadData {
     }
 
     public String readTrasmitterId() throws IOException {
-        writeCommand(Command.READ_TRANSMITTER_ID);
-        byte[] data = read(11).getData();
-        return new String(data);
+        if (transmitterId == null) {
+            writeCommand(Command.READ_TRANSMITTER_ID);
+            byte[] data = read(11).getData();
+            transmitterId = new String(data);
+        }
+        return transmitterId;
     }
 
     private Optional<String> getManufacturingAttribute(String attribute) throws IOException {
@@ -204,7 +213,8 @@ public class ReadData {
             payloadString = Utils.bytesToHex(Bytes.toArray(payload));
         }
         log.debug("Writing command {} with payload '{}'.", command.name(), payloadString);
-        mSerialDevice.write(new PacketBuilder(command, payload).build(), TIMEOUT_MS);
+        
+        serialDevice.write(new PacketBuilder(command, payload).build(), TIMEOUT_MS);
     }
 
     protected void writeCommand(Command command) throws IOException {
@@ -212,7 +222,7 @@ public class ReadData {
     }
 
     private ReadPacket read(int numOfBytes) throws IOException {
-        byte[] response = mSerialDevice.read(numOfBytes, TIMEOUT_MS);
+        byte[] response = serialDevice.read(numOfBytes, TIMEOUT_MS);
         if (response.length != numOfBytes) {
             log.error("Response numBytes {}, requested {}", response.length, numOfBytes);
         }

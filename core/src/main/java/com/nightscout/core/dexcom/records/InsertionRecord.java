@@ -4,6 +4,10 @@ import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.model.G4Insertion;
 import com.nightscout.core.model.InsertionEntry;
+import com.nightscout.core.model.v2.G4Timestamp;
+import com.nightscout.core.model.v2.Insertion;
+
+import net.tribe7.common.base.Function;
 
 import java.util.List;
 
@@ -46,5 +50,18 @@ public class InsertionRecord extends GenericTimestampRecord {
                 .disp_timestamp_sec(rawDisplayTimeSeconds)
                 .state(G4Insertion.values()[state.ordinal()])
                 .build();
+    }
+
+    public static Function<InsertionRecord, Insertion> v2ModelConverter() {
+        return new Function<InsertionRecord, Insertion>() {
+            @Override
+            public Insertion apply(InsertionRecord input) {
+                return new Insertion.Builder()
+                    .state(Insertion.State.values()[input.getState().ordinal()])
+                    .timestamp(new G4Timestamp(input.getRawSystemTimeSeconds(),
+                                               input.getRawDisplayTimeSeconds()))
+                    .build();
+            }
+        };
     }
 }
