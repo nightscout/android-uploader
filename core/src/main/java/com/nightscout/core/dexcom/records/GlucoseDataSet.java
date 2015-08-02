@@ -48,14 +48,6 @@ public class GlucoseDataSet extends GenericTimestampRecord {
         return rawSystemTimeSeconds;
     }
 
-    public long getSensorRawSystemTime() {
-        return sensorRawSystemTime;
-    }
-
-    public long getSensorRawDisplayTime() {
-        return sensorRawDisplayTime;
-    }
-
     public GlucoseDataSet(EGVRecord egvRecord, SensorRecord sensorRecord) {
         this(egvRecord);
         this.sensorRawSystemTime = sensorRecord.getRawSystemTimeSeconds();

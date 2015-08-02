@@ -24,7 +24,7 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 
-import com.nightscout.core.drivers.G4ConnectionState;
+import com.nightscout.core.drivers.DeviceConnectionState;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -56,7 +56,7 @@ abstract class CommonUsbSerialDriver implements UsbSerialDriver {
     protected int subClass;
     protected int protocol;
 
-    protected Action1<G4ConnectionState> connectionStateListener;
+    protected Action1<DeviceConnectionState> connectionStateListener;
 
     /**
      * Internal read buffer.  Guarded by {@link #mReadBufferLock}.
@@ -186,7 +186,7 @@ abstract class CommonUsbSerialDriver implements UsbSerialDriver {
     }
 
     @Override
-    public void registerConnectionListener(Action1<G4ConnectionState> connectionListener) {
+    public void registerConnectionListener(Action1<DeviceConnectionState> connectionListener) {
         connectionStateListener = connectionListener;
     }
 }

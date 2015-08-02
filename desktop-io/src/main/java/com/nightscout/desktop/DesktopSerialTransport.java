@@ -2,7 +2,7 @@ package com.nightscout.desktop;
 
 import com.embeddedunveiled.serial.SerialComManager;
 import com.nightscout.core.drivers.DeviceTransport;
-import com.nightscout.core.drivers.G4ConnectionState;
+import com.nightscout.core.drivers.DeviceConnectionState;
 
 import java.io.IOException;
 
@@ -64,7 +64,7 @@ public class DesktopSerialTransport implements DeviceTransport {
   }
 
   @Override
-  public void registerConnectionListener(Action1<G4ConnectionState> connectionListener) {
+  public void registerConnectionListener(Action1<DeviceConnectionState> connectionListener) {
     // no-op
   }
 }

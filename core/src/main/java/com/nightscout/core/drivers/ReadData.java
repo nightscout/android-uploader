@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Provider;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -49,8 +50,13 @@ public class ReadData {
     private Document manufacturingDataXml;
     private String transmitterId;
 
+    private DeviceTransport serialDevice;
+
     public ReadData(Provider<Optional<DeviceTransport>> provider) {
         deviceTransportProvider = provider;
+
+        // TODO remove
+        serialDevice = provider.get().get();
     }
 
     public boolean isConnected() {

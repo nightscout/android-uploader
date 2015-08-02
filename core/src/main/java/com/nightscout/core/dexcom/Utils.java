@@ -4,6 +4,7 @@ import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.model.G4Download;
 import com.nightscout.core.model.SensorEntry;
 import com.nightscout.core.model.SensorGlucoseValueEntry;
+import com.nightscout.core.model.v2.SensorGlucoseValue;
 import com.squareup.wire.Message;
 
 import net.tribe7.common.base.Strings;
@@ -47,6 +48,14 @@ public final class Utils {
     public static DateTime receiverTimeToDateTime(long deltaInSeconds) {
         int offset = DateTimeZone.getDefault().getOffset(DEXCOM_EPOCH) - DateTimeZone.getDefault().getOffset(Instant.now());
         return DEXCOM_EPOCH.plus(offset).plus(standardSeconds(deltaInSeconds));
+    }
+
+    public static DateTime receiverTimeToDateTime(SensorGlucoseValue sensorGlucoseValue) {
+        if (sensorGlucoseValue == null) {
+            return null;
+        }
+        int offset = DateTimeZone.getDefault().getOffset(DEXCOM_EPOCH) - DateTimeZone.getDefault().getOffset(Instant.now());
+        return DEXCOM_EPOCH.plus(offset).plus(standardSeconds(sensorGlucoseValue.timestamp.display_time_sec));
     }
 
     public static DateTime receiverTimeToDate(long delta) {

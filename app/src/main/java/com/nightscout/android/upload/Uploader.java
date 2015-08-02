@@ -13,7 +13,7 @@ import com.nightscout.core.dexcom.records.GenericTimestampRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.InsertionRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
-import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.drivers.AbstractUploader;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
@@ -188,7 +188,7 @@ public class Uploader {
                            List<MeterRecord> meterRecords,
                            List<CalRecord> calRecords, List<InsertionRecord> insertionRecords, int rcvrBat) {
 
-        AbstractUploaderDevice deviceStatus = AndroidUploaderDevice.getUploaderDevice(context);
+        AbstractUploader deviceStatus = AndroidUploaderDevice.getUploaderDevice(context);
 
         boolean allSuccessful = true;
         boolean successful = true;

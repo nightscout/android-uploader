@@ -1,6 +1,6 @@
 package com.nightscout.core.drivers;
 
-public enum G4ConnectionState {
+public enum DeviceConnectionState {
     CONNECTING,
     CONNECTED,
     CLOSING,

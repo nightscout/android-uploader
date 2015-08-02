@@ -7,7 +7,7 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
-import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.drivers.AbstractUploader;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
@@ -101,7 +101,7 @@ public class MongoUploaderTest {
         assertThat(dbObject.get("scale"), is(not(nullValue())));
     }
 
-    public void verifyDeviceStatus(AbstractUploaderDevice deviceStatus) {
+    public void verifyDeviceStatus(AbstractUploader deviceStatus) {
         BasicDBObject dbObject = captor.getValue();
         assertThat(dbObject.getInt("uploaderBattery"), is(deviceStatus.getBatteryLevel()));
         assertThat(dbObject.get("created_at"), is(not(nullValue())));
@@ -153,7 +153,7 @@ public class MongoUploaderTest {
 
     @Test
     public void testUploadDeviceStatus() {
-        AbstractUploaderDevice deviceStatus = mockDeviceStatus();
+        AbstractUploader deviceStatus = mockDeviceStatus();
         mongoUploader.uploadDeviceStatus(deviceStatus, 100);
         verifyDeviceStatus(deviceStatus);
     }
@@ -165,7 +165,7 @@ public class MongoUploaderTest {
                 new MongoClientURI("mongodb://foobar/db"),
                 "collection",
                 "dsCollection", reporter);
-        AbstractUploaderDevice deviceStatus = mockDeviceStatus();
+        AbstractUploader deviceStatus = mockDeviceStatus();
         assertThat(mongoUploader.uploadDeviceStatus(deviceStatus, 100), is(false));
     }
 

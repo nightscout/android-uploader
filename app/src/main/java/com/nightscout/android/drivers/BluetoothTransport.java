@@ -24,7 +24,7 @@ import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.drivers.DeviceTransport;
-import com.nightscout.core.drivers.G4ConnectionState;
+import com.nightscout.core.drivers.DeviceConnectionState;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
@@ -65,7 +65,7 @@ public class BluetoothTransport implements DeviceTransport {
     public final static int READ_TIMEOUT = 5000;
     public final static int WRITE_TIMEOUT = 5000;
 
-    private Action1<G4ConnectionState> connectionStateListener;
+    private Action1<DeviceConnectionState> connectionStateListener;
 
     // Bluetooth connection state variables
     private static final int STATE_DISCONNECTED = BluetoothProfile.STATE_DISCONNECTED;
@@ -88,8 +88,6 @@ public class BluetoothTransport implements DeviceTransport {
     private BluetoothGattCharacteristic mCommandCharacteristic;
     private BluetoothGattCharacteristic mResponseCharacteristic;
     private BluetoothGattCharacteristic mHeartBeatCharacteristic;
-
-    private G4ConnectionState connectionState = G4ConnectionState.CLOSED;
 
     // Header bytes for BLE messages
     private byte MESSAGE_INDEX = 0x01;
@@ -150,13 +148,13 @@ public class BluetoothTransport implements DeviceTransport {
     @Override
     public void open() throws IOException {
         cancelReconnect();
-        setConnectionState(G4ConnectionState.CONNECTING);
+        setConnectionState(DeviceConnectionState.CONNECTING);
         shouldBeOpen = true;
         Log.d(TAG, "Starting open");
         AndroidPreferences prefs = new AndroidPreferences(mContext);
         mBluetoothDeviceAddress = prefs.getBtAddress();
         if (mBluetoothDeviceAddress.equals("")) {
-            setConnectionState(G4ConnectionState.CLOSED);
+            setConnectionState(DeviceConnectionState.CLOSED);
             delayedReconnect(RECONNECT_LONG);
             throw new IOException("Invalid bluetooth address");
         }
@@ -180,12 +178,12 @@ public class BluetoothTransport implements DeviceTransport {
         }
         if (!finalCallback) {
             Log.e(TAG, "Timeout while opening BLE connection to receiver");
-            setConnectionState(G4ConnectionState.CLOSED);
+            setConnectionState(DeviceConnectionState.CLOSED);
             delayedReconnect(RECONNECT_LONG);
             throw new IOException("Timeout while opening BLE connection to receiver");
         }
         Log.d(TAG, "Successfully made it to the end of open");
-        setConnectionState(G4ConnectionState.CONNECTED);
+        setConnectionState(DeviceConnectionState.CONNECTED);
     }
 
     @Override
@@ -211,14 +209,14 @@ public class BluetoothTransport implements DeviceTransport {
     public int write(byte[] src, int timeoutMillis) throws IOException {
         if (!isConnected()) {
             Log.e(TAG, "Unable to write to device. Device not connected");
-            setConnectionState(G4ConnectionState.CLOSED);
+            setConnectionState(DeviceConnectionState.CLOSED);
             delayedReconnect(RECONNECT_SHORT);
             throw new IOException("Unable to write to device. Device not connected");
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             requestConnectionPriority();
         }
-        setConnectionState(G4ConnectionState.WRITING);
+        setConnectionState(DeviceConnectionState.WRITING);
         // TODO: The bluetooth protocol has 2 additional bytes, a message index and message count,
         // right now we don't use any messages that have any index or count > 1.  But a function to
         // handle should be introduced.
@@ -234,7 +232,7 @@ public class BluetoothTransport implements DeviceTransport {
         if (mBluetoothGatt.writeCharacteristic(mSendDataCharacteristic)) {
             Log.d(TAG, "Write was successfully initiated");
         }
-        setConnectionState(G4ConnectionState.CONNECTED);
+        setConnectionState(DeviceConnectionState.CONNECTED);
         return src.length;
     }
 
@@ -242,11 +240,11 @@ public class BluetoothTransport implements DeviceTransport {
     public byte[] read(int size, int timeoutMillis) throws IOException {
         if (!isConnected()) {
             Log.d(TAG, "Unable to read. Disconnected from receiver.");
-            setConnectionState(G4ConnectionState.CLOSED);
+            setConnectionState(DeviceConnectionState.CLOSED);
             delayedReconnect(RECONNECT_SHORT);
             throw new IOException("Disconnected from device. Unable to read");
         }
-        setConnectionState(G4ConnectionState.READING);
+        setConnectionState(DeviceConnectionState.READING);
         long endTime = System.currentTimeMillis() + timeoutMillis;
         while (endTime > System.currentTimeMillis()) {
             if (asyncReader.getResponse().length >= size) {
@@ -261,7 +259,7 @@ public class BluetoothTransport implements DeviceTransport {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             requestConnectionPriority();
         }
-        setConnectionState(G4ConnectionState.CONNECTED);
+        setConnectionState(DeviceConnectionState.CONNECTED);
         return asyncReader.getResponse();
     }
 
@@ -274,7 +272,7 @@ public class BluetoothTransport implements DeviceTransport {
         return mConnectionState == BluetoothProfile.STATE_CONNECTED;
     }
 
-    public void registerConnectionListener(Action1<G4ConnectionState> connectionListener) {
+    public void registerConnectionListener(Action1<DeviceConnectionState> connectionListener) {
         connectionStateListener = connectionListener;
     }
 
@@ -293,7 +291,7 @@ public class BluetoothTransport implements DeviceTransport {
                 for (BluetoothDevice bluetoothDevice : mBluetoothManager.getConnectedDevices(BluetoothProfile.GATT)) {
                     if (bluetoothDevice.getAddress().compareTo(device.getAddress()) == 0) {
                         mConnectionState = STATE_CONNECTED;
-                        setConnectionState(G4ConnectionState.CONNECTED);
+                        setConnectionState(DeviceConnectionState.CONNECTED);
                         Log.d(TAG, "Bluetooth device is connected.");
                     }
                 }
@@ -311,7 +309,7 @@ public class BluetoothTransport implements DeviceTransport {
 
         } else {
             Log.d(TAG, "Bluetooth is disabled");
-            setConnectionState(G4ConnectionState.CLOSED);
+            setConnectionState(DeviceConnectionState.CLOSED);
             EventReporter reporter = AndroidEventReporter.getReporter(mContext);
             reporter.report(EventType.DEVICE, EventSeverity.WARN, mContext.getString(R.string.warn_disabled_bluetooth));
         }
@@ -325,14 +323,14 @@ public class BluetoothTransport implements DeviceTransport {
 
         if (mBluetoothAdapter == null || address == null) {
             Log.d(TAG, "BluetoothAdapter not initialized or unspecified address.");
-            setConnectionState(G4ConnectionState.CLOSED);
+            setConnectionState(DeviceConnectionState.CLOSED);
             delayedReconnect(RECONNECT_LONG);
             return false;
         }
 
         if (mBluetoothGatt != null) {
             Log.d(TAG, "Bluetooth Gatt is not null, so closing...");
-            setConnectionState(G4ConnectionState.CLOSED);
+            setConnectionState(DeviceConnectionState.CLOSED);
             mBluetoothGatt.close();
             mBluetoothGatt = null;
             Log.d(TAG, "Bluetooth Gatt closed.");
@@ -346,7 +344,7 @@ public class BluetoothTransport implements DeviceTransport {
                 device = bluetoothDevice;
                 mBluetoothGatt = device.connectGatt(mContext.getApplicationContext(), true, mGattCallback);
                 if (isConnected()) {
-                    setConnectionState(G4ConnectionState.CONNECTED);
+                    setConnectionState(DeviceConnectionState.CONNECTED);
                     Log.d(TAG, "Bluetooth device connected.");
                 }
                 return isConnected();
@@ -416,7 +414,7 @@ public class BluetoothTransport implements DeviceTransport {
             Log.w(TAG, "Errors: " + writeStatusConnectionFailures(status));
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 if (status == BluetoothGatt.GATT_SUCCESS) {
-                    setConnectionState(G4ConnectionState.CONNECTING);
+                    setConnectionState(DeviceConnectionState.CONNECTING);
                     mBluetoothGatt = gatt;
                     device = mBluetoothGatt.getDevice();
                     mConnectionState = STATE_CONNECTED;
@@ -452,7 +450,7 @@ public class BluetoothTransport implements DeviceTransport {
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.w(TAG, "Disconnected from GATT server. Should be open: " + shouldBeOpen);
                 finalCallback = false;
-                setConnectionState(G4ConnectionState.CLOSED);
+                setConnectionState(DeviceConnectionState.CLOSED);
                 mConnectionState = STATE_DISCONNECTED;
                 Log.w(TAG, "Connection was unexpectedly lost. Attempting to reconnect");
                 delayedReconnect(RECONNECT_SHORT);
@@ -734,13 +732,15 @@ public class BluetoothTransport implements DeviceTransport {
             return false;
         }
 
-        final BluetoothGattService gaService = gatt.getService(DexShareAttributes.GENERIC_ATTRIBUTE_SERVICE);
+        final BluetoothGattService gaService = gatt.getService(
+            DexShareAttributes.GENERIC_ATTRIBUTE_SERVICE);
         if (gaService == null) {
             Log.d(TAG, "Returning false for ensureServiceChangedEnabled due being unable to read Generic attribute service");
             return false;
         }
 
-        final BluetoothGattCharacteristic scCharacteristic = gaService.getCharacteristic(DexShareAttributes.SERVICE_CHANGED_CHARACTERISTIC);
+        final BluetoothGattCharacteristic scCharacteristic = gaService.getCharacteristic(
+            DexShareAttributes.SERVICE_CHANGED_CHARACTERISTIC);
         if (scCharacteristic == null) {
             Log.d(TAG, "Returning false for ensureServiceChangedEnabled due being unable to get service changed characteristic");
             return false;
@@ -908,7 +908,7 @@ public class BluetoothTransport implements DeviceTransport {
             if (mInitInProgress) {
                 mInitInProgress = false;
                 Log.w(TAG, "Device should be ready now");
-                Observable.just(G4ConnectionState.CONNECTED).subscribe(connectionStateListener);
+                Observable.just(DeviceConnectionState.CONNECTED).subscribe(connectionStateListener);
                 finalCallback = true;
             }
             return;
@@ -974,7 +974,7 @@ public class BluetoothTransport implements DeviceTransport {
         return gatt.writeCharacteristic(characteristic);
     }
 
-    private void setConnectionState(G4ConnectionState connectionState) {
+    private void setConnectionState(DeviceConnectionState connectionState) {
         this.connectionState = connectionState;
         Observable.just(connectionState).subscribe(connectionStateListener);
     }

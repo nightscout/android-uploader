@@ -24,11 +24,11 @@ import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.core.BusProvider;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.drivers.AbstractDevice;
-import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.drivers.AbstractUploader;
 import com.nightscout.core.drivers.DeviceConnectionStatus;
 import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DexcomG4;
-import com.nightscout.core.drivers.G4ConnectionState;
+import com.nightscout.core.drivers.DeviceConnectionState;
 import com.nightscout.core.drivers.ReadData;
 import com.nightscout.core.drivers.DeviceType;
 import com.nightscout.core.events.EventReporter;
@@ -133,7 +133,8 @@ public class CollectorService extends Service {
 
     private void setDriver() {
         DeviceType deviceType = preferences.getDeviceType();
-        AbstractUploaderDevice uploaderDevice = AndroidUploaderDevice.getUploaderDevice(getApplicationContext());
+        AbstractUploader
+            uploaderDevice = AndroidUploaderDevice.getUploaderDevice(getApplicationContext());
         if (deviceType == DeviceType.DEXCOM_G4 || deviceType == DeviceType.DEXCOM_G4_SHARE2) {
             device = new DexcomG4(new ReadData(deviceTransportProvider), preferences, uploaderDevice);
             device.setReporter(reporter);
@@ -301,7 +302,7 @@ public class CollectorService extends Service {
 
     public DeviceConnectionStatus getDeviceConnectionStatus() {
         if (device == null) {
-            return new DeviceConnectionStatus(preferences.getDeviceType(), G4ConnectionState.CLOSED);
+            return new DeviceConnectionStatus(preferences.getDeviceType(), DeviceConnectionState.CLOSED);
         }
         log.debug("From service: {}.", device.getDeviceConnectionStatus().deviceType.name());
         return device.getDeviceConnectionStatus();

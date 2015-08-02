@@ -4,7 +4,7 @@ import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.InsertionRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
-import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.drivers.AbstractUploader;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.RestUriUtils;
 
@@ -110,7 +110,7 @@ public class RestV1Uploader extends AbstractRestUploader {
         return output;
     }
 
-    private JSONObject toJSONObject(AbstractUploaderDevice deviceStatus, int rcvrBat) throws JSONException {
+    private JSONObject toJSONObject(AbstractUploader deviceStatus, int rcvrBat) throws JSONException {
         JSONObject json = new JSONObject();
         json.put("uploaderBattery", deviceStatus.getBatteryLevel());
         json.put("receiverBattery", rcvrBat);
@@ -182,7 +182,7 @@ public class RestV1Uploader extends AbstractRestUploader {
     }
 
     @Override
-    protected boolean doUpload(AbstractUploaderDevice deviceStatus, int rcvrBat) throws IOException {
+    protected boolean doUpload(AbstractUploader deviceStatus, int rcvrBat) throws IOException {
         try {
             return doPost("devicestatus", toJSONObject(deviceStatus, rcvrBat));
         } catch (JSONException e) {

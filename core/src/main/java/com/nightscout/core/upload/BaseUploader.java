@@ -4,7 +4,7 @@ import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.InsertionRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
-import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.drivers.AbstractUploader;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ public abstract class BaseUploader {
     }
 
 
-    protected boolean doUpload(AbstractUploaderDevice deviceStatus, int rcvrBat) throws IOException {
+    protected boolean doUpload(AbstractUploader deviceStatus, int rcvrBat) throws IOException {
         log.info("Device status upload not supported.");
         return true;
     }
@@ -146,7 +146,7 @@ public abstract class BaseUploader {
      * @param deviceStatus
      * @return True if the upload was successful or False if the upload was unsuccessful
      */
-    public final boolean uploadDeviceStatus(AbstractUploaderDevice deviceStatus, int rcvrBat) {
+    public final boolean uploadDeviceStatus(AbstractUploader deviceStatus, int rcvrBat) {
         if (deviceStatus == null) {
             return true;
         }
@@ -175,7 +175,7 @@ public abstract class BaseUploader {
      * @param deviceStatus
      * @return True if the (all) uploads was successful or False if at least one upload was unsuccessful.
      */
-    public boolean uploadRecords(List<GlucoseDataSet> glucoseDataSets, List<MeterRecord> meterRecords, List<CalRecord> calRecords, List<InsertionRecord> insertionRecords, AbstractUploaderDevice deviceStatus, int rcvrBat) {
+    public boolean uploadRecords(List<GlucoseDataSet> glucoseDataSets, List<MeterRecord> meterRecords, List<CalRecord> calRecords, List<InsertionRecord> insertionRecords, AbstractUploader deviceStatus, int rcvrBat) {
         boolean allSuccessful = uploadGlucoseDataSets(glucoseDataSets);
         log.debug("allSuccessful after glucoseDatasets: {}", allSuccessful);
         allSuccessful &= uploadMeterRecords(meterRecords);

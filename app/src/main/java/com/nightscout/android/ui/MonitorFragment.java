@@ -27,37 +27,37 @@ import com.nightscout.android.ProcessorService;
 import com.nightscout.android.R;
 import com.nightscout.android.events.UserEventPanelActivity;
 import com.nightscout.core.BusProvider;
-import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.drivers.DeviceConnectionStatus;
-import com.nightscout.core.drivers.DexcomG4;
 import com.nightscout.core.drivers.DeviceType;
 import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.GlucoseUnit;
-import com.nightscout.core.model.SensorGlucoseValueEntry;
+import com.nightscout.core.model.v2.Download;
+import com.nightscout.core.model.v2.DownloadStatus;
+import com.nightscout.core.model.v2.G4Data;
+import com.nightscout.core.model.v2.SensorGlucoseValue;
+import com.nightscout.core.model.v2.converters.SensorGlucoseValueConverter;
 import com.nightscout.core.preferences.NightscoutPreferences;
-import com.nightscout.core.utils.GlucoseReading;
+import com.nightscout.core.utils.DexcomG4Utils;
+import com.nightscout.core.utils.ListUtils;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+import com.squareup.wire.Wire;
+
+import net.tribe7.common.base.Optional;
+import net.tribe7.common.collect.Lists;
 
 import org.joda.time.DateTime;
-import org.joda.time.Duration;
 import org.joda.time.Minutes;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Date;
 
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-import static com.nightscout.core.dexcom.SpecialValue.getEGVSpecialValue;
-import static com.nightscout.core.dexcom.SpecialValue.isSpecialValue;
 import static org.joda.time.Duration.standardMinutes;
 
 public class MonitorFragment extends Fragment {
@@ -79,8 +79,6 @@ public class MonitorFragment extends Fragment {
     @InjectView(R.id.circularProgressbar)
     ProgressBar progressBar;
     private Bus bus = BusProvider.getInstance();
-
-    private long lastRecordTime;
 
     @Inject
     NightscoutPreferences preferences;
@@ -122,6 +120,7 @@ public class MonitorFragment extends Fragment {
             mBound = false;
         }
     };
+    private SensorGlucoseValue latestRecord;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -139,13 +138,12 @@ public class MonitorFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        log.info("onCreateView called");
+        log.debug("onCreateView called");
         View view = inflater.inflate(R.layout.monitor_fragment, container, false);
         Nightscout app = Nightscout.get(getActivity());
         app.inject(this);
         ButterKnife.inject(this, view);
         bus.register(this);
-
 
         progressBar.setMax((int) Minutes.minutes(5).toStandardDuration().getMillis());
         progressBar.setProgress(0);
@@ -260,19 +258,16 @@ public class MonitorFragment extends Fragment {
         super.onResume();
     }
 
-    private void setSgvText(GlucoseReading sgv, TrendArrow trend) {
+    private void setSgvText(SensorGlucoseValue sensorGlucoseValue) {
         String text = "---";
-        if (sgv.asMgdl() != -1) {
-            text = isSpecialValue(sgv) ? getEGVSpecialValue(sgv).get().toString() : sgv.asStr(preferences.getPreferredUnits()) + trend.symbol();
+        if (sensorGlucoseValue.glucose_mgdl != -1) {
+            text = DexcomG4Utils.getDisplayableGlucoseValueString(sensorGlucoseValue, preferences.getPreferredUnits());
         }
         mTextSGV.setText(text);
-        mTextSGV.setTag(R.string.display_sgv, sgv.asMgdl());
-        mTextSGV.setTag(R.string.display_trend, trend.ordinal());
     }
 
     private void restoreSgvText() {
-        GlucoseReading reading = new GlucoseReading((int) mTextSGV.getTag(R.string.display_sgv), GlucoseUnit.MGDL);
-        setSgvText(reading, TrendArrow.values()[(int) mTextSGV.getTag(R.string.display_trend)]);
+        setSgvText(latestRecord);
     }
 
     @Override
@@ -317,7 +312,8 @@ public class MonitorFragment extends Fragment {
 
     private int getReceiverRes(DeviceConnectionStatus status) {
         int res = 0;
-        log.info("Device Type: " + status.deviceType + " Device State: " + status.deviceState.name());
+        log.debug(
+            "Device Type: " + status.deviceType + " Device State: " + status.deviceState.name());
         switch (status.deviceState) {
             case CONNECTED:
                 res = (status.deviceType == DeviceType.DEXCOM_G4) ? R.drawable.ic_usb : R.drawable.ic_ble;
@@ -378,11 +374,7 @@ public class MonitorFragment extends Fragment {
 
 
     @Subscribe
-    public void incomingData(final DexcomG4.UIDownload uiDownload) {
-        if (uiDownload.download == null) {
-            log.info("Download is NULL");
-            return;
-        }
+    public void incomingData(final Download uiDownload) {
         if (getActivity() == null) {
             log.info("Activity is null!");
             return;
@@ -390,38 +382,39 @@ public class MonitorFragment extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                long refTime = DateTime.parse(uiDownload.download.download_timestamp).getMillis();
-                if (uiDownload.download.sgv.size() > 0) {
-                    lastRecordTime = new DateTime().getMillis() - Duration.standardSeconds(uiDownload.download.receiver_system_time_sec - uiDownload.download.sgv.get(uiDownload.download.sgv.size() - 1).sys_timestamp_sec).getMillis();
-                    EGVRecord recentRecord;
-                    if (uiDownload.download.sgv.size() > 0) {
-                        recentRecord = new EGVRecord(uiDownload.download.sgv.get(uiDownload.download.sgv.size() - 1), uiDownload.download.receiver_system_time_sec, refTime);
-                        // Reload d3 chart with new data
-                        JSONArray array = new JSONArray();
-                        for (SensorGlucoseValueEntry sgve : uiDownload.download.sgv) {
-                            try {
-                                EGVRecord record = new EGVRecord(sgve, sgve.sys_timestamp_sec, refTime);
-                                array.put(record.toJSON());
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        mWebView.loadUrl("javascript:updateData(" + array + ")");
-                        setSgvText(recentRecord.getReading(), recentRecord.getTrend());
-                        // Update UI with latest record information
-
-                        String timeAgoStr = "---";
-                        if (recentRecord.getRawSystemTimeSeconds() > 0) {
-                            timeAgoStr = Utils.getTimeString(uiDownload.download.receiver_system_time_sec - recentRecord.getRawSystemTimeSeconds());
-                        }
-
-                        mTextTimestamp.setText(timeAgoStr);
-                        mTextTimestamp.setTag(timeAgoStr);
-                    }
-
-                } else {
-                    log.debug("Move along. Nothing to see here. No data that I'm interested in in the download");
+                if (uiDownload.status != DownloadStatus.SUCCESS) {
+                    log.info("Unsuccessful download encountered (status: {}). Skipping.", uiDownload.status.name());
+                    return;
                 }
+                if (uiDownload.g4_data == null) {
+                    log.error("Successful download with null G4Data encountered. Skipping!");
+                    return;
+                }
+                G4Data g4Data = uiDownload.g4_data;
+                Optional<SensorGlucoseValue>
+                    sensorGlucoseValueOptional = ListUtils.lastOrEmpty(g4Data.sensor_glucose_values);
+                if (!sensorGlucoseValueOptional.isPresent()) {
+                    log.debug("Move along. Nothing to see here. No data that I'm interested in the download");
+                    return;
+                }
+                JSONArray array = new JSONArray(Lists.transform(Wire.get(
+                                                                    g4Data.sensor_glucose_values,
+                                                                    G4Data.DEFAULT_SENSOR_GLUCOSE_VALUES),
+                    SensorGlucoseValueConverter
+                        .instance()));
+                mWebView.loadUrl("javascript:updateData(" + array + ")");
+
+                SensorGlucoseValue recentRecord = sensorGlucoseValueOptional.get();
+                setSgvText(recentRecord);
+                latestRecord = recentRecord;
+
+                String timeAgoStr = "---";
+
+                if (latestRecord.timestamp.system_time_sec > 0) {
+                    timeAgoStr = Utils.getTimeString(g4Data.receiver_system_time_sec - latestRecord.timestamp.system_time_sec);
+                }
+
+                mTextTimestamp.setText(timeAgoStr);
             }
         });
     }
@@ -435,22 +428,19 @@ public class MonitorFragment extends Fragment {
     public Runnable updateTimeAgo = new Runnable() {
         @Override
         public void run() {
-            // FIXME: doesn't calculate timeago properly.
-            long delta = new Date().getTime() - lastRecordTime;
-            if (lastRecordTime == 0) delta = 0;
-
-            String timeAgoStr;
-            if (lastRecordTime == -1) {
-                timeAgoStr = "---";
-            } else if (delta < 0) {
-                timeAgoStr = getString(R.string.TimeChangeDetected);
+            DateTime now = new DateTime();
+            DateTime lastReading = Utils.receiverTimeToDateTime(latestRecord);
+            String timeAgoString;
+            if (lastReading == null) {
+                timeAgoString = "---";
+            } else if (now.isBefore(lastReading)) {
+                timeAgoString = getString(R.string.TimeChangeDetected);
             } else {
-                timeAgoStr = Utils.getTimeString(delta);
+                timeAgoString = Utils.getTimeString(DexcomG4Utils.timeSinceReading(now, latestRecord).toDurationMillis());
             }
-            mTextTimestamp.setText(timeAgoStr);
+            mTextTimestamp.setText(timeAgoString);
             mHandler.removeCallbacks(updateTimeAgo);
-            long delay = delta % standardMinutes(1).getMillis();
-            mHandler.postDelayed(updateTimeAgo, delay);
+            mHandler.postDelayed(updateTimeAgo, standardMinutes(1).getMillis());
         }
     };
 

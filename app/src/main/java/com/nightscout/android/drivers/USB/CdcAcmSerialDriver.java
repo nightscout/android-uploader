@@ -12,7 +12,7 @@ import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
 
-import com.nightscout.core.drivers.G4ConnectionState;
+import com.nightscout.core.drivers.DeviceConnectionState;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -48,7 +48,7 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
     private static final int GET_LINE_CODING = 0x21;
     private static final int SET_CONTROL_LINE_STATE = 0x22;
     private static final int SEND_BREAK = 0x23;
-    private G4ConnectionState connectionState;
+    private DeviceConnectionState connectionState;
     private static final String SET_POWER_ON_COMMAND = "echo 'on' > \"/sys/bus/usb/devices/1-1/power/level\"";
 
     BroadcastReceiver mDeviceStatusReceiver = new BroadcastReceiver() {
@@ -57,10 +57,10 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
             switch (action) {
                 case UsbManager.ACTION_USB_DEVICE_DETACHED:
                     Log.d(TAG, "Stopping syncing on USB attached...");
-                    setConnectionState(G4ConnectionState.CLOSING);
+                    setConnectionState(DeviceConnectionState.CLOSING);
                     break;
                 case UsbManager.ACTION_USB_DEVICE_ATTACHED:
-                    setConnectionState(G4ConnectionState.CONNECTING);
+                    setConnectionState(DeviceConnectionState.CONNECTING);
                     Log.d(TAG, "Starting syncing on USB attached...");
                     break;
             }
@@ -80,7 +80,7 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
 
     @Override
     public void open() throws IOException {
-        setConnectionState(G4ConnectionState.CONNECTING);
+        setConnectionState(DeviceConnectionState.CONNECTING);
         if (mPowerManagementEnabled) {
             USBPower.powerOn();
         }
@@ -91,7 +91,7 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
         // class should be USB_CLASS_COMM
 
         if (!mConnection.claimInterface(mControlInterface, true)) {
-            Observable.just(G4ConnectionState.CLOSED).subscribe(connectionStateListener);
+            Observable.just(DeviceConnectionState.CLOSED).subscribe(connectionStateListener);
             throw new IOException("Could not claim control interface.");
         }
         mControlEndpoint = mControlInterface.getEndpoint(0);
@@ -102,14 +102,14 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
         // class should be USB_CLASS_CDC_DATA
 
         if (!mConnection.claimInterface(mDataInterface, true)) {
-            Observable.just(G4ConnectionState.CLOSED).subscribe(connectionStateListener);
+            Observable.just(DeviceConnectionState.CLOSED).subscribe(connectionStateListener);
             throw new IOException("Could not claim data interface.");
         }
         mReadEndpoint = mDataInterface.getEndpoint(1);
         Log.d(TAG, "Read endpoint direction: " + mReadEndpoint.getDirection());
         mWriteEndpoint = mDataInterface.getEndpoint(0);
         Log.d(TAG, "Write endpoint direction: " + mWriteEndpoint.getDirection());
-        setConnectionState(G4ConnectionState.CONNECTED);
+        setConnectionState(DeviceConnectionState.CONNECTED);
     }
 
     private int sendAcmControlMessage(int request, int value, byte[] buf) {
@@ -119,12 +119,12 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
 
     @Override
     public void close() throws IOException {
-        setConnectionState(G4ConnectionState.CLOSING);
+        setConnectionState(DeviceConnectionState.CLOSING);
         mConnection.close();
         if (mPowerManagementEnabled) {
             USBPower.powerOff();
         }
-        setConnectionState(G4ConnectionState.CLOSED);
+        setConnectionState(DeviceConnectionState.CLOSED);
     }
 
     @Override
@@ -139,16 +139,16 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
         return Arrays.copyOfRange(data, 0, readSize);
     }
 
-    private void setConnectionState(G4ConnectionState connectionState) {
+    private void setConnectionState(DeviceConnectionState connectionState) {
         this.connectionState = connectionState;
         Observable.just(connectionState).subscribe(connectionStateListener);
     }
 
     private int read(byte[] dest, int timeoutMillis) throws IOException {
-        if (connectionState != G4ConnectionState.CONNECTED) {
+        if (connectionState != DeviceConnectionState.CONNECTED) {
             throw new IOException("Attempted to read while not connected. Current state: " + connectionState.name());
         }
-        setConnectionState(G4ConnectionState.READING);
+        setConnectionState(DeviceConnectionState.READING);
         Log.w(TAG, "Dest: " + dest.length + " Buffer: " + mReadBuffer.length);
 
         final int numBytesRead;
@@ -167,16 +167,16 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
             }
             System.arraycopy(mReadBuffer, 0, dest, 0, numBytesRead);
         }
-        setConnectionState(G4ConnectionState.CONNECTED);
+        setConnectionState(DeviceConnectionState.CONNECTED);
         return numBytesRead;
     }
 
     @Override
     public int write(byte[] src, int timeoutMillis) throws IOException {
-        if (connectionState != G4ConnectionState.CONNECTED) {
+        if (connectionState != DeviceConnectionState.CONNECTED) {
             throw new IOException("Attempted to write while not connected. Current state: " + connectionState.name());
         }
-        setConnectionState(G4ConnectionState.WRITING);
+        setConnectionState(DeviceConnectionState.WRITING);
         int offset = 0;
 
         while (offset < src.length) {
@@ -206,7 +206,7 @@ public class CdcAcmSerialDriver extends CommonUsbSerialDriver {
             Log.d(TAG, "Wrote amt=" + amtWritten + " attempted=" + writeLength);
             offset += amtWritten;
         }
-        setConnectionState(G4ConnectionState.CONNECTED);
+        setConnectionState(DeviceConnectionState.CONNECTED);
 
         return offset;
     }
