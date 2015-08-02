@@ -102,8 +102,6 @@ public final class Utils {
 
     public static List<GlucoseDataSet> mergeGlucoseDataRecords(G4Download download, int numRecords) {
         List<SensorGlucoseValueEntry> sgvList = filterRecords(numRecords, download.sgv);
-//        List<CalibrationEntry> calList = filterRecords(numRecords, download.cal);
-//        List<MeterEntry> meterList = filterRecords(numRecords, download.meter);
         List<SensorEntry> sensorList = filterRecords(numRecords, download.sensor);
         long downloadTimestamp = DateTime.parse(download.download_timestamp).getMillis();
         return mergeGlucoseDataRecords(sgvList, sensorList, download.receiver_system_time_sec, downloadTimestamp);
@@ -138,7 +136,6 @@ public final class Utils {
         }
         return glucoseDataSets;
     }
-
 
     public static String bytesToHex(byte[] bytes) {
         if (bytes == null || bytes.length == 0) {

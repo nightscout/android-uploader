@@ -12,7 +12,7 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 
 public class PageHeader {
-    public static final int HEADER_SIZE=28;
+    public static final int HEADER_SIZE = 28;
     protected final int FIRSTRECORDINDEX_OFFSET=0;
     protected final int NUMRECS_OFFSET=4;
     protected final int RECTYPE_OFFSET=8;

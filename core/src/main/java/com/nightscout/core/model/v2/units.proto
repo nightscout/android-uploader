@@ -1,0 +1,9 @@
+package nightscout.model.v2;
+
+option java_package = "com.nightscout.core.model.v2";
+
+// Next tag: 2
+enum GlucoseUnit {
+    MGDL = 0;
+    MMOL = 1;
+}

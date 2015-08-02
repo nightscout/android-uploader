@@ -18,6 +18,8 @@ public class CalRecord extends GenericTimestampRecord {
     private static final Logger LOG = LoggerFactory.getLogger(CalRecord.class);
     public final static int RECORD_SIZE = 147;
     public final static int RECORD_V2_SIZE = 248;
+    private static final int SUB_LEN = 17;
+
     private double slope;
     private double intercept;
     private double scale;
@@ -25,7 +27,6 @@ public class CalRecord extends GenericTimestampRecord {
     private double decay;
     private int numRecords;
     private List<CalSubrecord> calSubrecords;
-    private int SUB_LEN = 17;
 
     public CalRecord(byte[] packet, long rcvrTime, long refTime) {
         super(packet, rcvrTime, refTime);

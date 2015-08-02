@@ -58,13 +58,13 @@ public enum Command {
         return value;
     }
 
-    public String toString(){
-        return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL,this.name()).replace("_", " ");
+    public String toString() {
+        return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, this.name()).replace("_", " ");
     }
 
-    public static Optional<Command> getCommandByValue(int value){
-        for(Command command:values()){
-            if (command.getValue() == value){
+    public static Optional<Command> getCommandByValue(int value) {
+        for (Command command : values()) {
+            if (command.getValue() == value) {
                 return Optional.of(command);
             }
         }

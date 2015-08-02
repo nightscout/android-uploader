@@ -61,10 +61,6 @@ abstract public class GenericTimestampRecord {
         return displayTime;
     }
 
-    public long getDisplayTimeSeconds() {
-        return displayTime.getMillis();
-    }
-
     public long getRawDisplayTimeSeconds() {
         return rawDisplayTimeSeconds;
     }
