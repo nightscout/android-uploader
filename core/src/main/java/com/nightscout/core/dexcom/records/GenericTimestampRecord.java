@@ -23,12 +23,11 @@ abstract public class GenericTimestampRecord {
     protected DateTime wallTime;
     protected String recordType = "unknown";
 
-    public GenericTimestampRecord(byte[] packet, long rcvrTime, long refTime) {
+    public GenericTimestampRecord(byte[] packet) {
         rawSystemTimeSeconds = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(OFFSET_SYS_TIME);
         systemTime = Utils.receiverTimeToDate(rawSystemTimeSeconds);
         rawDisplayTimeSeconds = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(OFFSET_DISPLAY_TIME);
         displayTime = Utils.receiverTimeToDate(rawDisplayTimeSeconds);
-        this.wallTime = Utils.systemTimeToWallTime(rawSystemTimeSeconds, rcvrTime, refTime);
     }
 
     public GenericTimestampRecord(DateTime displayTime, DateTime systemTime, DateTime wallTime) {

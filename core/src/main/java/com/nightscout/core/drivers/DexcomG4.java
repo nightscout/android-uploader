@@ -1,5 +1,6 @@
 package com.nightscout.core.drivers;
 
+import com.nightscout.core.Timestamped;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.records.CalRecord;
@@ -15,6 +16,7 @@ import com.nightscout.core.model.v2.DownloadStatus;
 import com.nightscout.core.model.v2.G4Data;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
+import net.tribe7.common.base.Optional;
 import net.tribe7.common.collect.Lists;
 
 import org.joda.time.DateTime;
@@ -52,7 +54,7 @@ public class DexcomG4 extends AbstractDevice {
     }
 
     @Override
-    protected Download doDownload() {
+    protected Download doDownloadAllAfter(Optional<Timestamped> timestamped) {
         DateTime downloadStartTime = new DateTime();
 
         Download.Builder downloadBuilder = new Download.Builder().timestamp(
@@ -81,16 +83,14 @@ public class DexcomG4 extends AbstractDevice {
             systemTime = readData.readSystemTime();
             batLevel = readData.readBatteryLevel();
 
-            recentRecords = readData.getRecentEGVsPages(1, systemTime,
-                                                        downloadStartTime.getMillis());
+            recentRecords = readData.getAllEGVRecordsAfter(timestamped);
             if (recentRecords.size() == 0) {
                 return downloadBuilder.status(DownloadStatus.NO_DATA).build();
             }
-            sensorRecords = readData.getRecentSensorRecords(1, systemTime,
-                                                            downloadStartTime.getMillis());
-            meterRecords = readData.getRecentMeterRecords(systemTime, downloadStartTime.getMillis());
-            calRecords = readData.getRecentCalRecords(systemTime, downloadStartTime.getMillis());
-            insertionRecords = readData.getRecentInsertion(systemTime, downloadStartTime.getMillis());
+            sensorRecords = readData.getRecentSensorRecords(1);
+            meterRecords = readData.getRecentMeterRecords();
+            calRecords = readData.getRecentCalRecords();
+            insertionRecords = readData.getRecentInsertion();
         } catch (IOException e) {
             getReporter().report(EventType.DEVICE, EventSeverity.ERROR,
                                  "IO error to device " + e.getMessage());

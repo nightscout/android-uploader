@@ -31,8 +31,8 @@ public class EGVRecord extends GenericTimestampRecord {
     private TrendArrow trend;
     private G4Noise noiseMode;
 
-    public EGVRecord(byte[] packet, long rcvrTime, long refTime) {
-        super(packet, rcvrTime, refTime);
+    public EGVRecord(byte[] packet) {
+        super(packet);
         if (packet.length != RECORD_SIZE) {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
                     ". Expected size: " + RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));

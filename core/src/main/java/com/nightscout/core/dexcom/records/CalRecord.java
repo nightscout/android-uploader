@@ -33,8 +33,8 @@ public class CalRecord extends GenericTimestampRecord {
     private int numRecords;
     private List<CalSubrecord> calSubrecords;
 
-    public CalRecord(byte[] packet, long rcvrTime, long refTime) {
-        super(packet, rcvrTime, refTime);
+    public CalRecord(byte[] packet) {
+        super(packet);
         if (packet.length != RECORD_SIZE && packet.length != RECORD_V2_SIZE) {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
                     ". Expected size: " + RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));

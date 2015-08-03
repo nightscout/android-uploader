@@ -1,5 +1,7 @@
 package com.nightscout.core.drivers;
 
+import com.nightscout.core.Timestamped;
+import com.nightscout.core.TimestampedInstances;
 import com.nightscout.core.dexcom.Command;
 import com.nightscout.core.dexcom.PacketBuilder;
 import com.nightscout.core.dexcom.ReadPacket;
@@ -12,10 +14,13 @@ import com.nightscout.core.dexcom.records.InsertionRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.PageHeader;
 import com.nightscout.core.dexcom.records.SensorRecord;
+import com.nightscout.core.model.v2.SensorGlucoseValue;
 
 import net.tribe7.common.base.Optional;
+import net.tribe7.common.collect.Lists;
 import net.tribe7.common.primitives.Bytes;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -27,11 +32,13 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Provider;
+import javax.swing.text.html.Option;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -64,13 +71,13 @@ public class ReadData {
         return transportOptional.isPresent() && transportOptional.get().isConnected();
     }
 
-    public List<InsertionRecord> getRecentInsertion(long rcvrTime, long refTime) throws IOException {
+    public List<InsertionRecord> getRecentInsertion() throws IOException {
         int endPage = readDataBasePageRange(RecordType.INSERTION_TIME);
         byte[] data = readDataBasePage(RecordType.INSERTION_TIME, endPage);
-        return parsePage(data, InsertionRecord.class, rcvrTime, refTime);
+        return parsePage(data, InsertionRecord.class);
     }
 
-    public List<EGVRecord> getRecentEGVsPages(int numOfRecentPages, long rcvrTime, long refTime) throws IOException {
+    public List<EGVRecord> getRecentEGVsPages(int numOfRecentPages) throws IOException {
         if (numOfRecentPages < 1) {
             log.warn("numOfRecentPages less than 1. Setting to 1.");
             numOfRecentPages = 1;
@@ -82,18 +89,43 @@ public class ReadData {
             int nextPage = endPage - i;
             log.debug("Reading #{} EGV pages (page number {})", i, nextPage);
             byte[] data = readDataBasePage(RecordType.EGV_DATA, nextPage);
-            allPages.addAll(parsePage(data, EGVRecord.class, rcvrTime, refTime));
+            allPages.addAll(parsePage(data, EGVRecord.class));
         }
         return allPages;
     }
 
-    public List<MeterRecord> getRecentMeterRecords(long rcvrTime, long refTime) throws IOException {
-        int endPage = readDataBasePageRange(RecordType.METER_DATA);
-        byte[] data = readDataBasePage(RecordType.METER_DATA, endPage);
-        return parsePage(data, MeterRecord.class, rcvrTime, refTime);
+    public List<EGVRecord> getAllEGVRecordsAfter(Optional<Timestamped> timestamped) throws IOException {
+        Timestamped alreadyDownloadedEntry;
+        if (timestamped.isPresent()) {
+            alreadyDownloadedEntry = timestamped.get();
+        } else {
+            alreadyDownloadedEntry = TimestampedInstances.epoch();
+        }
+        int endPage = readDataBasePageRange(RecordType.EGV_DATA);
+        List<EGVRecord> allPages = new ArrayList<>();
+        int currentPage = 0;
+        Timestamped earliestDownloaded = TimestampedInstances.now();
+
+        while(earliestDownloaded.compareTo(alreadyDownloadedEntry) > 0 && currentPage <= endPage) {
+            byte[] data = readDataBasePage(RecordType.EGV_DATA, currentPage);
+            List<EGVRecord> records = parsePage(data, EGVRecord.class);
+            List<SensorGlucoseValue> sensorGlucoseValues = Lists.transform(records, EGVRecord.v2ModelConverter());
+            if (sensorGlucoseValues.size() > 0) {
+                earliestDownloaded = TimestampedInstances.fromG4Timestamp(sensorGlucoseValues.get(0).timestamp);
+            }
+            allPages.addAll(records);
+            currentPage++;
+        }
+        return allPages;
     }
 
-    public List<SensorRecord> getRecentSensorRecords(int numOfRecentPages, long rcvrTime, long refTime) throws IOException {
+    public List<MeterRecord> getRecentMeterRecords() throws IOException {
+        int endPage = readDataBasePageRange(RecordType.METER_DATA);
+        byte[] data = readDataBasePage(RecordType.METER_DATA, endPage);
+        return parsePage(data, MeterRecord.class);
+    }
+
+    public List<SensorRecord> getRecentSensorRecords(int numOfRecentPages) throws IOException {
         if (numOfRecentPages < 1) {
             log.warn("Number of recent pages requested less than 1. Setting to 1.");
             numOfRecentPages = 1;
@@ -105,15 +137,15 @@ public class ReadData {
             int nextPage = endPage - i;
             log.debug("Reading #{} Sensor pages (page number {})", i, nextPage);
             byte[] data = readDataBasePage(RecordType.SENSOR_DATA, nextPage);
-            allPages.addAll(parsePage(data, SensorRecord.class, rcvrTime, refTime));
+            allPages.addAll(parsePage(data, SensorRecord.class));
         }
         return allPages;
     }
 
-    public List<CalRecord> getRecentCalRecords(long rcvrTime, long refTime) throws IOException {
+    public List<CalRecord> getRecentCalRecords() throws IOException {
         int endPage = readDataBasePageRange(RecordType.CAL_SET);
         byte[] data = readDataBasePage(RecordType.CAL_SET, endPage);
-        return parsePage(data, CalRecord.class, rcvrTime, refTime);
+        return parsePage(data, CalRecord.class);
     }
 
     public boolean ping() throws IOException {
@@ -236,15 +268,17 @@ public class ReadData {
         return new ReadPacket(response);
     }
 
-    private <T extends GenericTimestampRecord> List<T> parsePage(byte[] data, Class<T> clazz, long rcvrTime, long refTime) {
+    private <T extends GenericTimestampRecord> List<T> parsePage(byte[] data, Class<T> clazz) {
         PageHeader pageHeader = new PageHeader(data);
+        long rcvrTime = 0;
+        long refTime = 0;
         List<T> records = new ArrayList<>();
         for (int i = 0; i < pageHeader.getNumOfRecords(); i++) {
             int startIdx;
             switch (pageHeader.getRecordType()) {
                 case EGV_DATA:
                     startIdx = PageHeader.HEADER_SIZE + (EGVRecord.RECORD_SIZE + 1) * i;
-                    records.add(clazz.cast(new EGVRecord(Arrays.copyOfRange(data, startIdx, startIdx + EGVRecord.RECORD_SIZE), rcvrTime, refTime)));
+                    records.add(clazz.cast(new EGVRecord(Arrays.copyOfRange(data, startIdx, startIdx + EGVRecord.RECORD_SIZE))));
                     break;
                 case CAL_SET:
                     int recordLength = (pageHeader.getRevision() <= 2) ? CalRecord.RECORD_SIZE : CalRecord.RECORD_V2_SIZE;

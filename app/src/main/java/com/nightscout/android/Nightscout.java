@@ -10,6 +10,7 @@ import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.exceptions.FeedbackDialog;
 import com.nightscout.android.ui.ActivityHierarchyServer;
 import com.nightscout.core.BusProvider;
+import com.orm.SugarApp;
 
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
@@ -34,7 +35,7 @@ import dagger.ObjectGraph;
         logcatArguments = {"-t", "500", "-v", "time"}
 )
 
-public class Nightscout extends Application {
+public class Nightscout extends SugarApp {
     private final String TAG = Nightscout.class.getSimpleName();
     private Tracker tracker = null;
 

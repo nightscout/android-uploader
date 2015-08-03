@@ -31,36 +31,24 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 
+
     <application
         android:name=".Nightscout"
         android:icon="@drawable/ic_launcher"
         android:label="@string/title_activity_main"
         android:theme="@style/Nightscout"
         android:allowBackup="true">
+        <meta-data android:name="DATABASE" android:value="downloaded_entities.db" />
+        <meta-data android:name="VERSION" android:value="1" />
+        <meta-data android:name="QUERY_LOG" android:value="true" />
+        <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="com.nightscout.android.db.model" />
+
         <!-- Hard code this version for now. Robolectric has troubles starting when this is
              a variable. See: https://github.com/robolectric/robolectric/issues/1025 -->
         <meta-data
             android:name="com.google.android.gms.version"
             tools:replace="android:value"
             android:value="6587000" />
-        <!--<activity-->
-        <!--android:name=".MainActivity"-->
-        <!--android:screenOrientation="portrait"-->
-        <!--android:launchMode="singleTask">-->
-
-        <!--<intent-filter>-->
-        <!--<action android:name="android.intent.action.MAIN" />-->
-
-        <!--<category android:name="android.intent.category.DEFAULT" />-->
-        <!--<category android:name="android.intent.category.LAUNCHER" />-->
-
-        <!--<action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />-->
-        <!--</intent-filter>-->
-
-        <!--<meta-data-->
-        <!--android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"-->
-        <!--android:resource="@xml/device_filter" />-->
-        <!--</activity>-->
 
         <receiver android:name=".UpgradeReceiver">
             <intent-filter>

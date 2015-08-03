@@ -17,11 +17,12 @@ import android.preference.PreferenceManager;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
+import com.nightscout.android.db.DbUtils;
 import com.nightscout.android.drivers.AndroidUploaderDevice;
-import com.nightscout.core.drivers.DeviceTransportProvider;
 import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.core.BusProvider;
+import com.nightscout.core.Timestamped;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.drivers.AbstractDevice;
 import com.nightscout.core.drivers.AbstractUploader;
@@ -71,11 +72,9 @@ public class CollectorService extends Service {
     private AndroidPreferences preferences;
     private Tracker tracker;
     private PowerManager pm;
-    private Bus bus = BusProvider.getInstance();
     protected AbstractDevice device = null;
     protected DeviceTransport driver;
     private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
-    private DeviceTransportProvider deviceTransportProvider;
 
 
     private AlarmManager alarmManager;
@@ -136,8 +135,7 @@ public class CollectorService extends Service {
         AbstractUploader
             uploaderDevice = AndroidUploaderDevice.getUploaderDevice(getApplicationContext());
         if (deviceType == DeviceType.DEXCOM_G4 || deviceType == DeviceType.DEXCOM_G4_SHARE2) {
-            device = new DexcomG4(new ReadData(deviceTransportProvider), preferences, uploaderDevice);
-            device.setReporter(reporter);
+            device = new DexcomG4(new ReadData(deviceTransport), preferences, uploaderDevice, reporter);
         }
     }
 
@@ -200,7 +198,6 @@ public class CollectorService extends Service {
                     log.info("Device was opened for download");
                 } catch (IOException e) {
                     log.error("Unable to open device, will keep trying", e);
-                    log.warn("Next poll setting to default #2");
                     setNextPoll(nextUploadTimeMs);
                     return null;
                 }
@@ -208,31 +205,24 @@ public class CollectorService extends Service {
                 log.info("Device is connected");
             }
 
-            int numOfPages = params[0];
-            String syncType = params[1] == 0 ? STD_SYNC : GAP_SYNC;
-            ((DexcomG4) device).setNumOfPages(numOfPages);
             PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NSDownload");
             wl.acquire();
 
             Download download = null;
 
+
+            // TODO(tyler.s.rhodes): figure out how to 'legally' do this cast. Should be fine as
+            // long as ProtoRecord always inherits from Timestamped.
+            Optional<Timestamped> newestElementInDb = (Optional)DbUtils.getNewestElementInDb(deviceType);
+
             try {
-                download = device.download();
-                G4Data g4Data = download.g4_data;
+                download = device.downloadAllAfter(newestElementInDb);
                 if (download.status != DownloadStatus.SUCCESS) {
                     log.error("Bad download, will try again");
                     setNextPoll(nextUploadTimeMs);
                     return null;
                 }
-                Optional<GlucoseReading> calculatedIsig = IsigReading.calculate(
-                    ListUtils.lastOrEmpty(g4Data.sensor_glucose_values),
-                    ListUtils.lastOrEmpty(g4Data.calibrations),
-                    ListUtils.lastOrEmpty(g4Data.raw_sensor_readings));
-                if (calculatedIsig.isPresent()) {
-                    log.info("Calculated EGV using isig values: {} mg/dl", calculatedIsig.get().asMgdl());
-                }
-                bus.post(download);
-
+                DbUtils.updateAllRecords(download, deviceType);
             } catch (ArrayIndexOutOfBoundsException e) {
                 reporter.report(EventType.DEVICE, EventSeverity.ERROR,
                         getApplicationContext().getString(R.string.event_fail_log));
