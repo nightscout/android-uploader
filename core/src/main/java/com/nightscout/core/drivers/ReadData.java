@@ -20,7 +20,6 @@ import net.tribe7.common.base.Optional;
 import net.tribe7.common.collect.Lists;
 import net.tribe7.common.primitives.Bytes;
 
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -32,13 +31,11 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Provider;
-import javax.swing.text.html.Option;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -57,13 +54,10 @@ public class ReadData {
     private Document manufacturingDataXml;
     private String transmitterId;
 
-    private DeviceTransport serialDevice;
+    private DeviceTransport deviceTransport;
 
-    public ReadData(Provider<Optional<DeviceTransport>> provider) {
-        deviceTransportProvider = provider;
-
-        // TODO remove
-        serialDevice = provider.get().get();
+    public ReadData(DeviceTransport deviceTransport) {
+        this.deviceTransport = deviceTransport;
     }
 
     public boolean isConnected() {
@@ -252,7 +246,7 @@ public class ReadData {
         }
         log.debug("Writing command {} with payload '{}'.", command.name(), payloadString);
         
-        serialDevice.write(new PacketBuilder(command, payload).build(), TIMEOUT_MS);
+        deviceTransport.write(new PacketBuilder(command, payload).build(), TIMEOUT_MS);
     }
 
     protected void writeCommand(Command command) throws IOException {
@@ -260,7 +254,7 @@ public class ReadData {
     }
 
     private ReadPacket read(int numOfBytes) throws IOException {
-        byte[] response = serialDevice.read(numOfBytes, TIMEOUT_MS);
+        byte[] response = deviceTransport.read(numOfBytes, TIMEOUT_MS);
         if (response.length != numOfBytes) {
             log.error("Response numBytes {}, requested {}", response.length, numOfBytes);
         }
@@ -270,8 +264,6 @@ public class ReadData {
 
     private <T extends GenericTimestampRecord> List<T> parsePage(byte[] data, Class<T> clazz) {
         PageHeader pageHeader = new PageHeader(data);
-        long rcvrTime = 0;
-        long refTime = 0;
         List<T> records = new ArrayList<>();
         for (int i = 0; i < pageHeader.getNumOfRecords(); i++) {
             int startIdx;
@@ -283,19 +275,19 @@ public class ReadData {
                 case CAL_SET:
                     int recordLength = (pageHeader.getRevision() <= 2) ? CalRecord.RECORD_SIZE : CalRecord.RECORD_V2_SIZE;
                     startIdx = PageHeader.HEADER_SIZE + (recordLength + 1) * i;
-                    records.add(clazz.cast(new CalRecord(Arrays.copyOfRange(data, startIdx, startIdx + recordLength), rcvrTime, refTime)));
+                    records.add(clazz.cast(new CalRecord(Arrays.copyOfRange(data, startIdx, startIdx + recordLength))));
                     break;
                 case METER_DATA:
                     startIdx = PageHeader.HEADER_SIZE + (MeterRecord.RECORD_SIZE + 1) * i;
-                    records.add(clazz.cast(new MeterRecord(Arrays.copyOfRange(data, startIdx, startIdx + MeterRecord.RECORD_SIZE), rcvrTime, refTime)));
+                    records.add(clazz.cast(new MeterRecord(Arrays.copyOfRange(data, startIdx, startIdx + MeterRecord.RECORD_SIZE))));
                     break;
                 case SENSOR_DATA:
                     startIdx = PageHeader.HEADER_SIZE + (SensorRecord.RECORD_SIZE + 1) * i;
-                    records.add(clazz.cast(new SensorRecord(Arrays.copyOfRange(data, startIdx, startIdx + SensorRecord.RECORD_SIZE), rcvrTime, refTime)));
+                    records.add(clazz.cast(new SensorRecord(Arrays.copyOfRange(data, startIdx, startIdx + SensorRecord.RECORD_SIZE))));
                     break;
                 case INSERTION_TIME:
                     startIdx = PageHeader.HEADER_SIZE + (InsertionRecord.RECORD_SIZE + 1) * i;
-                    records.add(clazz.cast(new InsertionRecord(Arrays.copyOfRange(data, startIdx, startIdx + InsertionRecord.RECORD_SIZE), rcvrTime, refTime)));
+                    records.add(clazz.cast(new InsertionRecord(Arrays.copyOfRange(data, startIdx, startIdx + InsertionRecord.RECORD_SIZE))));
                     break;
                 default:
                     log.error("Unknown record type {} encountered. Ignoring.", pageHeader.getRecordType().name());

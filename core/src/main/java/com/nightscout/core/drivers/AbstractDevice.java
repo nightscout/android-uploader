@@ -17,15 +17,19 @@ import org.slf4j.LoggerFactory;
  * This class is a representation for a device, which contains data that we want.
  */
 abstract public class AbstractDevice {
-    protected final Logger log = LoggerFactory.getLogger(AbstractDevice.class);
-
     public final Download downloadAllAfter(Optional<Timestamped> timestamped) {
+        DownloadStatus status;
+        // TODO(trhodeos): catch more exception types.
         try {
             return doDownloadAllAfter(timestamped);
+        } catch (DeviceNotFoundException e) {
+            getReporter().report(EventType.DEVICE, EventSeverity.WARN, e.getMessage());
+            status = DownloadStatus.DEVICE_NOT_FOUND;
         } catch (Exception e) {
             getReporter().report(EventType.DEVICE, EventSeverity.ERROR, "Unknown error - " + e.getMessage());
+            status = DownloadStatus.UNKNOWN;
         }
-        return new Download.Builder().status(DownloadStatus.APPLICATION_ERROR)
+        return new Download.Builder().status(status)
             .timestamp(new DateTime().toString()).build();
     }
 

@@ -10,7 +10,6 @@ import net.tribe7.common.base.Function;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.List;
 
 public class SensorRecord extends GenericTimestampRecord {
     public static final int RECORD_SIZE = 19;
@@ -21,8 +20,8 @@ public class SensorRecord extends GenericTimestampRecord {
     private static final int OFFSET_FILTERED = 12;
     private static final int OFFSET_RSSI = 16;
 
-    public SensorRecord(byte[] packet, long rcvrTime, long refTime) {
-        super(packet, rcvrTime, refTime);
+    public SensorRecord(byte[] packet) {
+        super(packet);
         if (packet.length != RECORD_SIZE) {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
                     ". Expected size: " + RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
@@ -74,10 +73,6 @@ public class SensorRecord extends GenericTimestampRecord {
                 .filtered(filtered)
                 .unfiltered(unfiltered)
                 .build();
-    }
-
-    public static List<SensorEntry> toProtobufList(List<SensorRecord> list) {
-        return toProtobufList(list, SensorEntry.class);
     }
 
     public static Function<SensorRecord, RawSensorReading> v2ModelConverter() {

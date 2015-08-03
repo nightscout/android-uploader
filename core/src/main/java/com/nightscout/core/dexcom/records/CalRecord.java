@@ -7,12 +7,9 @@ import com.nightscout.core.model.v2.Calibration;
 import com.nightscout.core.model.v2.G4Timestamp;
 
 import net.tribe7.common.base.Function;
-import net.tribe7.common.collect.Lists;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -20,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CalRecord extends GenericTimestampRecord {
-    private static final Logger LOG = LoggerFactory.getLogger(CalRecord.class);
     public final static int RECORD_SIZE = 147;
     public final static int RECORD_V2_SIZE = 248;
     private static final int SUB_LEN = 17;
@@ -107,10 +103,6 @@ public class CalRecord extends GenericTimestampRecord {
                 .build();
     }
 
-    public static List<CalibrationEntry> toProtobufList(List<CalRecord> list) {
-        return toProtobufList(list, CalibrationEntry.class);
-    }
-
     public static Function<CalRecord, Calibration> v2ModelConverter() {
         return new Function<CalRecord, Calibration>() {
             @Override
@@ -140,20 +132,12 @@ public class CalRecord extends GenericTimestampRecord {
         return scale;
     }
 
-    public int[] getUnk() {
-        return unk;
-    }
-
     public double getDecay() {
         return decay;
     }
 
     public int getNumRecords() {
         return numRecords;
-    }
-
-    public List<CalSubrecord> getCalSubrecords() {
-        return calSubrecords;
     }
 
     @Override
@@ -178,16 +162,6 @@ public class CalRecord extends GenericTimestampRecord {
     @Override
     protected void setRecordType() {
         this.recordType = "cal";
-    }
-
-    public CalibrationEntry toProtoBuf() {
-        return new CalibrationEntry.Builder()
-                .sys_timestamp_sec(rawSystemTimeSeconds)
-                .disp_timestamp_sec(rawDisplayTimeSeconds)
-                .intercept(intercept)
-                .slope(slope)
-                .scale(scale)
-                .build();
     }
 
     @Override

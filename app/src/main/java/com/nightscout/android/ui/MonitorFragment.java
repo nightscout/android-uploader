@@ -239,7 +239,7 @@ public class MonitorFragment extends Fragment {
         Intent intent = new Intent(this.getActivity(), CollectorService.class);
         getActivity().bindService(intent, mCollectorConnection, Context.BIND_AUTO_CREATE);
         if (mBound) {
-            setReceiverButtonRes(getReceiverRes(mCollectorService.getDeviceConnectionStatus()));
+            //setReceiverButtonRes(getReceiverRes(mCollectorService.getDeviceConnectionStatus()));
             getActivity().unbindService(mCollectorConnection);
         }
         intent = new Intent(this.getActivity(), ProcessorService.class);

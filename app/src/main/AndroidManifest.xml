@@ -34,7 +34,8 @@
 
     <application
         android:name=".Nightscout"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/ic_app_launcher"
+        tools:replace="android:label,android:icon"
         android:label="@string/title_activity_main"
         android:theme="@style/Nightscout"
         android:allowBackup="true">

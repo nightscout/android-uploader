@@ -975,7 +975,6 @@ public class BluetoothTransport implements DeviceTransport {
     }
 
     private void setConnectionState(DeviceConnectionState connectionState) {
-        this.connectionState = connectionState;
         Observable.just(connectionState).subscribe(connectionStateListener);
     }
 

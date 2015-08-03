@@ -15,8 +15,8 @@ public class InsertionRecord extends GenericTimestampRecord {
     public static final int RECORD_SIZE = 14;
     private G4Insertion state = G4Insertion.INSERTION_NONE;
 
-    public InsertionRecord(byte[] packet, long rcvrTime, long refTime) {
-        super(packet, rcvrTime, refTime);
+    public InsertionRecord(byte[] packet) {
+        super(packet);
         if (packet.length != RECORD_SIZE) {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
                     ". Expected size: " + RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));

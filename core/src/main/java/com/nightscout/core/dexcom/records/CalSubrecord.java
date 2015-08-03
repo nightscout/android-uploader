@@ -42,43 +42,6 @@ public class CalSubrecord {
         this.rawDateApplied = dateApplied;
     }
 
-
-    public DateTime getDateEntered() {
-        return dateEntered;
-    }
-
-    public int getCalBGL() {
-        return calBGL;
-    }
-
-    public int getCalRaw() {
-        return calRaw;
-    }
-
-    public DateTime getDateApplied() {
-        return dateApplied;
-    }
-
-    public byte getUnk() {
-        return unk;
-    }
-
-    public int getRawDateEntered() {
-        return rawDateEntered;
-    }
-
-    public void setRawDateEntered(int rawDateEntered) {
-        this.rawDateEntered = rawDateEntered;
-    }
-
-    public int getRawDateApplied() {
-        return rawDateApplied;
-    }
-
-    public void setRawDateApplied(int rawDateApplied) {
-        this.rawDateApplied = rawDateApplied;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

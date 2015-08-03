@@ -8,25 +8,28 @@ import android.support.annotation.NonNull;
 import com.nightscout.core.Timestamped;
 import com.orm.SugarRecord;
 
+import net.tribe7.common.hash.Hashing;
+
 import java.util.List;
 
 public class ProtoRecord extends SugarRecord<ProtoRecord> implements Timestamped {
 
   public ProtoRecord() {}
-  public ProtoRecord(long timestamp_sec, RecordType recordType, byte[] serializedProtobuf) {
-    this.timestamp_sec = timestamp_sec;
+  public ProtoRecord(long timestampSec, RecordType recordType, byte[] serializedProtobuf) {
+    this.timestampSec = timestampSec;
     this.recordType = recordType;
     this.consumedBy = Lists.newArrayList();
+    this.md5Hash = Hashing.md5().hashBytes(serializedProtobuf).toString();
     this.serializedProtobuf = serializedProtobuf;
   }
   @Override
   public long getTimestampSec() {
-    return timestamp_sec;
+    return timestampSec;
   }
 
   @Override
   public int compareTo(@NonNull Timestamped another) {
-    return Longs.compare(timestamp_sec, another.getTimestampSec());
+    return Longs.compare(timestampSec, another.getTimestampSec());
   }
 
   public enum Consumer {
@@ -46,7 +49,7 @@ public class ProtoRecord extends SugarRecord<ProtoRecord> implements Timestamped
   /**
    * Timestamp of when the record was created (NOT when it was downloaded).
    */
-  long timestamp_sec;
+  long timestampSec;
 
   /**
    * List of consumers that have successfully consumed this value. Note: if the consumer wants to
@@ -60,9 +63,20 @@ public class ProtoRecord extends SugarRecord<ProtoRecord> implements Timestamped
   RecordType recordType;
 
   /**
+   * md5 hash of the serialized protobuf.
+   */
+  String md5Hash;
+
+  /**
    * Serialized protobuffer.
    */
-  @Unique
   byte[] serializedProtobuf;
 
+  public String getMd5Hash() {
+    return md5Hash;
+  }
+
+  public boolean existsInDatabase() {
+    return ProtoRecord.count(ProtoRecord.class, "md5_hash = ?", new String[]{getMd5Hash()}) > 0;
+  }
 }

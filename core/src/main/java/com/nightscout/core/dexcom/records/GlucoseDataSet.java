@@ -12,7 +12,6 @@ import org.joda.time.DateTime;
 public class GlucoseDataSet extends GenericTimestampRecord {
 
     private long sensorRawSystemTime;
-    private long sensorRawDisplayTime;
     private GlucoseReading reading;
     private TrendArrow trend;
     private int noise;
@@ -51,7 +50,6 @@ public class GlucoseDataSet extends GenericTimestampRecord {
     public GlucoseDataSet(EGVRecord egvRecord, SensorRecord sensorRecord) {
         this(egvRecord);
         this.sensorRawSystemTime = sensorRecord.getRawSystemTimeSeconds();
-        this.sensorRawDisplayTime = sensorRecord.getRawDisplayTimeSeconds();
         // TODO check times match between record
         unfiltered = sensorRecord.getUnfiltered();
         filtered = sensorRecord.getFiltered();
@@ -62,7 +60,6 @@ public class GlucoseDataSet extends GenericTimestampRecord {
     public GlucoseDataSet(SensorGlucoseValueEntry egvRecord, SensorEntry sensorRecord, long receiverTimestamp, long referenceTime) {
         super(egvRecord.disp_timestamp_sec, egvRecord.sys_timestamp_sec, receiverTimestamp, referenceTime);
         this.sensorRawSystemTime = sensorRecord.sys_timestamp_sec;
-        this.sensorRawDisplayTime = sensorRecord.disp_timestamp_sec;
         this.reading = new GlucoseReading(egvRecord.sgv_mgdl, GlucoseUnit.MGDL);
         this.trend = TrendArrow.values()[egvRecord.trend.ordinal()];
         this.noise = egvRecord.noise.ordinal();
@@ -90,10 +87,6 @@ public class GlucoseDataSet extends GenericTimestampRecord {
 
     public TrendArrow getTrend() {
         return trend;
-    }
-
-    public String getTrendSymbol() {
-        return trend.symbol();
     }
 
     public int getNoise() {

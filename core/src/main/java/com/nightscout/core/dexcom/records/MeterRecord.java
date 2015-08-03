@@ -21,8 +21,8 @@ public class MeterRecord extends GenericTimestampRecord {
     private int meterTime;
     private GlucoseReading reading;
 
-    public MeterRecord(byte[] packet, long rcvrTime, long refTime) {
-        super(packet, rcvrTime, refTime);
+    public MeterRecord(byte[] packet) {
+        super(packet);
         if (packet.length != RECORD_SIZE) {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
                     ". Expected size: " + RECORD_SIZE + " record: " + Utils.bytesToHex(packet));
@@ -67,10 +67,6 @@ public class MeterRecord extends GenericTimestampRecord {
         this.recordType = "meter";
     }
 
-    public GlucoseReading getMeterBG() {
-        return reading;
-    }
-
     public int getBgMgdl() {
         return reading.asMgdl();
     }
@@ -101,10 +97,6 @@ public class MeterRecord extends GenericTimestampRecord {
                     .build();
             }
         };
-    }
-
-    public static List<MeterEntry> toProtobufList(List<MeterRecord> list) {
-        return toProtobufList(list, MeterEntry.class);
     }
 
     @Override

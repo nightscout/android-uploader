@@ -267,7 +267,7 @@
             android:title="@string/pref_about_osl"
             android:summary="@string/pref_about_summary"
             android:dialogMessage="@string/pref_gpl_summary"
-            android:dialogIcon="@drawable/ic_launcher"
+            android:dialogIcon="@drawable/ic_app_launcher"
             android:positiveButtonText="@string/ok"
             android:negativeButtonText="@null" />
     </PreferenceCategory>

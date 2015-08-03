@@ -105,10 +105,6 @@ public class EGVRecord extends GenericTimestampRecord {
                 .build();
     }
 
-    public static List<SensorGlucoseValueEntry> toProtobufList(List<EGVRecord> list) {
-        return toProtobufList(list, SensorGlucoseValueEntry.class);
-    }
-
     public static Function<EGVRecord, SensorGlucoseValue> v2ModelConverter() {
         return new Function<EGVRecord, SensorGlucoseValue>() {
             @Override

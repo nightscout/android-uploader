@@ -185,7 +185,6 @@ abstract class CommonUsbSerialDriver implements UsbSerialDriver {
         return this.isConnected(vendorId, productId, deviceClass, subClass, protocol);
     }
 
-    @Override
     public void registerConnectionListener(Action1<DeviceConnectionState> connectionListener) {
         connectionStateListener = connectionListener;
     }

@@ -6,8 +6,6 @@ import net.tribe7.common.primitives.Longs;
 
 import org.joda.time.DateTime;
 
-import java.sql.Time;
-
 public class TimestampedInstances {
 
   private abstract static class AbstractTimestamped implements Timestamped {

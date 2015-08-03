@@ -11,11 +11,11 @@ import com.nightscout.core.model.v2.Insertion;
 import com.nightscout.core.model.v2.ManualMeterEntry;
 import com.nightscout.core.model.v2.RawSensorReading;
 import com.nightscout.core.model.v2.SensorGlucoseValue;
+import com.orm.query.Condition;
 import com.orm.query.Select;
 
 import net.tribe7.common.base.Optional;
 
-import java.util.Iterator;
 import java.util.List;
 
 public final class DbUtils {
@@ -31,22 +31,16 @@ public final class DbUtils {
         return Optional.absent();
     }
   }
+
   /**
    * Gets the Timestamped object with the oldest 'most recently updated' timestamp.
    * This is to ensure we grab all possible newly updated data from the dexcom.
    */
-  public static Optional<ProtoRecord> getNewestG4SensorGlucoseValueInDb() {
-    Iterator<ProtoRecord> protoRecordList = Select.from(ProtoRecord.class).where(
-        com.orm.query.Condition.prop("record_type")
-            .like("G4_SENSOR_GLUCOSE_VALUE")).orderBy("timestamp_sec DESC").groupBy("record_type").iterator();
-    ProtoRecord oldest = null;
-    while (protoRecordList.hasNext()) {
-      ProtoRecord next = protoRecordList.next();
-      if (oldest == null || next.compareTo(oldest) < 0) {
-        oldest = next;
-      }
-    }
-    return Optional.fromNullable(oldest);
+  private static Optional<ProtoRecord> getNewestG4SensorGlucoseValueInDb() {
+    ProtoRecord protoRecord = Select.from(ProtoRecord.class).where(
+        Condition.prop("record_type").like("G4_SENSOR_GLUCOSE_VALUE"))
+        .orderBy("timestamp_sec DESC").first();
+    return Optional.fromNullable(protoRecord);
   }
 
   public static void updateAllRecords(Download download) {
@@ -55,7 +49,7 @@ public final class DbUtils {
     }
   }
 
-  private static void updateAllG4Records(G4Data g4Data) {
+  private static int updateAllG4Records(G4Data g4Data) {
     List<ProtoRecord> recordList = Lists.newArrayList();
     if (g4Data.sensor_glucose_values != null) {
       for (SensorGlucoseValue sensorGlucoseValue : g4Data.sensor_glucose_values) {
@@ -87,6 +81,13 @@ public final class DbUtils {
                                        ProtoRecord.RecordType.G4_INSERTION, insertion.toByteArray()));
       }
     }
-
+    int numSaved = 0;
+    for (ProtoRecord record : recordList) {
+      if (!record.existsInDatabase()) {
+        record.save();
+        numSaved++;
+      }
+    }
+    return numSaved;
   }
 }

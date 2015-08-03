@@ -38,7 +38,7 @@
         <ImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@drawable/ic_launcher"
+                android:src="@drawable/ic_app_launcher"
                 android:contentDescription="@string/nightscout_icon"/>
     </LinearLayout>
     <TextView

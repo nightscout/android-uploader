@@ -21,15 +21,12 @@ import com.nightscout.android.db.DbUtils;
 import com.nightscout.android.drivers.AndroidUploaderDevice;
 import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
-import com.nightscout.core.BusProvider;
 import com.nightscout.core.Timestamped;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.drivers.AbstractDevice;
 import com.nightscout.core.drivers.AbstractUploader;
-import com.nightscout.core.drivers.DeviceConnectionStatus;
 import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DexcomG4;
-import com.nightscout.core.drivers.DeviceConnectionState;
 import com.nightscout.core.drivers.ReadData;
 import com.nightscout.core.drivers.DeviceType;
 import com.nightscout.core.events.EventReporter;
@@ -37,12 +34,8 @@ import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.v2.Download;
 import com.nightscout.core.model.v2.DownloadStatus;
-import com.nightscout.core.model.v2.G4Data;
 import com.nightscout.core.model.v2.SensorGlucoseValue;
-import com.nightscout.core.utils.GlucoseReading;
-import com.nightscout.core.utils.IsigReading;
 import com.nightscout.core.utils.ListUtils;
-import com.squareup.otto.Bus;
 
 import net.tribe7.common.base.Optional;
 
@@ -74,8 +67,6 @@ public class CollectorService extends Service {
     private PowerManager pm;
     protected AbstractDevice device = null;
     protected DeviceTransport driver;
-    private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
-
 
     private AlarmManager alarmManager;
     private PendingIntent syncManager;
@@ -101,25 +92,28 @@ public class CollectorService extends Service {
         driver = null;
         setDriver();
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if (key.equals(getString(R.string.dexcom_device_type))) {
-                    log.debug("Interesting value changed! {}", key);
-                    if (driver != null && driver.isConnected()) {
-                        try {
-                            driver.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
+        SharedPreferences.OnSharedPreferenceChangeListener
+            prefListener =
+            new SharedPreferences.OnSharedPreferenceChangeListener() {
+                @Override
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+                                                      String key) {
+                    if (key.equals(getString(R.string.dexcom_device_type))) {
+                        log.debug("Interesting value changed! {}", key);
+                        if (driver != null && driver.isConnected()) {
+                            try {
+                                driver.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
+                    } else {
+                        log.debug("Meh... something uninteresting changed");
                     }
-                } else {
-                    log.debug("Meh... something uninteresting changed");
                 }
-            }
-        };
-        prefs.registerOnSharedPreferenceChangeListener(prefListener);
+            };
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(
+            prefListener);
 
     }
 
@@ -135,7 +129,7 @@ public class CollectorService extends Service {
         AbstractUploader
             uploaderDevice = AndroidUploaderDevice.getUploaderDevice(getApplicationContext());
         if (deviceType == DeviceType.DEXCOM_G4 || deviceType == DeviceType.DEXCOM_G4_SHARE2) {
-            device = new DexcomG4(new ReadData(deviceTransport), preferences, uploaderDevice, reporter);
+            device = new DexcomG4(new ReadData(driver), preferences, uploaderDevice, reporter);
         }
     }
 
@@ -213,7 +207,7 @@ public class CollectorService extends Service {
 
             // TODO(tyler.s.rhodes): figure out how to 'legally' do this cast. Should be fine as
             // long as ProtoRecord always inherits from Timestamped.
-            Optional<Timestamped> newestElementInDb = (Optional)DbUtils.getNewestElementInDb(deviceType);
+            Optional<Timestamped> newestElementInDb = (Optional) DbUtils.getNewestElementInDb(deviceType);
 
             try {
                 download = device.downloadAllAfter(newestElementInDb);
@@ -222,7 +216,7 @@ public class CollectorService extends Service {
                     setNextPoll(nextUploadTimeMs);
                     return null;
                 }
-                DbUtils.updateAllRecords(download, deviceType);
+                DbUtils.updateAllRecords(download);
             } catch (ArrayIndexOutOfBoundsException e) {
                 reporter.report(EventType.DEVICE, EventSeverity.ERROR,
                         getApplicationContext().getString(R.string.event_fail_log));
@@ -266,21 +260,17 @@ public class CollectorService extends Service {
             }
             wl.release();
 
-            if (!syncType.equals(GAP_SYNC)) {
-                if (download != null) {
-                    long rcvrTime = download.g4_data.receiver_system_time_sec;
-                    Duration durationToNextPoll = Seconds.seconds(MAX_POLL_WAIT_SEC).toStandardDuration();
-                    Optional<SensorGlucoseValue> lastReadValue = ListUtils.lastOrEmpty(
-                        download.g4_data.sensor_glucose_values);
-                    if (lastReadValue.isPresent()) {
-                        long readTimeDifferenceSec = (rcvrTime - lastReadValue.get().timestamp.system_time_sec) % MAX_POLL_WAIT_SEC;
-                        durationToNextPoll.minus(readTimeDifferenceSec);
-                    }
-                    nextUploadTimeMs = durationToNextPoll.getMillis();
+            if (download != null) {
+                long rcvrTime = download.g4_data.receiver_system_time_sec;
+                Duration durationToNextPoll = Seconds.seconds(MAX_POLL_WAIT_SEC).toStandardDuration();
+                Optional<SensorGlucoseValue> lastReadValue = ListUtils.lastOrEmpty(download.g4_data.sensor_glucose_values);
+                if (lastReadValue.isPresent()) {
+                    long readTimeDifferenceSec = (rcvrTime - lastReadValue.get().timestamp.system_time_sec) % MAX_POLL_WAIT_SEC;
+                    durationToNextPoll.minus(readTimeDifferenceSec);
                 }
-                setNextPoll(nextUploadTimeMs);
+                nextUploadTimeMs = durationToNextPoll.getMillis();
             }
-
+            setNextPoll(nextUploadTimeMs);
             return download;
         }
     }
@@ -288,14 +278,6 @@ public class CollectorService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
-    }
-
-    public DeviceConnectionStatus getDeviceConnectionStatus() {
-        if (device == null) {
-            return new DeviceConnectionStatus(preferences.getDeviceType(), DeviceConnectionState.CLOSED);
-        }
-        log.debug("From service: {}.", device.getDeviceConnectionStatus().deviceType.name());
-        return device.getDeviceConnectionStatus();
     }
 
     public long getNextPoll() {
