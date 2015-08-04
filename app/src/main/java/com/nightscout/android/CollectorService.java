@@ -18,16 +18,16 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
 import com.nightscout.android.db.DbUtils;
-import com.nightscout.android.drivers.AndroidUploaderDevice;
+import com.nightscout.android.drivers.AndroidUploaderDeviceDevice;
 import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.core.Timestamped;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.drivers.AbstractDevice;
-import com.nightscout.core.drivers.AbstractUploader;
+import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DexcomG4;
-import com.nightscout.core.drivers.ReadData;
+import com.nightscout.core.drivers.DexcomG4Driver;
 import com.nightscout.core.drivers.DeviceType;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
@@ -126,10 +126,10 @@ public class CollectorService extends Service {
 
     private void setDriver() {
         DeviceType deviceType = preferences.getDeviceType();
-        AbstractUploader
-            uploaderDevice = AndroidUploaderDevice.getUploaderDevice(getApplicationContext());
+        AbstractUploaderDevice
+            uploaderDevice = AndroidUploaderDeviceDevice.getUploaderDevice(getApplicationContext());
         if (deviceType == DeviceType.DEXCOM_G4 || deviceType == DeviceType.DEXCOM_G4_SHARE2) {
-            device = new DexcomG4(new ReadData(driver), preferences, uploaderDevice, reporter);
+            device = new DexcomG4(new DexcomG4Driver(driver), preferences, uploaderDevice, reporter);
         }
     }
 

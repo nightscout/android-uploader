@@ -5,7 +5,7 @@ import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.InsertionRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
-import com.nightscout.core.drivers.AbstractUploader;
+import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.preferences.TestPreferences;
 
@@ -101,7 +101,7 @@ public class BaseUploaderTest {
         }
 
         @Override
-        protected boolean doUpload(AbstractUploader deviceStatus, int receiverBattery) throws IOException {
+        protected boolean doUpload(AbstractUploaderDevice deviceStatus, int receiverBattery) throws IOException {
             throw new IOException("device");
         }
     }

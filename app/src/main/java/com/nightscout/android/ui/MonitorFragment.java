@@ -400,8 +400,7 @@ public class MonitorFragment extends Fragment {
                 JSONArray array = new JSONArray(Lists.transform(Wire.get(
                                                                     g4Data.sensor_glucose_values,
                                                                     G4Data.DEFAULT_SENSOR_GLUCOSE_VALUES),
-                    SensorGlucoseValueConverter
-                        .instance()));
+                    SensorGlucoseValueConverter.instance()));
                 mWebView.loadUrl("javascript:updateData(" + array + ")");
 
                 SensorGlucoseValue recentRecord = sensorGlucoseValueOptional.get();

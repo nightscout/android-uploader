@@ -1,7 +1,7 @@
 package com.nightscout.desktop;
 
 import com.embeddedunveiled.serial.SerialComManager;
-import com.nightscout.core.drivers.AbstractUploader;
+import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DexcomG4;
 import com.nightscout.core.drivers.DeviceType;
@@ -37,7 +37,7 @@ public class DesktopIoMain {
     preferences.setMeterUploadEnabled(true);
     preferences.setInsertionUploadEnabled(true);
 
-    DexcomG4 dexcomG4 = new DexcomG4(transport, preferences, new AbstractUploader() {
+    DexcomG4 dexcomG4 = new DexcomG4(transport, preferences, new AbstractUploaderDevice() {
       @Override
       public int getBatteryLevel() {
         return 100;

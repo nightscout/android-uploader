@@ -13,7 +13,7 @@ import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.InsertionRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
-import com.nightscout.core.drivers.AbstractUploader;
+import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
@@ -158,7 +158,7 @@ public class MongoUploader extends BaseUploader {
         return output;
     }
 
-    private BasicDBObject toBasicDBObject(AbstractUploader deviceStatus, int rcvrBat) {
+    private BasicDBObject toBasicDBObject(AbstractUploaderDevice deviceStatus, int rcvrBat) {
         BasicDBObject output = new BasicDBObject();
         output.put("uploaderBattery", deviceStatus.getBatteryLevel());
         output.put("receiverBattery", rcvrBat);
@@ -255,7 +255,7 @@ public class MongoUploader extends BaseUploader {
     }
 
     @Override
-    protected boolean doUpload(AbstractUploader deviceStatus, int rcvrBat) throws IOException {
+    protected boolean doUpload(AbstractUploaderDevice deviceStatus, int rcvrBat) throws IOException {
         BasicDBObject dbObject = toBasicDBObject(deviceStatus, rcvrBat);
         return upsert(getDeviceStatusCollection(), dbObject, dbObject);
     }

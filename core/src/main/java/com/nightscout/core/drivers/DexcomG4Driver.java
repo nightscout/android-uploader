@@ -14,6 +14,10 @@ import com.nightscout.core.dexcom.records.InsertionRecord;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.PageHeader;
 import com.nightscout.core.dexcom.records.SensorRecord;
+import com.nightscout.core.model.v2.Calibration;
+import com.nightscout.core.model.v2.Insertion;
+import com.nightscout.core.model.v2.ManualMeterEntry;
+import com.nightscout.core.model.v2.RawSensorReading;
 import com.nightscout.core.model.v2.SensorGlucoseValue;
 
 import net.tribe7.common.base.Optional;
@@ -31,77 +35,74 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.inject.Provider;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-public class ReadData {
-    private static final Logger log = LoggerFactory.getLogger(ReadData.class);
+public final class DexcomG4Driver {
+    private static final Logger log = LoggerFactory.getLogger(DexcomG4Driver.class);
 
     public static final int EXPECTED_PAGE_SIZE_BYTES = 534;
     public static final int EXPECTED_PAGE_RANGE_SIZE_BYTES = 14;
 
     private static final int TIMEOUT_MS = 25000;
     private static final int MIN_LEN = 256;
-    private Provider<Optional<DeviceTransport>> deviceTransportProvider;
 
     // Storing this to reduce the number of reads from the device for other attributes
-    private Document manufacturingDataXml;
-    private String transmitterId;
+    private static Document manufacturingDataXml;
+    private static String transmitterId;
 
-    private DeviceTransport deviceTransport;
+    private DexcomG4Driver() {}
 
-    public ReadData(DeviceTransport deviceTransport) {
-        this.deviceTransport = deviceTransport;
+    public static List<Insertion> getRecentInsertions(DeviceTransport deviceTransport) throws IOException {
+        return Lists.transform(getRecentInsertion(deviceTransport), InsertionRecord.v2ModelConverter());
     }
-
-    public boolean isConnected() {
-        Optional<DeviceTransport> transportOptional = deviceTransportProvider.get();
-        return transportOptional.isPresent() && transportOptional.get().isConnected();
-    }
-
-    public List<InsertionRecord> getRecentInsertion() throws IOException {
-        int endPage = readDataBasePageRange(RecordType.INSERTION_TIME);
-        byte[] data = readDataBasePage(RecordType.INSERTION_TIME, endPage);
+    private static List<InsertionRecord> getRecentInsertion(DeviceTransport deviceTransport) throws IOException {
+        int endPage = readDataBasePageRange(deviceTransport, RecordType.INSERTION_TIME);
+        byte[] data = readDataBasePage(deviceTransport, RecordType.INSERTION_TIME, endPage);
         return parsePage(data, InsertionRecord.class);
     }
 
-    public List<EGVRecord> getRecentEGVsPages(int numOfRecentPages) throws IOException {
+    public static List<EGVRecord> getRecentEGVsPages(DeviceTransport deviceTransport, int numOfRecentPages) throws IOException {
         if (numOfRecentPages < 1) {
             log.warn("numOfRecentPages less than 1. Setting to 1.");
             numOfRecentPages = 1;
         }
-        int endPage = readDataBasePageRange(RecordType.EGV_DATA);
+        int endPage = readDataBasePageRange(deviceTransport, RecordType.EGV_DATA);
         numOfRecentPages = numOfRecentPages - 1;
         List<EGVRecord> allPages = new ArrayList<>();
         for (int i = Math.min(numOfRecentPages, endPage); i >= 0; i--) {
             int nextPage = endPage - i;
             log.debug("Reading #{} EGV pages (page number {})", i, nextPage);
-            byte[] data = readDataBasePage(RecordType.EGV_DATA, nextPage);
+            byte[] data = readDataBasePage(deviceTransport, RecordType.EGV_DATA, nextPage);
             allPages.addAll(parsePage(data, EGVRecord.class));
         }
         return allPages;
     }
 
-    public List<EGVRecord> getAllEGVRecordsAfter(Optional<Timestamped> timestamped) throws IOException {
+    public static List<SensorGlucoseValue> getAllSensorGlucoseValuesAfter(DeviceTransport deviceTransport, Optional<Timestamped> timestampedOptional) throws IOException {
+        return Lists.transform(getAllEGVRecordsAfter(deviceTransport, timestampedOptional), EGVRecord.v2ModelConverter());
+    }
+
+    private static List<EGVRecord> getAllEGVRecordsAfter(DeviceTransport deviceTransport, Optional<Timestamped> timestamped) throws IOException {
         Timestamped alreadyDownloadedEntry;
         if (timestamped.isPresent()) {
             alreadyDownloadedEntry = timestamped.get();
         } else {
             alreadyDownloadedEntry = TimestampedInstances.epoch();
         }
-        int endPage = readDataBasePageRange(RecordType.EGV_DATA);
+        int endPage = readDataBasePageRange(deviceTransport, RecordType.EGV_DATA);
         List<EGVRecord> allPages = new ArrayList<>();
         int currentPage = 0;
         Timestamped earliestDownloaded = TimestampedInstances.now();
 
         while(earliestDownloaded.compareTo(alreadyDownloadedEntry) > 0 && currentPage <= endPage) {
-            byte[] data = readDataBasePage(RecordType.EGV_DATA, currentPage);
+            byte[] data = readDataBasePage(deviceTransport, RecordType.EGV_DATA, currentPage);
             List<EGVRecord> records = parsePage(data, EGVRecord.class);
             List<SensorGlucoseValue> sensorGlucoseValues = Lists.transform(records, EGVRecord.v2ModelConverter());
             if (sensorGlucoseValues.size() > 0) {
@@ -113,64 +114,74 @@ public class ReadData {
         return allPages;
     }
 
-    public List<MeterRecord> getRecentMeterRecords() throws IOException {
-        int endPage = readDataBasePageRange(RecordType.METER_DATA);
-        byte[] data = readDataBasePage(RecordType.METER_DATA, endPage);
+    public static List<ManualMeterEntry> getRecentManualMeterEntries(DeviceTransport deviceTransport) throws IOException {
+        return Lists.transform(getRecentMeterRecords(deviceTransport), MeterRecord.v2ModelConverter());
+    }
+    private static List<MeterRecord> getRecentMeterRecords(DeviceTransport deviceTransport) throws IOException {
+        int endPage = readDataBasePageRange(deviceTransport, RecordType.METER_DATA);
+        byte[] data = readDataBasePage(deviceTransport, RecordType.METER_DATA, endPage);
         return parsePage(data, MeterRecord.class);
     }
 
-    public List<SensorRecord> getRecentSensorRecords(int numOfRecentPages) throws IOException {
+    public static List<RawSensorReading> getRecentRawSensorReadings(DeviceTransport deviceTransport, int numOfRecentPages) throws IOException {
+        return Lists.transform(getRecentSensorRecords(deviceTransport, numOfRecentPages),
+                               SensorRecord.v2ModelConverter());
+    }
+    private static List<SensorRecord> getRecentSensorRecords(DeviceTransport deviceTransport, int numOfRecentPages) throws IOException {
         if (numOfRecentPages < 1) {
             log.warn("Number of recent pages requested less than 1. Setting to 1.");
             numOfRecentPages = 1;
         }
-        int endPage = readDataBasePageRange(RecordType.SENSOR_DATA);
+        int endPage = readDataBasePageRange(deviceTransport, RecordType.SENSOR_DATA);
         numOfRecentPages = numOfRecentPages - 1;
         List<SensorRecord> allPages = new ArrayList<>();
         for (int i = Math.min(numOfRecentPages, endPage); i >= 0; i--) {
             int nextPage = endPage - i;
             log.debug("Reading #{} Sensor pages (page number {})", i, nextPage);
-            byte[] data = readDataBasePage(RecordType.SENSOR_DATA, nextPage);
+            byte[] data = readDataBasePage(deviceTransport, RecordType.SENSOR_DATA, nextPage);
             allPages.addAll(parsePage(data, SensorRecord.class));
         }
         return allPages;
     }
 
-    public List<CalRecord> getRecentCalRecords() throws IOException {
-        int endPage = readDataBasePageRange(RecordType.CAL_SET);
-        byte[] data = readDataBasePage(RecordType.CAL_SET, endPage);
+    public static List<Calibration> getRecentCalibrations(DeviceTransport deviceTransport) throws IOException {
+        return Lists.transform(getRecentCalRecords(deviceTransport), CalRecord.v2ModelConverter());
+    }
+    private static List<CalRecord> getRecentCalRecords(DeviceTransport deviceTransport) throws IOException {
+        int endPage = readDataBasePageRange(deviceTransport, RecordType.CAL_SET);
+        byte[] data = readDataBasePage(deviceTransport, RecordType.CAL_SET, endPage);
         return parsePage(data, CalRecord.class);
     }
 
-    public boolean ping() throws IOException {
-        writeCommand(Command.PING);
-        return read(MIN_LEN).getCommand() == Command.ACK;
+    public static boolean ping(DeviceTransport deviceTransport) throws IOException {
+        writeCommand(deviceTransport, Command.PING);
+        return read(deviceTransport, MIN_LEN).getCommand() == Command.ACK;
     }
 
-    public int readBatteryLevel() throws IOException {
+    public static int readBatteryLevel(DeviceTransport deviceTransport) throws IOException {
         log.debug("Reading battery level...");
-        writeCommand(Command.READ_BATTERY_LEVEL);
-        byte[] readData = read(10).getData();
+        writeCommand(deviceTransport, Command.READ_BATTERY_LEVEL);
+        byte[] readData = read(deviceTransport, 10).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
-    public String readSerialNumber() throws IOException {
-        return getManufacturingAttribute("SerialNumber").or("");
+    public static String readSerialNumber(DeviceTransport deviceTransport) throws IOException {
+        return getManufacturingAttribute(deviceTransport, "SerialNumber").or("");
     }
 
-    public String readTrasmitterId() throws IOException {
+    public static String readTrasmitterId(DeviceTransport deviceTransport) throws IOException {
         if (transmitterId == null) {
-            writeCommand(Command.READ_TRANSMITTER_ID);
-            byte[] data = read(11).getData();
+            writeCommand(deviceTransport, Command.READ_TRANSMITTER_ID);
+            byte[] data = read(deviceTransport, 11).getData();
             transmitterId = new String(data);
         }
         return transmitterId;
     }
 
-    private Optional<String> getManufacturingAttribute(String attribute) throws IOException {
+    private static Optional<String> getManufacturingAttribute(DeviceTransport deviceTransport, String attribute) throws IOException {
         String result;
         if (manufacturingDataXml == null) {
-            byte[] packet = readDataBasePage(RecordType.MANUFACTURING_DATA, 0);
+            byte[] packet = readDataBasePage(deviceTransport, RecordType.MANUFACTURING_DATA, 0);
             String raw = new String(packet);
             String xml = raw.substring(raw.indexOf('<'), raw.lastIndexOf('>') + 1);
             try {
@@ -190,16 +201,16 @@ public class ReadData {
         return Optional.fromNullable(result);
     }
 
-    public long readSystemTime() throws IOException {
-        writeCommand(Command.READ_SYSTEM_TIME);
-        byte[] readData = read(10).getData();
+    public static long readSystemTime(DeviceTransport deviceTransport) throws IOException {
+        writeCommand(deviceTransport, Command.READ_SYSTEM_TIME);
+        byte[] readData = read(deviceTransport, 10).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
-    public int readDisplayTimeOffset() throws IOException {
+    public static int readDisplayTimeOffset(DeviceTransport deviceTransport) throws IOException {
         log.debug("Reading display time offset...");
-        writeCommand(Command.READ_DISPLAY_TIME_OFFSET);
-        byte[] readData = read(10).getData();
+        writeCommand(deviceTransport, Command.READ_DISPLAY_TIME_OFFSET);
+        byte[] readData = read(deviceTransport, 10).getData();
         return ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
@@ -209,18 +220,18 @@ public class ReadData {
      * @return The last page number available.
      * @throws IOException
      */
-    private int readDataBasePageRange(RecordType recordType) throws IOException {
+    private static int readDataBasePageRange(DeviceTransport deviceTransport, RecordType recordType) throws IOException {
         ArrayList<Byte> payload = new ArrayList<>();
         payload.add((byte) recordType.ordinal());
-        writeCommand(Command.READ_DATABASE_PAGE_RANGE, payload);
-        byte[] readData = read(EXPECTED_PAGE_RANGE_SIZE_BYTES).getData();
+        writeCommand(deviceTransport, Command.READ_DATABASE_PAGE_RANGE, payload);
+        byte[] readData = read(deviceTransport, EXPECTED_PAGE_RANGE_SIZE_BYTES).getData();
         ByteBuffer buffer = ByteBuffer.wrap(readData).order(ByteOrder.LITTLE_ENDIAN);
         log.debug("Reading page range for {}: {}", recordType.name(),
                   Utils.bytesToHex(buffer.array()));
         return buffer.getInt(4);
     }
 
-    private byte[] readDataBasePage(RecordType recordType, int page) throws IOException {
+    private static byte[] readDataBasePage(DeviceTransport deviceTransport, RecordType recordType, int page) throws IOException {
         int numOfPages = 1;
         if (page < 0) {
             page = 0;
@@ -235,11 +246,11 @@ public class ReadData {
         payload.add(pageInt[1]);
         payload.add(pageInt[0]);
         payload.add(((byte) numOfPages));
-        writeCommand(Command.READ_DATABASE_PAGES, payload);
-        return read(EXPECTED_PAGE_SIZE_BYTES).getData();
+        writeCommand(deviceTransport, Command.READ_DATABASE_PAGES, payload);
+        return read(deviceTransport, EXPECTED_PAGE_SIZE_BYTES).getData();
     }
 
-    private void writeCommand(Command command, List<Byte> payload) throws IOException {
+    private static void writeCommand(DeviceTransport deviceTransport, Command command, List<Byte> payload) throws IOException {
         String payloadString = "";
         if (payload != null) {
             payloadString = Utils.bytesToHex(Bytes.toArray(payload));
@@ -249,11 +260,11 @@ public class ReadData {
         deviceTransport.write(new PacketBuilder(command, payload).build(), TIMEOUT_MS);
     }
 
-    protected void writeCommand(Command command) throws IOException {
-        writeCommand(command, null);
+    protected static void writeCommand(DeviceTransport deviceTransport, Command command) throws IOException {
+        writeCommand(deviceTransport, command, null);
     }
 
-    private ReadPacket read(int numOfBytes) throws IOException {
+    private static ReadPacket read(DeviceTransport deviceTransport, int numOfBytes) throws IOException {
         byte[] response = deviceTransport.read(numOfBytes, TIMEOUT_MS);
         if (response.length != numOfBytes) {
             log.error("Response numBytes {}, requested {}", response.length, numOfBytes);
@@ -262,7 +273,7 @@ public class ReadData {
         return new ReadPacket(response);
     }
 
-    private <T extends GenericTimestampRecord> List<T> parsePage(byte[] data, Class<T> clazz) {
+    private static <T extends GenericTimestampRecord> List<T> parsePage(byte[] data, Class<T> clazz) {
         PageHeader pageHeader = new PageHeader(data);
         List<T> records = new ArrayList<>();
         for (int i = 0; i < pageHeader.getNumOfRecords(); i++) {

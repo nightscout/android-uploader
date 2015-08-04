@@ -7,7 +7,7 @@ import com.nightscout.core.dexcom.records.EGVRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.MeterRecord;
 import com.nightscout.core.dexcom.records.SensorRecord;
-import com.nightscout.core.drivers.AbstractUploader;
+import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.model.G4Noise;
 
 import org.joda.time.DateTime;
@@ -46,8 +46,8 @@ public class MockFactory {
         return new CalRecord(0d, 0d, 0d, 0L, 0L, 0, subrecords, 0, 0);
     }
 
-    public static AbstractUploader mockDeviceStatus() {
-        return new AbstractUploader() {
+    public static AbstractUploaderDevice mockDeviceStatus() {
+        return new AbstractUploaderDevice() {
             @Override
             public int getBatteryLevel() {
                 return 999;

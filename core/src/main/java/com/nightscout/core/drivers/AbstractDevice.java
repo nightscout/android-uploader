@@ -10,8 +10,6 @@ import com.nightscout.core.model.v2.DownloadStatus;
 import net.tribe7.common.base.Optional;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class is a representation for a device, which contains data that we want.
@@ -32,8 +30,6 @@ abstract public class AbstractDevice {
         return new Download.Builder().status(status)
             .timestamp(new DateTime().toString()).build();
     }
-
-    public abstract boolean isConnected();
 
     protected abstract Download doDownloadAllAfter(Optional<Timestamped> timestamped);
 

@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
-import com.nightscout.android.drivers.AndroidUploaderDevice;
+import com.nightscout.android.drivers.AndroidUploaderDeviceDevice;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.utils.GlucoseReading;
@@ -95,7 +95,7 @@ public class Pebble {
         lastTrend = trend;
         lastDelta = delta;
         recordTime = DateTimeZone.getDefault().convertUTCToLocal(recordTime);
-        int batLevel = AndroidUploaderDevice.getUploaderDevice(cntx).getBatteryLevel();
+        int batLevel = AndroidUploaderDeviceDevice.getUploaderDevice(cntx).getBatteryLevel();
         PebbleDictionary dictionary = buildDictionary(trend, bgStr, (int) (recordTime / 1000),
                 (int) (DateTimeZone.getDefault().convertUTCToLocal(new DateTime().getMillis()) / 1000), deltaStr,
                 String.valueOf(batLevel), pwdName);

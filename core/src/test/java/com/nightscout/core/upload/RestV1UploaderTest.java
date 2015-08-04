@@ -1,6 +1,6 @@
 package com.nightscout.core.upload;
 
-import com.nightscout.core.drivers.AbstractUploader;
+import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.preferences.TestPreferences;
 
 import net.tribe7.common.collect.Lists;
@@ -104,7 +104,7 @@ public class RestV1UploaderTest {
         assertThat(jsonObject.get("scale"), is(not(nullValue())));
     }
 
-    public static void verifyDeviceStatus(JSONObject jsonObject, AbstractUploader deviceStatus)
+    public static void verifyDeviceStatus(JSONObject jsonObject, AbstractUploaderDevice deviceStatus)
             throws JSONException {
         assertThat(jsonObject.getInt("uploaderBattery"), is(deviceStatus.getBatteryLevel()));
     }
@@ -204,7 +204,7 @@ public class RestV1UploaderTest {
 
     @Test
     public void testDeviceStatus_Entity() throws Exception {
-        AbstractUploader deviceStatus = mockDeviceStatus();
+        AbstractUploaderDevice deviceStatus = mockDeviceStatus();
         restUploader.uploadDeviceStatus(deviceStatus, 100);
         HttpPost post = (HttpPost) captor.getValue();
         String entity = CharStreams.toString(new InputStreamReader(post.getEntity().getContent()));

@@ -5,13 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-import com.nightscout.core.drivers.AbstractUploader;
+import com.nightscout.core.drivers.AbstractUploaderDevice;
 
-public class AndroidUploaderDevice extends AbstractUploader {
+public class AndroidUploaderDeviceDevice extends AbstractUploaderDevice {
     private int uploaderBattery;
     private Context context;
 
-    private AndroidUploaderDevice(Context context) {
+    private AndroidUploaderDeviceDevice(Context context) {
         IntentFilter deviceStatusFilter = new IntentFilter();
         deviceStatusFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
         this.context = context;
@@ -23,8 +23,8 @@ public class AndroidUploaderDevice extends AbstractUploader {
     }
 
     // TODO: This registers everytime. Need to fix
-    public static AndroidUploaderDevice getUploaderDevice(Context context) {
-        return new AndroidUploaderDevice(context);
+    public static AndroidUploaderDeviceDevice getUploaderDevice(Context context) {
+        return new AndroidUploaderDeviceDevice(context);
     }
 
     public void close() {
