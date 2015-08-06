@@ -13,27 +13,18 @@ message G4Data {
     // Units reported by the g4, set in the user preferences.
     optional GlucoseUnit units = 2;
 
-    // Raw value of the receiver's system time. This is read directly from the receiver, and can be
-    // used to calculate 'real' time, by using it as a timestamp from a 'Dexcom epoch'. See
-    // com.nightscout.core.dexcom.Utils#receiverTimeToDateTime for more info.
-    optional uint64 receiver_system_time_sec = 4;
+    // Raw value of the receiver's system time. This is read directly from the receiver.
+    optional uint64 receiver_system_time_sec = 3;
 
-    optional float receiver_battery_percent = 6;
+    optional G4Metadata metadata = 4;
 
-    optional float uploader_battery_percent = 7;
+    repeated ManualMeterEntry manual_meter_entries = 5;
 
-    repeated ManualMeterEntry manual_meter_entries = 8;
+    repeated RawSensorReading raw_sensor_readings = 6;
 
-    repeated RawSensorReading raw_sensor_readings = 9;
+    repeated Calibration calibrations = 7;
 
-    repeated Calibration calibrations = 10;
-
-    repeated Insertion insertions = 11;
-
-    // The receiver id reported by the dexcom g4. This uniquely identifies the device where this Data object came from.
-    optional string receiver_id = 12;
-    // The transmitter id reported as used by the dexcom g4. Should look like '6A14AC'.
-    optional string transmitter_id = 13;
+    repeated Insertion insertions = 8;
 }
 
 // Next tag: 10
@@ -67,12 +58,28 @@ enum ReceiverStatus {
     RECEIVER_DISCONNECTED = 1; // The receiver is not connected to the uploader
 }
 
+// Next tag: 4
+message G4Metadata {
+    optional float receiver_battery_percent = 1;
+
+    // The receiver id reported by the dexcom g4. This uniquely identifies the device where this Data object came from.
+    optional string receiver_id = 2;
+    // The transmitter id reported as used by the dexcom g4. Should look like '6A14AC'.
+    optional string transmitter_id = 3;
+
+}
+
 // Next tag: 3
 message G4Timestamp {
-    // The internal clock of the receiver
+    // The internal clock of the receiver.
     optional uint64 system_time_sec = 1;
-    // The user configured time displayed on the receiver
+    // The user configured time displayed on the receiver.
     optional uint64 display_time_sec = 2;
+
+    // The "actual" time of the record. This is calculated by taking the difference of the dexcom's
+    // reported system time at download time and the record's system time (above), and adding it to
+    // the android device's current time.
+    optional uint64 wall_time_sec = 3;
 }
 
 // Next tag: 5

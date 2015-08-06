@@ -75,7 +75,8 @@ public class SensorRecord extends GenericTimestampRecord {
                 .build();
     }
 
-    public static Function<SensorRecord, RawSensorReading> v2ModelConverter() {
+    public static Function<SensorRecord, RawSensorReading> v2ModelConverter(
+        final Function<Long, Long> wallTimeConverter) {
         return new Function<SensorRecord, RawSensorReading>() {
             @Override
             public RawSensorReading apply(SensorRecord input) {
@@ -83,8 +84,11 @@ public class SensorRecord extends GenericTimestampRecord {
                     .rssi(input.rssi)
                     .filtered(input.filtered)
                     .unfiltered(input.unfiltered)
-                    .timestamp(new G4Timestamp(input.getRawSystemTimeSeconds(),
-                                               input.getRawDisplayTimeSeconds()))
+                    .timestamp(new G4Timestamp.Builder()
+                                   .system_time_sec(input.getRawSystemTimeSeconds())
+                                   .display_time_sec(input.getRawDisplayTimeSeconds())
+                                   .wall_time_sec(wallTimeConverter.apply(input.getRawSystemTimeSeconds()))
+                                   .build())
                     .build();
             }
         };

@@ -15,26 +15,36 @@ public final class G4Timestamp extends Message {
 
   public static final Long DEFAULT_SYSTEM_TIME_SEC = 0L;
   public static final Long DEFAULT_DISPLAY_TIME_SEC = 0L;
+  public static final Long DEFAULT_WALL_TIME_SEC = 0L;
 
   /**
-   * The internal clock of the receiver
+   * The internal clock of the receiver.
    */
   @ProtoField(tag = 1, type = UINT64)
   public final Long system_time_sec;
 
   /**
-   * The user configured time displayed on the receiver
+   * The user configured time displayed on the receiver.
    */
   @ProtoField(tag = 2, type = UINT64)
   public final Long display_time_sec;
 
-  public G4Timestamp(Long system_time_sec, Long display_time_sec) {
+  /**
+   * The "actual" time of the record. This is calculated by taking the difference of the dexcom's
+   * reported system time at download time and the record's system time (above), and adding it to
+   * the android device's current time.
+   */
+  @ProtoField(tag = 3, type = UINT64)
+  public final Long wall_time_sec;
+
+  public G4Timestamp(Long system_time_sec, Long display_time_sec, Long wall_time_sec) {
     this.system_time_sec = system_time_sec;
     this.display_time_sec = display_time_sec;
+    this.wall_time_sec = wall_time_sec;
   }
 
   private G4Timestamp(Builder builder) {
-    this(builder.system_time_sec, builder.display_time_sec);
+    this(builder.system_time_sec, builder.display_time_sec, builder.wall_time_sec);
     setBuilder(builder);
   }
 
@@ -44,7 +54,8 @@ public final class G4Timestamp extends Message {
     if (!(other instanceof G4Timestamp)) return false;
     G4Timestamp o = (G4Timestamp) other;
     return equals(system_time_sec, o.system_time_sec)
-        && equals(display_time_sec, o.display_time_sec);
+        && equals(display_time_sec, o.display_time_sec)
+        && equals(wall_time_sec, o.wall_time_sec);
   }
 
   @Override
@@ -53,6 +64,7 @@ public final class G4Timestamp extends Message {
     if (result == 0) {
       result = system_time_sec != null ? system_time_sec.hashCode() : 0;
       result = result * 37 + (display_time_sec != null ? display_time_sec.hashCode() : 0);
+      result = result * 37 + (wall_time_sec != null ? wall_time_sec.hashCode() : 0);
       hashCode = result;
     }
     return result;
@@ -62,6 +74,7 @@ public final class G4Timestamp extends Message {
 
     public Long system_time_sec;
     public Long display_time_sec;
+    public Long wall_time_sec;
 
     public Builder() {
     }
@@ -71,10 +84,11 @@ public final class G4Timestamp extends Message {
       if (message == null) return;
       this.system_time_sec = message.system_time_sec;
       this.display_time_sec = message.display_time_sec;
+      this.wall_time_sec = message.wall_time_sec;
     }
 
     /**
-     * The internal clock of the receiver
+     * The internal clock of the receiver.
      */
     public Builder system_time_sec(Long system_time_sec) {
       this.system_time_sec = system_time_sec;
@@ -82,10 +96,20 @@ public final class G4Timestamp extends Message {
     }
 
     /**
-     * The user configured time displayed on the receiver
+     * The user configured time displayed on the receiver.
      */
     public Builder display_time_sec(Long display_time_sec) {
       this.display_time_sec = display_time_sec;
+      return this;
+    }
+
+    /**
+     * The "actual" time of the record. This is calculated by taking the difference of the dexcom's
+     * reported system time at download time and the record's system time (above), and adding it to
+     * the android device's current time.
+     */
+    public Builder wall_time_sec(Long wall_time_sec) {
+      this.wall_time_sec = wall_time_sec;
       return this;
     }
 

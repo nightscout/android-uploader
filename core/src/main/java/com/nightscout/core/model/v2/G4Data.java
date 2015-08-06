@@ -8,8 +8,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.squareup.wire.Message.Datatype.ENUM;
-import static com.squareup.wire.Message.Datatype.FLOAT;
-import static com.squareup.wire.Message.Datatype.STRING;
 import static com.squareup.wire.Message.Datatype.UINT64;
 import static com.squareup.wire.Message.Label.REPEATED;
 
@@ -22,14 +20,10 @@ public final class G4Data extends Message {
   public static final List<SensorGlucoseValue> DEFAULT_SENSOR_GLUCOSE_VALUES = Collections.emptyList();
   public static final GlucoseUnit DEFAULT_UNITS = GlucoseUnit.MGDL;
   public static final Long DEFAULT_RECEIVER_SYSTEM_TIME_SEC = 0L;
-  public static final Float DEFAULT_RECEIVER_BATTERY_PERCENT = 0F;
-  public static final Float DEFAULT_UPLOADER_BATTERY_PERCENT = 0F;
   public static final List<ManualMeterEntry> DEFAULT_MANUAL_METER_ENTRIES = Collections.emptyList();
   public static final List<RawSensorReading> DEFAULT_RAW_SENSOR_READINGS = Collections.emptyList();
   public static final List<Calibration> DEFAULT_CALIBRATIONS = Collections.emptyList();
   public static final List<Insertion> DEFAULT_INSERTIONS = Collections.emptyList();
-  public static final String DEFAULT_RECEIVER_ID = "";
-  public static final String DEFAULT_TRANSMITTER_ID = "";
 
   /**
    * Glucose records as reported by the G4
@@ -44,59 +38,39 @@ public final class G4Data extends Message {
   public final GlucoseUnit units;
 
   /**
-   * Raw value of the receiver's system time. This is read directly from the receiver, and can be
-   * used to calculate 'real' time, by using it as a timestamp from a 'Dexcom epoch'. See
-   * com.nightscout.core.dexcom.Utils#receiverTimeToDateTime for more info.
+   * Raw value of the receiver's system time. This is read directly from the receiver.
    */
-  @ProtoField(tag = 4, type = UINT64)
+  @ProtoField(tag = 3, type = UINT64)
   public final Long receiver_system_time_sec;
 
-  @ProtoField(tag = 6, type = FLOAT)
-  public final Float receiver_battery_percent;
+  @ProtoField(tag = 4)
+  public final G4Metadata metadata;
 
-  @ProtoField(tag = 7, type = FLOAT)
-  public final Float uploader_battery_percent;
-
-  @ProtoField(tag = 8, label = REPEATED, messageType = ManualMeterEntry.class)
+  @ProtoField(tag = 5, label = REPEATED, messageType = ManualMeterEntry.class)
   public final List<ManualMeterEntry> manual_meter_entries;
 
-  @ProtoField(tag = 9, label = REPEATED, messageType = RawSensorReading.class)
+  @ProtoField(tag = 6, label = REPEATED, messageType = RawSensorReading.class)
   public final List<RawSensorReading> raw_sensor_readings;
 
-  @ProtoField(tag = 10, label = REPEATED, messageType = Calibration.class)
+  @ProtoField(tag = 7, label = REPEATED, messageType = Calibration.class)
   public final List<Calibration> calibrations;
 
-  @ProtoField(tag = 11, label = REPEATED, messageType = Insertion.class)
+  @ProtoField(tag = 8, label = REPEATED, messageType = Insertion.class)
   public final List<Insertion> insertions;
 
-  /**
-   * The receiver id reported by the dexcom g4. This uniquely identifies the device where this Data object came from.
-   */
-  @ProtoField(tag = 12, type = STRING)
-  public final String receiver_id;
-
-  /**
-   * The transmitter id reported as used by the dexcom g4. Should look like '6A14AC'.
-   */
-  @ProtoField(tag = 13, type = STRING)
-  public final String transmitter_id;
-
-  public G4Data(List<SensorGlucoseValue> sensor_glucose_values, GlucoseUnit units, Long receiver_system_time_sec, Float receiver_battery_percent, Float uploader_battery_percent, List<ManualMeterEntry> manual_meter_entries, List<RawSensorReading> raw_sensor_readings, List<Calibration> calibrations, List<Insertion> insertions, String receiver_id, String transmitter_id) {
+  public G4Data(List<SensorGlucoseValue> sensor_glucose_values, GlucoseUnit units, Long receiver_system_time_sec, G4Metadata metadata, List<ManualMeterEntry> manual_meter_entries, List<RawSensorReading> raw_sensor_readings, List<Calibration> calibrations, List<Insertion> insertions) {
     this.sensor_glucose_values = immutableCopyOf(sensor_glucose_values);
     this.units = units;
     this.receiver_system_time_sec = receiver_system_time_sec;
-    this.receiver_battery_percent = receiver_battery_percent;
-    this.uploader_battery_percent = uploader_battery_percent;
+    this.metadata = metadata;
     this.manual_meter_entries = immutableCopyOf(manual_meter_entries);
     this.raw_sensor_readings = immutableCopyOf(raw_sensor_readings);
     this.calibrations = immutableCopyOf(calibrations);
     this.insertions = immutableCopyOf(insertions);
-    this.receiver_id = receiver_id;
-    this.transmitter_id = transmitter_id;
   }
 
   private G4Data(Builder builder) {
-    this(builder.sensor_glucose_values, builder.units, builder.receiver_system_time_sec, builder.receiver_battery_percent, builder.uploader_battery_percent, builder.manual_meter_entries, builder.raw_sensor_readings, builder.calibrations, builder.insertions, builder.receiver_id, builder.transmitter_id);
+    this(builder.sensor_glucose_values, builder.units, builder.receiver_system_time_sec, builder.metadata, builder.manual_meter_entries, builder.raw_sensor_readings, builder.calibrations, builder.insertions);
     setBuilder(builder);
   }
 
@@ -108,14 +82,11 @@ public final class G4Data extends Message {
     return equals(sensor_glucose_values, o.sensor_glucose_values)
         && equals(units, o.units)
         && equals(receiver_system_time_sec, o.receiver_system_time_sec)
-        && equals(receiver_battery_percent, o.receiver_battery_percent)
-        && equals(uploader_battery_percent, o.uploader_battery_percent)
+        && equals(metadata, o.metadata)
         && equals(manual_meter_entries, o.manual_meter_entries)
         && equals(raw_sensor_readings, o.raw_sensor_readings)
         && equals(calibrations, o.calibrations)
-        && equals(insertions, o.insertions)
-        && equals(receiver_id, o.receiver_id)
-        && equals(transmitter_id, o.transmitter_id);
+        && equals(insertions, o.insertions);
   }
 
   @Override
@@ -125,14 +96,11 @@ public final class G4Data extends Message {
       result = sensor_glucose_values != null ? sensor_glucose_values.hashCode() : 1;
       result = result * 37 + (units != null ? units.hashCode() : 0);
       result = result * 37 + (receiver_system_time_sec != null ? receiver_system_time_sec.hashCode() : 0);
-      result = result * 37 + (receiver_battery_percent != null ? receiver_battery_percent.hashCode() : 0);
-      result = result * 37 + (uploader_battery_percent != null ? uploader_battery_percent.hashCode() : 0);
+      result = result * 37 + (metadata != null ? metadata.hashCode() : 0);
       result = result * 37 + (manual_meter_entries != null ? manual_meter_entries.hashCode() : 1);
       result = result * 37 + (raw_sensor_readings != null ? raw_sensor_readings.hashCode() : 1);
       result = result * 37 + (calibrations != null ? calibrations.hashCode() : 1);
       result = result * 37 + (insertions != null ? insertions.hashCode() : 1);
-      result = result * 37 + (receiver_id != null ? receiver_id.hashCode() : 0);
-      result = result * 37 + (transmitter_id != null ? transmitter_id.hashCode() : 0);
       hashCode = result;
     }
     return result;
@@ -143,14 +111,11 @@ public final class G4Data extends Message {
     public List<SensorGlucoseValue> sensor_glucose_values;
     public GlucoseUnit units;
     public Long receiver_system_time_sec;
-    public Float receiver_battery_percent;
-    public Float uploader_battery_percent;
+    public G4Metadata metadata;
     public List<ManualMeterEntry> manual_meter_entries;
     public List<RawSensorReading> raw_sensor_readings;
     public List<Calibration> calibrations;
     public List<Insertion> insertions;
-    public String receiver_id;
-    public String transmitter_id;
 
     public Builder() {
     }
@@ -161,14 +126,11 @@ public final class G4Data extends Message {
       this.sensor_glucose_values = copyOf(message.sensor_glucose_values);
       this.units = message.units;
       this.receiver_system_time_sec = message.receiver_system_time_sec;
-      this.receiver_battery_percent = message.receiver_battery_percent;
-      this.uploader_battery_percent = message.uploader_battery_percent;
+      this.metadata = message.metadata;
       this.manual_meter_entries = copyOf(message.manual_meter_entries);
       this.raw_sensor_readings = copyOf(message.raw_sensor_readings);
       this.calibrations = copyOf(message.calibrations);
       this.insertions = copyOf(message.insertions);
-      this.receiver_id = message.receiver_id;
-      this.transmitter_id = message.transmitter_id;
     }
 
     /**
@@ -188,22 +150,15 @@ public final class G4Data extends Message {
     }
 
     /**
-     * Raw value of the receiver's system time. This is read directly from the receiver, and can be
-     * used to calculate 'real' time, by using it as a timestamp from a 'Dexcom epoch'. See
-     * com.nightscout.core.dexcom.Utils#receiverTimeToDateTime for more info.
+     * Raw value of the receiver's system time. This is read directly from the receiver.
      */
     public Builder receiver_system_time_sec(Long receiver_system_time_sec) {
       this.receiver_system_time_sec = receiver_system_time_sec;
       return this;
     }
 
-    public Builder receiver_battery_percent(Float receiver_battery_percent) {
-      this.receiver_battery_percent = receiver_battery_percent;
-      return this;
-    }
-
-    public Builder uploader_battery_percent(Float uploader_battery_percent) {
-      this.uploader_battery_percent = uploader_battery_percent;
+    public Builder metadata(G4Metadata metadata) {
+      this.metadata = metadata;
       return this;
     }
 
@@ -224,22 +179,6 @@ public final class G4Data extends Message {
 
     public Builder insertions(List<Insertion> insertions) {
       this.insertions = checkForNulls(insertions);
-      return this;
-    }
-
-    /**
-     * The receiver id reported by the dexcom g4. This uniquely identifies the device where this Data object came from.
-     */
-    public Builder receiver_id(String receiver_id) {
-      this.receiver_id = receiver_id;
-      return this;
-    }
-
-    /**
-     * The transmitter id reported as used by the dexcom g4. Should look like '6A14AC'.
-     */
-    public Builder transmitter_id(String transmitter_id) {
-      this.transmitter_id = transmitter_id;
       return this;
     }
 

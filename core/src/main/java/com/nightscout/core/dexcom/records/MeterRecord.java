@@ -10,11 +10,8 @@ import com.nightscout.core.utils.GlucoseReading;
 
 import net.tribe7.common.base.Function;
 
-import org.joda.time.DateTime;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.List;
 
 public class MeterRecord extends GenericTimestampRecord {
     public final static int RECORD_SIZE = 15;
@@ -33,13 +30,6 @@ public class MeterRecord extends GenericTimestampRecord {
         setRecordType();
     }
 
-    public MeterRecord(int meterBgMgdl, int meterTime, DateTime displayTime, DateTime systemTime, DateTime wallTime) {
-        super(displayTime, systemTime, wallTime);
-        this.reading = new GlucoseReading(meterBgMgdl, GlucoseUnit.MGDL);
-        this.meterTime = meterTime;
-        setRecordType();
-    }
-
     public MeterRecord(int meterBgMgdl, int meterTime, long displayTime, long systemTime, long rcvrTime, long refTime) {
         super(displayTime, systemTime, rcvrTime, refTime);
         this.reading = new GlucoseReading(meterBgMgdl, GlucoseUnit.MGDL);
@@ -47,19 +37,6 @@ public class MeterRecord extends GenericTimestampRecord {
         setRecordType();
     }
 
-    public MeterRecord(MeterEntry meter, long recieverTime, long refTime) {
-        super(meter.disp_timestamp_sec, meter.sys_timestamp_sec, recieverTime, refTime);
-        this.reading = new GlucoseReading(meter.meter_bg_mgdl, GlucoseUnit.MGDL);
-        this.meterTime = meter.meter_time;
-        setRecordType();
-    }
-
-    public MeterRecord(int meterBgMgdl, int meterTime, long systemTime) {
-        super(systemTime);
-        this.reading = new GlucoseReading(meterBgMgdl, GlucoseUnit.MGDL);
-        this.meterTime = meterTime;
-        setRecordType();
-    }
 
 
     @Override
@@ -85,15 +62,18 @@ public class MeterRecord extends GenericTimestampRecord {
                 .build();
     }
 
-    public static Function<MeterRecord, ManualMeterEntry> v2ModelConverter() {
+    public static Function<MeterRecord, ManualMeterEntry> v2ModelConverter(
+        final Function<Long, Long> wallTimeConverter) {
         return new Function<MeterRecord, ManualMeterEntry>() {
             @Override
             public ManualMeterEntry apply(MeterRecord input) {
                 return new ManualMeterEntry.Builder()
                     .entered_blood_glucose_mgdl(input.getBgMgdl())
                     .meter_time(input.getMeterTime())
-                    .timestamp(new G4Timestamp(input.getRawSystemTimeSeconds(),
-                                               input.getRawDisplayTimeSeconds()))
+                    .timestamp(new G4Timestamp.Builder()
+                                   .system_time_sec(input.getRawSystemTimeSeconds())
+                                   .display_time_sec(input.getRawDisplayTimeSeconds())
+                                   .wall_time_sec(wallTimeConverter.apply(input.getRawSystemTimeSeconds())).build())
                     .build();
             }
         };

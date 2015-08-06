@@ -52,14 +52,18 @@ public class InsertionRecord extends GenericTimestampRecord {
                 .build();
     }
 
-    public static Function<InsertionRecord, Insertion> v2ModelConverter() {
+    public static Function<InsertionRecord, Insertion> v2ModelConverter(
+        Function<Long, Long> wallTimeConverter) {
         return new Function<InsertionRecord, Insertion>() {
             @Override
             public Insertion apply(InsertionRecord input) {
                 return new Insertion.Builder()
                     .state(Insertion.State.values()[input.getState().ordinal()])
-                    .timestamp(new G4Timestamp(input.getRawSystemTimeSeconds(),
-                                               input.getRawDisplayTimeSeconds()))
+                    .timestamp(new G4Timestamp.Builder()
+                                   .system_time_sec(input.getRawSystemTimeSeconds())
+                                   .display_time_sec(input.getRawDisplayTimeSeconds())
+                                   .wall_time_sec(input.getRawSystemTimeSeconds())
+                                   .build())
                     .build();
             }
         };

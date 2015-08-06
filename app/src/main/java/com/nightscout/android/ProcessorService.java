@@ -49,7 +49,6 @@ import java.util.List;
 
 public class ProcessorService extends Service {
 
-    public static final String ACTION_UPLOAD = "org.nightscout.uploader.UPLOAD";
     private static final String TAG = ProcessorService.class.getSimpleName();
     private Uploader uploader;
     private Pebble pebble;

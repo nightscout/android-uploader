@@ -20,6 +20,7 @@ import com.nightscout.core.model.v2.ManualMeterEntry;
 import com.nightscout.core.model.v2.RawSensorReading;
 import com.nightscout.core.model.v2.SensorGlucoseValue;
 
+import net.tribe7.common.base.Function;
 import net.tribe7.common.base.Optional;
 import net.tribe7.common.collect.Lists;
 import net.tribe7.common.primitives.Bytes;
@@ -58,8 +59,9 @@ public final class DexcomG4Driver {
 
     private DexcomG4Driver() {}
 
-    public static List<Insertion> getRecentInsertions(DeviceTransport deviceTransport) throws IOException {
-        return Lists.transform(getRecentInsertion(deviceTransport), InsertionRecord.v2ModelConverter());
+    public static List<Insertion> getRecentInsertions(DeviceTransport deviceTransport,
+                                                      Function<Long, Long> wallTimeConverter) throws IOException {
+        return Lists.transform(getRecentInsertion(deviceTransport), InsertionRecord.v2ModelConverter(wallTimeConverter));
     }
     private static List<InsertionRecord> getRecentInsertion(DeviceTransport deviceTransport) throws IOException {
         int endPage = readDataBasePageRange(deviceTransport, RecordType.INSERTION_TIME);
@@ -84,11 +86,14 @@ public final class DexcomG4Driver {
         return allPages;
     }
 
-    public static List<SensorGlucoseValue> getAllSensorGlucoseValuesAfter(DeviceTransport deviceTransport, Optional<Timestamped> timestampedOptional) throws IOException {
-        return Lists.transform(getAllEGVRecordsAfter(deviceTransport, timestampedOptional), EGVRecord.v2ModelConverter());
+    public static List<SensorGlucoseValue> getAllSensorGlucoseValuesAfter(
+        DeviceTransport deviceTransport, Optional<Timestamped> timestampedOptional,
+        Function<Long, Long> wallTimeConverter) throws IOException {
+        return Lists.transform(getAllEGVRecordsAfter(deviceTransport, timestampedOptional, wallTimeConverter),
+                               EGVRecord.v2ModelConverter(wallTimeConverter));
     }
 
-    private static List<EGVRecord> getAllEGVRecordsAfter(DeviceTransport deviceTransport, Optional<Timestamped> timestamped) throws IOException {
+    private static List<EGVRecord> getAllEGVRecordsAfter(DeviceTransport deviceTransport, Optional<Timestamped> timestamped, Function<Long, Long> wallTimeConverter) throws IOException {
         Timestamped alreadyDownloadedEntry;
         if (timestamped.isPresent()) {
             alreadyDownloadedEntry = timestamped.get();
@@ -103,7 +108,8 @@ public final class DexcomG4Driver {
         while(earliestDownloaded.compareTo(alreadyDownloadedEntry) > 0 && currentPage <= endPage) {
             byte[] data = readDataBasePage(deviceTransport, RecordType.EGV_DATA, currentPage);
             List<EGVRecord> records = parsePage(data, EGVRecord.class);
-            List<SensorGlucoseValue> sensorGlucoseValues = Lists.transform(records, EGVRecord.v2ModelConverter());
+            List<SensorGlucoseValue> sensorGlucoseValues = Lists.transform(records,
+                                                                           EGVRecord.v2ModelConverter(wallTimeConverter));
             if (sensorGlucoseValues.size() > 0) {
                 earliestDownloaded = TimestampedInstances.fromG4Timestamp(sensorGlucoseValues.get(0).timestamp);
             }
@@ -113,8 +119,9 @@ public final class DexcomG4Driver {
         return allPages;
     }
 
-    public static List<ManualMeterEntry> getRecentManualMeterEntries(DeviceTransport deviceTransport) throws IOException {
-        return Lists.transform(getRecentMeterRecords(deviceTransport), MeterRecord.v2ModelConverter());
+    public static List<ManualMeterEntry> getRecentManualMeterEntries(
+        DeviceTransport deviceTransport, Function<Long, Long> wallTimeConverter) throws IOException {
+        return Lists.transform(getRecentMeterRecords(deviceTransport), MeterRecord.v2ModelConverter(wallTimeConverter));
     }
     private static List<MeterRecord> getRecentMeterRecords(DeviceTransport deviceTransport) throws IOException {
         int endPage = readDataBasePageRange(deviceTransport, RecordType.METER_DATA);
@@ -122,9 +129,11 @@ public final class DexcomG4Driver {
         return parsePage(data, MeterRecord.class);
     }
 
-    public static List<RawSensorReading> getRecentRawSensorReadings(DeviceTransport deviceTransport, int numOfRecentPages) throws IOException {
+    public static List<RawSensorReading> getRecentRawSensorReadings(DeviceTransport deviceTransport,
+                                                                    int numOfRecentPages,
+                                                                    Function<Long, Long> wallTimeConverter) throws IOException {
         return Lists.transform(getRecentSensorRecords(deviceTransport, numOfRecentPages),
-                               SensorRecord.v2ModelConverter());
+                               SensorRecord.v2ModelConverter(wallTimeConverter));
     }
     private static List<SensorRecord> getRecentSensorRecords(DeviceTransport deviceTransport, int numOfRecentPages) throws IOException {
         if (numOfRecentPages < 1) {
@@ -143,8 +152,9 @@ public final class DexcomG4Driver {
         return allPages;
     }
 
-    public static List<Calibration> getRecentCalibrations(DeviceTransport deviceTransport) throws IOException {
-        return Lists.transform(getRecentCalRecords(deviceTransport), CalRecord.v2ModelConverter());
+    public static List<Calibration> getRecentCalibrations(DeviceTransport deviceTransport,
+                                                          Function<Long, Long> wallTimeConverter) throws IOException {
+        return Lists.transform(getRecentCalRecords(deviceTransport), CalRecord.v2ModelConverter(wallTimeConverter));
     }
     private static List<CalRecord> getRecentCalRecords(DeviceTransport deviceTransport) throws IOException {
         int endPage = readDataBasePageRange(deviceTransport, RecordType.CAL_SET);

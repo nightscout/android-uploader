@@ -28,13 +28,6 @@ public class CalSubrecord {
         unk = packet[16];
     }
 
-    public CalSubrecord(int calBGL, int calRaw, DateTime dateApplied, DateTime dateEntered) {
-        this.calBGL = calBGL;
-        this.calRaw = calRaw;
-        this.dateEntered = dateEntered;
-        this.dateApplied = dateApplied;
-    }
-
     public CalSubrecord(int calBGL, int calRaw, int dateApplied, int dateEntered) {
         this.calBGL = calBGL;
         this.calRaw = calRaw;

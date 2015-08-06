@@ -7,9 +7,12 @@ import android.support.annotation.NonNull;
 
 import com.nightscout.core.Timestamped;
 import com.orm.SugarRecord;
+import com.squareup.wire.Message;
+import com.squareup.wire.Wire;
 
 import net.tribe7.common.hash.Hashing;
 
+import java.io.IOException;
 import java.util.List;
 
 public class ProtoRecord extends SugarRecord<ProtoRecord> implements Timestamped {
@@ -39,6 +42,7 @@ public class ProtoRecord extends SugarRecord<ProtoRecord> implements Timestamped
   }
 
   public enum RecordType {
+    UNKNOWN,
     G4_SENSOR_GLUCOSE_VALUE,
     G4_INSERTION,
     G4_CALIBRATION,
@@ -73,13 +77,23 @@ public class ProtoRecord extends SugarRecord<ProtoRecord> implements Timestamped
    */
   byte[] serializedProtobuf;
 
-  String deviceId;
-
   public String getMd5Hash() {
     return md5Hash;
   }
 
   public boolean existsInDatabase() {
     return ProtoRecord.count(ProtoRecord.class, "md5_hash = ?", new String[]{getMd5Hash()}) > 0;
+  }
+
+  public <T extends Message> T getAs(Class<T> clazz) {
+    try {
+      return new Wire().parseFrom(serializedProtobuf, clazz);
+    } catch (IOException e) {
+      return null;
+    }
+  }
+
+  public boolean hasBeenConsumedBy(Consumer consumer) {
+    return consumedBy.contains(consumer);
   }
 }

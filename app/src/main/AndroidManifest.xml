@@ -71,16 +71,6 @@
         </receiver>
 
         <receiver
-            android:name=".UploadReceiver"
-            android:enabled="true"
-            android:permission="org.nightscout.uploader.UPDATE_NIGHTSCOUT_DATA">
-            <intent-filter>
-                <action android:name="com.nightscout.android.dexcom.action.SYNC" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </receiver>
-
-        <receiver
             android:name=".G4UsbReceiver"
             android:enabled="true">
             <intent-filter>

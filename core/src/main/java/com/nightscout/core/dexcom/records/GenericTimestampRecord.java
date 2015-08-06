@@ -44,10 +44,6 @@ abstract public class GenericTimestampRecord {
         this.wallTime = Utils.systemTimeToWallTime(rawSystemTimeSeconds, receiverTime, refTime);
     }
 
-    public GenericTimestampRecord(long rawSystemTimeSeconds) {
-        this.rawSystemTimeSeconds = rawSystemTimeSeconds;
-    }
-
     public DateTime getSystemTime() {
         return systemTime;
     }

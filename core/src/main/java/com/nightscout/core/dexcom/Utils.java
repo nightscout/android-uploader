@@ -7,6 +7,7 @@ import com.nightscout.core.model.SensorGlucoseValueEntry;
 import com.nightscout.core.model.v2.SensorGlucoseValue;
 import com.squareup.wire.Message;
 
+import net.tribe7.common.base.Function;
 import net.tribe7.common.base.Strings;
 import net.tribe7.common.hash.HashCode;
 
@@ -65,6 +66,12 @@ public final class Utils {
     public static DateTime systemTimeToWallTime(long recordTimeSec, long receiverTimeSec, long referenceTimeMs) {
         long recordOffset = Duration.standardSeconds(receiverTimeSec - recordTimeSec).getMillis();
         return new DateTime(referenceTimeMs - recordOffset);
+    }
+
+    public static long systemTimeToWallTimeSecs(long recordTimeSec, long receiverTimeSec, DateTime referenceTime) {
+        DateTime wallTime = systemTimeToWallTime(recordTimeSec, receiverTimeSec,
+                                                 referenceTime.getMillis());
+        return wallTime.getMillis() / 1000;
     }
 
     /**
@@ -151,5 +158,23 @@ public final class Utils {
             return "";
         }
         return HashCode.fromBytes(bytes).toString().toUpperCase();
+    }
+
+    /**
+     * Returns a function that can be applied to a receiver system timestamp, and will calculate the
+     * likely actual timestamp of that system timestamp.
+     * @param receiverTimeSec Time read off of the receiver at the start of the sync.
+     * @param downloadStartTime Time read off of the android device at the start of the sync.
+     * @return Function that can be applied to a receiver sys timestamp in seconds, and get back a 'wall'
+     * timestamp in seconds.
+     */
+    public static Function<Long, Long> wallTimeConverter(final long receiverTimeSec,
+                                                         final DateTime downloadStartTime) {
+        return new Function<Long, Long>() {
+            @Override
+            public Long apply(Long input) {
+                return Utils.systemTimeToWallTimeSecs(input, receiverTimeSec, downloadStartTime);
+            }
+        };
     }
 }

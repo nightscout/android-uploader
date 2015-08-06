@@ -1,34 +1,29 @@
 package com.nightscout.android;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.preference.PreferenceManager;
-
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 
 import com.nightscout.android.db.DbUtils;
-import com.nightscout.android.drivers.AndroidUploaderDeviceDevice;
 import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.core.Timestamped;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.drivers.AbstractDevice;
-import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.drivers.DeviceTransport;
-import com.nightscout.core.drivers.DexcomG4;
-import com.nightscout.core.drivers.DexcomG4Driver;
 import com.nightscout.core.drivers.DeviceType;
+import com.nightscout.core.drivers.DexcomG4;
 import com.nightscout.core.events.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
@@ -38,7 +33,9 @@ import com.nightscout.core.model.v2.SensorGlucoseValue;
 import com.nightscout.core.utils.ListUtils;
 
 import net.tribe7.common.base.Optional;
+import net.tribe7.common.base.Supplier;
 
+import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Minutes;
 import org.joda.time.Seconds;
@@ -46,6 +43,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 public class CollectorService extends Service {
     private static final Logger log = LoggerFactory.getLogger(CollectorService.class);
@@ -66,7 +66,6 @@ public class CollectorService extends Service {
     private Tracker tracker;
     private PowerManager pm;
     protected AbstractDevice device = null;
-    protected DeviceTransport driver;
 
     private AlarmManager alarmManager;
     private PendingIntent syncManager;
@@ -74,12 +73,16 @@ public class CollectorService extends Service {
     private final IBinder mBinder = new LocalBinder();
     private long nextPoll = 0;
 
+    @Inject
+    @Named("dexcomDriverSupplier")
+    private Supplier<DeviceTransport> dexcomDriverSupplier;
+
     @Override
     public void onCreate() {
         super.onCreate();
         reporter = AndroidEventReporter.getReporter(getApplicationContext());
         preferences = new AndroidPreferences(getApplicationContext());
-        tracker = ((Nightscout) getApplicationContext()).getTracker();
+        tracker = Nightscout.get(this).getTracker();
 
         pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
 
@@ -89,32 +92,9 @@ public class CollectorService extends Service {
         syncIntent.putExtra(SYNC_TYPE, STD_SYNC);
         syncManager = PendingIntent.getBroadcast(getApplicationContext(), 1, syncIntent, 0);
 
-        driver = null;
-        setDriver();
+        dexcomDriverSupplier = new DexcomDriverSupplier(getApplicationContext(), preferences);
 
-        SharedPreferences.OnSharedPreferenceChangeListener
-            prefListener =
-            new SharedPreferences.OnSharedPreferenceChangeListener() {
-                @Override
-                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-                                                      String key) {
-                    if (key.equals(getString(R.string.dexcom_device_type))) {
-                        log.debug("Interesting value changed! {}", key);
-                        if (driver != null && driver.isConnected()) {
-                            try {
-                                driver.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    } else {
-                        log.debug("Meh... something uninteresting changed");
-                    }
-                }
-            };
-        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(
-            prefListener);
-
+        initializeDevice();
     }
 
     public class LocalBinder extends Binder {
@@ -124,28 +104,25 @@ public class CollectorService extends Service {
         }
     }
 
-    private void setDriver() {
+    private void initializeDevice() {
         DeviceType deviceType = preferences.getDeviceType();
-        AbstractUploaderDevice
-            uploaderDevice = AndroidUploaderDeviceDevice.getUploaderDevice(getApplicationContext());
         if (deviceType == DeviceType.DEXCOM_G4 || deviceType == DeviceType.DEXCOM_G4_SHARE2) {
-            device = new DexcomG4(new DexcomG4Driver(driver), preferences, uploaderDevice, reporter);
+            device = new DexcomG4(dexcomDriverSupplier, reporter);
+        } else {
+            log.warn("Unknown device {} encountered.. Doing nothing.", deviceType.name());
         }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        try {
-            log.debug("onDestroy called");
-            if (driver != null) {
+        DeviceTransport driver = dexcomDriverSupplier.get();
+        if (driver != null && driver.isConnected()) {
+            try {
                 driver.close();
-            } else {
-                // TODO - find out why onDestory is being called on startup?
-                log.warn("Driver null. Why?");
+            } catch (IOException e) {
+                log.error("Error closing driver", e);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         cancelPoll();
     }
@@ -167,47 +144,21 @@ public class CollectorService extends Service {
 
         @Override
         protected Download doInBackground(Integer... params) {
-            if (driver == null) {
-                log.warn("Driver is null");
-                return null;
+            if (device == null) {
+                log.error("Device not initialized. Returning.");
+                return new Download.Builder().status(DownloadStatus.DEVICE_NOT_FOUND)
+                    .timestamp(new DateTime().toString()).build();
             }
-
             long nextUploadTimeMs = Minutes.minutes(2).toStandardDuration().getMillis();
 
-            DeviceType deviceType = preferences.getDeviceType();
-
-            if (deviceType == DeviceType.DEXCOM_G4) {
-                try {
-                    driver.open();
-                    log.info("DEXCOM_G4 was opened for download");
-                } catch (IOException e) {
-                    log.error("Unable to open DEXCOM_G4, will keep trying", e);
-                    setNextPoll(nextUploadTimeMs);
-                    return null;
-                }
-            } else if (!device.isConnected()) {
-                log.error("Device is not connected");
-                try {
-                    driver.open();
-                    log.info("Device was opened for download");
-                } catch (IOException e) {
-                    log.error("Unable to open device, will keep trying", e);
-                    setNextPoll(nextUploadTimeMs);
-                    return null;
-                }
-            } else {
-                log.info("Device is connected");
-            }
+            Optional<Timestamped> newestElementInDb =
+                Optional.<Timestamped>fromNullable(
+                    DbUtils.getNewestElementInDb(preferences.getDeviceType()).orNull());
 
             PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NSDownload");
             wl.acquire();
 
             Download download = null;
-
-
-            // TODO(tyler.s.rhodes): figure out how to 'legally' do this cast. Should be fine as
-            // long as ProtoRecord always inherits from Timestamped.
-            Optional<Timestamped> newestElementInDb = (Optional) DbUtils.getNewestElementInDb(deviceType);
 
             try {
                 download = device.downloadAllAfter(newestElementInDb);
@@ -261,11 +212,12 @@ public class CollectorService extends Service {
             wl.release();
 
             if (download != null) {
-                long rcvrTime = download.g4_data.receiver_system_time_sec;
                 Duration durationToNextPoll = Seconds.seconds(MAX_POLL_WAIT_SEC).toStandardDuration();
                 Optional<SensorGlucoseValue> lastReadValue = ListUtils.lastOrEmpty(download.g4_data.sensor_glucose_values);
                 if (lastReadValue.isPresent()) {
-                    long readTimeDifferenceSec = (rcvrTime - lastReadValue.get().timestamp.system_time_sec) % MAX_POLL_WAIT_SEC;
+                    long readTimeDifferenceSec =
+                        (download.g4_data.receiver_system_time_sec - lastReadValue
+                            .get().timestamp.system_time_sec) % MAX_POLL_WAIT_SEC;
                     durationToNextPoll.minus(readTimeDifferenceSec);
                 }
                 nextUploadTimeMs = durationToNextPoll.getMillis();
@@ -297,7 +249,7 @@ public class CollectorService extends Service {
     }
 
     public void cancelPoll() {
-        log.debug("Canceling next alarm poll.");
+        log.debug("Cancelling next alarm poll.");
         nextPoll = 0;
         alarmManager.cancel(syncManager);
     }

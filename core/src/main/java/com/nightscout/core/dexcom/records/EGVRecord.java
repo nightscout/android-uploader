@@ -21,7 +21,6 @@ import org.json.JSONObject;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.List;
 
 public class EGVRecord extends GenericTimestampRecord {
     public final static int RECORD_SIZE = 12;
@@ -35,7 +34,7 @@ public class EGVRecord extends GenericTimestampRecord {
         super(packet);
         if (packet.length != RECORD_SIZE) {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
-                    ". Expected size: " + RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
+                                                   ". Expected size: " + RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
         }
         int bGValue = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8) & Constants.EGV_VALUE_MASK;
         this.reading = new GlucoseReading(bGValue, GlucoseUnit.MGDL);
@@ -98,20 +97,24 @@ public class EGVRecord extends GenericTimestampRecord {
     public SensorGlucoseValueEntry toProtobuf() {
         SensorGlucoseValueEntry.Builder builder = new SensorGlucoseValueEntry.Builder();
         return builder.sys_timestamp_sec(rawSystemTimeSeconds)
-                .disp_timestamp_sec(rawDisplayTimeSeconds)
-                .sgv_mgdl(reading.asMgdl())
-                .trend(trend.toProtobuf())
-                .noise(noiseMode)
-                .build();
+            .disp_timestamp_sec(rawDisplayTimeSeconds)
+            .sgv_mgdl(reading.asMgdl())
+            .trend(trend.toProtobuf())
+            .noise(noiseMode)
+            .build();
     }
 
-    public static Function<EGVRecord, SensorGlucoseValue> v2ModelConverter() {
+    public static Function<EGVRecord, SensorGlucoseValue> v2ModelConverter(final Function<Long, Long> wallTimeConverter) {
         return new Function<EGVRecord, SensorGlucoseValue>() {
             @Override
             public SensorGlucoseValue apply(EGVRecord input) {
                 return new SensorGlucoseValue.Builder()
                     .glucose_mgdl(input.getBgMgdl())
-                    .timestamp(new G4Timestamp(input.getRawSystemTimeSeconds(), input.getRawDisplayTimeSeconds()))
+                    .timestamp(new G4Timestamp.Builder()
+                                   .system_time_sec(input.getRawSystemTimeSeconds())
+                                   .display_time_sec(input.getRawDisplayTimeSeconds())
+                                   .wall_time_sec(wallTimeConverter.apply(input.getRawSystemTimeSeconds()))
+                                   .build())
                     .noise(Noise.values()[input.noiseValue])
                     .trend(Trend.values()[input.trendValue])
                     .build();

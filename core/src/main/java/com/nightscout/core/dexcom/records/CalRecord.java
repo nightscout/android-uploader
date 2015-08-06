@@ -24,7 +24,6 @@ public class CalRecord extends GenericTimestampRecord {
     private double slope;
     private double intercept;
     private double scale;
-    private int[] unk = new int[3];
     private double decay;
     private int numRecords;
     private List<CalSubrecord> calSubrecords;
@@ -38,6 +37,7 @@ public class CalRecord extends GenericTimestampRecord {
         slope = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getDouble(8);
         intercept = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getDouble(16);
         scale = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getDouble(24);
+        int[] unk = new int[3];
         unk[0] = packet[32];
         unk[1] = packet[33];
         unk[2] = packet[34];
@@ -55,17 +55,6 @@ public class CalRecord extends GenericTimestampRecord {
             calSubrecords.add(new CalSubrecord(temp, displayTimeOffset));
             start += SUB_LEN;
         }
-        setRecordType();
-    }
-
-    public CalRecord(double intercept, double slope, double scale, double decay, DateTime displayTime, DateTime systemTime, List<CalSubrecord> subrecord, DateTime wallTime) {
-        super(displayTime, systemTime, wallTime);
-        this.intercept = intercept;
-        this.slope = slope;
-        this.scale = scale;
-        this.decay = decay;
-        this.numRecords = subrecord.size();
-        this.calSubrecords = subrecord;
         setRecordType();
     }
 
@@ -103,7 +92,7 @@ public class CalRecord extends GenericTimestampRecord {
                 .build();
     }
 
-    public static Function<CalRecord, Calibration> v2ModelConverter() {
+    public static Function<CalRecord, Calibration> v2ModelConverter(final Function<Long, Long> wallTimeConverter) {
         return new Function<CalRecord, Calibration>() {
             @Override
             public Calibration apply(CalRecord input) {
@@ -112,8 +101,11 @@ public class CalRecord extends GenericTimestampRecord {
                     .intercept(input.intercept)
                     .scale(input.scale)
                     .slope(input.slope)
-                    .timestamp(new G4Timestamp(input.getRawSystemTimeSeconds(),
-                                               input.getRawDisplayTimeSeconds()))
+                    .timestamp(
+                        new G4Timestamp.Builder().system_time_sec(input.getRawSystemTimeSeconds())
+                            .display_time_sec(input.getRawDisplayTimeSeconds())
+                            .wall_time_sec(wallTimeConverter.apply(input.getRawSystemTimeSeconds()))
+                            .build())
                     .build();
             }
         };
@@ -153,10 +145,9 @@ public class CalRecord extends GenericTimestampRecord {
         if (numRecords != calRecord.numRecords) return false;
         if (Double.compare(calRecord.scale, scale) != 0) return false;
         if (Double.compare(calRecord.slope, slope) != 0) return false;
-        if (calSubrecords != null ? !calSubrecords.equals(calRecord.calSubrecords) : calRecord.calSubrecords != null)
-            return false;
+        return !(calSubrecords != null ? !calSubrecords.equals(calRecord.calSubrecords)
+                                       : calRecord.calSubrecords != null);
 
-        return true;
     }
 
     @Override

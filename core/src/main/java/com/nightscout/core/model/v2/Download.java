@@ -6,6 +6,7 @@ import com.squareup.wire.Message;
 import com.squareup.wire.ProtoField;
 
 import static com.squareup.wire.Message.Datatype.ENUM;
+import static com.squareup.wire.Message.Datatype.FLOAT;
 import static com.squareup.wire.Message.Datatype.STRING;
 
 /**
@@ -16,6 +17,7 @@ public final class Download extends Message {
 
   public static final DownloadStatus DEFAULT_STATUS = DownloadStatus.SUCCESS;
   public static final String DEFAULT_TIMESTAMP = "";
+  public static final Float DEFAULT_UPLOADER_BATTERY_PERCENT = 0F;
 
   @ProtoField(tag = 1, type = ENUM)
   public final DownloadStatus status;
@@ -26,20 +28,24 @@ public final class Download extends Message {
   @ProtoField(tag = 2, type = STRING)
   public final String timestamp;
 
+  @ProtoField(tag = 7, type = FLOAT)
+  public final Float uploader_battery_percent;
+
   /**
    * Data from a Dexcom G4.
    */
   @ProtoField(tag = 3)
   public final G4Data g4_data;
 
-  public Download(DownloadStatus status, String timestamp, G4Data g4_data) {
+  public Download(DownloadStatus status, String timestamp, Float uploader_battery_percent, G4Data g4_data) {
     this.status = status;
     this.timestamp = timestamp;
+    this.uploader_battery_percent = uploader_battery_percent;
     this.g4_data = g4_data;
   }
 
   private Download(Builder builder) {
-    this(builder.status, builder.timestamp, builder.g4_data);
+    this(builder.status, builder.timestamp, builder.uploader_battery_percent, builder.g4_data);
     setBuilder(builder);
   }
 
@@ -50,6 +56,7 @@ public final class Download extends Message {
     Download o = (Download) other;
     return equals(status, o.status)
         && equals(timestamp, o.timestamp)
+        && equals(uploader_battery_percent, o.uploader_battery_percent)
         && equals(g4_data, o.g4_data);
   }
 
@@ -59,6 +66,7 @@ public final class Download extends Message {
     if (result == 0) {
       result = status != null ? status.hashCode() : 0;
       result = result * 37 + (timestamp != null ? timestamp.hashCode() : 0);
+      result = result * 37 + (uploader_battery_percent != null ? uploader_battery_percent.hashCode() : 0);
       result = result * 37 + (g4_data != null ? g4_data.hashCode() : 0);
       hashCode = result;
     }
@@ -69,6 +77,7 @@ public final class Download extends Message {
 
     public DownloadStatus status;
     public String timestamp;
+    public Float uploader_battery_percent;
     public G4Data g4_data;
 
     public Builder() {
@@ -79,6 +88,7 @@ public final class Download extends Message {
       if (message == null) return;
       this.status = message.status;
       this.timestamp = message.timestamp;
+      this.uploader_battery_percent = message.uploader_battery_percent;
       this.g4_data = message.g4_data;
     }
 
@@ -92,6 +102,11 @@ public final class Download extends Message {
      */
     public Builder timestamp(String timestamp) {
       this.timestamp = timestamp;
+      return this;
+    }
+
+    public Builder uploader_battery_percent(Float uploader_battery_percent) {
+      this.uploader_battery_percent = uploader_battery_percent;
       return this;
     }
 
