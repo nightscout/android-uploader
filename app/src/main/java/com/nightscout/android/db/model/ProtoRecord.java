@@ -44,6 +44,7 @@ public class ProtoRecord extends SugarRecord<ProtoRecord> implements Timestamped
     G4_CALIBRATION,
     G4_MANUAL_METER_ENTRY,
     G4_RAW_SENSOR_READING,
+    G4_METADATA
   }
 
   /**
@@ -71,6 +72,8 @@ public class ProtoRecord extends SugarRecord<ProtoRecord> implements Timestamped
    * Serialized protobuffer.
    */
   byte[] serializedProtobuf;
+
+  String deviceId;
 
   public String getMd5Hash() {
     return md5Hash;

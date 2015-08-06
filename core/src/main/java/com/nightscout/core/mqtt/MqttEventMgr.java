@@ -25,7 +25,6 @@ import static net.tribe7.common.base.Preconditions.checkNotNull;
 public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrObservable,
         MqttTimerObserver {
     protected final Logger log = LoggerFactory.getLogger(MqttEventMgr.class);
-    private final static String TAG = MqttEventMgr.class.getSimpleName();
     private List<MqttMgrObserver> observers = new ArrayList<>();
     private MqttClient client;
     private MqttConnectOptions options;
@@ -45,7 +44,7 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
         this.options = checkNotNull(options);
         this.timer = checkNotNull(timer);
         this.pinger = checkNotNull(pinger);
-        this.client.setCallback(MqttEventMgr.this);
+        this.client.setCallback(this);
         this.reporter = reporter;
     }
 
@@ -253,7 +252,7 @@ public class MqttEventMgr implements MqttCallback, MqttPingerObserver, MqttMgrOb
         publish(message, topic, defaultQOS);
     }
 
-    public void publish(byte[] message, String topic, int QOS) {
+    private void publish(byte[] message, String topic, int QOS) {
         try {
             client.publish(topic, message, QOS, true);
             reporter.report(EventType.UPLOADER, EventSeverity.INFO,

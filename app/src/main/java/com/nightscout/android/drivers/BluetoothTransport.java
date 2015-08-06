@@ -281,9 +281,16 @@ public class BluetoothTransport implements DeviceTransport {
 
         mConnectionState = STATE_DISCONNECTED;
         mBluetoothManager = (BluetoothManager) mContext.getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = mBluetoothManager.getAdapter();
 
-        if (mBluetoothManager != null && mBluetoothAdapter.isEnabled()) {
+        if (mBluetoothManager == null || !mBluetoothManager.getAdapter().isEnabled()) {
+            Log.d(TAG, "Bluetooth is disabled");
+            setConnectionState(DeviceConnectionState.CLOSED);
+            EventReporter reporter = AndroidEventReporter.getReporter(mContext);
+            reporter.report(EventType.DEVICE, EventSeverity.WARN, mContext.getString(R.string.warn_disabled_bluetooth));
+            return;
+        }
+
+        mBluetoothAdapter = mBluetoothManager.getAdapter();
 
             if (device != null) {
 
@@ -306,14 +313,6 @@ public class BluetoothTransport implements DeviceTransport {
                     Log.d(TAG, "Bluetooth device of interest can not be found.");
                 }
             }
-
-        } else {
-            Log.d(TAG, "Bluetooth is disabled");
-            setConnectionState(DeviceConnectionState.CLOSED);
-            EventReporter reporter = AndroidEventReporter.getReporter(mContext);
-            reporter.report(EventType.DEVICE, EventSeverity.WARN, mContext.getString(R.string.warn_disabled_bluetooth));
-        }
-
         Log.d(TAG, "Connection state: " + mConnectionState);
     }
 

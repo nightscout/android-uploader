@@ -22,6 +22,9 @@ message Download {
     // ISO8601 timestamp of when the uploader initiated this download.
     optional string timestamp = 2;
 
+    optional float uploader_battery_percent = 7;
+
+
     // Data from a Dexcom G4.
     optional G4Data g4_data = 3;
 }

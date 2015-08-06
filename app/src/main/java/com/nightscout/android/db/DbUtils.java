@@ -2,6 +2,7 @@ package com.nightscout.android.db;
 
 import com.google.common.collect.Lists;
 
+import com.nightscout.android.db.model.DeviceRecord;
 import com.nightscout.android.db.model.ProtoRecord;
 import com.nightscout.core.drivers.DeviceType;
 import com.nightscout.core.model.v2.Calibration;
