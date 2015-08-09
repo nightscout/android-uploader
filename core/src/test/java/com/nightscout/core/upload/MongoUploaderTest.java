@@ -98,7 +98,7 @@ public class MongoUploaderTest {
     public void setUpUpsertCapture() {
         captor = ArgumentCaptor.forClass(BasicDBObject.class);
         WriteResult result = mock(WriteResult.class);
-        when(result.getError()).thenReturn(null);
+        when(result.wasAcknowledged()).thenReturn(true);
         when(mockCollection.update(
                 any(DBObject.class),
                 captor.capture(),
