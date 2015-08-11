@@ -239,6 +239,7 @@ public class AndroidPreferences implements NightscoutPreferences {
         preferences.edit().putString(context.getString(R.string.rest_uris), Joiner.on(' ').join(uris)).apply();
     }
 
+    @Override
     public boolean isRootEnabled() {
         return preferences.getBoolean(context.getString(R.string.root_enable), false);
     }

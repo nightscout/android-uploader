@@ -268,6 +268,11 @@ public class TestPreferences implements NightscoutPreferences {
     }
 
     @Override
+    public boolean isRootEnabled() {
+        return false;
+    }
+
+    @Override
     public void setLastEgvMqttUpload(long timestamp) {
         setLastBaseUpload(timestamp, "mqtt", "egv");
     }

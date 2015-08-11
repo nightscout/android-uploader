@@ -8,10 +8,10 @@ import android.preference.PreferenceManager;
 import com.nightscout.android.drivers.BluetoothTransport;
 import com.nightscout.android.drivers.USB.CdcAcmSerialDriver;
 import com.nightscout.android.drivers.USB.UsbSerialProber;
-import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DeviceType;
 import com.nightscout.core.drivers.DexcomG4;
+import com.nightscout.core.preferences.NightscoutPreferences;
 
 import net.tribe7.common.base.Supplier;
 
@@ -20,16 +20,16 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class DexcomDriverSupplier implements Supplier<DeviceTransport>, SharedPreferences.OnSharedPreferenceChangeListener{
+public class DexcomDriverSupplier implements Supplier<DeviceTransport>, SharedPreferences.OnSharedPreferenceChangeListener {
 
   public static final Logger log = LoggerFactory.getLogger(DexcomDriverSupplier.class);
 
   private final Context applicationContext;
-  private final AndroidPreferences preferences;
+  private final NightscoutPreferences preferences;
 
   private DeviceTransport currentDeviceTransport;
 
-  public DexcomDriverSupplier(Context applicationContext, AndroidPreferences preferences) {
+  public DexcomDriverSupplier(Context applicationContext, NightscoutPreferences preferences) {
     this.applicationContext = applicationContext;
     PreferenceManager.getDefaultSharedPreferences(applicationContext).registerOnSharedPreferenceChangeListener(
         this);
@@ -84,8 +84,8 @@ public class DexcomDriverSupplier implements Supplier<DeviceTransport>, SharedPr
   @Override
   public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
     if (key.equals(applicationContext.getString(R.string.dexcom_device_type))) {
-      log.debug("Interesting value changed! {}", key);
       if (currentDeviceTransport != null && currentDeviceTransport.isConnected()) {
+        log.debug("Device type changed. Closing currently open device.");
         try {
           currentDeviceTransport.close();
         } catch (IOException e) {
@@ -93,8 +93,6 @@ public class DexcomDriverSupplier implements Supplier<DeviceTransport>, SharedPr
         }
         currentDeviceTransport = null;
       }
-    } else {
-      log.debug("Meh... something uninteresting changed");
     }
   }
 }

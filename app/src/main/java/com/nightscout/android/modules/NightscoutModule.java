@@ -3,12 +3,15 @@ package com.nightscout.android.modules;
 import android.app.Application;
 
 import com.nightscout.android.Nightscout;
+import com.nightscout.android.drivers.DriverModule;
 import com.nightscout.android.exceptions.AcraFeedbackDialog;
 import com.nightscout.android.exceptions.FeedbackDialog;
 import com.nightscout.android.preferences.PreferencesModule;
+import com.nightscout.android.ui.ActivityHierarchyServer;
 import com.nightscout.android.ui.MonitorFragment;
 import com.nightscout.android.ui.NightscoutNavigationDrawer;
 import com.nightscout.android.ui.UiModule;
+import com.orm.Database;
 
 import org.acra.ACRA;
 
@@ -21,13 +24,16 @@ import dagger.Provides;
 
 @Module(
     includes = {
+        DriverModule.class,
         PreferencesModule.class,
         UiModule.class
     },
     injects = {
         Nightscout.class,
         MonitorFragment.class,
-        NightscoutNavigationDrawer.class
+        NightscoutNavigationDrawer.class,
+        Database.class,
+        ActivityHierarchyServer.class
     },
     library = true
 )
@@ -52,5 +58,11 @@ public class NightscoutModule {
         ACRA.init(app);
         ACRA.getErrorReporter().putCustomData("timezone", TimeZone.getDefault().getID());
         return new AcraFeedbackDialog();
+    }
+
+    @Provides
+    @Singleton
+    Database provideSugarDatabase(Application app) {
+        return new Database(app.getApplicationContext());
     }
 }

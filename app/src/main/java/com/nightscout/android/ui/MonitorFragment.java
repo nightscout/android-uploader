@@ -260,7 +260,7 @@ public class MonitorFragment extends Fragment {
 
     private void setSgvText(SensorGlucoseValue sensorGlucoseValue) {
         String text = "---";
-        if (sensorGlucoseValue.glucose_mgdl != -1) {
+        if (sensorGlucoseValue != null && sensorGlucoseValue.glucose_mgdl != -1) {
             text = DexcomG4Utils.getDisplayableGlucoseValueString(sensorGlucoseValue, preferences.getPreferredUnits());
         }
         mTextSGV.setText(text);

@@ -75,7 +75,7 @@ public class CollectorService extends Service {
 
     @Inject
     @Named("dexcomDriverSupplier")
-    private Supplier<DeviceTransport> dexcomDriverSupplier;
+    Supplier<DeviceTransport> dexcomDriverSupplier;
 
     @Override
     public void onCreate() {

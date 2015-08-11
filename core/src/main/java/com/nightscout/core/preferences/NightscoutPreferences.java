@@ -101,6 +101,8 @@ public interface NightscoutPreferences {
 
     void setLastEgvSysTime(long egvSysTime);
 
+    boolean isRootEnabled();
+
     public void setLastEgvMqttUpload(long timestamp);
 
     public void setLastSensorMqttUpload(long timestamp);

@@ -35,7 +35,7 @@ public class MeterRecordTest {
         byte[] record = new byte[]{(byte) 0x28, (byte) 0x80, (byte) 0x18, (byte) 0x0B, (byte) 0xC5,
                 (byte) 0x2B, (byte) 0x18, (byte) 0x0B, (byte) 0x71, (byte) 0x00, (byte) 0x0A,
                 (byte) 0x80, (byte) 0x18, (byte) 0x0B, (byte) 0xAC};
-        MeterRecord meterRecord = new MeterRecord(record, 0, 0);
+        MeterRecord meterRecord = new MeterRecord(record);
         assertThat(meterRecord.getBgMgdl(), is(113));
         assertThat(meterRecord.getRawDisplayTimeSeconds(), is(186133445L));
         assertThat(meterRecord.getRawSystemTimeSeconds(), is(186155048L));
@@ -47,7 +47,7 @@ public class MeterRecordTest {
         byte[] record = new byte[]{(byte) 0x28, (byte) 0x80, (byte) 0x18, (byte) 0x0B, (byte) 0xC5,
                 (byte) 0x2B, (byte) 0x18, (byte) 0x0B, (byte) 0x71, (byte) 0x00, (byte) 0x0A,
                 (byte) 0x80, (byte) 0x18, (byte) 0x0B};
-        MeterRecord meterRecord = new MeterRecord(record, 0, 0);
+        new MeterRecord(record);
     }
 
     @Test(expected = InvalidRecordLengthException.class)
@@ -55,6 +55,6 @@ public class MeterRecordTest {
         byte[] record = new byte[]{(byte) 0x28, (byte) 0x80, (byte) 0x18, (byte) 0x0B, (byte) 0xC5,
                 (byte) 0x2B, (byte) 0x18, (byte) 0x0B, (byte) 0x71, (byte) 0x00, (byte) 0x0A,
                 (byte) 0x80, (byte) 0x18, (byte) 0x0B, (byte) 0x00, (byte) 0x00};
-        MeterRecord meterRecord = new MeterRecord(record, 0, 0);
+        new MeterRecord(record);
     }
 }

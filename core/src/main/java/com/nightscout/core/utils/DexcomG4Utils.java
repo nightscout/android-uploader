@@ -2,6 +2,7 @@ package com.nightscout.core.utils;
 
 import com.nightscout.core.dexcom.SpecialValue;
 import com.nightscout.core.dexcom.Utils;
+import com.nightscout.core.model.G4Trend;
 import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.model.v2.G4Data;
 import com.nightscout.core.model.v2.SensorGlucoseValue;
@@ -40,6 +41,32 @@ public final class DexcomG4Utils {
   public static Interval timeSinceReading(final DateTime now, final SensorGlucoseValue reading) {
     checkNotNull(now, reading);
     return new Interval(Utils.receiverTimeToDateTime(reading.timestamp.display_time_sec), now);
+  }
+
+  public static String getFriendlyTrendName(Trend trend) {
+    switch (trend) {
+      case TREND_NONE:
+        return "NONE";
+      case DOUBLE_UP:
+        return "DoubleUp";
+      case SINGLE_UP:
+        return "SingleUp";
+      case FORTY_FIVE_UP:
+        return "FortyFiveUp";
+      case FLAT:
+        return "Flat";
+      case FORTY_FIVE_DOWN:
+        return "FortyFiveDown";
+      case SINGLE_DOWN:
+        return "SingleDown";
+      case DOUBLE_DOWN:
+        return "DoubleDown";
+      case NOT_COMPUTABLE:
+        return "NOT COMPUTABLE";
+      case RATE_OUT_OF_RANGE:
+        return "OUT OF RANGE";
+    }
+    return "UNKNOWN";
   }
 
   public static String getDisplayableGlucoseValueString(SensorGlucoseValue sensorGlucoseValue,

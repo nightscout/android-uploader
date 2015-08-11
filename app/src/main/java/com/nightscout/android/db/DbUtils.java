@@ -81,7 +81,7 @@ public final class DbUtils {
     Iterable<ProtoRecord> filteredRecords = Iterables.filter(records, new Predicate<ProtoRecord>() {
       @Override
       public boolean apply(ProtoRecord record) {
-        return record.hasBeenConsumedBy(consumer);
+        return !record.hasBeenConsumedBy(consumer);
       }
     });
     return Lists.newArrayList(Iterables.transform(filteredRecords, new Function<ProtoRecord, T>() {

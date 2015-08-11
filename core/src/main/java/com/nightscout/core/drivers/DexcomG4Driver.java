@@ -123,7 +123,7 @@ public final class DexcomG4Driver {
         DeviceTransport deviceTransport, Function<Long, Long> wallTimeConverter) throws IOException {
         return Lists.transform(getRecentMeterRecords(deviceTransport), MeterRecord.v2ModelConverter(wallTimeConverter));
     }
-    private static List<MeterRecord> getRecentMeterRecords(DeviceTransport deviceTransport) throws IOException {
+    static List<MeterRecord> getRecentMeterRecords(DeviceTransport deviceTransport) throws IOException {
         int endPage = readDataBasePageRange(deviceTransport, RecordType.METER_DATA);
         byte[] data = readDataBasePage(deviceTransport, RecordType.METER_DATA, endPage);
         return parsePage(data, MeterRecord.class);
@@ -135,7 +135,7 @@ public final class DexcomG4Driver {
         return Lists.transform(getRecentSensorRecords(deviceTransport, numOfRecentPages),
                                SensorRecord.v2ModelConverter(wallTimeConverter));
     }
-    private static List<SensorRecord> getRecentSensorRecords(DeviceTransport deviceTransport, int numOfRecentPages) throws IOException {
+    static List<SensorRecord> getRecentSensorRecords(DeviceTransport deviceTransport, int numOfRecentPages) throws IOException {
         if (numOfRecentPages < 1) {
             log.warn("Number of recent pages requested less than 1. Setting to 1.");
             numOfRecentPages = 1;
@@ -156,7 +156,7 @@ public final class DexcomG4Driver {
                                                           Function<Long, Long> wallTimeConverter) throws IOException {
         return Lists.transform(getRecentCalRecords(deviceTransport), CalRecord.v2ModelConverter(wallTimeConverter));
     }
-    private static List<CalRecord> getRecentCalRecords(DeviceTransport deviceTransport) throws IOException {
+    static List<CalRecord> getRecentCalRecords(DeviceTransport deviceTransport) throws IOException {
         int endPage = readDataBasePageRange(deviceTransport, RecordType.CAL_SET);
         byte[] data = readDataBasePage(deviceTransport, RecordType.CAL_SET, endPage);
         return parsePage(data, CalRecord.class);

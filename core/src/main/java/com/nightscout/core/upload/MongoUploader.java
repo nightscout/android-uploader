@@ -27,7 +27,6 @@ import java.util.ResourceBundle;
 
 import static net.tribe7.common.base.Preconditions.checkNotNull;
 
-
 public class MongoUploader extends BaseUploader {
 
     private final MongoClientURI dbUri;

@@ -2,7 +2,6 @@ package com.nightscout.core.dexcom;
 
 import com.nightscout.core.dexcom.records.CalRecord;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -88,7 +87,7 @@ public class CalRecordTest {
 
     @Test
     public void shouldParsePre505CalRecord() throws Exception {
-        CalRecord calRecord = new CalRecord(recordPre505, 0, 0);
+        CalRecord calRecord = new CalRecord(recordPre505);
         assertThat(calRecord.getSlope(), is(813.5875452253041));
         assertThat(calRecord.getIntercept(), is(26543.54390965904));
         assertThat(calRecord.getScale(), is(1.0));
@@ -100,7 +99,7 @@ public class CalRecordTest {
 
     @Test
     public void shouldParse505CalRecord() throws Exception {
-        CalRecord calRecord = new CalRecord(record505, 0, 0);
+        CalRecord calRecord = new CalRecord(record505);
         assertThat(calRecord.getSlope(), is(782.9303804407411));
         assertThat(calRecord.getIntercept(), is(28720.042100646853));
         assertThat(calRecord.getScale(), is(1.0));
@@ -113,33 +112,25 @@ public class CalRecordTest {
     @Test(expected = InvalidRecordLengthException.class)
     public void shouldNotParseSmallCal505Record() throws Exception {
         record505 = Arrays.copyOfRange(record505, 0, record505.length - 1);
-        CalRecord calRecord = new CalRecord(record505, 0, 0);
+        new CalRecord(record505);
     }
 
     @Test(expected = InvalidRecordLengthException.class)
     public void shouldNotParseSmallCalPre505Record() throws Exception {
         recordPre505 = Arrays.copyOfRange(recordPre505, 0, recordPre505.length - 1);
-        CalRecord calRecord = new CalRecord(recordPre505, 0, 0);
+        new CalRecord(recordPre505);
     }
 
 
     @Test(expected = InvalidRecordLengthException.class)
     public void shouldNotParseLargeCal505Record() throws Exception {
         record505 = Arrays.copyOf(record505, record505.length + 1);
-        CalRecord calRecord = new CalRecord(record505, 0, 0);
+        new CalRecord(record505);
     }
 
     @Test(expected = InvalidRecordLengthException.class)
     public void shouldNotParseLargeCalPre505Record() throws Exception {
         recordPre505 = Arrays.copyOf(recordPre505, recordPre505.length + 1);
-        CalRecord calRecord = new CalRecord(recordPre505, 0, 0);
+        new CalRecord(recordPre505);
     }
-
-
-    @After
-    public void tearDown() {
-        recordPre505 = null;
-        record505 = null;
-    }
-
 }

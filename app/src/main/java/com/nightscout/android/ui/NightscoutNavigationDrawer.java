@@ -12,13 +12,10 @@ import com.nightscout.android.CollectorService;
 import com.nightscout.android.Nightscout;
 import com.nightscout.android.ProcessorService;
 import com.nightscout.android.R;
-import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.android.events.EventFragment;
 import com.nightscout.android.exceptions.FeedbackDialog;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.settings.SettingsActivity;
-import com.nightscout.core.events.EventSeverity;
-import com.nightscout.core.events.EventType;
 
 import java.net.URI;
 
@@ -37,9 +34,6 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
     FeedbackDialog feedbackDialog;
     Tracker mTracker;
     private AndroidPreferences preferences;
-    private AndroidEventReporter reporter;
-//    @Inject AppContainer appContainer;
-
 
     @Override
     public void init(Bundle bundle) {
@@ -48,16 +42,11 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
 
         mTracker = ((Nightscout) getApplicationContext()).getTracker();
         preferences = new AndroidPreferences(this);
-        reporter = AndroidEventReporter.getReporter(this);
-        reporter.report(EventType.APPLICATION, EventSeverity.INFO,
-                getApplicationContext().getString(R.string.app_started));
 
 
         MaterialAccount account = new MaterialAccount(this.getResources(), "Nightscout", BuildConfig.VERSION_CODENAME, R.drawable.ic_launcher, R.drawable.nscafe);
         this.addAccount(account);
 
-
-//        setDrawerHeaderImage(R.drawable.ic_launcher);
         MaterialSection section = newSection("Home", new MonitorFragment());
         addSection(section);
 
