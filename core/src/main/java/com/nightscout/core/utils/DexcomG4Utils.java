@@ -2,17 +2,23 @@ package com.nightscout.core.utils;
 
 import com.nightscout.core.dexcom.SpecialValue;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.model.G4Trend;
 import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.model.v2.G4Data;
+import com.nightscout.core.model.v2.RawSensorReading;
 import com.nightscout.core.model.v2.SensorGlucoseValue;
 import com.nightscout.core.model.v2.Trend;
+import com.nightscout.core.upload.converters.SensorGlucoseValueAndRawSensorReading;
+import com.squareup.wire.Message;
+import com.squareup.wire.Wire;
 
 import net.tribe7.common.base.Optional;
+import net.tribe7.common.collect.Lists;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
+
+import java.util.List;
 
 import static com.nightscout.core.dexcom.SpecialValue.getEGVSpecialValue;
 import static net.tribe7.common.base.Preconditions.checkNotNull;
@@ -103,5 +109,39 @@ public final class DexcomG4Utils {
         return "";
     }
     return "";
+  }
+
+  public static List<SensorGlucoseValueAndRawSensorReading> mergeRawEntries(G4Data download) {
+    List<SensorGlucoseValue> sensorGlucoseValues = Wire.get(download.sensor_glucose_values, G4Data.DEFAULT_SENSOR_GLUCOSE_VALUES);
+    List<RawSensorReading> rawSensorReadings = Wire.get(download.raw_sensor_readings,
+                                                        G4Data.DEFAULT_RAW_SENSOR_READINGS);
+
+    List<SensorGlucoseValueAndRawSensorReading> output = Lists.newArrayList();
+    int currentIndex = 0;
+    while (currentIndex < sensorGlucoseValues.size() || currentIndex < rawSensorReadings.size()) {
+      SensorGlucoseValue sensorGlucoseValue = null;
+      RawSensorReading rawSensorReading = null;
+      if (currentIndex < sensorGlucoseValues.size()) {
+        sensorGlucoseValue = sensorGlucoseValues.get(currentIndex);
+      }
+      if (currentIndex < rawSensorReadings.size()) {
+        rawSensorReading = rawSensorReadings.get(currentIndex);
+      }
+      output.add(new SensorGlucoseValueAndRawSensorReading(sensorGlucoseValue, rawSensorReading));
+      currentIndex++;
+    }
+    return output;
+  }
+
+  public static void addAllEntriesAsMessages(final G4Data download, List<Message> output) {
+    if (download == null || output == null) {
+      return;
+    }
+    output.addAll(Wire.get(download.calibrations, G4Data.DEFAULT_CALIBRATIONS));
+    output.addAll(Wire.get(download.manual_meter_entries, G4Data.DEFAULT_MANUAL_METER_ENTRIES));
+    output.addAll(Wire.get(download.sensor_glucose_values, G4Data.DEFAULT_SENSOR_GLUCOSE_VALUES));
+    output.addAll(Wire.get(download.raw_sensor_readings, G4Data.DEFAULT_RAW_SENSOR_READINGS));
+    output.addAll(Wire.get(download.insertions, G4Data.DEFAULT_INSERTIONS));
+
   }
 }

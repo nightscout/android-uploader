@@ -9,6 +9,10 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.MongoException;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ReplaceOneModel;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.WriteModel;
 import com.nightscout.core.dexcom.records.CalRecord;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.dexcom.records.InsertionRecord;
@@ -19,9 +23,13 @@ import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
+import net.tribe7.common.collect.Lists;
+
+import org.bson.conversions.Bson;
+
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -57,11 +65,7 @@ public class MongoUploader extends BaseUploader {
         if (client != null) {
             return client;
         }
-        try {
-            this.client = new MongoClient(dbUri);
-        } catch (UnknownHostException e) {
-            throw new IOException("Error connecting to mongo host " + dbUri.getURI(), e);
-        }
+        this.client = new MongoClient(dbUri);
         return this.client;
     }
 
@@ -166,6 +170,19 @@ public class MongoUploader extends BaseUploader {
         return output;
     }
 
+    private List<WriteModel<BasicDBObject>> toBulkUpsertList(List<BasicDBObject> dbObjects) {
+        List<WriteModel<BasicDBObject>> output = Lists.newArrayList();
+        UpdateOptions options = new UpdateOptions();
+        options.upsert(true);
+        for (BasicDBObject object : dbObjects) {
+            Bson filter = Filters.and(Filters.eq("type", object.get("type")),
+                                      Filters.eq("sysTime", object.get("sysTime")));
+
+            output.add(new ReplaceOneModel<>(filter, object, options));
+        }
+        return output;
+    }
+
     private boolean upsert(BasicDBObject query, BasicDBObject dbObject) throws IOException {
         return upsert(getCollection(), query, dbObject);
     }
@@ -176,8 +193,8 @@ public class MongoUploader extends BaseUploader {
         log.error("Collection: {}", collection.toString());
         try {
             WriteResult result = collection.update(query, dbObject, true, false,
-                    WriteConcern.UNACKNOWLEDGED);
-            return result.getError() == null;
+                    WriteConcern.ACKNOWLEDGED);
+            return result.wasAcknowledged();
         } catch (MongoException e) {
             // Credentials error - user name or password is incorrect.
             if (e.getCode() == 18) {

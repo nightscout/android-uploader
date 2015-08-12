@@ -4,6 +4,7 @@ import com.nightscout.core.dexcom.records.InsertionRecord;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.model.v2.Calibration;
 import com.nightscout.core.model.v2.G4Timestamp;
+import com.nightscout.core.model.v2.Insertion;
 import com.nightscout.core.model.v2.ManualMeterEntry;
 import com.nightscout.core.model.v2.RawSensorReading;
 import com.nightscout.core.model.v2.SensorGlucoseValue;
@@ -19,7 +20,7 @@ public final class RestV1Converters {
 
   private RestV1Converters() {}
 
-  private Function<SensorGlucoseValueAndRawSensorReading, JSONObject> sensorReadingJSONObjectFunction() throws JSONException {
+  public static Function<SensorGlucoseValueAndRawSensorReading, JSONObject> sensorReadingConverter() {
     return new Function<SensorGlucoseValueAndRawSensorReading, JSONObject>() {
       @Override
       public JSONObject apply(SensorGlucoseValueAndRawSensorReading record) {
@@ -74,10 +75,13 @@ public final class RestV1Converters {
       @Override
       public JSONObject apply(Calibration input) {
         JSONObject json = new JSONObject();
+        if (input == null) {
+          return json;
+        }
         try {
+          fillTimestamp(input.timestamp, json);
           json.put("device", "dexcom");
           json.put("type", "cal");
-          fillTimestamp(input.timestamp, json);
           json.put("slope", input.slope);
           json.put("intercept", input.intercept);
           json.put("scale", input.scale);
@@ -89,12 +93,23 @@ public final class RestV1Converters {
     };
   }
 
-  private JSONObject toJSONObject(InsertionRecord insertionRecord) throws JSONException {
-    JSONObject output = new JSONObject();
-  fillTimestamp();
-    output.put("state", insertionRecord.getState().name());
-    output.put("type", insertionRecord.getRecordType());
-    return output;
+  public static Function<Insertion, JSONObject> insertionConverter() {
+    return new Function<Insertion, JSONObject>() {
+      @Override
+      public JSONObject apply(Insertion input) {
+        JSONObject json = new JSONObject();
+        if (input == null) {
+          return json;
+        }
+        try {
+          fillTimestamp(input.timestamp, json);
+          json.put("state", input.state.name());
+        } catch (JSONException e) {
+          // Empty.
+        }
+        return json;
+      }
+    };
   }
 
   private JSONObject toJSONObject(AbstractUploaderDevice deviceStatus, int rcvrBat)
