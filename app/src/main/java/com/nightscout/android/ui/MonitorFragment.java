@@ -245,9 +245,7 @@ public class MonitorFragment extends Fragment {
         intent = new Intent(this.getActivity(), ProcessorService.class);
         getActivity().bindService(intent, mProcessorConnection, Context.BIND_AUTO_CREATE);
         if (mBound) {
-            int lastUpload = mProcessorService.getLastUploadStatus();
-            log.warn("Last upload status: {}", (lastUpload == 1) ? "Success" : "Failed");
-            setUploaderButtonRes(getUploaderRes(lastUpload));
+            //setUploaderButtonRes(getUploaderRes(lastUpload));
             getActivity().unbindService(mProcessorConnection);
 
         }

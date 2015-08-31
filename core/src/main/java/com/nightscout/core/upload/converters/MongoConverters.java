@@ -6,6 +6,7 @@ import com.nightscout.core.model.v2.Insertion;
 import com.nightscout.core.model.v2.ManualMeterEntry;
 import com.nightscout.core.model.v2.RawSensorReading;
 import com.nightscout.core.model.v2.SensorGlucoseValue;
+import com.nightscout.core.upload.v2.MongoHandler;
 import com.nightscout.core.utils.DexcomG4Utils;
 
 import net.tribe7.common.base.Function;
@@ -13,7 +14,9 @@ import net.tribe7.common.base.Function;
 import org.bson.Document;
 import org.joda.time.DateTime;
 
-public class MongoConverters {
+public final class MongoConverters {
+
+  private MongoConverters() {}
 
   private static void fillTimestamp(G4Timestamp timestamp, Document dbObject) {
     if (timestamp == null) {

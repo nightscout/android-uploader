@@ -1,0 +1,2098 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Lint Report</title>
+<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Roboto" />
+<link rel="stylesheet" type="text/css" href="lint-report_files/hololike.css" />
+<script language="javascript" type="text/javascript"> 
+<!--
+function reveal(id) {
+if (document.getElementById) {
+document.getElementById(id).style.display = 'block';
+document.getElementById(id+'Link').style.display = 'none';
+}
+}
+//--> 
+</script>
+</head>
+<body>
+<h1>Lint Report</h1>
+<div class="titleSeparator"></div>
+Check performed at Sun Aug 30 21:29:45 PDT 2015.<br/>
+0 errors and 156 warnings found:<br/><br/>
+<table class="overview">
+<tr><td></td><td class="categoryColumn"><a href="#Correctness">Correctness</a>
+</td></tr>
+<tr>
+<td class="countColumn">3</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#DefaultLocale">DefaultLocale: Implied default locale in case conversion</a>
+</td></tr>
+<tr>
+<td class="countColumn">4</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#InvalidPackage">InvalidPackage: Package not included in Android</a>
+</td></tr>
+<tr>
+<td class="countColumn">1</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#OldTargetApi">OldTargetApi: Target SDK attribute is not targeting latest version</a>
+</td></tr>
+<tr>
+<td class="countColumn">1</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#InflateParams">InflateParams: Layout Inflation without a Parent</a>
+</td></tr>
+<tr>
+<td class="countColumn">1</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#ProtectedPermissions">ProtectedPermissions: Using system app permission</a>
+</td></tr>
+<tr>
+<td class="countColumn">3</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#GradleDependency">GradleDependency: Obsolete Gradle Dependency</a>
+</td></tr>
+<tr>
+<td class="countColumn">15</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#NewerVersionAvailable">NewerVersionAvailable: Newer Library Versions Available</a>
+</td></tr>
+<tr>
+<td class="countColumn">2</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#SpUsage">SpUsage: Using <code>dp</code> instead of <code>sp</code> for text sizes</a>
+</td></tr>
+<tr><td></td><td class="categoryColumn"><a href="#Performance">Performance</a>
+</td></tr>
+<tr>
+<td class="countColumn">1</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#Wakelock">Wakelock: Incorrect <code>WakeLock</code> usage</a>
+</td></tr>
+<tr>
+<td class="countColumn">1</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#Recycle">Recycle: Missing <code>recycle()</code> calls</a>
+</td></tr>
+<tr>
+<td class="countColumn">33</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#LogConditional">LogConditional: Unconditional Logging Calls</a>
+</td></tr>
+<tr>
+<td class="countColumn">50</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#UnusedResources">UnusedResources: Unused resources</a>
+</td></tr>
+<tr>
+<td class="countColumn">15</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#UnusedIds">UnusedIds: Unused id</a>
+</td></tr>
+<tr><td></td><td class="categoryColumn"><a href="#Usability:Typography">Usability:Typography</a>
+</td></tr>
+<tr>
+<td class="countColumn">1</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#TypographyQuotes">TypographyQuotes: Straight quotes can be replaced with curvy quotes</a>
+</td></tr>
+<tr><td></td><td class="categoryColumn"><a href="#Usability:Icons">Usability:Icons</a>
+</td></tr>
+<tr>
+<td class="countColumn">1</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#IconDipSize">IconDipSize: Icon density-independent size validation</a>
+</td></tr>
+<tr>
+<td class="countColumn">1</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#IconDuplicatesConfig">IconDuplicatesConfig: Identical bitmaps across various configurations</a>
+</td></tr>
+<tr><td></td><td class="categoryColumn"><a href="#Usability">Usability</a>
+</td></tr>
+<tr>
+<td class="countColumn">2</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#SelectableText">SelectableText: Dynamic text should probably be selectable</a>
+</td></tr>
+<tr><td></td><td class="categoryColumn"><a href="#Accessibility">Accessibility</a>
+</td></tr>
+<tr>
+<td class="countColumn">1</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#ClickableViewAccessibility">ClickableViewAccessibility: Accessibility in Custom Views</a>
+</td></tr>
+<tr>
+<td class="countColumn">2</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#ContentDescription">ContentDescription: Image without <code>contentDescription</code></a>
+</td></tr>
+<tr>
+<td class="countColumn">1</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#LabelFor">LabelFor: Missing <code>labelFor</code> attribute</a>
+</td></tr>
+<tr><td></td><td class="categoryColumn"><a href="#Internationalization">Internationalization</a>
+</td></tr>
+<tr>
+<td class="countColumn">3</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#HardcodedText">HardcodedText: Hardcoded text</a>
+</td></tr>
+<tr><td></td><td class="categoryColumn"><a href="#Bi-directional Text">Bi-directional Text</a>
+</td></tr>
+<tr>
+<td class="countColumn">13</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#RtlHardcoded">RtlHardcoded: Using left/right instead of start/end attributes</a>
+</td></tr>
+<tr>
+<td class="countColumn">1</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<a href="#RtlEnabled">RtlEnabled: Using RTL attributes without enabling RTL support</a>
+</td></tr>
+</table>
+<br/>
+<a name="Correctness"></a>
+<div class="category"><a href="#" title="Return to top">Correctness</a><div class="categorySeparator"></div>
+</div>
+<a name="DefaultLocale"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">DefaultLocale: Implied default locale in case conversion</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:361</span>: <span class="message">Implicitly using the default locale is a common source of bugs: Use <code>toUpperCase(Locale)</code> instead</span><br /><pre class="errorlines">
+<span class="lineno"> 358</span>     @TargetApi(Build.VERSION_CODES.KITKAT)
+<span class="lineno"> 359</span>     private byte[] getHandshakeKey() {
+<span class="lineno"> 360</span>         AndroidPreferences prefs = new AndroidPreferences(mContext);
+<span class="lineno"> 361</span>         String receiverSn = prefs.getShareSerial().<span class="errorspan">toUpperCase() + "000000";</span>
+<span class="lineno"> 362</span>         Log.d(TAG, "Receiver serial: " + receiverSn + "(" + Utils.bytesToHex(receiverSn.getBytes(StandardCharsets.US_ASCII)) + ")");
+<span class="lineno"> 363</span> 
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/preferences/PreferencesValidator.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/preferences/PreferencesValidator.java</a>:74</span>: <span class="message">Implicitly using the default locale is a common source of bugs: Use <code>toUpperCase(Locale)</code> instead</span><br /><pre class="errorlines">
+<span class="lineno">  71</span>         if (Strings.isNullOrEmpty(serialNum)) {
+<span class="lineno">  72</span>             return Optional.of(context.getString(R.string.invalid_share2_serial, serialNum));
+<span class="lineno">  73</span>         }
+<span class="lineno">  74</span>         Log.d("XXX", "Serial Number: " + serialNum.<span class="errorspan">toUpperCase());</span>
+<span class="lineno">  75</span>         if (!serialNum.toUpperCase().startsWith("SM") || (serialNum.length() &lt; 10)) {
+<span class="lineno">  76</span>             return Optional.of(context.getString(R.string.invalid_share2_serial, serialNum));
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/preferences/PreferencesValidator.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/preferences/PreferencesValidator.java</a>:75</span>: <span class="message">Implicitly using the default locale is a common source of bugs: Use <code>toUpperCase(Locale)</code> instead</span><br /><pre class="errorlines">
+<span class="lineno">  72</span>             return Optional.of(context.getString(R.string.invalid_share2_serial, serialNum));
+<span class="lineno">  73</span>         }
+<span class="lineno">  74</span>         Log.d("XXX", "Serial Number: " + serialNum.toUpperCase());
+<span class="lineno">  75</span>         if (!serialNum.<span class="errorspan">toUpperCase().startsWith("SM") || (serialNum.length() &lt; 10)) {</span>
+<span class="lineno">  76</span>             return Optional.of(context.getString(R.string.invalid_share2_serial, serialNum));
+<span class="lineno">  77</span>         }
+</pre>
+</div>
+<div class="metadata">Priority: 6 / 10<br/>
+Category: Correctness</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Implied default locale in case conversion.</div>
+<div class="explanation">
+Calling <code>String#toLowerCase()</code> or <code>#toUpperCase()</code> <b>without specifying an explicit locale</b> is a common source of bugs. The reason for that is that those methods will use the current locale on the user's device, and even though the code appears to work correctly when you are developing the app, it will fail in some locales. For example, in the Turkish locale, the uppercase replacement for <code>i</code> is <b>not</b> <code>I</code>.<br/>
+<br/>
+If you want the methods to just perform ASCII replacement, for example to convert an enum name, call <code>String#toUpperCase(Locale.US)</code> instead. If you really want to use the current locale, call <code>String#toUpperCase(Locale.getDefault())</code> instead.
+</div>
+<br/><div class="moreinfo">More info: <a href="http://developer.android.com/reference/java/util/Locale.html#default_locale">http://developer.android.com/reference/java/util/Locale.html#default_locale</a>
+</div><br/>To suppress this error, use the issue id "DefaultLocale" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+<a name="InvalidPackage"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">InvalidPackage: Package not included in Android</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="../../../.gradle/caches/modules-2/files-2.1/org.mongodb/mongo-java-driver/3.0.2/7d3880dec6c8a2f07c1f544776c326834b513712/mongo-java-driver-3.0.2.jar">../../../.gradle/caches/modules-2/files-2.1/org.mongodb/mongo-java-driver/3.0.2/7d3880dec6c8a2f07c1f544776c326834b513712/mongo-java-driver-3.0.2.jar</a></span>: <span class="message">Invalid package reference in library; not included in Android: <code>java.lang.management</code>. Referenced from <code>com.mongodb.internal.management.jmx.JMXMBeanServer</code>.</span><br />
+<span class="location"><a href="../../../.gradle/caches/modules-2/files-2.1/org.mongodb/mongo-java-driver/3.0.2/7d3880dec6c8a2f07c1f544776c326834b513712/mongo-java-driver-3.0.2.jar">../../../.gradle/caches/modules-2/files-2.1/org.mongodb/mongo-java-driver/3.0.2/7d3880dec6c8a2f07c1f544776c326834b513712/mongo-java-driver-3.0.2.jar</a></span>: <span class="message">Invalid package reference in library; not included in Android: <code>javax.management</code>. Referenced from <code>com.mongodb.internal.management.jmx.JMXMBeanServer</code>.</span><br />
+<span class="location"><a href="../../../.gradle/caches/modules-2/files-2.1/org.mongodb/mongo-java-driver/3.0.2/7d3880dec6c8a2f07c1f544776c326834b513712/mongo-java-driver-3.0.2.jar">../../../.gradle/caches/modules-2/files-2.1/org.mongodb/mongo-java-driver/3.0.2/7d3880dec6c8a2f07c1f544776c326834b513712/mongo-java-driver-3.0.2.jar</a></span>: <span class="message">Invalid package reference in library; not included in Android: <code>javax.security.sasl</code>. Referenced from <code>com.mongodb.connection.GSSAPIAuthenticator</code>.</span><br />
+<span class="location"><a href="../../../.gradle/caches/modules-2/files-2.1/org.mongodb/mongo-java-driver/3.0.2/7d3880dec6c8a2f07c1f544776c326834b513712/mongo-java-driver-3.0.2.jar">../../../.gradle/caches/modules-2/files-2.1/org.mongodb/mongo-java-driver/3.0.2/7d3880dec6c8a2f07c1f544776c326834b513712/mongo-java-driver-3.0.2.jar</a></span>: <span class="message">Invalid package reference in library; not included in Android: <code>javax.xml.bind</code>. Referenced from <code>com.mongodb.util.JSONCallback</code>.</span><br />
+</div>
+<div class="metadata">Priority: 6 / 10<br/>
+Category: Correctness</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Package not included in Android.</div>
+<div class="explanation">
+This check scans through libraries looking for calls to APIs that are not included in Android.<br/>
+<br/>
+When you create Android projects, the classpath is set up such that you can only access classes in the API packages that are included in Android. However, if you add other projects to your libs/ folder, there is no guarantee that those .jar files were built with an Android specific classpath, and in particular, they could be accessing unsupported APIs such as java.applet.<br/>
+<br/>
+This check scans through library jars and looks for references to API packages that are not included in Android and flags these. This is only an error if your code calls one of the library classes which wind up referencing the unsupported package.
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "InvalidPackage" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+<a name="OldTargetApi"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">OldTargetApi: Target SDK attribute is not targeting latest version</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:19</span>: <span class="message">Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details.</span><br /><pre class="errorlines">
+<span class="lineno">  16</span>     defaultConfig {
+<span class="lineno">  17</span>         applicationId "com.nightscout.android"
+<span class="lineno">  18</span>         minSdkVersion 18
+<span class="lineno">  19</span>         <span class="errorspan">targetSdkVersion 18</span>
+<span class="lineno">  20</span>         versionCode 22
+<span class="lineno">  21</span>         versionName "0.2.0-alpha10"
+</pre>
+</div>
+<div class="metadata">Note: This issue has an associated quickfix operation in Android Studio/IntelliJ&nbsp;<img alt="Fix" border="0" align="top" src="lint-report_files/lint-run.png" />
+<br>
+Priority: 6 / 10<br/>
+Category: Correctness</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Target SDK attribute is not targeting latest version.</div>
+<div class="explanation">
+When your application runs on a version of Android that is more recent than your <code>targetSdkVersion</code> specifies that it has been tested with, various compatibility modes kick in. This ensures that your application continues to work, but it may look out of place. For example, if the <code>targetSdkVersion</code> is less than 14, your app may get an option button in the UI.<br/>
+<br/>
+To fix this issue, set the <code>targetSdkVersion</code> to the highest available value. Then test your app to make sure everything works correctly. You may want to consult the compatibility notes to see what changes apply to each version you are adding support for: <a href="http://developer.android.com/reference/android/os/Build.VERSION_CODES.html">http://developer.android.com/reference/android/os/Build.VERSION_CODES.html</a>
+</div>
+<br/><div class="moreinfo">More info: <a href="http://developer.android.com/reference/android/os/Build.VERSION_CODES.html">http://developer.android.com/reference/android/os/Build.VERSION_CODES.html</a>
+</div><br/>To suppress this error, use the issue id "OldTargetApi" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+<a name="InflateParams"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">InflateParams: Layout Inflation without a Parent</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/java/com/nightscout/android/settings/BluetoothScanActivity.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/settings/BluetoothScanActivity.java</a>:209</span>: <span class="message">Avoid passing <code>null</code> as the view root (needed to resolve layout parameters on the inflated layout's root element)</span><br /><pre class="errorlines">
+<span class="lineno"> 206</span>             ViewHolder viewHolder;
+<span class="lineno"> 207</span>             // General ListView optimization code.
+<span class="lineno"> 208</span>             if (view == null) {
+<span class="lineno"> 209</span>                 view = mInflator.inflate(R.layout.ledevice_listitem, <span class="errorspan">null);</span>
+<span class="lineno"> 210</span>                 viewHolder = new ViewHolder();
+<span class="lineno"> 211</span>                 viewHolder.deviceAddress = (TextView) view.findViewById(R.id.device_address);
+</pre>
+</div>
+<div class="metadata">Priority: 5 / 10<br/>
+Category: Correctness</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Layout Inflation without a Parent.</div>
+<div class="explanation">
+When inflating a layout, avoid passing in null as the parent view, since otherwise any layout parameters on the root of the inflated layout will be ignored.
+</div>
+<br/><div class="moreinfo">More info: <a href="http://www.doubleencore.com/2013/05/layout-inflation-as-intended">http://www.doubleencore.com/2013/05/layout-inflation-as-intended</a>
+</div><br/>To suppress this error, use the issue id "InflateParams" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+<a name="ProtectedPermissions"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">ProtectedPermissions: Using system app permission</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/AndroidManifest.xml">/Users/trhodes/workspace/android-uploader/app/src/main/AndroidManifest.xml</a>:22</span>: <span class="message">Permission is only granted to system apps</span><br /><pre class="errorlines">
+<span class="lineno">  19</span>     &lt;uses-permission android:name="android.permission.READ_LOGS" />
+<span class="lineno">  20</span>     &lt;uses-permission android:name="android.permission.VIBRATE" />
+<span class="lineno">  21</span>     &lt;uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+<span class="lineno">  22</span>     &lt;uses-permission <span class="errorspan">android:name="android.permission.UPDATE_DEVICE_STATS" /></span>
+<span class="lineno">  23</span>     &lt;uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+<span class="lineno">  24</span>     &lt;uses-permission android:name="android.permission.WAKE_LOCK" />
+</pre>
+</div>
+<div class="metadata">Priority: 5 / 10<br/>
+Category: Correctness</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Using system app permission.</div>
+<div class="explanation">
+Permissions with the protection level signature or signatureOrSystem are only granted to system apps. If an app is a regular non-system app, it will never be able to use these permissions.
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "ProtectedPermissions" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+<a name="GradleDependency"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">GradleDependency: Obsolete Gradle Dependency</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:72</span>: <span class="message">A newer version of com.android.support:appcompat-v7 than 22.0.0 is available: 22.2.1</span><br /><pre class="errorlines">
+<span class="lineno">  69</span>     }
+<span class="lineno">  70</span>     compile 'ch.acra:acra:4.6.1'
+<span class="lineno">  71</span>     compile 'com.android.support:support-annotations:22.0.0'
+<span class="lineno">  72</span>     <span class="errorspan">compile 'com.android.support:appcompat-v7:22.0.0'</span>
+<span class="lineno">  73</span>     compile 'com.android.support:support-v4:22.0.0'
+<span class="lineno">  74</span>     compile('com.google.android.gms:play-services-analytics:7.0.0') {
+</pre>
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:73</span>: <span class="message">A newer version of com.android.support:support-v4 than 22.0.0 is available: 22.2.1</span><br /><pre class="errorlines">
+<span class="lineno">  70</span>     compile 'ch.acra:acra:4.6.1'
+<span class="lineno">  71</span>     compile 'com.android.support:support-annotations:22.0.0'
+<span class="lineno">  72</span>     compile 'com.android.support:appcompat-v7:22.0.0'
+<span class="lineno">  73</span>     <span class="errorspan">compile 'com.android.support:support-v4:22.0.0'</span>
+<span class="lineno">  74</span>     compile('com.google.android.gms:play-services-analytics:7.0.0') {
+<span class="lineno">  75</span>         exclude module: 'support-v4'
+</pre>
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:74</span>: <span class="message">A newer version of com.google.android.gms:play-services-analytics than 7.0.0 is available: 7.5.0</span><br /><pre class="errorlines">
+<span class="lineno">  71</span>     compile 'com.android.support:support-annotations:22.0.0'
+<span class="lineno">  72</span>     compile 'com.android.support:appcompat-v7:22.0.0'
+<span class="lineno">  73</span>     compile 'com.android.support:support-v4:22.0.0'
+<span class="lineno">  74</span>     <span class="errorspan">compile('com.google.android.gms:play-services-analytics:7.0.0') {</span>
+<span class="lineno">  75</span>         exclude module: 'support-v4'
+<span class="lineno">  76</span>     }
+</pre>
+</div>
+<div class="metadata">Note: This issue has an associated quickfix operation in Android Studio/IntelliJ&nbsp;<img alt="Fix" border="0" align="top" src="lint-report_files/lint-run.png" />
+<br>
+Priority: 4 / 10<br/>
+Category: Correctness</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Obsolete Gradle Dependency.</div>
+<div class="explanation">
+This detector looks for usages of libraries where the version you are using is not the current stable release. Using older versions is fine, and there are cases where you deliberately want to stick with an older version. However, you may simply not be aware that a more recent version is available, and that is what this lint check helps find.
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "GradleDependency" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+<a name="NewerVersionAvailable"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">NewerVersionAvailable: Newer Library Versions Available</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:70</span>: <span class="message">A newer version of ch.acra:acra than 4.6.1 is available: 4.6.2</span><br /><pre class="errorlines">
+<span class="lineno">  67</span>         exclude group: 'org.apache.httpcomponents'
+<span class="lineno">  68</span>         exclude group: 'joda-time', module: 'joda-time'
+<span class="lineno">  69</span>     }
+<span class="lineno">  70</span>     <span class="errorspan">compile 'ch.acra:acra:4.6.1'</span>
+<span class="lineno">  71</span>     compile 'com.android.support:support-annotations:22.0.0'
+<span class="lineno">  72</span>     compile 'com.android.support:appcompat-v7:22.0.0'
+</pre>
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:77</span>: <span class="message">A newer version of org.mongodb:mongo-java-driver than 2.10.1 is available: 3.0.3</span><br /><pre class="errorlines">
+<span class="lineno">  74</span>     compile('com.google.android.gms:play-services-analytics:7.0.0') {
+<span class="lineno">  75</span>         exclude module: 'support-v4'
+<span class="lineno">  76</span>     }
+<span class="lineno">  77</span>     <span class="errorspan">compile 'org.mongodb:mongo-java-driver:2.10.1'</span>
+<span class="lineno">  78</span>     compile 'joda-time:joda-time:2.5'
+<span class="lineno">  79</span>     compile 'net.tribe7.seeds:seeds-functional:16.0.1'
+</pre>
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:78</span>: <span class="message">A newer version of joda-time:joda-time than 2.5 is available: 2.8.2</span><br /><pre class="errorlines">
+<span class="lineno">  75</span>         exclude module: 'support-v4'
+<span class="lineno">  76</span>     }
+<span class="lineno">  77</span>     compile 'org.mongodb:mongo-java-driver:2.10.1'
+<span class="lineno">  78</span>     <span class="errorspan">compile 'joda-time:joda-time:2.5'</span>
+<span class="lineno">  79</span>     compile 'net.tribe7.seeds:seeds-functional:16.0.1'
+<span class="lineno">  80</span>     compile 'net.tribe7.seeds:seeds-primitives:16.0.1'
+</pre>
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:81</span>: <span class="message">A newer version of com.noveogroup.android:android-logger than 1.3.4 is available: 1.3.6</span><br /><pre class="errorlines">
+<span class="lineno">  78</span>     compile 'joda-time:joda-time:2.5'
+<span class="lineno">  79</span>     compile 'net.tribe7.seeds:seeds-functional:16.0.1'
+<span class="lineno">  80</span>     compile 'net.tribe7.seeds:seeds-primitives:16.0.1'
+<span class="lineno">  81</span>     <span class="errorspan">compile 'com.noveogroup.android:android-logger:1.3.4'</span>
+<span class="lineno">  82</span>     compile 'com.squareup.dagger:dagger:1.2.1'
+<span class="lineno">  83</span>     provided 'com.squareup.dagger:dagger-compiler:1.2.1'
+</pre>
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:82</span>: <span class="message">A newer version of com.squareup.dagger:dagger than 1.2.1 is available: 1.2.2</span><br /><pre class="errorlines">
+<span class="lineno">  79</span>     compile 'net.tribe7.seeds:seeds-functional:16.0.1'
+<span class="lineno">  80</span>     compile 'net.tribe7.seeds:seeds-primitives:16.0.1'
+<span class="lineno">  81</span>     compile 'com.noveogroup.android:android-logger:1.3.4'
+<span class="lineno">  82</span>     <span class="errorspan">compile 'com.squareup.dagger:dagger:1.2.1'</span>
+<span class="lineno">  83</span>     provided 'com.squareup.dagger:dagger-compiler:1.2.1'
+<span class="lineno">  84</span>     compile 'com.jakewharton:butterknife:4.0.1'
+</pre>
+<button id="NewerVersionAvailableDivLink" onclick="reveal('NewerVersionAvailableDiv');" />+ 10 More Occurrences...</button>
+<div id="NewerVersionAvailableDiv" style="display: none">
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:83</span>: <span class="message">A newer version of com.squareup.dagger:dagger-compiler than 1.2.1 is available: 1.2.2</span><br /><pre class="errorlines">
+<span class="lineno">  80</span>     compile 'net.tribe7.seeds:seeds-primitives:16.0.1'
+<span class="lineno">  81</span>     compile 'com.noveogroup.android:android-logger:1.3.4'
+<span class="lineno">  82</span>     compile 'com.squareup.dagger:dagger:1.2.1'
+<span class="lineno">  83</span>     <span class="errorspan">provided 'com.squareup.dagger:dagger-compiler:1.2.1'</span>
+<span class="lineno">  84</span>     compile 'com.jakewharton:butterknife:4.0.1'
+<span class="lineno">  85</span>     compile 'com.squareup:otto:1.3.5'
+</pre>
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:84</span>: <span class="message">A newer version of com.jakewharton:butterknife than 4.0.1 is available: 7.0.1</span><br /><pre class="errorlines">
+<span class="lineno">  81</span>     compile 'com.noveogroup.android:android-logger:1.3.4'
+<span class="lineno">  82</span>     compile 'com.squareup.dagger:dagger:1.2.1'
+<span class="lineno">  83</span>     provided 'com.squareup.dagger:dagger-compiler:1.2.1'
+<span class="lineno">  84</span>     <span class="errorspan">compile 'com.jakewharton:butterknife:4.0.1'</span>
+<span class="lineno">  85</span>     compile 'com.squareup:otto:1.3.5'
+<span class="lineno">  86</span>     compile 'com.embarkmobile:zxing-android-minimal:2.0.0@aar'
+</pre>
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:85</span>: <span class="message">A newer version of com.squareup:otto than 1.3.5 is available: 1.3.8</span><br /><pre class="errorlines">
+<span class="lineno">  82</span>     compile 'com.squareup.dagger:dagger:1.2.1'
+<span class="lineno">  83</span>     provided 'com.squareup.dagger:dagger-compiler:1.2.1'
+<span class="lineno">  84</span>     compile 'com.jakewharton:butterknife:4.0.1'
+<span class="lineno">  85</span>     <span class="errorspan">compile 'com.squareup:otto:1.3.5'</span>
+<span class="lineno">  86</span>     compile 'com.embarkmobile:zxing-android-minimal:2.0.0@aar'
+<span class="lineno">  87</span>     compile 'com.embarkmobile:zxing-android-legacy:2.0.0@aar'
+</pre>
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:89</span>: <span class="message">A newer version of com.google.zxing:core than 3.1.0 is available: 3.2.1</span><br /><pre class="errorlines">
+<span class="lineno">  86</span>     compile 'com.embarkmobile:zxing-android-minimal:2.0.0@aar'
+<span class="lineno">  87</span>     compile 'com.embarkmobile:zxing-android-legacy:2.0.0@aar'
+<span class="lineno">  88</span>     compile 'com.embarkmobile:zxing-android-integration:2.0.0@aar'
+<span class="lineno">  89</span>     <span class="errorspan">compile 'com.google.zxing:core:3.1.0'</span>
+<span class="lineno">  90</span>     compile 'com.getpebble:pebblekit:2.6.0@aar'
+<span class="lineno">  91</span>     compile 'io.reactivex:rxjava:1.0.0'
+</pre>
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:90</span>: <span class="message">A newer version of com.getpebble:pebblekit than 2.6.0 is available: 3.0.0</span><br /><pre class="errorlines">
+<span class="lineno">  87</span>     compile 'com.embarkmobile:zxing-android-legacy:2.0.0@aar'
+<span class="lineno">  88</span>     compile 'com.embarkmobile:zxing-android-integration:2.0.0@aar'
+<span class="lineno">  89</span>     compile 'com.google.zxing:core:3.1.0'
+<span class="lineno">  90</span>     <span class="errorspan">compile 'com.getpebble:pebblekit:2.6.0@aar'</span>
+<span class="lineno">  91</span>     compile 'io.reactivex:rxjava:1.0.0'
+<span class="lineno">  92</span>     compile 'it.neokree:MaterialNavigationDrawer:1.3.3'
+</pre>
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:91</span>: <span class="message">A newer version of io.reactivex:rxjava than 1.0.0 is available: 1.0.14</span><br /><pre class="errorlines">
+<span class="lineno">  88</span>     compile 'com.embarkmobile:zxing-android-integration:2.0.0@aar'
+<span class="lineno">  89</span>     compile 'com.google.zxing:core:3.1.0'
+<span class="lineno">  90</span>     compile 'com.getpebble:pebblekit:2.6.0@aar'
+<span class="lineno">  91</span>     <span class="errorspan">compile 'io.reactivex:rxjava:1.0.0'</span>
+<span class="lineno">  92</span>     compile 'it.neokree:MaterialNavigationDrawer:1.3.3'
+<span class="lineno">  93</span>     compile 'com.github.satyan:sugar:1.3'
+</pre>
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:93</span>: <span class="message">A newer version of com.github.satyan:sugar than 1.3 is available: 1.4</span><br /><pre class="errorlines">
+<span class="lineno">  90</span>     compile 'com.getpebble:pebblekit:2.6.0@aar'
+<span class="lineno">  91</span>     compile 'io.reactivex:rxjava:1.0.0'
+<span class="lineno">  92</span>     compile 'it.neokree:MaterialNavigationDrawer:1.3.3'
+<span class="lineno">  93</span>     <span class="errorspan">compile 'com.github.satyan:sugar:1.3'</span>
+<span class="lineno">  94</span> 
+<span class="lineno">  95</span>     testCompile 'org.hamcrest:hamcrest-library:1.3'
+</pre>
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:105</span>: <span class="message">A newer version of org.hamcrest:hamcrest-core than 1.1 is available: 1.3</span><br /><pre class="errorlines">
+<span class="lineno"> 102</span>     }
+<span class="lineno"> 103</span> 
+<span class="lineno"> 104</span>     // espresso
+<span class="lineno"> 105</span>     <span class="errorspan">androidTestCompile 'org.hamcrest:hamcrest-core:1.1'</span>
+<span class="lineno"> 106</span>     androidTestCompile 'org.hamcrest:hamcrest-library:1.1'
+<span class="lineno"> 107</span>     androidTestCompile 'org.hamcrest:hamcrest-integration:1.1'
+</pre>
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:106</span>: <span class="message">A newer version of org.hamcrest:hamcrest-library than 1.1 is available: 1.3</span><br /><pre class="errorlines">
+<span class="lineno"> 103</span> 
+<span class="lineno"> 104</span>     // espresso
+<span class="lineno"> 105</span>     androidTestCompile 'org.hamcrest:hamcrest-core:1.1'
+<span class="lineno"> 106</span>     <span class="errorspan">androidTestCompile 'org.hamcrest:hamcrest-library:1.1'</span>
+<span class="lineno"> 107</span>     androidTestCompile 'org.hamcrest:hamcrest-integration:1.1'
+<span class="lineno"> 108</span>     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.1'
+</pre>
+<span class="location"><a href="build.gradle">/Users/trhodes/workspace/android-uploader/app/build.gradle</a>:107</span>: <span class="message">A newer version of org.hamcrest:hamcrest-integration than 1.1 is available: 1.3</span><br /><pre class="errorlines">
+<span class="lineno"> 104</span>     // espresso
+<span class="lineno"> 105</span>     androidTestCompile 'org.hamcrest:hamcrest-core:1.1'
+<span class="lineno"> 106</span>     androidTestCompile 'org.hamcrest:hamcrest-library:1.1'
+<span class="lineno"> 107</span>     <span class="errorspan">androidTestCompile 'org.hamcrest:hamcrest-integration:1.1'</span>
+<span class="lineno"> 108</span>     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.1'
+<span class="lineno"> 109</span>     androidTestCompile 'com.android.support.test:runner:0.2'
+</pre>
+</div>
+</div>
+<div class="metadata">Note: This issue has an associated quickfix operation in Android Studio/IntelliJ&nbsp;<img alt="Fix" border="0" align="top" src="lint-report_files/lint-run.png" />
+<br>
+Priority: 4 / 10<br/>
+Category: Correctness</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Newer Library Versions Available.</div>
+<div class="explanation">
+This detector checks with a central repository to see if there are newer versions available for the dependencies used by this project.<br/>
+This is similar to the <code>GradleDependency</code> check, which checks for newer versions available in the Android SDK tools and libraries, but this works with any MavenCentral dependency, and connects to the library every time, which makes it more flexible but also <b>much</b> slower.
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "NewerVersionAvailable" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+<a name="SpUsage"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">SpUsage: Using <code>dp</code> instead of <code>sp</code> for text sizes</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/res/layout/ledevice_listitem.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/ledevice_listitem.xml</a>:12</span>: <span class="message">Should use "<code>sp</code>" instead of "<code>dp</code>" for text sizes</span><br /><pre class="errorlines">
+<span class="lineno">   9</span>         android:id="@+id/device_name"
+<span class="lineno">  10</span>         android:layout_width="match_parent"
+<span class="lineno">  11</span>         android:layout_height="wrap_content"
+<span class="lineno">  12</span>         <span class="errorspan">android:textSize="24dp" /></span>
+<span class="lineno">  13</span> 
+<span class="lineno">  14</span>     &lt;TextView
+</pre>
+<span class="location"><a href="src/main/res/layout/ledevice_listitem.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/ledevice_listitem.xml</a>:18</span>: <span class="message">Should use "<code>sp</code>" instead of "<code>dp</code>" for text sizes</span><br /><pre class="errorlines">
+<span class="lineno">  15</span>         android:id="@+id/device_address"
+<span class="lineno">  16</span>         android:layout_width="match_parent"
+<span class="lineno">  17</span>         android:layout_height="wrap_content"
+<span class="lineno">  18</span>         <span class="errorspan">android:textSize="12dp" /></span>
+<span class="lineno">  19</span> 
+<span class="lineno">  20</span> &lt;/LinearLayout>
+</pre>
+</div>
+<div class="metadata">Note: This issue has an associated quickfix operation in Android Studio/IntelliJ&nbsp;<img alt="Fix" border="0" align="top" src="lint-report_files/lint-run.png" />
+<br>
+Priority: 3 / 10<br/>
+Category: Correctness</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Using <code>dp</code> instead of <code>sp</code> for text sizes.</div>
+<div class="explanation">
+When setting text sizes, you should normally use <code>sp</code>, or "scale-independent pixels". This is like the <code>dp</code> unit, but it is also scaled by the user's font size preference. It is recommend you use this unit when specifying font sizes, so they will be adjusted for both the screen density and the user's preference.<br/>
+<br/>
+There <b>are</b> cases where you might need to use <code>dp</code>; typically this happens when the text is in a container with a specific dp-size. This will prevent the text from spilling outside the container. Note however that this means that the user's font size settings are not respected, so consider adjusting the layout itself to be more flexible.
+</div>
+<br/><div class="moreinfo">More info: <a href="http://developer.android.com/training/multiscreen/screendensities.html">http://developer.android.com/training/multiscreen/screendensities.html</a>
+</div><br/>To suppress this error, use the issue id "SpUsage" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+
+<a name="Performance"></a>
+<div class="category"><a href="#" title="Return to top">Performance</a><div class="categorySeparator"></div>
+</div>
+<a name="Wakelock"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">Wakelock: Incorrect <code>WakeLock</code> usage</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/java/com/nightscout/android/CollectorService.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/CollectorService.java</a>:212</span>: <span class="message">The <code>release()</code> call is not always reached (via exceptional flow)</span><br /><pre class="errorlines">
+<span class="lineno"> 209</span>                         .setFatal(false)
+<span class="lineno"> 210</span>                         .build());
+<span class="lineno"> 211</span>             }
+<span class="lineno"> 212</span>             wl.<span class="errorspan">release();</span>
+<span class="lineno"> 213</span> 
+<span class="lineno"> 214</span>             if (download != null) {
+</pre>
+</div>
+<div class="metadata">Priority: 9 / 10<br/>
+Category: Performance</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Incorrect <code>WakeLock</code> usage.</div>
+<div class="explanation">
+Failing to release a wakelock properly can keep the Android device in a high power mode, which reduces battery life. There are several causes of this, such as releasing the wake lock in <code>onDestroy()</code> instead of in <code>onPause()</code>, failing to call <code>release()</code> in all possible code paths after an <code>acquire()</code>, and so on.<br/>
+<br/>
+NOTE: If you are using the lock just to keep the screen on, you should strongly consider using <code>FLAG_KEEP_SCREEN_ON</code> instead. This window flag will be correctly managed by the platform as the user moves between applications and doesn't require a special permission. See <a href="http://developer.android.com/reference/android/view/WindowManager.LayoutParams.html#FLAG_KEEP_SCREEN_ON">http://developer.android.com/reference/android/view/WindowManager.LayoutParams.html#FLAG_KEEP_SCREEN_ON</a>.
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "Wakelock" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+<a name="Recycle"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">Recycle: Missing <code>recycle()</code> calls</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/java/com/nightscout/android/events/EventFragment.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/events/EventFragment.java</a>:127</span>: <span class="message">This <code>Cursor</code> should be freed up after use with <code>#close()</code></span><br /><pre class="errorlines">
+<span class="lineno"> 124</span>                 null : new String[]{String.valueOf(type.ordinal())};
+<span class="lineno"> 125</span>         String selection = (type == EventType.ALL) ?
+<span class="lineno"> 126</span>                 null : String.format("%s=?", EventsContract.EventEntry.COLUMN_NAME_EVENT_TYPE);
+<span class="lineno"> 127</span>         Cursor cursor = db.<span class="errorspan">query(</span>
+<span class="lineno"> 128</span>                 EventsContract.EventEntry.TABLE_NAME,
+<span class="lineno"> 129</span>                 projection,
+</pre>
+</div>
+<div class="metadata">Priority: 7 / 10<br/>
+Category: Performance</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Missing <code>recycle()</code> calls.</div>
+<div class="explanation">
+Many resources, such as TypedArrays, VelocityTrackers, etc., should be recycled (with a <code>recycle()</code> call) after use. This lint check looks for missing <code>recycle()</code> calls.
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "Recycle" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+<a name="LogConditional"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">LogConditional: Unconditional Logging Calls</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/java/com/nightscout/android/events/AndroidEventReporter.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/events/AndroidEventReporter.java</a>:33</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno">  30</span>     }
+<span class="lineno">  31</span> 
+<span class="lineno">  32</span>     public synchronized void report(EventType type, EventSeverity severity, String message) {
+<span class="lineno">  33</span>         <span class="errorspan">Log.d("AndroidEventReporter", type.name() + " " + severity.name() + " " + message);</span>
+<span class="lineno">  34</span>         ContentValues values = new ContentValues();
+<span class="lineno">  35</span>         values.put(EventsContract.EventEntry.COLUMN_NAME_TIME_STAMP, new Date().getTime());
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:228</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 225</span>         bytes[1] = MESSAGE_COUNT;
+<span class="lineno"> 226</span>         System.arraycopy(src, 0, bytes, 2, src.length);
+<span class="lineno"> 227</span> 
+<span class="lineno"> 228</span>         <span class="errorspan">Log.d(TAG, "Writing: " + Utils.bytesToHex(bytes));</span>
+<span class="lineno"> 229</span>         mSendDataCharacteristic.setValue(bytes);
+<span class="lineno"> 230</span> 
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:258</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 255</span>             Log.d(TAG, "Timeout occurred while reading");
+<span class="lineno"> 256</span>             throw new IOException("Timeout while reading from bluetooth address " + device.getAddress());
+<span class="lineno"> 257</span>         }
+<span class="lineno"> 258</span>         <span class="errorspan">Log.d(TAG, "From asyncReader observable: " + Utils.bytesToHex(asyncReader.getResponse()));</span>
+<span class="lineno"> 259</span>         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+<span class="lineno"> 260</span>             requestConnectionPriority();
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:316</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 313</span>                     Log.d(TAG, "Bluetooth device of interest can not be found.");
+<span class="lineno"> 314</span>                 }
+<span class="lineno"> 315</span>             }
+<span class="lineno"> 316</span>         <span class="errorspan">Log.d(TAG, "Connection state: " + mConnectionState);</span>
+<span class="lineno"> 317</span>     }
+<span class="lineno"> 318</span> 
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:321</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 318</span> 
+<span class="lineno"> 319</span>     public boolean connect(final String address) {
+<span class="lineno"> 320</span> 
+<span class="lineno"> 321</span>         <span class="errorspan">Log.d(TAG, "Attempting to connect with device with address: " + address);</span>
+<span class="lineno"> 322</span> 
+<span class="lineno"> 323</span>         if (mBluetoothAdapter == null || address == null) {
+</pre>
+<button id="LogConditionalDivLink" onclick="reveal('LogConditionalDiv');" />+ 28 More Occurrences...</button>
+<div id="LogConditionalDiv" style="display: none">
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:362</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 359</span>     private byte[] getHandshakeKey() {
+<span class="lineno"> 360</span>         AndroidPreferences prefs = new AndroidPreferences(mContext);
+<span class="lineno"> 361</span>         String receiverSn = prefs.getShareSerial().toUpperCase() + "000000";
+<span class="lineno"> 362</span>         <span class="errorspan">Log.d(TAG, "Receiver serial: " + receiverSn + "(" + Utils.bytesToHex(receiverSn.getBytes(StandardCharsets.US_ASCII)) + ")");</span>
+<span class="lineno"> 363</span> 
+<span class="lineno"> 364</span>         if (receiverSn.compareTo("SM00000000000000") == 0 || receiverSn.equals("")) {
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:383</span>: <span class="message">The log call Log.i(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 380</span>             if (mBluetoothGatt == null || !device.getAddress().equals(mBluetoothGatt.getDevice().getAddress()))
+<span class="lineno"> 381</span>                 return;
+<span class="lineno"> 382</span> 
+<span class="lineno"> 383</span>             <span class="errorspan">Log.i(TAG, "Bond state changed for: " + device.getName() + " new state: " + bondState + " previous: " + previousBondState);</span>
+<span class="lineno"> 384</span> 
+<span class="lineno"> 385</span>             switch (bondState) {
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:469</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 466</span> 
+<span class="lineno"> 467</span>         @Override
+<span class="lineno"> 468</span>         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+<span class="lineno"> 469</span>             <span class="errorspan">Log.d(TAG, "Services discovered with status: " + status);</span>
+<span class="lineno"> 470</span>             if (status == BluetoothGatt.GATT_SUCCESS) {
+<span class="lineno"> 471</span>                 mShareService = mBluetoothGatt.getService(DexShareAttributes.CradleService2);
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:529</span>: <span class="message">The log call Log.v(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 526</span> 
+<span class="lineno"> 527</span>         @Override
+<span class="lineno"> 528</span>         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+<span class="lineno"> 529</span>             <span class="errorspan">Log.v(TAG, "Characteristic changed (" + characteristic.getUuid().toString() + ")");</span>
+<span class="lineno"> 530</span>             UUID charUuid = characteristic.getUuid();
+<span class="lineno"> 531</span>             if (charUuid.compareTo(mReceiveDataCharacteristic.getUuid()) == 0) {
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:545</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 542</span> 
+<span class="lineno"> 543</span>         @Override
+<span class="lineno"> 544</span>         public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
+<span class="lineno"> 545</span>             <span class="errorspan">Log.d(TAG, "RSSI: " + rssi + " Status: " + status);</span>
+<span class="lineno"> 546</span>             super.onReadRemoteRssi(gatt, rssi, status);
+<span class="lineno"> 547</span>         }
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:580</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 577</span> 
+<span class="lineno"> 578</span>         @Override
+<span class="lineno"> 579</span>         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+<span class="lineno"> 580</span>             <span class="errorspan">Log.d(TAG, "characteristic wrote " + status);</span>
+<span class="lineno"> 581</span>             Log.w(TAG, "Errors: " + writeStatusConnectionFailures(status));
+<span class="lineno"> 582</span> 
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:706</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 703</span> 
+<span class="lineno"> 704</span>     @TargetApi(Build.VERSION_CODES.KITKAT)
+<span class="lineno"> 705</span>     public void delayedReconnect(long millis) {
+<span class="lineno"> 706</span>         <span class="errorspan">Log.d(TAG, "Setting reconnecting in " + millis + " ms from now.");</span>
+<span class="lineno"> 707</span>         Intent reconnectIntent = new Intent(RECONNECT_INTENT);
+<span class="lineno"> 708</span>         reconnectPendingIntent = PendingIntent.getBroadcast(mContext.getApplicationContext(), 1, reconnectIntent, 0);
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:918</span>: <span class="message">The log call Log.v(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 915</span> 
+<span class="lineno"> 916</span>         switch (request.type) {
+<span class="lineno"> 917</span>             case READ: {
+<span class="lineno"> 918</span>                 <span class="errorspan">Log.v(TAG, "Reading characteristic (from queued commands) " + request.characteristic.getUuid().toString());</span>
+<span class="lineno"> 919</span>                 readCharacteristic(request.characteristic);
+<span class="lineno"> 920</span>                 break;
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:927</span>: <span class="message">The log call Log.v(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 924</span>                     Log.e(TAG, "Characteristic is null");
+<span class="lineno"> 925</span>                 }
+<span class="lineno"> 926</span> 
+<span class="lineno"> 927</span>                 <span class="errorspan">Log.v(TAG, "Writing characteristic (from queued commands) " + request.characteristic.getUuid().toString() + " " + new String(request.value));</span>
+<span class="lineno"> 928</span>                 final BluetoothGattCharacteristic characteristic = request.characteristic;
+<span class="lineno"> 929</span>                 characteristic.setValue(request.value);
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:934</span>: <span class="message">The log call Log.v(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 931</span>                 break;
+<span class="lineno"> 932</span>             }
+<span class="lineno"> 933</span>             case ENABLE_NOTIFICATIONS: {
+<span class="lineno"> 934</span>                 <span class="errorspan">Log.v(TAG, "Enabling notifications on characteristic (from queued commands) " + request.characteristic.getUuid().toString());</span>
+<span class="lineno"> 935</span>                 Log.v(TAG, "Notification status: " + enableNotifications(request.characteristic));
+<span class="lineno"> 936</span>                 break;
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:935</span>: <span class="message">The log call Log.v(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 932</span>             }
+<span class="lineno"> 933</span>             case ENABLE_NOTIFICATIONS: {
+<span class="lineno"> 934</span>                 Log.v(TAG, "Enabling notifications on characteristic (from queued commands) " + request.characteristic.getUuid().toString());
+<span class="lineno"> 935</span>                 <span class="errorspan">Log.v(TAG, "Notification status: " + enableNotifications(request.characteristic));</span>
+<span class="lineno"> 936</span>                 break;
+<span class="lineno"> 937</span>             }
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:939</span>: <span class="message">The log call Log.v(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 936</span>                 break;
+<span class="lineno"> 937</span>             }
+<span class="lineno"> 938</span>             case ENABLE_INDICATIONS: {
+<span class="lineno"> 939</span>                 <span class="errorspan">Log.v(TAG, "Enabling indications on characteristic (from queued commands) " + request.characteristic.getUuid().toString());</span>
+<span class="lineno"> 940</span>                 Log.v(TAG, "Indication status: " + enableIndications(request.characteristic));
+<span class="lineno"> 941</span>                 break;
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:940</span>: <span class="message">The log call Log.v(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 937</span>             }
+<span class="lineno"> 938</span>             case ENABLE_INDICATIONS: {
+<span class="lineno"> 939</span>                 Log.v(TAG, "Enabling indications on characteristic (from queued commands) " + request.characteristic.getUuid().toString());
+<span class="lineno"> 940</span>                 <span class="errorspan">Log.v(TAG, "Indication status: " + enableIndications(request.characteristic));</span>
+<span class="lineno"> 941</span>                 break;
+<span class="lineno"> 942</span>             }
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:956</span>: <span class="message">The log call Log.v(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 953</span>         if ((properties &amp; BluetoothGattCharacteristic.PROPERTY_READ) == 0)
+<span class="lineno"> 954</span>             return false;
+<span class="lineno"> 955</span> 
+<span class="lineno"> 956</span>         <span class="errorspan">Log.v(TAG, "Reading characteristic " + characteristic.getUuid());</span>
+<span class="lineno"> 957</span>         Log.d(TAG, "gatt.readCharacteristic(" + characteristic.getUuid() + ")");
+<span class="lineno"> 958</span>         return gatt.readCharacteristic(characteristic);
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:957</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 954</span>             return false;
+<span class="lineno"> 955</span> 
+<span class="lineno"> 956</span>         Log.v(TAG, "Reading characteristic " + characteristic.getUuid());
+<span class="lineno"> 957</span>         <span class="errorspan">Log.d(TAG, "gatt.readCharacteristic(" + characteristic.getUuid() + ")");</span>
+<span class="lineno"> 958</span>         return gatt.readCharacteristic(characteristic);
+<span class="lineno"> 959</span>     }
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:971</span>: <span class="message">The log call Log.v(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 968</span>         if ((properties &amp; (BluetoothGattCharacteristic.PROPERTY_WRITE | BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)) == 0)
+<span class="lineno"> 969</span>             return false;
+<span class="lineno"> 970</span> 
+<span class="lineno"> 971</span>         <span class="errorspan">Log.v(TAG, "Writing characteristic " + characteristic.getUuid());</span>
+<span class="lineno"> 972</span>         Log.d(TAG, "gatt.writeCharacteristic(" + characteristic.getUuid() + ")");
+<span class="lineno"> 973</span>         return gatt.writeCharacteristic(characteristic);
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:972</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 969</span>             return false;
+<span class="lineno"> 970</span> 
+<span class="lineno"> 971</span>         Log.v(TAG, "Writing characteristic " + characteristic.getUuid());
+<span class="lineno"> 972</span>         <span class="errorspan">Log.d(TAG, "gatt.writeCharacteristic(" + characteristic.getUuid() + ")");</span>
+<span class="lineno"> 973</span>         return gatt.writeCharacteristic(characteristic);
+<span class="lineno"> 974</span>     }
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/USB/CdcAcmSerialDriver.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/USB/CdcAcmSerialDriver.java</a>:87</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno">  84</span>         if (mPowerManagementEnabled) {
+<span class="lineno">  85</span>             USBPower.powerOn();
+<span class="lineno">  86</span>         }
+<span class="lineno">  87</span>         <span class="errorspan">Log.d(TAG, "claiming interfaces, count=" + mDevice.getInterfaceCount());</span>
+<span class="lineno">  88</span> 
+<span class="lineno">  89</span>         mControlInterface = mDevice.getInterface(0);
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/USB/CdcAcmSerialDriver.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/USB/CdcAcmSerialDriver.java</a>:90</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno">  87</span>         Log.d(TAG, "claiming interfaces, count=" + mDevice.getInterfaceCount());
+<span class="lineno">  88</span> 
+<span class="lineno">  89</span>         mControlInterface = mDevice.getInterface(0);
+<span class="lineno">  90</span>         <span class="errorspan">Log.d(TAG, "Control iface=" + mControlInterface);</span>
+<span class="lineno">  91</span>         // class should be USB_CLASS_COMM
+<span class="lineno">  92</span> 
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/USB/CdcAcmSerialDriver.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/USB/CdcAcmSerialDriver.java</a>:98</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno">  95</span>             throw new IOException("Could not claim control interface.");
+<span class="lineno">  96</span>         }
+<span class="lineno">  97</span>         mControlEndpoint = mControlInterface.getEndpoint(0);
+<span class="lineno">  98</span>         <span class="errorspan">Log.d(TAG, "Control endpoint direction: " + mControlEndpoint.getDirection());</span>
+<span class="lineno">  99</span> 
+<span class="lineno"> 100</span>         mDataInterface = mDevice.getInterface(1);
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/USB/CdcAcmSerialDriver.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/USB/CdcAcmSerialDriver.java</a>:101</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno">  98</span>         Log.d(TAG, "Control endpoint direction: " + mControlEndpoint.getDirection());
+<span class="lineno">  99</span> 
+<span class="lineno"> 100</span>         mDataInterface = mDevice.getInterface(1);
+<span class="lineno"> 101</span>         <span class="errorspan">Log.d(TAG, "data iface=" + mDataInterface);</span>
+<span class="lineno"> 102</span>         // class should be USB_CLASS_CDC_DATA
+<span class="lineno"> 103</span> 
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/USB/CdcAcmSerialDriver.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/USB/CdcAcmSerialDriver.java</a>:109</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 106</span>             throw new IOException("Could not claim data interface.");
+<span class="lineno"> 107</span>         }
+<span class="lineno"> 108</span>         mReadEndpoint = mDataInterface.getEndpoint(1);
+<span class="lineno"> 109</span>         <span class="errorspan">Log.d(TAG, "Read endpoint direction: " + mReadEndpoint.getDirection());</span>
+<span class="lineno"> 110</span>         mWriteEndpoint = mDataInterface.getEndpoint(0);
+<span class="lineno"> 111</span>         Log.d(TAG, "Write endpoint direction: " + mWriteEndpoint.getDirection());
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/USB/CdcAcmSerialDriver.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/USB/CdcAcmSerialDriver.java</a>:111</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 108</span>         mReadEndpoint = mDataInterface.getEndpoint(1);
+<span class="lineno"> 109</span>         Log.d(TAG, "Read endpoint direction: " + mReadEndpoint.getDirection());
+<span class="lineno"> 110</span>         mWriteEndpoint = mDataInterface.getEndpoint(0);
+<span class="lineno"> 111</span>         <span class="errorspan">Log.d(TAG, "Write endpoint direction: " + mWriteEndpoint.getDirection());</span>
+<span class="lineno"> 112</span>         setConnectionState(DeviceConnectionState.CONNECTED);
+<span class="lineno"> 113</span>     }
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/drivers/USB/CdcAcmSerialDriver.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/USB/CdcAcmSerialDriver.java</a>:206</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 203</span>                         + " bytes at offset " + offset + " length=" + src.length);
+<span class="lineno"> 204</span>             }
+<span class="lineno"> 205</span> 
+<span class="lineno"> 206</span>             <span class="errorspan">Log.d(TAG, "Wrote amt=" + amtWritten + " attempted=" + writeLength);</span>
+<span class="lineno"> 207</span>             offset += amtWritten;
+<span class="lineno"> 208</span>         }
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/events/EventFragment.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/events/EventFragment.java</a>:172</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno"> 169</span>     }
+<span class="lineno"> 170</span> 
+<span class="lineno"> 171</span>     public synchronized void clear(EventType type) {
+<span class="lineno"> 172</span>         <span class="errorspan">Log.d("AndroidEventReporter", "Clearing logs for: " + type.name());</span>
+<span class="lineno"> 173</span>         EventsDbHelper dbHelper = EventsDbHelper.getHelper(getActivity().getApplicationContext());
+<span class="lineno"> 174</span>         SQLiteDatabase db = dbHelper.getReadableDatabase();
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/wearables/Pebble.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/wearables/Pebble.java</a>:46</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno">  43</span>     private PebbleKit.PebbleDataReceiver dataReceiver = new PebbleKit.PebbleDataReceiver(PEBBLEAPP_UUID) {
+<span class="lineno">  44</span>         @Override
+<span class="lineno">  45</span>         public void receiveData(final Context mContext, final int transactionId, final PebbleDictionary data) {
+<span class="lineno">  46</span>             <span class="errorspan">Log.d(TAG, "Received query. data: " + data.size());</span>
+<span class="lineno">  47</span>             PebbleKit.sendAckToPebble(mContext, transactionId);
+<span class="lineno">  48</span>             sendDownload(currentReading);
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/preferences/PreferencesValidator.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/preferences/PreferencesValidator.java</a>:74</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno">  71</span>         if (Strings.isNullOrEmpty(serialNum)) {
+<span class="lineno">  72</span>             return Optional.of(context.getString(R.string.invalid_share2_serial, serialNum));
+<span class="lineno">  73</span>         }
+<span class="lineno">  74</span>         <span class="errorspan">Log.d("XXX", "Serial Number: " + serialNum.toUpperCase());</span>
+<span class="lineno">  75</span>         if (!serialNum.toUpperCase().startsWith("SM") || (serialNum.length() &lt; 10)) {
+<span class="lineno">  76</span>             return Optional.of(context.getString(R.string.invalid_share2_serial, serialNum));
+</pre>
+<span class="location"><a href="src/main/java/com/nightscout/android/settings/SettingsActivity.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/settings/SettingsActivity.java</a>:69</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno">  66</span>     @Override
+<span class="lineno">  67</span>     public boolean onOptionsItemSelected(MenuItem item) {
+<span class="lineno">  68</span>         int id = item.getItemId();
+<span class="lineno">  69</span>         <span class="errorspan">Log.d(TAG, "Option selected: " + item.getTitle());</span>
+<span class="lineno">  70</span>         if (id == R.id.home) {
+<span class="lineno">  71</span>             NavUtils.navigateUpFromSameTask(this);
+</pre>
+</div>
+</div>
+<div class="metadata">Priority: 5 / 10<br/>
+Category: Performance</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Unconditional Logging Calls.</div>
+<div class="explanation">
+The BuildConfig class (available in Tools 17) provides a constant, "DEBUG", which indicates whether the code is being built in release mode or in debug mode. In release mode, you typically want to strip out all the logging calls. Since the compiler will automatically remove all code which is inside a "if (false)" check, surrounding your logging calls with a check for BuildConfig.DEBUG is a good idea.<br/>
+<br/>
+If you <b>really</b> intend for the logging to be present in release mode, you can suppress this warning with a @SuppressLint annotation for the intentional logging calls.
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "LogConditional" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+<a name="UnusedResources"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">UnusedResources: Unused resources</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/res/layout/activity_main.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/activity_main.xml</a></span>: <span class="message">The resource <code>R.layout.activity_main</code> appears to be unused</span><br />
+<span class="location"><a href="src/main/res/xml/app_tracker.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/xml/app_tracker.xml</a>:4</span>: <span class="message">The resource <code>R.integer.ga_sessionTimeout</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">   1</span> &lt;?xml version="1.0" encoding="utf-8"?>
+<span class="lineno">   2</span> &lt;resources>
+<span class="lineno">   3</span> 
+<span class="lineno">   4</span>     &lt;integer <span class="errorspan">name="ga_sessionTimeout">300&lt;/integer></span>
+<span class="lineno">   5</span> 
+<span class="lineno">   6</span>     &lt;!-- Enable automatic Activity measurement -->
+</pre>
+<span class="location"><a href="src/main/res/xml/app_tracker.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/xml/app_tracker.xml</a>:7</span>: <span class="message">The resource <code>R.bool.ga_autoActivityTracking</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">   4</span>     &lt;integer name="ga_sessionTimeout">300&lt;/integer>
+<span class="lineno">   5</span> 
+<span class="lineno">   6</span>     &lt;!-- Enable automatic Activity measurement -->
+<span class="lineno">   7</span>     &lt;bool <span class="errorspan">name="ga_autoActivityTracking">true&lt;/bool></span>
+<span class="lineno">   8</span> 
+<span class="lineno">   9</span>     &lt;bool name="ga_reportUncaughtExceptions">false&lt;/bool>
+</pre>
+<span class="location"><a href="src/main/res/xml/app_tracker.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/xml/app_tracker.xml</a>:9</span>: <span class="message">The resource <code>R.bool.ga_reportUncaughtExceptions</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">   6</span>     &lt;!-- Enable automatic Activity measurement -->
+<span class="lineno">   7</span>     &lt;bool name="ga_autoActivityTracking">true&lt;/bool>
+<span class="lineno">   8</span> 
+<span class="lineno">   9</span>     &lt;bool <span class="errorspan">name="ga_reportUncaughtExceptions">false&lt;/bool></span>
+<span class="lineno">  10</span> 
+<span class="lineno">  11</span>     &lt;!-- The screen names that will appear in reports -->
+</pre>
+<span class="location"><a href="src/main/res/xml/app_tracker.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/xml/app_tracker.xml</a>:12</span>: <span class="message">The resource <code>R.screenName.com_nightscout_android_MainActivity</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">   9</span>     &lt;bool name="ga_reportUncaughtExceptions">false&lt;/bool>
+<span class="lineno">  10</span> 
+<span class="lineno">  11</span>     &lt;!-- The screen names that will appear in reports -->
+<span class="lineno">  12</span>     &lt;screenName <span class="errorspan">name="com.nightscout.android.MainActivity">Main screen&lt;/screenName></span>
+<span class="lineno">  13</span> 
+<span class="lineno">  14</span>     &lt;!--  The following value should be replaced with correct property id. -->
+</pre>
+<button id="UnusedResourcesDivLink" onclick="reveal('UnusedResourcesDiv');" />+ 45 More Occurrences...</button>
+<div id="UnusedResourcesDiv" style="display: none">
+<span class="location"><a href="src/main/res/xml/app_tracker.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/xml/app_tracker.xml</a>:15</span>: <span class="message">The resource <code>R.string.ga_trackingId</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  12</span>     &lt;screenName name="com.nightscout.android.MainActivity">Main screen&lt;/screenName>
+<span class="lineno">  13</span> 
+<span class="lineno">  14</span>     &lt;!--  The following value should be replaced with correct property id. -->
+<span class="lineno">  15</span>     &lt;string <span class="errorspan">name="ga_trackingId">UA-54765135-1&lt;/string></span>
+<span class="lineno">  16</span> &lt;/resources>
+<span class="lineno">  17</span> 
+</pre>
+<span class="location"><a href="src/main/res/values/colors.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/colors.xml</a>:4</span>: <span class="message">The resource <code>R.color.red</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">   1</span> &lt;?xml version="1.0" encoding="utf-8"?>
+<span class="lineno">   2</span> &lt;resources>
+<span class="lineno">   3</span>     &lt;color name="black">#FF000000&lt;/color>
+<span class="lineno">   4</span>     &lt;color <span class="errorspan">name="red">#FFFF0000&lt;/color></span>
+<span class="lineno">   5</span>     &lt;color name="white">#FFFFFFFF&lt;/color>
+<span class="lineno">   6</span>     &lt;color name="cyan">#ff006578&lt;/color>
+</pre>
+<span class="location"><a href="src/main/res/layout/debug_activity_frame.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/debug_activity_frame.xml</a></span>: <span class="message">The resource <code>R.layout.debug_activity_frame</code> appears to be unused</span><br />
+
+Applies to variants: release<br/>
+Does <b>not</b> apply to variants: debug<br/>
+<span class="location"><a href="src/main/res/layout/debug_drawer_content.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/debug_drawer_content.xml</a></span>: <span class="message">The resource <code>R.layout.debug_drawer_content</code> appears to be unused</span><br />
+
+Applies to variants: release<br/>
+Does <b>not</b> apply to variants: debug<br/>
+<span class="location"><a href="src/main/res/values/integers.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/integers.xml</a>:3</span>: <span class="message">The resource <code>R.integer.http_socket_timeout</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">   1</span> &lt;?xml version="1.0" encoding="utf-8"?>
+<span class="lineno">   2</span> &lt;resources>
+<span class="lineno">   3</span>     &lt;integer <span class="errorspan">name="http_socket_timeout">60000&lt;/integer></span>
+<span class="lineno">   4</span>     &lt;integer name="http_connection_timeout">30000&lt;/integer>
+<span class="lineno">   5</span> &lt;/resources>
+</pre>
+<span class="location"><a href="src/main/res/values/integers.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/integers.xml</a>:4</span>: <span class="message">The resource <code>R.integer.http_connection_timeout</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">   1</span> &lt;?xml version="1.0" encoding="utf-8"?>
+<span class="lineno">   2</span> &lt;resources>
+<span class="lineno">   3</span>     &lt;integer name="http_socket_timeout">60000&lt;/integer>
+<span class="lineno">   4</span>     &lt;integer <span class="errorspan">name="http_connection_timeout">30000&lt;/integer></span>
+<span class="lineno">   5</span> &lt;/resources>
+
+</pre>
+<span class="location"><a href="src/main/res/menu/menu.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/menu/menu.xml</a></span>: <span class="message">The resource <code>R.menu.menu</code> appears to be unused</span><br />
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:5</span>: <span class="message">The resource <code>R.string.action_settings</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">   2</span> &lt;resources>
+<span class="lineno">   3</span>     &lt;string name="title_activity_main">Nightscout&lt;/string>
+<span class="lineno">   4</span> 
+<span class="lineno">   5</span>     &lt;string <span class="errorspan">name="action_settings">Settings&lt;/string></span>
+<span class="lineno">   6</span> 
+<span class="lineno">   7</span>     &lt;string name="unknown_values">---&lt;/string>
+</pre>
+<ul></ul><button id="Location13DivLink" onclick="reveal('Location13Div');" />+ 1 Additional Locations...</button>
+<div id="Location13Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:5</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:14</span>: <span class="message">The resource <code>R.string.feedback_toast_text</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  11</span>     &lt;string name="feebback_dialog_text">Report an issue&lt;/string>
+<span class="lineno">  12</span>     &lt;string name="feedback_dialog_comment_prompt">Please include brief description of the issue you encountered&lt;/string>
+<span class="lineno">  13</span>     &lt;string name="feedback_dialog_ok_toast">Thank you!&lt;/string>
+<span class="lineno">  14</span>     &lt;string <span class="errorspan">name="feedback_toast_text" /></span>
+<span class="lineno">  15</span>     &lt;string name="message_user_not_understand">Reading from device is disabled until you review and accept &amp;#8220;I understand&amp;#8221; in preferences&lt;/string>
+<span class="lineno">  16</span>     &lt;string name="acra_enabled_summary">Crash reporting is enabled&lt;/string>
+</pre>
+<ul></ul><button id="Location14DivLink" onclick="reveal('Location14Div');" />+ 1 Additional Locations...</button>
+<div id="Location14Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:14</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:15</span>: <span class="message">The resource <code>R.string.message_user_not_understand</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  12</span>     &lt;string name="feedback_dialog_comment_prompt">Please include brief description of the issue you encountered&lt;/string>
+<span class="lineno">  13</span>     &lt;string name="feedback_dialog_ok_toast">Thank you!&lt;/string>
+<span class="lineno">  14</span>     &lt;string name="feedback_toast_text" />
+<span class="lineno">  15</span>     &lt;string <span class="errorspan">name="message_user_not_understand">Reading from device is disabled until you review and accept &amp;#8220;I understand&amp;#8221; in preferences&lt;/string></span>
+<span class="lineno">  16</span>     &lt;string name="acra_enabled_summary">Crash reporting is enabled&lt;/string>
+<span class="lineno">  17</span>     &lt;string name="acra_disabled_summary">Crash reporting is disabled&lt;/string>
+</pre>
+<ul></ul><button id="Location15DivLink" onclick="reveal('Location15Div');" />+ 1 Additional Locations...</button>
+<div id="Location15Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:15</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:27</span>: <span class="message">The resource <code>R.string.USBLabelText</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  24</span>     &lt;string name="feedback_menu_text">Report an issue&lt;/string>
+<span class="lineno">  25</span>     &lt;string name="gap_sync_menu_text">Gap sync&lt;/string>
+<span class="lineno">  26</span>     &lt;string name="preferences_menu_text">Preferences&lt;/string>
+<span class="lineno">  27</span>     &lt;string <span class="errorspan">name="USBLabelText">USB&lt;/string></span>
+<span class="lineno">  28</span>     &lt;string name="UploadLabelText">Upload&lt;/string>
+<span class="lineno">  29</span>     &lt;string name="DexBatteryLabelText">Dex Battery&lt;/string>
+</pre>
+<ul></ul><button id="Location16DivLink" onclick="reveal('Location16Div');" />+ 1 Additional Locations...</button>
+<div id="Location16Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:28</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:28</span>: <span class="message">The resource <code>R.string.UploadLabelText</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  25</span>     &lt;string name="gap_sync_menu_text">Gap sync&lt;/string>
+<span class="lineno">  26</span>     &lt;string name="preferences_menu_text">Preferences&lt;/string>
+<span class="lineno">  27</span>     &lt;string name="USBLabelText">USB&lt;/string>
+<span class="lineno">  28</span>     &lt;string <span class="errorspan">name="UploadLabelText">Upload&lt;/string></span>
+<span class="lineno">  29</span>     &lt;string name="DexBatteryLabelText">Dex Battery&lt;/string>
+<span class="lineno">  30</span>     &lt;string name="TimeSyncLabelText">Time&lt;/string>
+</pre>
+<ul></ul><button id="Location17DivLink" onclick="reveal('Location17Div');" />+ 1 Additional Locations...</button>
+<div id="Location17Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:29</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:29</span>: <span class="message">The resource <code>R.string.DexBatteryLabelText</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  26</span>     &lt;string name="preferences_menu_text">Preferences&lt;/string>
+<span class="lineno">  27</span>     &lt;string name="USBLabelText">USB&lt;/string>
+<span class="lineno">  28</span>     &lt;string name="UploadLabelText">Upload&lt;/string>
+<span class="lineno">  29</span>     &lt;string <span class="errorspan">name="DexBatteryLabelText">Dex Battery&lt;/string></span>
+<span class="lineno">  30</span>     &lt;string name="TimeSyncLabelText">Time&lt;/string>
+<span class="lineno">  31</span>     &lt;string name="unknown_mongo_host">Error resolving Mongo host. Double check mongo url.&lt;/string>
+</pre>
+<ul></ul><button id="Location18DivLink" onclick="reveal('Location18Div');" />+ 1 Additional Locations...</button>
+<div id="Location18Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:60</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:30</span>: <span class="message">The resource <code>R.string.TimeSyncLabelText</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  27</span>     &lt;string name="USBLabelText">USB&lt;/string>
+<span class="lineno">  28</span>     &lt;string name="UploadLabelText">Upload&lt;/string>
+<span class="lineno">  29</span>     &lt;string name="DexBatteryLabelText">Dex Battery&lt;/string>
+<span class="lineno">  30</span>     &lt;string <span class="errorspan">name="TimeSyncLabelText">Time&lt;/string></span>
+<span class="lineno">  31</span>     &lt;string name="unknown_mongo_host">Error resolving Mongo host. Double check mongo url.&lt;/string>
+<span class="lineno">  32</span>     &lt;string name="illegal_rest_url">Could not create API uploader. Check your settings.&lt;/string>
+</pre>
+<ul></ul><button id="Location19DivLink" onclick="reveal('Location19Div');" />+ 1 Additional Locations...</button>
+<div id="Location19Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:61</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:34</span>: <span class="message">The resource <code>R.string.donate_dialog_title</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  31</span>     &lt;string name="unknown_mongo_host">Error resolving Mongo host. Double check mongo url.&lt;/string>
+<span class="lineno">  32</span>     &lt;string name="illegal_rest_url">Could not create API uploader. Check your settings.&lt;/string>
+<span class="lineno">  33</span> 
+<span class="lineno">  34</span>     &lt;string <span class="errorspan">name="donate_dialog_title">Donate data?&lt;/string></span>
+<span class="lineno">  35</span>     &lt;string name="donate_dialog_summary">Will you anonymously donate your CGM data for research in order to speed up diabetes innovation?&lt;/string>
+<span class="lineno">  36</span>     &lt;string name="donate_dialog_yes">Yes&lt;/string>
+</pre>
+<ul></ul><button id="Location20DivLink" onclick="reveal('Location20Div');" />+ 1 Additional Locations...</button>
+<div id="Location20Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:31</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:35</span>: <span class="message">The resource <code>R.string.donate_dialog_summary</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  32</span>     &lt;string name="illegal_rest_url">Could not create API uploader. Check your settings.&lt;/string>
+<span class="lineno">  33</span> 
+<span class="lineno">  34</span>     &lt;string name="donate_dialog_title">Donate data?&lt;/string>
+<span class="lineno">  35</span>     &lt;string <span class="errorspan">name="donate_dialog_summary">Will you anonymously donate your CGM data for research in order to speed up diabetes innovation?&lt;/string></span>
+<span class="lineno">  36</span>     &lt;string name="donate_dialog_yes">Yes&lt;/string>
+<span class="lineno">  37</span>     &lt;string name="donate_dialog_no">No&lt;/string>
+</pre>
+<ul></ul><button id="Location21DivLink" onclick="reveal('Location21Div');" />+ 1 Additional Locations...</button>
+<div id="Location21Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:32</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:36</span>: <span class="message">The resource <code>R.string.donate_dialog_yes</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  33</span> 
+<span class="lineno">  34</span>     &lt;string name="donate_dialog_title">Donate data?&lt;/string>
+<span class="lineno">  35</span>     &lt;string name="donate_dialog_summary">Will you anonymously donate your CGM data for research in order to speed up diabetes innovation?&lt;/string>
+<span class="lineno">  36</span>     &lt;string <span class="errorspan">name="donate_dialog_yes">Yes&lt;/string></span>
+<span class="lineno">  37</span>     &lt;string name="donate_dialog_no">No&lt;/string>
+<span class="lineno">  38</span> 
+</pre>
+<ul></ul><button id="Location22DivLink" onclick="reveal('Location22Div');" />+ 1 Additional Locations...</button>
+<div id="Location22Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:33</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:37</span>: <span class="message">The resource <code>R.string.donate_dialog_no</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  34</span>     &lt;string name="donate_dialog_title">Donate data?&lt;/string>
+<span class="lineno">  35</span>     &lt;string name="donate_dialog_summary">Will you anonymously donate your CGM data for research in order to speed up diabetes innovation?&lt;/string>
+<span class="lineno">  36</span>     &lt;string name="donate_dialog_yes">Yes&lt;/string>
+<span class="lineno">  37</span>     &lt;string <span class="errorspan">name="donate_dialog_no">No&lt;/string></span>
+<span class="lineno">  38</span> 
+<span class="lineno">  39</span>     &lt;string name="auto_configure_title">Auto configure&lt;/string>
+</pre>
+<ul></ul><button id="Location23DivLink" onclick="reveal('Location23Div');" />+ 1 Additional Locations...</button>
+<div id="Location23Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:34</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:61</span>: <span class="message">The resource <code>R.string.unknown_rest_host</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  58</span> 
+<span class="lineno">  59</span>     &lt;string name="TimeChangeDetected">Time change detected&lt;/string>
+<span class="lineno">  60</span>     &lt;string name="illegal_mongo_uri">Mongo uri has invalid syntax. Please double check.&lt;/string>
+<span class="lineno">  61</span>     &lt;string <span class="errorspan">name="unknown_rest_host">Cannot connect to %s, please check that you are connected to the internet, and that the url is correct.&lt;/string></span>
+<span class="lineno">  62</span>     &lt;string name="invalid_rest_uri">Invalid rest url %s, please double check formatting. URLs should be percent encoded&lt;/string>
+<span class="lineno">  63</span>     &lt;string name="invalid_mqtt_endpoint">Invalid mqtt url %s, please double check formatting.&lt;/string>
+</pre>
+<ul></ul><button id="Location24DivLink" onclick="reveal('Location24Div');" />+ 1 Additional Locations...</button>
+<div id="Location24Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:68</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:67</span>: <span class="message">The resource <code>R.string.version_unknown</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  64</span>     &lt;string name="rest_uri_missing_token">Missing token for rest uri %s.&lt;/string>
+<span class="lineno">  65</span>     &lt;string name="invalid_input_title">Invalid Input&lt;/string>
+<span class="lineno">  66</span>     &lt;string name="ok">OK&lt;/string>
+<span class="lineno">  67</span>     &lt;string <span class="errorspan">name="version_unknown">Unknown version&lt;/string></span>
+<span class="lineno">  68</span>     &lt;string name="default_pwd_name">Camping&lt;/string>
+<span class="lineno">  69</span>     &lt;string name="app_started">Application started&lt;/string>
+</pre>
+<ul></ul><button id="Location25DivLink" onclick="reveal('Location25Div');" />+ 1 Additional Locations...</button>
+<div id="Location25Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:69</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:69</span>: <span class="message">The resource <code>R.string.app_started</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  66</span>     &lt;string name="ok">OK&lt;/string>
+<span class="lineno">  67</span>     &lt;string name="version_unknown">Unknown version&lt;/string>
+<span class="lineno">  68</span>     &lt;string name="default_pwd_name">Camping&lt;/string>
+<span class="lineno">  69</span>     &lt;string <span class="errorspan">name="app_started">Application started&lt;/string></span>
+<span class="lineno">  70</span>     &lt;string name="g4_connected">G4 receiver is connected&lt;/string>
+<span class="lineno">  71</span>     &lt;string name="g4_disconnected">G4 has been disconnected&lt;/string>
+</pre>
+<ul></ul><button id="Location26DivLink" onclick="reveal('Location26Div');" />+ 1 Additional Locations...</button>
+<div id="Location26Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:71</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:70</span>: <span class="message">The resource <code>R.string.g4_connected</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  67</span>     &lt;string name="version_unknown">Unknown version&lt;/string>
+<span class="lineno">  68</span>     &lt;string name="default_pwd_name">Camping&lt;/string>
+<span class="lineno">  69</span>     &lt;string name="app_started">Application started&lt;/string>
+<span class="lineno">  70</span>     &lt;string <span class="errorspan">name="g4_connected">G4 receiver is connected&lt;/string></span>
+<span class="lineno">  71</span>     &lt;string name="g4_disconnected">G4 has been disconnected&lt;/string>
+<span class="lineno">  72</span>     &lt;string name="event_log_menu_text">Event log&lt;/string>
+</pre>
+<ul></ul><button id="Location27DivLink" onclick="reveal('Location27Div');" />+ 1 Additional Locations...</button>
+<div id="Location27Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:72</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:71</span>: <span class="message">The resource <code>R.string.g4_disconnected</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  68</span>     &lt;string name="default_pwd_name">Camping&lt;/string>
+<span class="lineno">  69</span>     &lt;string name="app_started">Application started&lt;/string>
+<span class="lineno">  70</span>     &lt;string name="g4_connected">G4 receiver is connected&lt;/string>
+<span class="lineno">  71</span>     &lt;string <span class="errorspan">name="g4_disconnected">G4 has been disconnected&lt;/string></span>
+<span class="lineno">  72</span>     &lt;string name="event_log_menu_text">Event log&lt;/string>
+<span class="lineno">  73</span>     &lt;string name="event_sync_log">Receiver download complete&lt;/string>
+</pre>
+<ul></ul><button id="Location28DivLink" onclick="reveal('Location28Div');" />+ 1 Additional Locations...</button>
+<div id="Location28Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:73</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:73</span>: <span class="message">The resource <code>R.string.event_sync_log</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  70</span>     &lt;string name="g4_connected">G4 receiver is connected&lt;/string>
+<span class="lineno">  71</span>     &lt;string name="g4_disconnected">G4 has been disconnected&lt;/string>
+<span class="lineno">  72</span>     &lt;string name="event_log_menu_text">Event log&lt;/string>
+<span class="lineno">  73</span>     &lt;string <span class="errorspan">name="event_sync_log">Receiver download complete&lt;/string></span>
+<span class="lineno">  74</span>     &lt;string name="crc_fail_log">CRC check failed. Will try again in 5 minutes&lt;/string>
+<span class="lineno">  75</span>     &lt;string name="unknown_fail_log">Unknown error encountered. Will try again in 5 minutes&lt;/string>
+</pre>
+<ul></ul><button id="Location29DivLink" onclick="reveal('Location29Div');" />+ 1 Additional Locations...</button>
+<div id="Location29Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:76</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:77</span>: <span class="message">The resource <code>R.string.event_success_upload</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  74</span>     &lt;string name="crc_fail_log">CRC check failed. Will try again in 5 minutes&lt;/string>
+<span class="lineno">  75</span>     &lt;string name="unknown_fail_log">Unknown error encountered. Will try again in 5 minutes&lt;/string>
+<span class="lineno">  76</span>     &lt;string name="event_fail_log">Application error encountered while reading from receiver.&lt;/string>
+<span class="lineno">  77</span>     &lt;string <span class="errorspan">name="event_success_upload">Successful upload to %s&lt;/string></span>
+<span class="lineno">  78</span>     &lt;string name="development_settings">Development Drawer&lt;/string>
+<span class="lineno">  79</span>     &lt;string name="nightscout_icon">Nightscout Icon&lt;/string>
+</pre>
+<ul></ul><button id="Location30DivLink" onclick="reveal('Location30Div');" />+ 1 Additional Locations...</button>
+<div id="Location30Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:80</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:81</span>: <span class="message">The resource <code>R.string.event_fail_upload</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  78</span>     &lt;string name="development_settings">Development Drawer&lt;/string>
+<span class="lineno">  79</span>     &lt;string name="nightscout_icon">Nightscout Icon&lt;/string>
+<span class="lineno">  80</span>     &lt;string name="pref_about_hash">Git hash&lt;/string>
+<span class="lineno">  81</span>     &lt;string <span class="errorspan">name="event_fail_upload">Upload to %s has failed&lt;/string></span>
+<span class="lineno">  82</span>     &lt;string name="device_log_menu">Device logs&lt;/string>
+<span class="lineno">  83</span>     &lt;string name="upload_log_menu">Upload Logs&lt;/string>
+</pre>
+<ul></ul><button id="Location31DivLink" onclick="reveal('Location31Div');" />+ 1 Additional Locations...</button>
+<div id="Location31Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:84</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:84</span>: <span class="message">The resource <code>R.string.mqtt_mgr_not_initialized</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  81</span>     &lt;string name="event_fail_upload">Upload to %s has failed&lt;/string>
+<span class="lineno">  82</span>     &lt;string name="device_log_menu">Device logs&lt;/string>
+<span class="lineno">  83</span>     &lt;string name="upload_log_menu">Upload Logs&lt;/string>
+<span class="lineno">  84</span>     &lt;string <span class="errorspan">name="mqtt_mgr_not_initialized">MQTT connection has not been initialized.&lt;/string></span>
+<span class="lineno">  85</span>     &lt;string name="no_uploaders">No uploaders have been configured.&lt;/string>
+<span class="lineno">  86</span>     &lt;string name="unhandled_mqtt_exception">MQTT Exception: %s&lt;/string>
+</pre>
+<ul></ul><button id="Location32DivLink" onclick="reveal('Location32Div');" />+ 1 Additional Locations...</button>
+<div id="Location32Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:87</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:85</span>: <span class="message">The resource <code>R.string.no_uploaders</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  82</span>     &lt;string name="device_log_menu">Device logs&lt;/string>
+<span class="lineno">  83</span>     &lt;string name="upload_log_menu">Upload Logs&lt;/string>
+<span class="lineno">  84</span>     &lt;string name="mqtt_mgr_not_initialized">MQTT connection has not been initialized.&lt;/string>
+<span class="lineno">  85</span>     &lt;string <span class="errorspan">name="no_uploaders">No uploaders have been configured.&lt;/string></span>
+<span class="lineno">  86</span>     &lt;string name="unhandled_mqtt_exception">MQTT Exception: %s&lt;/string>
+<span class="lineno">  87</span>     &lt;string name="error_bluetooth_not_supported">Bluetooth not supported&lt;/string>
+</pre>
+<ul></ul><button id="Location33DivLink" onclick="reveal('Location33Div');" />+ 1 Additional Locations...</button>
+<div id="Location33Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:88</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:86</span>: <span class="message">The resource <code>R.string.unhandled_mqtt_exception</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  83</span>     &lt;string name="upload_log_menu">Upload Logs&lt;/string>
+<span class="lineno">  84</span>     &lt;string name="mqtt_mgr_not_initialized">MQTT connection has not been initialized.&lt;/string>
+<span class="lineno">  85</span>     &lt;string name="no_uploaders">No uploaders have been configured.&lt;/string>
+<span class="lineno">  86</span>     &lt;string <span class="errorspan">name="unhandled_mqtt_exception">MQTT Exception: %s&lt;/string></span>
+<span class="lineno">  87</span>     &lt;string name="error_bluetooth_not_supported">Bluetooth not supported&lt;/string>
+<span class="lineno">  88</span>     &lt;string name="unknown_device">Unknown device&lt;/string>
+</pre>
+<ul></ul><button id="Location34DivLink" onclick="reveal('Location34Div');" />+ 1 Additional Locations...</button>
+<div id="Location34Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:89</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:93</span>: <span class="message">The resource <code>R.string.bluetooth_scan_text</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  90</span>     &lt;string name="menu_scan">Scan&lt;/string>
+<span class="lineno">  91</span>     &lt;string name="menu_stop">Stop&lt;/string>
+<span class="lineno">  92</span>     &lt;string name="connecting_to_device">Connecting&lt;/string>
+<span class="lineno">  93</span>     &lt;string <span class="errorspan">name="bluetooth_scan_text">BT Scan&lt;/string></span>
+<span class="lineno">  94</span>     &lt;string name="title_activity_bluetooth_scan">Bluetooth&lt;/string>
+<span class="lineno">  95</span>     &lt;string name="pref_title_device_type">Device type&lt;/string>
+</pre>
+<ul></ul><button id="Location35DivLink" onclick="reveal('Location35Div');" />+ 1 Additional Locations...</button>
+<div id="Location35Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:96</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:99</span>: <span class="message">The resource <code>R.string.button_force_sync</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  96</span>     &lt;string name="pref_share2_serial_number">Share Serial number&lt;/string>
+<span class="lineno">  97</span>     &lt;string name="scan_share2_barcode">Scan Share Barcode&lt;/string>
+<span class="lineno">  98</span>     &lt;string name="pref_share2_scan_barcode_summary">Scan the barcode on the share receiver&lt;/string>
+<span class="lineno">  99</span>     &lt;string <span class="errorspan">name="button_force_sync">Force sync&lt;/string></span>
+<span class="lineno"> 100</span>     &lt;string name="pref_bt_scan_share2">Discover Share device&lt;/string>
+<span class="lineno"> 101</span>     &lt;string name="pref_bt_scan_summary">Scan for bluetooth G4 Share receivers&lt;/string>
+</pre>
+<ul></ul><button id="Location36DivLink" onclick="reveal('Location36Div');" />+ 1 Additional Locations...</button>
+<div id="Location36Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:16</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings_activity_settings.xml</a>:21</span>: <span class="message">The resource <code>R.string.pref_header_cloud_storage</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  18</span>     &lt;string name="pref_switch_off_data_donate">NO&lt;/string>
+<span class="lineno">  19</span> 
+<span class="lineno">  20</span>     &lt;!-- Settings for Cloud Storage -->
+<span class="lineno">  21</span>     &lt;string <span class="errorspan">name="pref_header_cloud_storage">Cloud Storage&lt;/string></span>
+<span class="lineno">  22</span> 
+<span class="lineno">  23</span>     &lt;!-- MongoDB Settings -->
+</pre>
+<ul></ul><button id="Location37DivLink" onclick="reveal('Location37Div');" />+ 1 Additional Locations...</button>
+<div id="Location37Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:21</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings_activity_settings.xml</a>:59</span>: <span class="message">The resource <code>R.string.pref_title_android_battery</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  56</span>     &lt;string name="pref_title_data_to_upload">Data to upload&lt;/string>
+<span class="lineno">  57</span>     &lt;string name="pref_summary_data_to_upload">Various data to send to the cloud.  Be aware, the more data you send, the more data will be used from your carrier if not on WiFi&lt;/string>
+<span class="lineno">  58</span> 
+<span class="lineno">  59</span>     &lt;string <span class="errorspan">name="pref_title_android_battery">Battery Percent&lt;/string></span>
+<span class="lineno">  60</span>     &lt;string name="pref_summary_android_battery">The Android uploader battery percentage&lt;/string>
+<span class="lineno">  61</span> 
+</pre>
+<ul></ul><button id="Location38DivLink" onclick="reveal('Location38Div');" />+ 1 Additional Locations...</button>
+<div id="Location38Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:59</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings_activity_settings.xml</a>:60</span>: <span class="message">The resource <code>R.string.pref_summary_android_battery</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  57</span>     &lt;string name="pref_summary_data_to_upload">Various data to send to the cloud.  Be aware, the more data you send, the more data will be used from your carrier if not on WiFi&lt;/string>
+<span class="lineno">  58</span> 
+<span class="lineno">  59</span>     &lt;string name="pref_title_android_battery">Battery Percent&lt;/string>
+<span class="lineno">  60</span>     &lt;string <span class="errorspan">name="pref_summary_android_battery">The Android uploader battery percentage&lt;/string></span>
+<span class="lineno">  61</span> 
+<span class="lineno">  62</span>     &lt;string name="pref_title_egv">EGVs&lt;/string>
+</pre>
+<ul></ul><button id="Location39DivLink" onclick="reveal('Location39Div');" />+ 1 Additional Locations...</button>
+<div id="Location39Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:60</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings_activity_settings.xml</a>:62</span>: <span class="message">The resource <code>R.string.pref_title_egv</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  59</span>     &lt;string name="pref_title_android_battery">Battery Percent&lt;/string>
+<span class="lineno">  60</span>     &lt;string name="pref_summary_android_battery">The Android uploader battery percentage&lt;/string>
+<span class="lineno">  61</span> 
+<span class="lineno">  62</span>     &lt;string <span class="errorspan">name="pref_title_egv">EGVs&lt;/string></span>
+<span class="lineno">  63</span>     &lt;string name="pref_summary_egv">Estimated Glucose Values&lt;/string>
+<span class="lineno">  64</span> 
+</pre>
+<ul></ul><button id="Location40DivLink" onclick="reveal('Location40Div');" />+ 1 Additional Locations...</button>
+<div id="Location40Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:62</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings_activity_settings.xml</a>:63</span>: <span class="message">The resource <code>R.string.pref_summary_egv</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  60</span>     &lt;string name="pref_summary_android_battery">The Android uploader battery percentage&lt;/string>
+<span class="lineno">  61</span> 
+<span class="lineno">  62</span>     &lt;string name="pref_title_egv">EGVs&lt;/string>
+<span class="lineno">  63</span>     &lt;string <span class="errorspan">name="pref_summary_egv">Estimated Glucose Values&lt;/string></span>
+<span class="lineno">  64</span> 
+<span class="lineno">  65</span>     &lt;string name="pref_title_meter_bg">Meter BGs&lt;/string>
+</pre>
+<ul></ul><button id="Location41DivLink" onclick="reveal('Location41Div');" />+ 1 Additional Locations...</button>
+<div id="Location41Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:63</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings_activity_settings.xml</a>:68</span>: <span class="message">The resource <code>R.string.pref_title_sensor_data</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  65</span>     &lt;string name="pref_title_meter_bg">Meter BGs&lt;/string>
+<span class="lineno">  66</span>     &lt;string name="pref_summary_meter_bg">Meter BGs used to calibrate&lt;/string>
+<span class="lineno">  67</span> 
+<span class="lineno">  68</span>     &lt;string <span class="errorspan">name="pref_title_sensor_data">Sensor Data&lt;/string></span>
+<span class="lineno">  69</span>     &lt;string name="pref_summary_sensor_data">Raw ISIG data from sensor&lt;/string>
+<span class="lineno">  70</span> 
+</pre>
+<ul></ul><button id="Location42DivLink" onclick="reveal('Location42Div');" />+ 1 Additional Locations...</button>
+<div id="Location42Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:68</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings_activity_settings.xml</a>:69</span>: <span class="message">The resource <code>R.string.pref_summary_sensor_data</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  66</span>     &lt;string name="pref_summary_meter_bg">Meter BGs used to calibrate&lt;/string>
+<span class="lineno">  67</span> 
+<span class="lineno">  68</span>     &lt;string name="pref_title_sensor_data">Sensor Data&lt;/string>
+<span class="lineno">  69</span>     &lt;string <span class="errorspan">name="pref_summary_sensor_data">Raw ISIG data from sensor&lt;/string></span>
+<span class="lineno">  70</span> 
+<span class="lineno">  71</span>     &lt;string name="pref_title_cal_data">Calibration Data&lt;/string>
+</pre>
+<ul></ul><button id="Location43DivLink" onclick="reveal('Location43Div');" />+ 1 Additional Locations...</button>
+<div id="Location43Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:69</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings_activity_settings.xml</a>:71</span>: <span class="message">The resource <code>R.string.pref_title_cal_data</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  68</span>     &lt;string name="pref_title_sensor_data">Sensor Data&lt;/string>
+<span class="lineno">  69</span>     &lt;string name="pref_summary_sensor_data">Raw ISIG data from sensor&lt;/string>
+<span class="lineno">  70</span> 
+<span class="lineno">  71</span>     &lt;string <span class="errorspan">name="pref_title_cal_data">Calibration Data&lt;/string></span>
+<span class="lineno">  72</span>     &lt;string name="pref_summary_cal_data">Calibration data used in converting sensor ISIG values to glucose values&lt;/string>
+<span class="lineno">  73</span> 
+</pre>
+<ul></ul><button id="Location44DivLink" onclick="reveal('Location44Div');" />+ 1 Additional Locations...</button>
+<div id="Location44Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:71</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings_activity_settings.xml</a>:72</span>: <span class="message">The resource <code>R.string.pref_summary_cal_data</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  69</span>     &lt;string name="pref_summary_sensor_data">Raw ISIG data from sensor&lt;/string>
+<span class="lineno">  70</span> 
+<span class="lineno">  71</span>     &lt;string name="pref_title_cal_data">Calibration Data&lt;/string>
+<span class="lineno">  72</span>     &lt;string <span class="errorspan">name="pref_summary_cal_data">Calibration data used in converting sensor ISIG values to glucose values&lt;/string></span>
+<span class="lineno">  73</span> 
+<span class="lineno">  74</span>     &lt;!-- Settings for Display Options -->
+</pre>
+<ul></ul><button id="Location45DivLink" onclick="reveal('Location45Div');" />+ 1 Additional Locations...</button>
+<div id="Location45Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:72</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings_activity_settings.xml</a>:78</span>: <span class="message">The resource <code>R.string.pref_title_chart_options</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  75</span>     &lt;string name="pref_header_display_options">Display Options&lt;/string>
+<span class="lineno">  76</span> 
+<span class="lineno">  77</span>     &lt;!-- Chart Settings -->
+<span class="lineno">  78</span>     &lt;string <span class="errorspan">name="pref_title_chart_options">Chart Options&lt;/string></span>
+<span class="lineno">  79</span>     &lt;string name="pref_summary_chart_options">Various configurations for chart&lt;/string>
+<span class="lineno">  80</span> 
+</pre>
+<ul></ul><button id="Location46DivLink" onclick="reveal('Location46Div');" />+ 1 Additional Locations...</button>
+<div id="Location46Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:78</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings_activity_settings.xml</a>:79</span>: <span class="message">The resource <code>R.string.pref_summary_chart_options</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  76</span> 
+<span class="lineno">  77</span>     &lt;!-- Chart Settings -->
+<span class="lineno">  78</span>     &lt;string name="pref_title_chart_options">Chart Options&lt;/string>
+<span class="lineno">  79</span>     &lt;string <span class="errorspan">name="pref_summary_chart_options">Various configurations for chart&lt;/string></span>
+<span class="lineno">  80</span> 
+<span class="lineno">  81</span>     &lt;!-- Chart Units Settings -->
+</pre>
+<ul></ul><button id="Location47DivLink" onclick="reveal('Location47Div');" />+ 1 Additional Locations...</button>
+<div id="Location47Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:79</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings_activity_settings.xml</a>:104</span>: <span class="message">The resource <code>R.string.pref_summary_about_release_name</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno"> 101</span>     &lt;string name="pref_header_about">About&lt;/string>
+<span class="lineno"> 102</span> 
+<span class="lineno"> 103</span>     &lt;string name="pref_title_about_release_name">Release name&lt;/string>
+<span class="lineno"> 104</span>     &lt;string <span class="errorspan">name="pref_summary_about_release_name">Dreamsicle&lt;/string></span>
+<span class="lineno"> 105</span> 
+<span class="lineno"> 106</span>     &lt;string name="pref_title_about_version_number">Version number&lt;/string>
+</pre>
+<ul></ul><button id="Location48DivLink" onclick="reveal('Location48Div');" />+ 1 Additional Locations...</button>
+<div id="Location48Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:106</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings_activity_settings.xml</a>:124</span>: <span class="message">The resource <code>R.string.prefs_pwd_display_name_title</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno"> 121</span>     &lt;string name="pref_header_privacy">Privacy&lt;/string>
+<span class="lineno"> 122</span>     &lt;string name="pref_enable_acra">Enable crash reporting&lt;/string>
+<span class="lineno"> 123</span>     &lt;string name="prefs_auto_config_summary">Auto configure using a barcode. See http://nightscout.github.io/pages/configure/ for more details&lt;/string>
+<span class="lineno"> 124</span>     &lt;string <span class="errorspan">name="prefs_pwd_display_name_title">PWD Display name&lt;/string></span>
+<span class="lineno"> 125</span>     &lt;string name="prefs_pwd_display_name_summary">This is the name of the pwd that will be displayed on other monitors e.g. pebble&lt;/string>
+<span class="lineno"> 126</span>     &lt;string name="pref_about_deviceid">Device ID&lt;/string>
+</pre>
+<ul></ul><button id="Location49DivLink" onclick="reveal('Location49Div');" />+ 1 Additional Locations...</button>
+<div id="Location49Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:125</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings_activity_settings.xml</a>:125</span>: <span class="message">The resource <code>R.string.prefs_pwd_display_name_summary</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno"> 122</span>     &lt;string name="pref_enable_acra">Enable crash reporting&lt;/string>
+<span class="lineno"> 123</span>     &lt;string name="prefs_auto_config_summary">Auto configure using a barcode. See http://nightscout.github.io/pages/configure/ for more details&lt;/string>
+<span class="lineno"> 124</span>     &lt;string name="prefs_pwd_display_name_title">PWD Display name&lt;/string>
+<span class="lineno"> 125</span>     &lt;string <span class="errorspan">name="prefs_pwd_display_name_summary">This is the name of the pwd that will be displayed on other monitors e.g. pebble&lt;/string></span>
+<span class="lineno"> 126</span>     &lt;string name="pref_about_deviceid">Device ID&lt;/string>
+<span class="lineno"> 127</span> &lt;/resources>
+</pre>
+<ul></ul><button id="Location50DivLink" onclick="reveal('Location50Div');" />+ 1 Additional Locations...</button>
+<div id="Location50Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:126</span>
+</ul>
+</div><br/><br/>
+</div>
+</div>
+<div class="metadata">Priority: 3 / 10<br/>
+Category: Performance</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Unused resources.</div>
+<div class="explanation">
+Unused resources make applications larger and slow down builds.
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "UnusedResources" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+<a name="UnusedIds"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">UnusedIds: Unused id</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/res/layout/activity_main.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/activity_main.xml</a>:8</span>: <span class="message">The resource <code>R.id.monitor_fragment</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">   5</span>     android:paddingLeft="@dimen/activity_horizontal_margin"
+<span class="lineno">   6</span>     android:paddingRight="@dimen/activity_horizontal_margin"
+<span class="lineno">   7</span>     android:paddingTop="@dimen/activity_vertical_margin"
+<span class="lineno">   8</span>     <span class="errorspan">android:id="@+id/monitor_fragment"</span>
+<span class="lineno">   9</span>     tools:context="com.nightscout.android.MainActivity">
+<span class="lineno">  10</span> 
+</pre>
+<span class="location"><a href="src/main/res/layout/debug_activity_frame.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/debug_activity_frame.xml</a>:4</span>: <span class="message">The resource <code>R.id.debug_drawer_layout</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">   1</span> &lt;?xml version="1.0" encoding="utf-8"?>
+<span class="lineno">   2</span> &lt;android.support.v4.widget.DrawerLayout
+<span class="lineno">   3</span>         xmlns:android="http://schemas.android.com/apk/res/android"
+<span class="lineno">   4</span>         <span class="errorspan">android:id="@+id/debug_drawer_layout"</span>
+<span class="lineno">   5</span>         android:layout_width="match_parent"
+<span class="lineno">   6</span>         android:layout_height="match_parent">
+</pre>
+
+Applies to variants: release<br/>
+Does <b>not</b> apply to variants: debug<br/>
+<span class="location"><a href="src/main/res/layout/debug_activity_frame.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/debug_activity_frame.xml</a>:8</span>: <span class="message">The resource <code>R.id.debug_content</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">   5</span>         android:layout_width="match_parent"
+<span class="lineno">   6</span>         android:layout_height="match_parent">
+<span class="lineno">   7</span>     &lt;LinearLayout
+<span class="lineno">   8</span>             <span class="errorspan">android:id="@+id/debug_content"</span>
+<span class="lineno">   9</span>             android:layout_width="match_parent"
+<span class="lineno">  10</span>             android:layout_height="match_parent"
+</pre>
+
+Applies to variants: release<br/>
+Does <b>not</b> apply to variants: debug<br/>
+<span class="location"><a href="src/main/res/layout/debug_activity_frame.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/debug_activity_frame.xml</a>:14</span>: <span class="message">The resource <code>R.id.debug_drawer</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  11</span>             android:orientation="horizontal"
+<span class="lineno">  12</span>             />
+<span class="lineno">  13</span>     &lt;ScrollView
+<span class="lineno">  14</span>             <span class="errorspan">android:id="@+id/debug_drawer"</span>
+<span class="lineno">  15</span>             android:layout_width="290dp"
+<span class="lineno">  16</span>             android:layout_height="match_parent"
+</pre>
+
+Applies to variants: release<br/>
+Does <b>not</b> apply to variants: debug<br/>
+<span class="location"><a href="src/main/res/layout/debug_drawer_content.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/debug_drawer_content.xml</a>:55</span>: <span class="message">The resource <code>R.id.debug_egv_input</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  52</span>             android:gravity="center_vertical"
+<span class="lineno">  53</span>             >
+<span class="lineno">  54</span>         &lt;EditText
+<span class="lineno">  55</span>                 <span class="errorspan">android:id="@+id/debug_egv_input"</span>
+<span class="lineno">  56</span>                 android:layout_height="wrap_content"
+<span class="lineno">  57</span>                 android:layout_width="0dp"
+</pre>
+
+Applies to variants: release<br/>
+Does <b>not</b> apply to variants: debug<br/>
+<button id="UnusedIdsDivLink" onclick="reveal('UnusedIdsDiv');" />+ 10 More Occurrences...</button>
+<div id="UnusedIdsDiv" style="display: none">
+<span class="location"><a href="src/main/res/layout/debug_drawer_content.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/debug_drawer_content.xml</a>:64</span>: <span class="message">The resource <code>R.id.debug_generate_egv_button</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  61</span>                 android:imeOptions="actionDone"
+<span class="lineno">  62</span>                 />
+<span class="lineno">  63</span>         &lt;Button
+<span class="lineno">  64</span>                 <span class="errorspan">android:id="@+id/debug_generate_egv_button"</span>
+<span class="lineno">  65</span>                 android:layout_height="wrap_content"
+<span class="lineno">  66</span>                 android:layout_width="wrap_content"
+</pre>
+
+Applies to variants: release<br/>
+Does <b>not</b> apply to variants: debug<br/>
+<span class="location"><a href="src/main/res/layout/ledevice_listitem.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/ledevice_listitem.xml</a>:6</span>: <span class="message">The resource <code>R.id.device_list_id</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">   3</span>     android:orientation="vertical"
+<span class="lineno">   4</span>     android:layout_width="match_parent"
+<span class="lineno">   5</span>     android:layout_height="wrap_content"
+<span class="lineno">   6</span>     <span class="errorspan">android:id="@+id/device_list_id"></span>
+<span class="lineno">   7</span> 
+<span class="lineno">   8</span>     &lt;TextView
+</pre>
+<span class="location"><a href="src/main/res/menu/menu.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/menu/menu.xml</a>:5</span>: <span class="message">The resource <code>R.id.menu_settings</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">   2</span> &lt;menu xmlns:android="http://schemas.android.com/apk/res/android"
+<span class="lineno">   3</span>     xmlns:nightscout="http://schemas.android.com/apk/res-auto">
+<span class="lineno">   4</span>     &lt;item
+<span class="lineno">   5</span>         <span class="errorspan">android:id="@+id/menu_settings"</span>
+<span class="lineno">   6</span>         android:orderInCategory="100"
+<span class="lineno">   7</span>         android:title="@string/preferences_menu_text" />
+</pre>
+<span class="location"><a href="src/main/res/menu/menu.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/menu/menu.xml</a>:9</span>: <span class="message">The resource <code>R.id.feedback_settings</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">   6</span>         android:orderInCategory="100"
+<span class="lineno">   7</span>         android:title="@string/preferences_menu_text" />
+<span class="lineno">   8</span>     &lt;item
+<span class="lineno">   9</span>         <span class="errorspan">android:id="@+id/feedback_settings"</span>
+<span class="lineno">  10</span>         android:orderInCategory="100"
+<span class="lineno">  11</span>         android:title="@string/feedback_menu_text" />
+</pre>
+<span class="location"><a href="src/main/res/menu/menu.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/menu/menu.xml</a>:13</span>: <span class="message">The resource <code>R.id.gap_sync</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  10</span>         android:orderInCategory="100"
+<span class="lineno">  11</span>         android:title="@string/feedback_menu_text" />
+<span class="lineno">  12</span>     &lt;item
+<span class="lineno">  13</span>         <span class="errorspan">android:id="@+id/gap_sync"</span>
+<span class="lineno">  14</span>         android:orderInCategory="100"
+<span class="lineno">  15</span>         android:title="@string/gap_sync_menu_text" />
+</pre>
+<span class="location"><a href="src/main/res/menu/menu.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/menu/menu.xml</a>:17</span>: <span class="message">The resource <code>R.id.event_log</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  14</span>         android:orderInCategory="100"
+<span class="lineno">  15</span>         android:title="@string/gap_sync_menu_text" />
+<span class="lineno">  16</span>     &lt;item
+<span class="lineno">  17</span>         <span class="errorspan">android:id="@+id/event_log"</span>
+<span class="lineno">  18</span>         android:orderInCategory="100"
+<span class="lineno">  19</span>         android:title="@string/event_log_menu_text" />
+</pre>
+<span class="location"><a href="src/main/res/menu/menu.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/menu/menu.xml</a>:21</span>: <span class="message">The resource <code>R.id.usb_log</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  18</span>         android:orderInCategory="100"
+<span class="lineno">  19</span>         android:title="@string/event_log_menu_text" />
+<span class="lineno">  20</span>     &lt;item
+<span class="lineno">  21</span>         <span class="errorspan">android:id="@+id/usb_log"</span>
+<span class="lineno">  22</span>         android:orderInCategory="100"
+<span class="lineno">  23</span>         nightscout:showAsAction="ifRoom"
+</pre>
+<span class="location"><a href="src/main/res/menu/menu.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/menu/menu.xml</a>:27</span>: <span class="message">The resource <code>R.id.upload_log</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  24</span>         android:title="@string/device_log_menu" />
+<span class="lineno">  25</span> 
+<span class="lineno">  26</span>     &lt;item
+<span class="lineno">  27</span>         <span class="errorspan">android:id="@+id/upload_log"</span>
+<span class="lineno">  28</span>         android:orderInCategory="100"
+<span class="lineno">  29</span>         nightscout:showAsAction="ifRoom"
+</pre>
+<span class="location"><a href="src/main/res/menu/menu.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/menu/menu.xml</a>:37</span>: <span class="message">The resource <code>R.id.close_settings</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  34</span>     &lt;!--nightscout:showAsAction="ifRoom"-->
+<span class="lineno">  35</span>     &lt;!--android:title="@string/bluetooth_scan_text" />-->
+<span class="lineno">  36</span>     &lt;item
+<span class="lineno">  37</span>         <span class="errorspan">android:id="@+id/close_settings"</span>
+<span class="lineno">  38</span>         android:orderInCategory="100"
+<span class="lineno">  39</span>         nightscout:showAsAction="ifRoom"
+</pre>
+<span class="location"><a href="src/main/res/menu/menu_bluetooth_scan.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/menu/menu_bluetooth_scan.xml</a>:5</span>: <span class="message">The resource <code>R.id.menu_refresh</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">   2</span> &lt;menu xmlns:android="http://schemas.android.com/apk/res/android"
+<span class="lineno">   3</span>     xmlns:app="http://schemas.android.com/apk/res-auto">
+<span class="lineno">   4</span>     &lt;item
+<span class="lineno">   5</span>         <span class="errorspan">android:id="@+id/menu_refresh"</span>
+<span class="lineno">   6</span>         android:title="@string/menu_refresh"
+<span class="lineno">   7</span>         android:checkable="false"
+</pre>
+</div>
+</div>
+<div class="metadata">Priority: 1 / 10<br/>
+Category: Performance</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Unused id.</div>
+<div class="explanation">
+This resource id definition appears not to be needed since it is not referenced from anywhere. Having id definitions, even if unused, is not necessarily a bad idea since they make working on layouts and menus easier, so there is not a strong reason to delete these.
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "UnusedIds" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+
+<a name="Usability:Typography"></a>
+<div class="category"><a href="#" title="Return to top">Usability:Typography</a><div class="categorySeparator"></div>
+</div>
+<a name="TypographyQuotes"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">TypographyQuotes: Straight quotes can be replaced with curvy quotes</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:15</span>: <span class="message">Replace straight quotes (") with directional quotes (&#8220;&#8221;, &amp;#8220; and &amp;#8221;) ?</span><br /><pre class="errorlines">
+<span class="lineno">  12</span>     &lt;string name="feedback_dialog_comment_prompt">Please include brief description of the issue you encountered&lt;/string>
+<span class="lineno">  13</span>     &lt;string name="feedback_dialog_ok_toast">Grazie!&lt;/string>
+<span class="lineno">  14</span>     &lt;string name="feedback_toast_text" />
+<span class="lineno">  15</span>     &lt;string name="message_user_not_understand"><span class="errorspan">La lettura dal device è disabilitata finchè non leggi e accetti \"HO CAPITO\" nelle preferenze&lt;/string></span>
+<span class="lineno">  16</span>     &lt;string name="button_force_sync">Forza invio dati ultimi 2 giorni&lt;/string>
+<span class="lineno">  17</span>     &lt;string name="acra_enabled_summary">Crash reporting is enabled&lt;/string>
+</pre>
+</div>
+<div class="metadata">Note: This issue has an associated quickfix operation in Eclipse/ADT & Android Studio/IntelliJ&nbsp;<img alt="Fix" border="0" align="top" src="lint-report_files/lint-run.png" />
+<br>
+Priority: 5 / 10<br/>
+Category: Usability:Typography</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Straight quotes can be replaced with curvy quotes.</div>
+<div class="explanation">
+Straight single quotes and double quotes, when used as a pair, can be replaced by "curvy quotes" (or directional quotes). This can make the text more readable.<br/>
+<br/>
+Note that you should never use grave accents and apostrophes to quote, `like this'.<br/>
+<br/>
+(Also note that you should not use curvy quotes for code fragments.)
+</div>
+<br/><div class="moreinfo">More info: <a href="http://en.wikipedia.org/wiki/Quotation_mark">http://en.wikipedia.org/wiki/Quotation_mark</a>
+</div><br/>To suppress this error, use the issue id "TypographyQuotes" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+
+<a name="Usability:Icons"></a>
+<div class="category"><a href="#" title="Return to top">Usability:Icons</a><div class="categorySeparator"></div>
+</div>
+<a name="IconDipSize"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">IconDipSize: Icon density-independent size validation</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/res/drawable-xxxhdpi/nscafe.png">/Users/trhodes/workspace/android-uploader/app/src/main/res/drawable-xxxhdpi/nscafe.png</a></span>: <span class="message">The image <code>nscafe.png</code> varies significantly in its density-independent (dip) size across the various density versions: drawable-mdpi/nscafe.png: 240x240 dp (240x240 px), drawable-hdpi/nscafe.png: 160x160 dp (240x240 px), drawable-xhdpi/nscafe.png: 120x120 dp (240x240 px), drawable-xxhdpi/nscafe.png: 80x80 dp (240x240 px), drawable-xxxhdpi/nscafe.png: 60x60 dp (240x240 px)</span><br />
+<ul></ul><button id="Location1DivLink" onclick="reveal('Location1Div');" />+ 4 Additional Locations...</button>
+<div id="Location1Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/drawable-xxhdpi/nscafe.png">/Users/trhodes/workspace/android-uploader/app/src/main/res/drawable-xxhdpi/nscafe.png</a></span>
+<li> <span class="location"><a href="src/main/res/drawable-xhdpi/nscafe.png">/Users/trhodes/workspace/android-uploader/app/src/main/res/drawable-xhdpi/nscafe.png</a></span>
+<li> <span class="location"><a href="src/main/res/drawable-hdpi/nscafe.png">/Users/trhodes/workspace/android-uploader/app/src/main/res/drawable-hdpi/nscafe.png</a></span>
+<li> <span class="location"><a href="src/main/res/drawable-mdpi/nscafe.png">/Users/trhodes/workspace/android-uploader/app/src/main/res/drawable-mdpi/nscafe.png</a></span>
+</ul>
+</div><br/><br/>
+<table><tr><td><a href="src/main/res/drawable-xhdpi/nscafe.png"><img border="0" align="top" src="src/main/res/drawable-xhdpi/nscafe.png" /></a>
+</td><td><a href="src/main/res/drawable-hdpi/nscafe.png"><img border="0" align="top" src="src/main/res/drawable-hdpi/nscafe.png" /></a>
+</td><td><a href="src/main/res/drawable-mdpi/nscafe.png"><img border="0" align="top" src="src/main/res/drawable-mdpi/nscafe.png" /></a>
+</td><td><a href="src/main/res/drawable-xxxhdpi/nscafe.png"><img border="0" align="top" src="src/main/res/drawable-xxxhdpi/nscafe.png" /></a>
+</td><td><a href="src/main/res/drawable-xxhdpi/nscafe.png"><img border="0" align="top" src="src/main/res/drawable-xxhdpi/nscafe.png" /></a>
+</td></tr><tr><th>xhdpi</th><th>hdpi</th><th>mdpi</th><th>xxxhdpi</th><th>xxhdpi</th></tr>
+</table>
+</div>
+<div class="metadata">Priority: 5 / 10<br/>
+Category: Usability:Icons</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Icon density-independent size validation.</div>
+<div class="explanation">
+Checks the all icons which are provided in multiple densities, all compute to roughly the same density-independent pixel (<code>dip</code>) size. This catches errors where images are either placed in the wrong folder, or icons are changed to new sizes but some folders are forgotten.
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "IconDipSize" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+<a name="IconDuplicatesConfig"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">IconDuplicatesConfig: Identical bitmaps across various configurations</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/res/drawable-xxxhdpi/nscafe.png">/Users/trhodes/workspace/android-uploader/app/src/main/res/drawable-xxxhdpi/nscafe.png</a></span>: <span class="message">The <code>nscafe.png</code> icon has identical contents in the following configuration folders: drawable-hdpi, drawable-mdpi, drawable-xhdpi, drawable-xxhdpi, drawable-xxxhdpi</span><br />
+<ul></ul><button id="Location1DivLink" onclick="reveal('Location1Div');" />+ 4 Additional Locations...</button>
+<div id="Location1Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/drawable-xxhdpi/nscafe.png">/Users/trhodes/workspace/android-uploader/app/src/main/res/drawable-xxhdpi/nscafe.png</a></span>
+<li> <span class="location"><a href="src/main/res/drawable-xhdpi/nscafe.png">/Users/trhodes/workspace/android-uploader/app/src/main/res/drawable-xhdpi/nscafe.png</a></span>
+<li> <span class="location"><a href="src/main/res/drawable-mdpi/nscafe.png">/Users/trhodes/workspace/android-uploader/app/src/main/res/drawable-mdpi/nscafe.png</a></span>
+<li> <span class="location"><a href="src/main/res/drawable-hdpi/nscafe.png">/Users/trhodes/workspace/android-uploader/app/src/main/res/drawable-hdpi/nscafe.png</a></span>
+</ul>
+</div><br/><br/>
+<table><tr><td><a href="src/main/res/drawable-xhdpi/nscafe.png"><img border="0" align="top" src="src/main/res/drawable-xhdpi/nscafe.png" /></a>
+</td><td><a href="src/main/res/drawable-hdpi/nscafe.png"><img border="0" align="top" src="src/main/res/drawable-hdpi/nscafe.png" /></a>
+</td><td><a href="src/main/res/drawable-mdpi/nscafe.png"><img border="0" align="top" src="src/main/res/drawable-mdpi/nscafe.png" /></a>
+</td><td><a href="src/main/res/drawable-xxxhdpi/nscafe.png"><img border="0" align="top" src="src/main/res/drawable-xxxhdpi/nscafe.png" /></a>
+</td><td><a href="src/main/res/drawable-xxhdpi/nscafe.png"><img border="0" align="top" src="src/main/res/drawable-xxhdpi/nscafe.png" /></a>
+</td></tr><tr><th>xhdpi</th><th>hdpi</th><th>mdpi</th><th>xxxhdpi</th><th>xxhdpi</th></tr>
+</table>
+</div>
+<div class="metadata">Priority: 5 / 10<br/>
+Category: Usability:Icons</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Identical bitmaps across various configurations.</div>
+<div class="explanation">
+If an icon is provided under different configuration parameters such as <code>drawable-hdpi</code> or <code>-v11</code>, they should typically be different. This detector catches cases where the same icon is provided in different configuration folder which is usually not intentional.
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "IconDuplicatesConfig" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+
+<a name="Usability"></a>
+<div class="category"><a href="#" title="Return to top">Usability</a><div class="categorySeparator"></div>
+</div>
+<a name="SelectableText"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">SelectableText: Dynamic text should probably be selectable</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/res/layout/ledevice_listitem.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/ledevice_listitem.xml</a>:8</span>: <span class="message">Consider making the text value selectable by specifying <code>android:textIsSelectable="true"</code></span><br /><pre class="errorlines">
+<span class="lineno">   5</span>     android:layout_height="wrap_content"
+<span class="lineno">   6</span>     android:id="@+id/device_list_id">
+<span class="lineno">   7</span> 
+<span class="lineno">   8</span>     <span class="errorspan">&lt;TextView</span>
+<span class="lineno">   9</span>         android:id="@+id/device_name"
+<span class="lineno">  10</span>         android:layout_width="match_parent"
+</pre>
+<span class="location"><a href="src/main/res/layout/ledevice_listitem.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/ledevice_listitem.xml</a>:14</span>: <span class="message">Consider making the text value selectable by specifying <code>android:textIsSelectable="true"</code></span><br /><pre class="errorlines">
+<span class="lineno">  11</span>         android:layout_height="wrap_content"
+<span class="lineno">  12</span>         android:textSize="24dp" />
+<span class="lineno">  13</span> 
+<span class="lineno">  14</span>     <span class="errorspan">&lt;TextView</span>
+<span class="lineno">  15</span>         android:id="@+id/device_address"
+<span class="lineno">  16</span>         android:layout_width="match_parent"
+</pre>
+</div>
+<div class="metadata">Note: This issue has an associated quickfix operation in Android Studio/IntelliJ&nbsp;<img alt="Fix" border="0" align="top" src="lint-report_files/lint-run.png" />
+<br>
+Priority: 7 / 10<br/>
+Category: Usability</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Dynamic text should probably be selectable.</div>
+<div class="explanation">
+If a <code>&lt;TextView></code> is used to display data, the user might want to copy that data and paste it elsewhere. To allow this, the <code>&lt;TextView></code> should specify <code>android:textIsSelectable="true"</code>.<br/>
+<br/>
+This lint check looks for TextViews which are likely to be displaying data: views whose text is set dynamically. This value will be ignored on platforms older than API 11, so it is okay to set it regardless of your <code>minSdkVersion</code>.
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "SelectableText" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+
+<a name="Accessibility"></a>
+<div class="category"><a href="#" title="Return to top">Accessibility</a><div class="categorySeparator"></div>
+</div>
+<a name="ClickableViewAccessibility"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">ClickableViewAccessibility: Accessibility in Custom Views</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/java/com/nightscout/android/ui/MonitorFragment.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/ui/MonitorFragment.java</a>:167</span>: <span class="message"><code>com/nightscout/android/ui/MonitorFragment$3#onTouch</code> should call <code>View#performClick</code> when a click is detected</span><br /><pre class="errorlines">
+<span class="lineno"> 164</span>         // disable scroll on touch
+<span class="lineno"> 165</span>         mWebView.setOnTouchListener(new View.OnTouchListener() {
+<span class="lineno"> 166</span>             @Override
+<span class="lineno"> 167</span>             public boolean <span class="errorspan">onTouch(View v, MotionEvent event) {</span>
+<span class="lineno"> 168</span>                 return (event.getAction() == MotionEvent.ACTION_MOVE);
+<span class="lineno"> 169</span>             }
+</pre>
+</div>
+<div class="metadata">Priority: 6 / 10<br/>
+Category: Accessibility</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Accessibility in Custom Views.</div>
+<div class="explanation">
+If a <code>View</code> that overrides <code>onTouchEvent</code> or uses an <code>OnTouchListener</code> does not also implement <code>performClick</code> and call it when clicks are detected, the <code>View</code> may not handle accessibility actions properly. Logic handling the click actions should ideally be placed in <code>View#performClick</code> as some accessibility services invoke <code>performClick</code> when a click action should occur.
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "ClickableViewAccessibility" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+<a name="ContentDescription"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">ContentDescription: Image without <code>contentDescription</code></a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/res/layout/monitor_fragment.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/monitor_fragment.xml</a>:52</span>: <span class="message">[Accessibility] Missing <code>contentDescription</code> attribute on image</span><br /><pre class="errorlines">
+<span class="lineno">  49</span>         android:layout_alignParentBottom="false"
+<span class="lineno">  50</span>         android:layout_marginBottom="45dp" />
+<span class="lineno">  51</span> 
+<span class="lineno">  52</span>     <span class="errorspan">&lt;ImageButton</span>
+<span class="lineno">  53</span>         android:layout_width="wrap_content"
+<span class="lineno">  54</span>         android:layout_height="wrap_content"
+</pre>
+<span class="location"><a href="src/main/res/layout/monitor_fragment.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/monitor_fragment.xml</a>:63</span>: <span class="message">[Accessibility] Missing <code>contentDescription</code> attribute on image</span><br /><pre class="errorlines">
+<span class="lineno">  60</span>         android:layout_alignParentLeft="true"
+<span class="lineno">  61</span>         android:layout_alignParentStart="true" />
+<span class="lineno">  62</span> 
+<span class="lineno">  63</span>     <span class="errorspan">&lt;ImageButton</span>
+<span class="lineno">  64</span>         android:layout_width="wrap_content"
+<span class="lineno">  65</span>         android:layout_height="wrap_content"
+</pre>
+</div>
+<div class="metadata">Note: This issue has an associated quickfix operation in Eclipse/ADT & Android Studio/IntelliJ&nbsp;<img alt="Fix" border="0" align="top" src="lint-report_files/lint-run.png" />
+<br>
+Priority: 3 / 10<br/>
+Category: Accessibility</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Image without <code>contentDescription</code></div>
+<div class="explanation">
+Non-textual widgets like ImageViews and ImageButtons should use the <code>contentDescription</code> attribute to specify a textual description of the widget such that screen readers and other accessibility tools can adequately describe the user interface.<br/>
+<br/>
+Note that elements in application screens that are purely decorative and do not provide any content or enable a user action should not have accessibility content descriptions. In this case, just suppress the lint warning with a tools:ignore="ContentDescription" attribute.<br/>
+<br/>
+Note that for text fields, you should not set both the <code>hint</code> and the <code>contentDescription</code> attributes since the hint will never be shown. Just set the <code>hint</code>. See <a href="http://developer.android.com/guide/topics/ui/accessibility/checklist.html#special-cases">http://developer.android.com/guide/topics/ui/accessibility/checklist.html#special-cases</a>.
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "ContentDescription" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+<a name="LabelFor"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">LabelFor: Missing <code>labelFor</code> attribute</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/res/layout/debug_drawer_content.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/debug_drawer_content.xml</a>:54</span>: <span class="message">No label views point to this text field with an <code>android:labelFor="@+id/@+id/debug_egv_input"</code> attribute</span><br /><pre class="errorlines">
+<span class="lineno">  51</span>             android:layout_gravity="start|center_vertical|fill_horizontal"
+<span class="lineno">  52</span>             android:gravity="center_vertical"
+<span class="lineno">  53</span>             >
+<span class="lineno">  54</span>         <span class="errorspan">&lt;EditText</span>
+<span class="lineno">  55</span>                 android:id="@+id/debug_egv_input"
+<span class="lineno">  56</span>                 android:layout_height="wrap_content"
+</pre>
+</div>
+<div class="metadata">Priority: 2 / 10<br/>
+Category: Accessibility</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Missing <code>labelFor</code> attribute.</div>
+<div class="explanation">
+Text fields should be labelled with a <code>labelFor</code> attribute, provided your <code>minSdkVersion</code> is at least 17.<br/>
+<br/>
+If your view is labeled but by a label in a different layout which includes this one, just suppress this warning from lint.
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "LabelFor" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+
+<a name="Internationalization"></a>
+<div class="category"><a href="#" title="Return to top">Internationalization</a><div class="categorySeparator"></div>
+</div>
+<a name="HardcodedText"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">HardcodedText: Hardcoded text</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/res/layout/debug_drawer_content.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/debug_drawer_content.xml</a>:46</span>: <span class="message">[I18N] Hardcoded string "Generate EGV:", should use <code>@string</code> resource</span><br /><pre class="errorlines">
+<span class="lineno">  43</span>     &lt;/LinearLayout>
+<span class="lineno">  44</span>     &lt;TextView
+<span class="lineno">  45</span>             android:layout_gravity="start|center_vertical"
+<span class="lineno">  46</span>             <span class="errorspan">android:text="Generate EGV:"</span>
+<span class="lineno">  47</span>             />
+<span class="lineno">  48</span>     &lt;LinearLayout
+</pre>
+<span class="location"><a href="src/main/res/layout/debug_drawer_content.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/debug_drawer_content.xml</a>:58</span>: <span class="message">[I18N] Hardcoded string "100", should use <code>@string</code> resource</span><br /><pre class="errorlines">
+<span class="lineno">  55</span>                 android:id="@+id/debug_egv_input"
+<span class="lineno">  56</span>                 android:layout_height="wrap_content"
+<span class="lineno">  57</span>                 android:layout_width="0dp"
+<span class="lineno">  58</span>                 <span class="errorspan">android:text="100"</span>
+<span class="lineno">  59</span>                 android:layout_weight="1"
+<span class="lineno">  60</span>                 android:inputType="number"
+</pre>
+<span class="location"><a href="src/main/res/layout/debug_drawer_content.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/debug_drawer_content.xml</a>:68</span>: <span class="message">[I18N] Hardcoded string "Generate", should use <code>@string</code> resource</span><br /><pre class="errorlines">
+<span class="lineno">  65</span>                 android:layout_height="wrap_content"
+<span class="lineno">  66</span>                 android:layout_width="wrap_content"
+<span class="lineno">  67</span>                 android:layout_marginLeft="4dp"
+<span class="lineno">  68</span>                 <span class="errorspan">android:text="Generate"</span>
+<span class="lineno">  69</span>                 android:visibility="visible"
+<span class="lineno">  70</span>                 />
+</pre>
+</div>
+<div class="metadata">Note: This issue has an associated quickfix operation in Eclipse/ADT&nbsp;<img alt="Fix" border="0" align="top" src="lint-report_files/lint-run.png" />
+<br>
+Priority: 5 / 10<br/>
+Category: Internationalization</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Hardcoded text.</div>
+<div class="explanation">
+Hardcoding text attributes directly in layout files is bad for several reasons:<br/>
+<br/>
+* When creating configuration variations (for example for landscape or portrait)you have to repeat the actual text (and keep it up to date when making changes)<br/>
+<br/>
+* The application cannot be translated to other languages by just adding new translations for existing string resources.<br/>
+<br/>
+In Android Studio and Eclipse there are quickfixes to automatically extract this hardcoded string into a resource lookup.
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "HardcodedText" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+
+<a name="Bi-directional Text"></a>
+<div class="category"><a href="#" title="Return to top">Bi-directional Text</a><div class="categorySeparator"></div>
+</div>
+<a name="RtlHardcoded"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">RtlHardcoded: Using left/right instead of start/end attributes</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/res/layout/debug_drawer_content.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/debug_drawer_content.xml</a>:21</span>: <span class="message">Consider replacing <code>android:layout_marginRight</code> with <code>android:layout_marginEnd="8dp"</code> to better support right-to-left layouts</span><br /><pre class="errorlines">
+<span class="lineno">  18</span>                 android:layout_width="0dp"
+<span class="lineno">  19</span>                 android:layout_height="48dp"
+<span class="lineno">  20</span>                 android:layout_weight="1"
+<span class="lineno">  21</span>                 <span class="errorspan">android:layout_marginRight="8dp"</span>
+<span class="lineno">  22</span>                 android:gravity="center_vertical|end"
+<span class="lineno">  23</span>                 android:orientation="vertical"
+</pre>
+<span class="location"><a href="src/main/res/layout/debug_drawer_content.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/debug_drawer_content.xml</a>:67</span>: <span class="message">Consider replacing <code>android:layout_marginLeft</code> with <code>android:layout_marginStart="4dp"</code> to better support right-to-left layouts</span><br /><pre class="errorlines">
+<span class="lineno">  64</span>                 android:id="@+id/debug_generate_egv_button"
+<span class="lineno">  65</span>                 android:layout_height="wrap_content"
+<span class="lineno">  66</span>                 android:layout_width="wrap_content"
+<span class="lineno">  67</span>                 <span class="errorspan">android:layout_marginLeft="4dp"</span>
+<span class="lineno">  68</span>                 android:text="Generate"
+<span class="lineno">  69</span>                 android:visibility="visible"
+</pre>
+<span class="location"><a href="src/main/res/layout/monitor_fragment.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/monitor_fragment.xml</a>:14</span>: <span class="message">Redundant attribute <code>layout_alignParentLeft</code>; already defining <code>layout_alignParentStart</code> with <code>targetSdkVersion</code> 18</span><br /><pre class="errorlines">
+<span class="lineno">  11</span>         android:textAppearance="?android:attr/textAppearanceLarge"
+<span class="lineno">  12</span>         android:text="@string/unknown_values"
+<span class="lineno">  13</span>         android:id="@+id/sgValue"
+<span class="lineno">  14</span>         <span class="errorspan">android:layout_alignParentLeft="false"</span>
+<span class="lineno">  15</span>         android:layout_alignParentStart="false"
+<span class="lineno">  16</span>         android:textSize="@android:dimen/notification_large_icon_width"
+</pre>
+<span class="location"><a href="src/main/res/layout/monitor_fragment.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/monitor_fragment.xml</a>:19</span>: <span class="message">Redundant attribute <code>layout_alignParentRight</code>; already defining <code>layout_alignParentEnd</code> with <code>targetSdkVersion</code> 18</span><br /><pre class="errorlines">
+<span class="lineno">  16</span>         android:textSize="@android:dimen/notification_large_icon_width"
+<span class="lineno">  17</span>         android:singleLine="true"
+<span class="lineno">  18</span>         android:gravity="center|center_vertical|center_horizontal"
+<span class="lineno">  19</span>         <span class="errorspan">android:layout_alignParentRight="false"</span>
+<span class="lineno">  20</span>         android:layout_alignParentEnd="false"
+<span class="lineno">  21</span>         tools:ignore="ContentDescription" />
+</pre>
+<span class="location"><a href="src/main/res/layout/monitor_fragment.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/monitor_fragment.xml</a>:30</span>: <span class="message">Redundant attribute <code>layout_alignParentLeft</code>; already defining <code>layout_alignParentStart</code> with <code>targetSdkVersion</code> 18</span><br /><pre class="errorlines">
+<span class="lineno">  27</span>         android:text="@string/unknown_values"
+<span class="lineno">  28</span>         android:id="@+id/timeAgo"
+<span class="lineno">  29</span>         android:layout_alignParentTop="false"
+<span class="lineno">  30</span>         <span class="errorspan">android:layout_alignParentLeft="false"</span>
+<span class="lineno">  31</span>         android:layout_alignParentStart="false"
+<span class="lineno">  32</span>         android:gravity="center|center_vertical|center_horizontal"
+</pre>
+<button id="RtlHardcodedDivLink" onclick="reveal('RtlHardcodedDiv');" />+ 8 More Occurrences...</button>
+<div id="RtlHardcodedDiv" style="display: none">
+<span class="location"><a href="src/main/res/layout/monitor_fragment.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/monitor_fragment.xml</a>:42</span>: <span class="message">Redundant attribute <code>layout_alignParentLeft</code>; already defining <code>layout_alignParentStart</code> with <code>targetSdkVersion</code> 18</span><br /><pre class="errorlines">
+<span class="lineno">  39</span>         android:layout_width="wrap_content"
+<span class="lineno">  40</span>         android:layout_height="match_parent"
+<span class="lineno">  41</span>         android:id="@+id/webView"
+<span class="lineno">  42</span>         <span class="errorspan">android:layout_alignParentLeft="true"</span>
+<span class="lineno">  43</span>         android:layout_alignParentStart="true"
+<span class="lineno">  44</span>         android:layout_below="@+id/timeAgo"
+</pre>
+<span class="location"><a href="src/main/res/layout/monitor_fragment.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/monitor_fragment.xml</a>:46</span>: <span class="message">Redundant attribute <code>layout_alignRight</code>; already defining <code>layout_alignEnd</code> with <code>targetSdkVersion</code> 18</span><br /><pre class="errorlines">
+<span class="lineno">  43</span>         android:layout_alignParentStart="true"
+<span class="lineno">  44</span>         android:layout_below="@+id/timeAgo"
+<span class="lineno">  45</span>         android:layout_alignEnd="@+id/timeAgo"
+<span class="lineno">  46</span>         <span class="errorspan">android:layout_alignRight="@+id/timeAgo"</span>
+<span class="lineno">  47</span>         android:layout_alignParentRight="true"
+<span class="lineno">  48</span>         android:layout_alignParentEnd="true"
+</pre>
+<span class="location"><a href="src/main/res/layout/monitor_fragment.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/monitor_fragment.xml</a>:47</span>: <span class="message">Redundant attribute <code>layout_alignParentRight</code>; already defining <code>layout_alignParentEnd</code> with <code>targetSdkVersion</code> 18</span><br /><pre class="errorlines">
+<span class="lineno">  44</span>         android:layout_below="@+id/timeAgo"
+<span class="lineno">  45</span>         android:layout_alignEnd="@+id/timeAgo"
+<span class="lineno">  46</span>         android:layout_alignRight="@+id/timeAgo"
+<span class="lineno">  47</span>         <span class="errorspan">android:layout_alignParentRight="true"</span>
+<span class="lineno">  48</span>         android:layout_alignParentEnd="true"
+<span class="lineno">  49</span>         android:layout_alignParentBottom="false"
+</pre>
+<span class="location"><a href="src/main/res/layout/monitor_fragment.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/monitor_fragment.xml</a>:60</span>: <span class="message">Redundant attribute <code>layout_alignParentLeft</code>; already defining <code>layout_alignParentStart</code> with <code>targetSdkVersion</code> 18</span><br /><pre class="errorlines">
+<span class="lineno">  57</span>         android:adjustViewBounds="false"
+<span class="lineno">  58</span>         android:baselineAlignBottom="false"
+<span class="lineno">  59</span>         android:layout_alignParentTop="true"
+<span class="lineno">  60</span>         <span class="errorspan">android:layout_alignParentLeft="true"</span>
+<span class="lineno">  61</span>         android:layout_alignParentStart="true" />
+<span class="lineno">  62</span> 
+</pre>
+<span class="location"><a href="src/main/res/layout/monitor_fragment.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/monitor_fragment.xml</a>:69</span>: <span class="message">Redundant attribute <code>layout_alignParentRight</code>; already defining <code>layout_alignParentEnd</code> with <code>targetSdkVersion</code> 18</span><br /><pre class="errorlines">
+<span class="lineno">  66</span>         android:id="@+id/usbButton"
+<span class="lineno">  67</span>         android:background="@drawable/ic_nousb"
+<span class="lineno">  68</span>         android:layout_alignParentTop="true"
+<span class="lineno">  69</span>         <span class="errorspan">android:layout_alignParentRight="true"</span>
+<span class="lineno">  70</span>         android:layout_alignParentEnd="true" />
+<span class="lineno">  71</span> 
+</pre>
+<span class="location"><a href="src/main/res/layout/monitor_fragment.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/monitor_fragment.xml</a>:84</span>: <span class="message">Consider replacing <code>android:layout_alignParentRight</code> with <code>android:layout_alignParentEnd="false"</code> to better support right-to-left layouts</span><br /><pre class="errorlines">
+<span class="lineno">  81</span>         android:progressDrawable="@drawable/circular"
+<span class="lineno">  82</span>         android:layout_below="@+id/usbButton"
+<span class="lineno">  83</span>         android:layout_alignBaseline="@+id/usbButton"
+<span class="lineno">  84</span>         <span class="errorspan">android:layout_alignParentRight="false"</span>
+<span class="lineno">  85</span>         android:layout_alignLeft="@+id/usbButton"
+<span class="lineno">  86</span>         android:layout_alignRight="@+id/usbButton" />
+</pre>
+<span class="location"><a href="src/main/res/layout/monitor_fragment.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/monitor_fragment.xml</a>:85</span>: <span class="message">Consider replacing <code>android:layout_alignLeft</code> with <code>android:layout_alignStart="@+id/usbButton"</code> to better support right-to-left layouts</span><br /><pre class="errorlines">
+<span class="lineno">  82</span>         android:layout_below="@+id/usbButton"
+<span class="lineno">  83</span>         android:layout_alignBaseline="@+id/usbButton"
+<span class="lineno">  84</span>         android:layout_alignParentRight="false"
+<span class="lineno">  85</span>         <span class="errorspan">android:layout_alignLeft="@+id/usbButton"</span>
+<span class="lineno">  86</span>         android:layout_alignRight="@+id/usbButton" />
+<span class="lineno">  87</span> 
+</pre>
+<span class="location"><a href="src/main/res/layout/monitor_fragment.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/layout/monitor_fragment.xml</a>:86</span>: <span class="message">Consider replacing <code>android:layout_alignRight</code> with <code>android:layout_alignEnd="@+id/usbButton"</code> to better support right-to-left layouts</span><br /><pre class="errorlines">
+<span class="lineno">  83</span>         android:layout_alignBaseline="@+id/usbButton"
+<span class="lineno">  84</span>         android:layout_alignParentRight="false"
+<span class="lineno">  85</span>         android:layout_alignLeft="@+id/usbButton"
+<span class="lineno">  86</span>         <span class="errorspan">android:layout_alignRight="@+id/usbButton" /></span>
+<span class="lineno">  87</span> 
+<span class="lineno">  88</span> &lt;/RelativeLayout>
+</pre>
+</div>
+</div>
+<div class="metadata">Priority: 5 / 10<br/>
+Category: Bi-directional Text</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Using left/right instead of start/end attributes.</div>
+<div class="explanation">
+Using <code>Gravity#LEFT</code> and <code>Gravity#RIGHT</code> can lead to problems when a layout is rendered in locales where text flows from right to left. Use <code>Gravity#START</code> and <code>Gravity#END</code> instead. Similarly, in XML <code>gravity</code> and <code>layout_gravity</code> attributes, use <code>start</code> rather than <code>left</code>.<br/>
+For XML attributes such as paddingLeft and <code>layout_marginLeft</code>, use <code>paddingStart</code> and <code>layout_marginStart</code>. <b>NOTE</b>: If your <code>minSdkVersion</code> is less than 17, you should add <b>both</b> the older left/right attributes <b>as well as</b> the new start/right attributes. On older platforms, where RTL is not supported and the start/right attributes are unknown and therefore ignored, you need the older left/right attributes. There is a separate lint check which catches that type of error.<br/>
+(Note: For <code>Gravity#LEFT</code> and <code>Gravity#START</code>, you can use these constants even when targeting older platforms, because the <code>start</code> bitmask is a superset of the <code>left</code> bitmask. Therefore, you can use <code>gravity="start"</code> rather than <code>gravity="left|start"</code>.)
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "RtlHardcoded" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+<a name="RtlEnabled"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">RtlEnabled: Using RTL attributes without enabling RTL support</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/AndroidManifest.xml">/Users/trhodes/workspace/android-uploader/app/src/main/AndroidManifest.xml</a></span>: <span class="message">The project references RTL attributes, but does not explicitly enable or disable RTL support with <code>android:supportsRtl</code> in the manifest</span><br />
+</div>
+<div class="metadata">Priority: 3 / 10<br/>
+Category: Bi-directional Text</div>
+Severity: <span class="warning">Warning</span><div class="summary">
+Explanation: Using RTL attributes without enabling RTL support.</div>
+<div class="explanation">
+To enable right-to-left support, when running on API 17 and higher, you must set the <code>android:supportsRtl</code> attribute in the manifest <code>&lt;application></code> element.<br/>
+If you have started adding RTL attributes, but have not yet finished the migration, you can set the attribute to false to satisfy this lint check.
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "RtlEnabled" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+
+<a name="MissingIssues"></a>
+<div class="category">Disabled Checks<div class="categorySeparator"></div>
+</div>
+The following issues were not run by lint, either because the check is not enabled by default, or because it was disabled with a command line flag or via one or more lint.xml configuration files in the project directories.
+<br/><br/>
+
+<a name="SuppressInfo"></a>
+<div class="category">Suppressing Warnings and Errors<div class="categorySeparator"></div>
+</div>
+Lint errors can be suppressed in a variety of ways:<br/>
+<br/>
+1. With a <code>@SuppressLint</code> annotation in the Java code<br/>
+2. With a <code>tools:ignore</code> attribute in the XML file<br/>
+3. With ignore flags specified in the <code>build.gradle</code> file, as explained below<br/>
+4. With a <code>lint.xml</code> configuration file in the project<br/>
+5. With a <code>lint.xml</code> configuration file passed to lint via the --config flag<br/>
+6. With the --ignore flag passed to lint.<br/>
+<br/>
+To suppress a lint warning with an annotation, add a <code>@SuppressLint("id")</code> annotation on the class, method or variable declaration closest to the warning instance you want to disable. The id can be one or more issue id's, such as <code>"UnusedResources"</code> or <code>{"UnusedResources","UnusedIds"}</code>, or it can be <code>"all"</code> to suppress all lint warnings in the given scope.<br/>
+<br/>
+To suppress a lint warning in an XML file, add a <code>tools:ignore="id"</code> attribute on the element containing the error, or one of its surrounding elements. You also need to define the namespace for the tools prefix on the root element in your document, next to the <code>xmlns:android</code> declaration:<br/>
+<code>xmlns:tools="http://schemas.android.com/tools"</code><br/>
+<br/>
+To suppress a lint warning in a <code>build.gradle</code> file, add a section like this:<br/>
+<br/>
+android {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;lintOptions {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;disable 'TypographyFractions','TypographyQuotes'<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+}<br/>
+<br/>
+Here we specify a comma separated list of issue id's after the disable command. You can also use <code>warning</code> or <code>error</code> instead of <code>disable</code> to change the severity of issues.<br/>
+<br/>
+To suppress lint warnings with a configuration XML file, create a file named <code>lint.xml</code> and place it at the root directory of the project in which it applies.<br/>
+<br/>
+The format of the <code>lint.xml</code> file is something like the following:<br/>
+<br/>
+&lt;?xml version="1.0" encoding="UTF-8"?><br/>
+&lt;lint><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!-- Disable this given check in this project --><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;issue id="IconMissingDensityFolder" severity="ignore" /><br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!-- Ignore the ObsoleteLayoutParam issue in the given files --><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;issue id="ObsoleteLayoutParam"><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ignore path="res/layout/activation.xml" /><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ignore path="res/layout-xlarge/activation.xml" /><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/issue><br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!-- Ignore the UselessLeaf issue in the given file --><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;issue id="UselessLeaf"><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ignore path="res/layout/main.xml" /><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/issue><br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;!-- Change the severity of hardcoded strings to "error" --><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;issue id="HardcodedText" severity="error" /><br/>
+&lt;/lint><br/>
+<br/>
+To suppress lint checks from the command line, pass the --ignore flag with a comma separated list of ids to be suppressed, such as:<br/>
+<code>$ lint --ignore UnusedResources,UselessLeaf /my/project/path</code><br/>
+<br/>
+For more information, see <a href="http://tools.android.com/tips/lint/suppressing-lint-warnings">http://tools.android.com/tips/lint/suppressing-lint-warnings</a><br/>
+
+
+</body>
+</html>

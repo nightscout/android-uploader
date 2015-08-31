@@ -12,37 +12,24 @@ import android.util.Log;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.events.AndroidEventReporter;
-import com.nightscout.android.mqtt.AndroidMqttPinger;
-import com.nightscout.android.mqtt.AndroidMqttTimer;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.android.upload.Uploader;
 import com.nightscout.android.wearables.Pebble;
-import com.nightscout.core.events.EventSeverity;
-import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.G4Download;
-import com.nightscout.core.mqtt.MqttEventMgr;
-import com.nightscout.core.mqtt.MqttPinger;
-import com.nightscout.core.mqtt.MqttTimer;
 import com.nightscout.core.utils.RestUriUtils;
 import com.squareup.otto.Subscribe;
 
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-
 import java.net.URI;
-import java.util.Arrays;
 
 public class ProcessorService extends Service {
 
     private static final String TAG = ProcessorService.class.getSimpleName();
     private Pebble pebble;
-    private MqttEventMgr mqttManager;
     private AndroidEventReporter reporter;
     private AndroidPreferences preferences;
     private Tracker tracker;
     private final IBinder mBinder = new LocalBinder();
+    private Uploader uploader;
 
 
     @Override
@@ -56,12 +43,6 @@ public class ProcessorService extends Service {
             pebble.setUnits(preferences.getPreferredUnits());
             pebble.setPwdName(preferences.getPwdName());
         }
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                setupMqtt();
-            }
-        }).start();
         tracker = ((Nightscout) getApplicationContext()).getTracker();
         reportUploadMethods();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -71,55 +52,7 @@ public class ProcessorService extends Service {
                 @Override
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
                                                       String key) {
-                    String[] prefKeys = {getApplicationContext().getString(R.string.rest_enable),
-                                         getApplicationContext().getString(R.string.rest_uris),
-                                         getApplicationContext().getString(R.string.mongo_enable),
-                                         getApplicationContext().getString(R.string.mongo_uri),
-                                         getApplicationContext()
-                                             .getString(R.string.mongo_entries_collection),
-                                         getApplicationContext()
-                                             .getString(R.string.mongo_devicestatus_collection)};
-                    if (Arrays.asList(prefKeys).contains(key)) {
-                        uploader = new Uploader(getApplicationContext(), preferences);
-                    } else if (key
-                        .equals(getApplicationContext().getString(R.string.mqtt_enable))) {
-                        // Assume that MQTT already has the information needed and set it up.
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                setupMqtt();
-                                if (mqttManager != null && mqttManager.isConnected()) {
-                                    mqttManager.setShouldReconnect(false);
-                                    mqttManager.disconnect();
-                                    mqttManager.setShouldReconnect(true);
-                                }
-                            }
-                        }).start();
-                    } else {
-                        Log.d(TAG, "Meh... something uninteresting changed");
-                    }
-
-                    // Assume that MQTT is already enabled and the MQTT endpoint and credentials are just changing
-                    prefKeys =
-                        new String[]{getApplicationContext().getString(R.string.mqtt_endpoint),
-                                     getApplicationContext().getString(R.string.mqtt_pass),
-                                     getApplicationContext().getString(R.string.mqtt_user)};
-                    if (preferences.isMqttEnabled() && Arrays.asList(prefKeys).contains(key)) {
-
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                setupMqtt();
-                                Log.d(TAG, "MQTT change detected. Restarting MQTT");
-                                if (mqttManager != null && mqttManager.isConnected()) {
-                                    mqttManager.setShouldReconnect(false);
-                                    mqttManager.disconnect();
-                                    mqttManager.setShouldReconnect(true);
-                                }
-                            }
-                        }).start();
-                    }
-                    if (key.equals(getString(R.string.preferred_units)) && preferences
+                                        if (key.equals(getString(R.string.preferred_units)) && preferences
                         .isCampingModeEnabled()) {
                         pebble.config(preferences.getPwdName(), preferences.getPreferredUnits(),
                                       getApplicationContext());
@@ -149,46 +82,6 @@ public class ProcessorService extends Service {
         super.onDestroy();
         if (pebble != null) {
             pebble.close();
-        }
-        if (mqttManager != null) {
-            mqttManager.setShouldReconnect(false);
-            mqttManager.close();
-        }
-    }
-
-    public void setupMqtt() {
-        if (preferences.isMqttEnabled()) {
-            mqttManager = setupMqttConnection(preferences.getMqttUser(), preferences.getMqttPass(), preferences.getMqttEndpoint());
-            if (mqttManager != null) {
-                Log.d(TAG, "Attempt to connect to MQTT");
-                mqttManager.setShouldReconnect(true);
-                mqttManager.connect();
-            } else {
-                Log.d(TAG, "MQTT is NULL");
-            }
-        }
-    }
-
-    public MqttEventMgr setupMqttConnection(String user, String pass, String endpoint) {
-        if (user.equals("") || pass.equals("") || endpoint.equals("")) {
-            reporter.report(EventType.UPLOADER, EventSeverity.ERROR, "Unable to setup MQTT. Please check settings");
-            return null;
-        }
-        try {
-            MqttConnectOptions mqttOptions = new MqttConnectOptions();
-            mqttOptions.setCleanSession(true);
-            mqttOptions.setKeepAliveInterval(150000);
-            mqttOptions.setUserName(user);
-            mqttOptions.setPassword(pass.toCharArray());
-            String androidId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-            MemoryPersistence dataStore = new MemoryPersistence();
-            MqttClient client = new MqttClient(endpoint, androidId, dataStore);
-            MqttPinger pinger = new AndroidMqttPinger(getApplicationContext(), 0, client, 150000);
-            MqttTimer timer = new AndroidMqttTimer(getApplicationContext(), 0);
-            return new MqttEventMgr(client, mqttOptions, pinger, timer, reporter);
-        } catch (MqttException e) {
-            reporter.report(EventType.UPLOADER, EventSeverity.ERROR, "Unable to setup MQTT. Please check settings");
-            return null;
         }
     }
 
