@@ -51,8 +51,8 @@ public class CollectorService extends IntentService {
     @Named("dexcomDriverSupplier")
     Supplier<DeviceTransport> dexcomDriverSupplier;
 
-    public CollectorService(String name) {
-        super(name);
+    public CollectorService() {
+      super("CollectorService");
     }
 
     @Override

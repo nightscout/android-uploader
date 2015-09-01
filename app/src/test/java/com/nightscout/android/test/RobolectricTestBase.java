@@ -30,22 +30,11 @@ public class RobolectricTestBase {
     public final void setUpBase() {
         getShadowApplication().declareActionUnbindable(
             "com.google.android.gms.analytics.service.START");
-
-        mockServices();
     }
 
     @Test
     public void shouldHaveApplication() {
         assertThat(getContext(), is(notNullValue()));
-    }
-
-    private void mockServices() {
-        CollectorService.LocalBinder collectorBinder = Mockito.mock(CollectorService.LocalBinder.class);
-        Mockito.when(collectorBinder.getService()).thenReturn(Mockito.mock(CollectorService.class));
-        getShadowApplication().setComponentNameAndServiceForBindService(new ComponentName("com.nightscout.android", "CollectorService"), collectorBinder);
-        ProcessorService.LocalBinder processorBinder = Mockito.mock(ProcessorService.LocalBinder.class);
-        Mockito.when(processorBinder.getService()).thenReturn(Mockito.mock(ProcessorService.class));
-        getShadowApplication().setComponentNameAndServiceForBindService(new ComponentName("com.nightscout.android", "ProcessorService"), collectorBinder);
     }
 
     public void whenOnBroadcastReceived(String intentKey, final Function<Intent, Void> verifyCallback) {

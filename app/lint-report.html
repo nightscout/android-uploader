@@ -18,18 +18,14 @@ document.getElementById(id+'Link').style.display = 'none';
 <body>
 <h1>Lint Report</h1>
 <div class="titleSeparator"></div>
-Check performed at Mon Aug 31 22:16:51 PDT 2015.<br/>
-1 errors and 157 warnings found:<br/><br/>
+Check performed at Mon Aug 31 22:32:01 PDT 2015.<br/>
+0 errors and 157 warnings found:<br/><br/>
 <table class="overview">
 <tr><td></td><td class="categoryColumn"><a href="#Correctness">Correctness</a>
 </td></tr>
 <tr>
 <td class="countColumn">3</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
 <a href="#DefaultLocale">DefaultLocale: Implied default locale in case conversion</a>
-</td></tr>
-<tr>
-<td class="countColumn">1</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-error.png" alt="Error" />
-<a href="#Instantiatable">Instantiatable: Registered class is not instantiatable</a>
 </td></tr>
 <tr>
 <td class="countColumn">4</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
@@ -175,29 +171,6 @@ If you want the methods to just perform ASCII replacement, for example to conver
 </div>
 <br/><div class="moreinfo">More info: <a href="http://developer.android.com/reference/java/util/Locale.html#default_locale">http://developer.android.com/reference/java/util/Locale.html#default_locale</a>
 </div><br/>To suppress this error, use the issue id "DefaultLocale" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
-</div>
-<a name="Instantiatable"></a>
-<div class="issue">
-<div class="id"><a href="#" title="Return to top">Instantiatable: Registered class is not instantiatable</a><div class="issueSeparator"></div>
-</div>
-<div class="warningslist">
-<span class="location"><a href="src/main/java/com/nightscout/android/CollectorService.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/CollectorService.java</a>:54</span>: <span class="message">This class should provide a default constructor (a public constructor with no arguments) (com.nightscout.android.CollectorService)</span><br /><pre class="errorlines">
-<span class="lineno">  51</span>     @Named("dexcomDriverSupplier")
-<span class="lineno">  52</span>     Supplier&lt;DeviceTransport> dexcomDriverSupplier;
-<span class="lineno">  53</span> 
-<span class="lineno">  54</span>     public <span class="errorspan">CollectorService(String name) {</span>
-<span class="lineno">  55</span>         super(name);
-<span class="lineno">  56</span>     }
-</pre>
-</div>
-<div class="metadata">Priority: 6 / 10<br/>
-Category: Correctness</div>
-Severity: <span class="error">Fatal</span><div class="summary">
-Explanation: Registered class is not instantiatable.</div>
-<div class="explanation">
-Activities, services, broadcast receivers etc. registered in the manifest file must be "instantiatable" by the system, which means that the class must be public, it must have an empty public constructor, and if it's an inner class, it must be a static inner class.
-</div>
-<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "Instantiatable" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
 </div>
 <a name="InvalidPackage"></a>
 <div class="issue">
