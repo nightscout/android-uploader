@@ -4,7 +4,7 @@ import com.nightscout.core.Timestamped;
 import com.nightscout.core.dexcom.CRCFailError;
 import com.nightscout.core.dexcom.InvalidRecordLengthException;
 import com.nightscout.core.dexcom.Utils;
-import com.nightscout.core.events.EventReporter;
+import com.nightscout.core.events.reporters.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.v2.Download;

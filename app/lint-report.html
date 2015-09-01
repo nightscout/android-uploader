@@ -18,14 +18,18 @@ document.getElementById(id+'Link').style.display = 'none';
 <body>
 <h1>Lint Report</h1>
 <div class="titleSeparator"></div>
-Check performed at Sun Aug 30 21:29:45 PDT 2015.<br/>
-0 errors and 156 warnings found:<br/><br/>
+Check performed at Mon Aug 31 22:16:51 PDT 2015.<br/>
+1 errors and 157 warnings found:<br/><br/>
 <table class="overview">
 <tr><td></td><td class="categoryColumn"><a href="#Correctness">Correctness</a>
 </td></tr>
 <tr>
 <td class="countColumn">3</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
 <a href="#DefaultLocale">DefaultLocale: Implied default locale in case conversion</a>
+</td></tr>
+<tr>
+<td class="countColumn">1</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-error.png" alt="Error" />
+<a href="#Instantiatable">Instantiatable: Registered class is not instantiatable</a>
 </td></tr>
 <tr>
 <td class="countColumn">4</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
@@ -59,18 +63,14 @@ Check performed at Sun Aug 30 21:29:45 PDT 2015.<br/>
 </td></tr>
 <tr>
 <td class="countColumn">1</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
-<a href="#Wakelock">Wakelock: Incorrect <code>WakeLock</code> usage</a>
-</td></tr>
-<tr>
-<td class="countColumn">1</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
 <a href="#Recycle">Recycle: Missing <code>recycle()</code> calls</a>
 </td></tr>
 <tr>
-<td class="countColumn">33</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<td class="countColumn">32</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
 <a href="#LogConditional">LogConditional: Unconditional Logging Calls</a>
 </td></tr>
 <tr>
-<td class="countColumn">50</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
+<td class="countColumn">53</td><td class="issueColumn"><img border="0" align="top" src="lint-report_files/lint-warning.png" alt="Warning" />
 <a href="#UnusedResources">UnusedResources: Unused resources</a>
 </td></tr>
 <tr>
@@ -175,6 +175,29 @@ If you want the methods to just perform ASCII replacement, for example to conver
 </div>
 <br/><div class="moreinfo">More info: <a href="http://developer.android.com/reference/java/util/Locale.html#default_locale">http://developer.android.com/reference/java/util/Locale.html#default_locale</a>
 </div><br/>To suppress this error, use the issue id "DefaultLocale" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
+</div>
+<a name="Instantiatable"></a>
+<div class="issue">
+<div class="id"><a href="#" title="Return to top">Instantiatable: Registered class is not instantiatable</a><div class="issueSeparator"></div>
+</div>
+<div class="warningslist">
+<span class="location"><a href="src/main/java/com/nightscout/android/CollectorService.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/CollectorService.java</a>:54</span>: <span class="message">This class should provide a default constructor (a public constructor with no arguments) (com.nightscout.android.CollectorService)</span><br /><pre class="errorlines">
+<span class="lineno">  51</span>     @Named("dexcomDriverSupplier")
+<span class="lineno">  52</span>     Supplier&lt;DeviceTransport> dexcomDriverSupplier;
+<span class="lineno">  53</span> 
+<span class="lineno">  54</span>     public <span class="errorspan">CollectorService(String name) {</span>
+<span class="lineno">  55</span>         super(name);
+<span class="lineno">  56</span>     }
+</pre>
+</div>
+<div class="metadata">Priority: 6 / 10<br/>
+Category: Correctness</div>
+Severity: <span class="error">Fatal</span><div class="summary">
+Explanation: Registered class is not instantiatable.</div>
+<div class="explanation">
+Activities, services, broadcast receivers etc. registered in the manifest file must be "instantiatable" by the system, which means that the class must be public, it must have an empty public constructor, and if it's an inner class, it must be a static inner class.
+</div>
+<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "Instantiatable" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
 </div>
 <a name="InvalidPackage"></a>
 <div class="issue">
@@ -496,31 +519,6 @@ There <b>are</b> cases where you might need to use <code>dp</code>; typically th
 <a name="Performance"></a>
 <div class="category"><a href="#" title="Return to top">Performance</a><div class="categorySeparator"></div>
 </div>
-<a name="Wakelock"></a>
-<div class="issue">
-<div class="id"><a href="#" title="Return to top">Wakelock: Incorrect <code>WakeLock</code> usage</a><div class="issueSeparator"></div>
-</div>
-<div class="warningslist">
-<span class="location"><a href="src/main/java/com/nightscout/android/CollectorService.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/CollectorService.java</a>:212</span>: <span class="message">The <code>release()</code> call is not always reached (via exceptional flow)</span><br /><pre class="errorlines">
-<span class="lineno"> 209</span>                         .setFatal(false)
-<span class="lineno"> 210</span>                         .build());
-<span class="lineno"> 211</span>             }
-<span class="lineno"> 212</span>             wl.<span class="errorspan">release();</span>
-<span class="lineno"> 213</span> 
-<span class="lineno"> 214</span>             if (download != null) {
-</pre>
-</div>
-<div class="metadata">Priority: 9 / 10<br/>
-Category: Performance</div>
-Severity: <span class="warning">Warning</span><div class="summary">
-Explanation: Incorrect <code>WakeLock</code> usage.</div>
-<div class="explanation">
-Failing to release a wakelock properly can keep the Android device in a high power mode, which reduces battery life. There are several causes of this, such as releasing the wake lock in <code>onDestroy()</code> instead of in <code>onPause()</code>, failing to call <code>release()</code> in all possible code paths after an <code>acquire()</code>, and so on.<br/>
-<br/>
-NOTE: If you are using the lock just to keep the screen on, you should strongly consider using <code>FLAG_KEEP_SCREEN_ON</code> instead. This window flag will be correctly managed by the platform as the user moves between applications and doesn't require a special permission. See <a href="http://developer.android.com/reference/android/view/WindowManager.LayoutParams.html#FLAG_KEEP_SCREEN_ON">http://developer.android.com/reference/android/view/WindowManager.LayoutParams.html#FLAG_KEEP_SCREEN_ON</a>.
-</div>
-<br/><div class="moreinfo">More info: </div><br/>To suppress this error, use the issue id "Wakelock" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
-</div>
 <a name="Recycle"></a>
 <div class="issue">
 <div class="id"><a href="#" title="Return to top">Recycle: Missing <code>recycle()</code> calls</a><div class="issueSeparator"></div>
@@ -549,13 +547,13 @@ Many resources, such as TypedArrays, VelocityTrackers, etc., should be recycled 
 <div class="id"><a href="#" title="Return to top">LogConditional: Unconditional Logging Calls</a><div class="issueSeparator"></div>
 </div>
 <div class="warningslist">
-<span class="location"><a href="src/main/java/com/nightscout/android/events/AndroidEventReporter.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/events/AndroidEventReporter.java</a>:33</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
-<span class="lineno">  30</span>     }
-<span class="lineno">  31</span> 
-<span class="lineno">  32</span>     public synchronized void report(EventType type, EventSeverity severity, String message) {
-<span class="lineno">  33</span>         <span class="errorspan">Log.d("AndroidEventReporter", type.name() + " " + severity.name() + " " + message);</span>
-<span class="lineno">  34</span>         ContentValues values = new ContentValues();
-<span class="lineno">  35</span>         values.put(EventsContract.EventEntry.COLUMN_NAME_TIME_STAMP, new Date().getTime());
+<span class="location"><a href="src/main/java/com/nightscout/android/events/reporters/AndroidEventReporter.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/events/reporters/AndroidEventReporter.java</a>:35</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
+<span class="lineno">  32</span>     }
+<span class="lineno">  33</span> 
+<span class="lineno">  34</span>     public synchronized void report(EventType type, EventSeverity severity, String message) {
+<span class="lineno">  35</span>         <span class="errorspan">Log.d("AndroidEventReporter", type.name() + " " + severity.name() + " " + message);</span>
+<span class="lineno">  36</span>         ContentValues values = new ContentValues();
+<span class="lineno">  37</span>         values.put(EventsContract.EventEntry.COLUMN_NAME_TIME_STAMP, new Date().getTime());
 </pre>
 <span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:228</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
 <span class="lineno"> 225</span>         bytes[1] = MESSAGE_COUNT;
@@ -589,7 +587,7 @@ Many resources, such as TypedArrays, VelocityTrackers, etc., should be recycled 
 <span class="lineno"> 322</span> 
 <span class="lineno"> 323</span>         if (mBluetoothAdapter == null || address == null) {
 </pre>
-<button id="LogConditionalDivLink" onclick="reveal('LogConditionalDiv');" />+ 28 More Occurrences...</button>
+<button id="LogConditionalDivLink" onclick="reveal('LogConditionalDiv');" />+ 27 More Occurrences...</button>
 <div id="LogConditionalDiv" style="display: none">
 <span class="location"><a href="src/main/java/com/nightscout/android/drivers/BluetoothTransport.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/drivers/BluetoothTransport.java</a>:362</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
 <span class="lineno"> 359</span>     private byte[] getHandshakeKey() {
@@ -791,14 +789,6 @@ Many resources, such as TypedArrays, VelocityTrackers, etc., should be recycled 
 <span class="lineno"> 173</span>         EventsDbHelper dbHelper = EventsDbHelper.getHelper(getActivity().getApplicationContext());
 <span class="lineno"> 174</span>         SQLiteDatabase db = dbHelper.getReadableDatabase();
 </pre>
-<span class="location"><a href="src/main/java/com/nightscout/android/wearables/Pebble.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/wearables/Pebble.java</a>:46</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
-<span class="lineno">  43</span>     private PebbleKit.PebbleDataReceiver dataReceiver = new PebbleKit.PebbleDataReceiver(PEBBLEAPP_UUID) {
-<span class="lineno">  44</span>         @Override
-<span class="lineno">  45</span>         public void receiveData(final Context mContext, final int transactionId, final PebbleDictionary data) {
-<span class="lineno">  46</span>             <span class="errorspan">Log.d(TAG, "Received query. data: " + data.size());</span>
-<span class="lineno">  47</span>             PebbleKit.sendAckToPebble(mContext, transactionId);
-<span class="lineno">  48</span>             sendDownload(currentReading);
-</pre>
 <span class="location"><a href="src/main/java/com/nightscout/android/preferences/PreferencesValidator.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/preferences/PreferencesValidator.java</a>:74</span>: <span class="message">The log call Log.d(...) should be conditional: surround with <code>if (Log.isLoggable(...))</code> or <code>if (BuildConfig.DEBUG) { ... }</code></span><br /><pre class="errorlines">
 <span class="lineno">  71</span>         if (Strings.isNullOrEmpty(serialNum)) {
 <span class="lineno">  72</span>             return Optional.of(context.getString(R.string.invalid_share2_serial, serialNum));
@@ -866,7 +856,7 @@ If you <b>really</b> intend for the logging to be present in release mode, you c
 <span class="lineno">  13</span> 
 <span class="lineno">  14</span>     &lt;!--  The following value should be replaced with correct property id. -->
 </pre>
-<button id="UnusedResourcesDivLink" onclick="reveal('UnusedResourcesDiv');" />+ 45 More Occurrences...</button>
+<button id="UnusedResourcesDivLink" onclick="reveal('UnusedResourcesDiv');" />+ 48 More Occurrences...</button>
 <div id="UnusedResourcesDiv" style="display: none">
 <span class="location"><a href="src/main/res/xml/app_tracker.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/xml/app_tracker.xml</a>:15</span>: <span class="message">The resource <code>R.string.ga_trackingId</code> appears to be unused</span><br /><pre class="errorlines">
 <span class="lineno">  12</span>     &lt;screenName name="com.nightscout.android.MainActivity">Main screen&lt;/screenName>
@@ -1006,6 +996,34 @@ Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:61</span>
 </ul>
 </div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:31</span>: <span class="message">The resource <code>R.string.unknown_mongo_host</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  28</span>     &lt;string name="UploadLabelText">Upload&lt;/string>
+<span class="lineno">  29</span>     &lt;string name="DexBatteryLabelText">Dex Battery&lt;/string>
+<span class="lineno">  30</span>     &lt;string name="TimeSyncLabelText">Time&lt;/string>
+<span class="lineno">  31</span>     &lt;string <span class="errorspan">name="unknown_mongo_host">Error resolving Mongo host. Double check mongo url.&lt;/string></span>
+<span class="lineno">  32</span>     &lt;string name="illegal_rest_url">Could not create API uploader. Check your settings.&lt;/string>
+<span class="lineno">  33</span> 
+</pre>
+<ul></ul><button id="Location20DivLink" onclick="reveal('Location20Div');" />+ 1 Additional Locations...</button>
+<div id="Location20Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:36</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:32</span>: <span class="message">The resource <code>R.string.illegal_rest_url</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  29</span>     &lt;string name="DexBatteryLabelText">Dex Battery&lt;/string>
+<span class="lineno">  30</span>     &lt;string name="TimeSyncLabelText">Time&lt;/string>
+<span class="lineno">  31</span>     &lt;string name="unknown_mongo_host">Error resolving Mongo host. Double check mongo url.&lt;/string>
+<span class="lineno">  32</span>     &lt;string <span class="errorspan">name="illegal_rest_url">Could not create API uploader. Check your settings.&lt;/string></span>
+<span class="lineno">  33</span> 
+<span class="lineno">  34</span>     &lt;string name="donate_dialog_title">Donate data?&lt;/string>
+</pre>
+<ul></ul><button id="Location21DivLink" onclick="reveal('Location21Div');" />+ 1 Additional Locations...</button>
+<div id="Location21Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:37</span>
+</ul>
+</div><br/><br/>
 <span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:34</span>: <span class="message">The resource <code>R.string.donate_dialog_title</code> appears to be unused</span><br /><pre class="errorlines">
 <span class="lineno">  31</span>     &lt;string name="unknown_mongo_host">Error resolving Mongo host. Double check mongo url.&lt;/string>
 <span class="lineno">  32</span>     &lt;string name="illegal_rest_url">Could not create API uploader. Check your settings.&lt;/string>
@@ -1014,8 +1032,8 @@ Additional locations: <ul>
 <span class="lineno">  35</span>     &lt;string name="donate_dialog_summary">Will you anonymously donate your CGM data for research in order to speed up diabetes innovation?&lt;/string>
 <span class="lineno">  36</span>     &lt;string name="donate_dialog_yes">Yes&lt;/string>
 </pre>
-<ul></ul><button id="Location20DivLink" onclick="reveal('Location20Div');" />+ 1 Additional Locations...</button>
-<div id="Location20Div" style="display: none">
+<ul></ul><button id="Location22DivLink" onclick="reveal('Location22Div');" />+ 1 Additional Locations...</button>
+<div id="Location22Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:31</span>
 </ul>
@@ -1028,8 +1046,8 @@ Additional locations: <ul>
 <span class="lineno">  36</span>     &lt;string name="donate_dialog_yes">Yes&lt;/string>
 <span class="lineno">  37</span>     &lt;string name="donate_dialog_no">No&lt;/string>
 </pre>
-<ul></ul><button id="Location21DivLink" onclick="reveal('Location21Div');" />+ 1 Additional Locations...</button>
-<div id="Location21Div" style="display: none">
+<ul></ul><button id="Location23DivLink" onclick="reveal('Location23Div');" />+ 1 Additional Locations...</button>
+<div id="Location23Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:32</span>
 </ul>
@@ -1042,8 +1060,8 @@ Additional locations: <ul>
 <span class="lineno">  37</span>     &lt;string name="donate_dialog_no">No&lt;/string>
 <span class="lineno">  38</span> 
 </pre>
-<ul></ul><button id="Location22DivLink" onclick="reveal('Location22Div');" />+ 1 Additional Locations...</button>
-<div id="Location22Div" style="display: none">
+<ul></ul><button id="Location24DivLink" onclick="reveal('Location24Div');" />+ 1 Additional Locations...</button>
+<div id="Location24Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:33</span>
 </ul>
@@ -1056,8 +1074,8 @@ Additional locations: <ul>
 <span class="lineno">  38</span> 
 <span class="lineno">  39</span>     &lt;string name="auto_configure_title">Auto configure&lt;/string>
 </pre>
-<ul></ul><button id="Location23DivLink" onclick="reveal('Location23Div');" />+ 1 Additional Locations...</button>
-<div id="Location23Div" style="display: none">
+<ul></ul><button id="Location25DivLink" onclick="reveal('Location25Div');" />+ 1 Additional Locations...</button>
+<div id="Location25Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:34</span>
 </ul>
@@ -1070,8 +1088,8 @@ Additional locations: <ul>
 <span class="lineno">  62</span>     &lt;string name="invalid_rest_uri">Invalid rest url %s, please double check formatting. URLs should be percent encoded&lt;/string>
 <span class="lineno">  63</span>     &lt;string name="invalid_mqtt_endpoint">Invalid mqtt url %s, please double check formatting.&lt;/string>
 </pre>
-<ul></ul><button id="Location24DivLink" onclick="reveal('Location24Div');" />+ 1 Additional Locations...</button>
-<div id="Location24Div" style="display: none">
+<ul></ul><button id="Location26DivLink" onclick="reveal('Location26Div');" />+ 1 Additional Locations...</button>
+<div id="Location26Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:68</span>
 </ul>
@@ -1084,8 +1102,8 @@ Additional locations: <ul>
 <span class="lineno">  68</span>     &lt;string name="default_pwd_name">Camping&lt;/string>
 <span class="lineno">  69</span>     &lt;string name="app_started">Application started&lt;/string>
 </pre>
-<ul></ul><button id="Location25DivLink" onclick="reveal('Location25Div');" />+ 1 Additional Locations...</button>
-<div id="Location25Div" style="display: none">
+<ul></ul><button id="Location27DivLink" onclick="reveal('Location27Div');" />+ 1 Additional Locations...</button>
+<div id="Location27Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:69</span>
 </ul>
@@ -1098,8 +1116,8 @@ Additional locations: <ul>
 <span class="lineno">  70</span>     &lt;string name="g4_connected">G4 receiver is connected&lt;/string>
 <span class="lineno">  71</span>     &lt;string name="g4_disconnected">G4 has been disconnected&lt;/string>
 </pre>
-<ul></ul><button id="Location26DivLink" onclick="reveal('Location26Div');" />+ 1 Additional Locations...</button>
-<div id="Location26Div" style="display: none">
+<ul></ul><button id="Location28DivLink" onclick="reveal('Location28Div');" />+ 1 Additional Locations...</button>
+<div id="Location28Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:71</span>
 </ul>
@@ -1112,8 +1130,8 @@ Additional locations: <ul>
 <span class="lineno">  71</span>     &lt;string name="g4_disconnected">G4 has been disconnected&lt;/string>
 <span class="lineno">  72</span>     &lt;string name="event_log_menu_text">Event log&lt;/string>
 </pre>
-<ul></ul><button id="Location27DivLink" onclick="reveal('Location27Div');" />+ 1 Additional Locations...</button>
-<div id="Location27Div" style="display: none">
+<ul></ul><button id="Location29DivLink" onclick="reveal('Location29Div');" />+ 1 Additional Locations...</button>
+<div id="Location29Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:72</span>
 </ul>
@@ -1126,8 +1144,8 @@ Additional locations: <ul>
 <span class="lineno">  72</span>     &lt;string name="event_log_menu_text">Event log&lt;/string>
 <span class="lineno">  73</span>     &lt;string name="event_sync_log">Receiver download complete&lt;/string>
 </pre>
-<ul></ul><button id="Location28DivLink" onclick="reveal('Location28Div');" />+ 1 Additional Locations...</button>
-<div id="Location28Div" style="display: none">
+<ul></ul><button id="Location30DivLink" onclick="reveal('Location30Div');" />+ 1 Additional Locations...</button>
+<div id="Location30Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:73</span>
 </ul>
@@ -1140,10 +1158,24 @@ Additional locations: <ul>
 <span class="lineno">  74</span>     &lt;string name="crc_fail_log">CRC check failed. Will try again in 5 minutes&lt;/string>
 <span class="lineno">  75</span>     &lt;string name="unknown_fail_log">Unknown error encountered. Will try again in 5 minutes&lt;/string>
 </pre>
-<ul></ul><button id="Location29DivLink" onclick="reveal('Location29Div');" />+ 1 Additional Locations...</button>
-<div id="Location29Div" style="display: none">
+<ul></ul><button id="Location31DivLink" onclick="reveal('Location31Div');" />+ 1 Additional Locations...</button>
+<div id="Location31Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:76</span>
+</ul>
+</div><br/><br/>
+<span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:74</span>: <span class="message">The resource <code>R.string.crc_fail_log</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno">  71</span>     &lt;string name="g4_disconnected">G4 has been disconnected&lt;/string>
+<span class="lineno">  72</span>     &lt;string name="event_log_menu_text">Event log&lt;/string>
+<span class="lineno">  73</span>     &lt;string name="event_sync_log">Receiver download complete&lt;/string>
+<span class="lineno">  74</span>     &lt;string <span class="errorspan">name="crc_fail_log">CRC check failed. Will try again in 5 minutes&lt;/string></span>
+<span class="lineno">  75</span>     &lt;string name="unknown_fail_log">Unknown error encountered. Will try again in 5 minutes&lt;/string>
+<span class="lineno">  76</span>     &lt;string name="event_fail_log">Application error encountered while reading from receiver.&lt;/string>
+</pre>
+<ul></ul><button id="Location32DivLink" onclick="reveal('Location32Div');" />+ 1 Additional Locations...</button>
+<div id="Location32Div" style="display: none">
+Additional locations: <ul>
+<li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:77</span>
 </ul>
 </div><br/><br/>
 <span class="location"><a href="src/main/res/values/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values/strings.xml</a>:77</span>: <span class="message">The resource <code>R.string.event_success_upload</code> appears to be unused</span><br /><pre class="errorlines">
@@ -1154,8 +1186,8 @@ Additional locations: <ul>
 <span class="lineno">  78</span>     &lt;string name="development_settings">Development Drawer&lt;/string>
 <span class="lineno">  79</span>     &lt;string name="nightscout_icon">Nightscout Icon&lt;/string>
 </pre>
-<ul></ul><button id="Location30DivLink" onclick="reveal('Location30Div');" />+ 1 Additional Locations...</button>
-<div id="Location30Div" style="display: none">
+<ul></ul><button id="Location33DivLink" onclick="reveal('Location33Div');" />+ 1 Additional Locations...</button>
+<div id="Location33Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:80</span>
 </ul>
@@ -1168,8 +1200,8 @@ Additional locations: <ul>
 <span class="lineno">  82</span>     &lt;string name="device_log_menu">Device logs&lt;/string>
 <span class="lineno">  83</span>     &lt;string name="upload_log_menu">Upload Logs&lt;/string>
 </pre>
-<ul></ul><button id="Location31DivLink" onclick="reveal('Location31Div');" />+ 1 Additional Locations...</button>
-<div id="Location31Div" style="display: none">
+<ul></ul><button id="Location34DivLink" onclick="reveal('Location34Div');" />+ 1 Additional Locations...</button>
+<div id="Location34Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:84</span>
 </ul>
@@ -1182,8 +1214,8 @@ Additional locations: <ul>
 <span class="lineno">  85</span>     &lt;string name="no_uploaders">No uploaders have been configured.&lt;/string>
 <span class="lineno">  86</span>     &lt;string name="unhandled_mqtt_exception">MQTT Exception: %s&lt;/string>
 </pre>
-<ul></ul><button id="Location32DivLink" onclick="reveal('Location32Div');" />+ 1 Additional Locations...</button>
-<div id="Location32Div" style="display: none">
+<ul></ul><button id="Location35DivLink" onclick="reveal('Location35Div');" />+ 1 Additional Locations...</button>
+<div id="Location35Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:87</span>
 </ul>
@@ -1196,8 +1228,8 @@ Additional locations: <ul>
 <span class="lineno">  86</span>     &lt;string name="unhandled_mqtt_exception">MQTT Exception: %s&lt;/string>
 <span class="lineno">  87</span>     &lt;string name="error_bluetooth_not_supported">Bluetooth not supported&lt;/string>
 </pre>
-<ul></ul><button id="Location33DivLink" onclick="reveal('Location33Div');" />+ 1 Additional Locations...</button>
-<div id="Location33Div" style="display: none">
+<ul></ul><button id="Location36DivLink" onclick="reveal('Location36Div');" />+ 1 Additional Locations...</button>
+<div id="Location36Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:88</span>
 </ul>
@@ -1210,8 +1242,8 @@ Additional locations: <ul>
 <span class="lineno">  87</span>     &lt;string name="error_bluetooth_not_supported">Bluetooth not supported&lt;/string>
 <span class="lineno">  88</span>     &lt;string name="unknown_device">Unknown device&lt;/string>
 </pre>
-<ul></ul><button id="Location34DivLink" onclick="reveal('Location34Div');" />+ 1 Additional Locations...</button>
-<div id="Location34Div" style="display: none">
+<ul></ul><button id="Location37DivLink" onclick="reveal('Location37Div');" />+ 1 Additional Locations...</button>
+<div id="Location37Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:89</span>
 </ul>
@@ -1224,8 +1256,8 @@ Additional locations: <ul>
 <span class="lineno">  94</span>     &lt;string name="title_activity_bluetooth_scan">Bluetooth&lt;/string>
 <span class="lineno">  95</span>     &lt;string name="pref_title_device_type">Device type&lt;/string>
 </pre>
-<ul></ul><button id="Location35DivLink" onclick="reveal('Location35Div');" />+ 1 Additional Locations...</button>
-<div id="Location35Div" style="display: none">
+<ul></ul><button id="Location38DivLink" onclick="reveal('Location38Div');" />+ 1 Additional Locations...</button>
+<div id="Location38Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:96</span>
 </ul>
@@ -1238,8 +1270,8 @@ Additional locations: <ul>
 <span class="lineno"> 100</span>     &lt;string name="pref_bt_scan_share2">Discover Share device&lt;/string>
 <span class="lineno"> 101</span>     &lt;string name="pref_bt_scan_summary">Scan for bluetooth G4 Share receivers&lt;/string>
 </pre>
-<ul></ul><button id="Location36DivLink" onclick="reveal('Location36Div');" />+ 1 Additional Locations...</button>
-<div id="Location36Div" style="display: none">
+<ul></ul><button id="Location39DivLink" onclick="reveal('Location39Div');" />+ 1 Additional Locations...</button>
+<div id="Location39Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings.xml</a>:16</span>
 </ul>
@@ -1252,8 +1284,8 @@ Additional locations: <ul>
 <span class="lineno">  22</span> 
 <span class="lineno">  23</span>     &lt;!-- MongoDB Settings -->
 </pre>
-<ul></ul><button id="Location37DivLink" onclick="reveal('Location37Div');" />+ 1 Additional Locations...</button>
-<div id="Location37Div" style="display: none">
+<ul></ul><button id="Location40DivLink" onclick="reveal('Location40Div');" />+ 1 Additional Locations...</button>
+<div id="Location40Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:21</span>
 </ul>
@@ -1266,8 +1298,8 @@ Additional locations: <ul>
 <span class="lineno">  60</span>     &lt;string name="pref_summary_android_battery">The Android uploader battery percentage&lt;/string>
 <span class="lineno">  61</span> 
 </pre>
-<ul></ul><button id="Location38DivLink" onclick="reveal('Location38Div');" />+ 1 Additional Locations...</button>
-<div id="Location38Div" style="display: none">
+<ul></ul><button id="Location41DivLink" onclick="reveal('Location41Div');" />+ 1 Additional Locations...</button>
+<div id="Location41Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:59</span>
 </ul>
@@ -1280,8 +1312,8 @@ Additional locations: <ul>
 <span class="lineno">  61</span> 
 <span class="lineno">  62</span>     &lt;string name="pref_title_egv">EGVs&lt;/string>
 </pre>
-<ul></ul><button id="Location39DivLink" onclick="reveal('Location39Div');" />+ 1 Additional Locations...</button>
-<div id="Location39Div" style="display: none">
+<ul></ul><button id="Location42DivLink" onclick="reveal('Location42Div');" />+ 1 Additional Locations...</button>
+<div id="Location42Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:60</span>
 </ul>
@@ -1294,8 +1326,8 @@ Additional locations: <ul>
 <span class="lineno">  63</span>     &lt;string name="pref_summary_egv">Estimated Glucose Values&lt;/string>
 <span class="lineno">  64</span> 
 </pre>
-<ul></ul><button id="Location40DivLink" onclick="reveal('Location40Div');" />+ 1 Additional Locations...</button>
-<div id="Location40Div" style="display: none">
+<ul></ul><button id="Location43DivLink" onclick="reveal('Location43Div');" />+ 1 Additional Locations...</button>
+<div id="Location43Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:62</span>
 </ul>
@@ -1308,8 +1340,8 @@ Additional locations: <ul>
 <span class="lineno">  64</span> 
 <span class="lineno">  65</span>     &lt;string name="pref_title_meter_bg">Meter BGs&lt;/string>
 </pre>
-<ul></ul><button id="Location41DivLink" onclick="reveal('Location41Div');" />+ 1 Additional Locations...</button>
-<div id="Location41Div" style="display: none">
+<ul></ul><button id="Location44DivLink" onclick="reveal('Location44Div');" />+ 1 Additional Locations...</button>
+<div id="Location44Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:63</span>
 </ul>
@@ -1322,8 +1354,8 @@ Additional locations: <ul>
 <span class="lineno">  69</span>     &lt;string name="pref_summary_sensor_data">Raw ISIG data from sensor&lt;/string>
 <span class="lineno">  70</span> 
 </pre>
-<ul></ul><button id="Location42DivLink" onclick="reveal('Location42Div');" />+ 1 Additional Locations...</button>
-<div id="Location42Div" style="display: none">
+<ul></ul><button id="Location45DivLink" onclick="reveal('Location45Div');" />+ 1 Additional Locations...</button>
+<div id="Location45Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:68</span>
 </ul>
@@ -1336,8 +1368,8 @@ Additional locations: <ul>
 <span class="lineno">  70</span> 
 <span class="lineno">  71</span>     &lt;string name="pref_title_cal_data">Calibration Data&lt;/string>
 </pre>
-<ul></ul><button id="Location43DivLink" onclick="reveal('Location43Div');" />+ 1 Additional Locations...</button>
-<div id="Location43Div" style="display: none">
+<ul></ul><button id="Location46DivLink" onclick="reveal('Location46Div');" />+ 1 Additional Locations...</button>
+<div id="Location46Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:69</span>
 </ul>
@@ -1350,8 +1382,8 @@ Additional locations: <ul>
 <span class="lineno">  72</span>     &lt;string name="pref_summary_cal_data">Calibration data used in converting sensor ISIG values to glucose values&lt;/string>
 <span class="lineno">  73</span> 
 </pre>
-<ul></ul><button id="Location44DivLink" onclick="reveal('Location44Div');" />+ 1 Additional Locations...</button>
-<div id="Location44Div" style="display: none">
+<ul></ul><button id="Location47DivLink" onclick="reveal('Location47Div');" />+ 1 Additional Locations...</button>
+<div id="Location47Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:71</span>
 </ul>
@@ -1364,8 +1396,8 @@ Additional locations: <ul>
 <span class="lineno">  73</span> 
 <span class="lineno">  74</span>     &lt;!-- Settings for Display Options -->
 </pre>
-<ul></ul><button id="Location45DivLink" onclick="reveal('Location45Div');" />+ 1 Additional Locations...</button>
-<div id="Location45Div" style="display: none">
+<ul></ul><button id="Location48DivLink" onclick="reveal('Location48Div');" />+ 1 Additional Locations...</button>
+<div id="Location48Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:72</span>
 </ul>
@@ -1378,8 +1410,8 @@ Additional locations: <ul>
 <span class="lineno">  79</span>     &lt;string name="pref_summary_chart_options">Various configurations for chart&lt;/string>
 <span class="lineno">  80</span> 
 </pre>
-<ul></ul><button id="Location46DivLink" onclick="reveal('Location46Div');" />+ 1 Additional Locations...</button>
-<div id="Location46Div" style="display: none">
+<ul></ul><button id="Location49DivLink" onclick="reveal('Location49Div');" />+ 1 Additional Locations...</button>
+<div id="Location49Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:78</span>
 </ul>
@@ -1392,8 +1424,8 @@ Additional locations: <ul>
 <span class="lineno">  80</span> 
 <span class="lineno">  81</span>     &lt;!-- Chart Units Settings -->
 </pre>
-<ul></ul><button id="Location47DivLink" onclick="reveal('Location47Div');" />+ 1 Additional Locations...</button>
-<div id="Location47Div" style="display: none">
+<ul></ul><button id="Location50DivLink" onclick="reveal('Location50Div');" />+ 1 Additional Locations...</button>
+<div id="Location50Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:79</span>
 </ul>
@@ -1406,8 +1438,8 @@ Additional locations: <ul>
 <span class="lineno"> 105</span> 
 <span class="lineno"> 106</span>     &lt;string name="pref_title_about_version_number">Version number&lt;/string>
 </pre>
-<ul></ul><button id="Location48DivLink" onclick="reveal('Location48Div');" />+ 1 Additional Locations...</button>
-<div id="Location48Div" style="display: none">
+<ul></ul><button id="Location51DivLink" onclick="reveal('Location51Div');" />+ 1 Additional Locations...</button>
+<div id="Location51Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:106</span>
 </ul>
@@ -1420,8 +1452,8 @@ Additional locations: <ul>
 <span class="lineno"> 125</span>     &lt;string name="prefs_pwd_display_name_summary">This is the name of the pwd that will be displayed on other monitors e.g. pebble&lt;/string>
 <span class="lineno"> 126</span>     &lt;string name="pref_about_deviceid">Device ID&lt;/string>
 </pre>
-<ul></ul><button id="Location49DivLink" onclick="reveal('Location49Div');" />+ 1 Additional Locations...</button>
-<div id="Location49Div" style="display: none">
+<ul></ul><button id="Location52DivLink" onclick="reveal('Location52Div');" />+ 1 Additional Locations...</button>
+<div id="Location52Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:125</span>
 </ul>
@@ -1434,8 +1466,8 @@ Additional locations: <ul>
 <span class="lineno"> 126</span>     &lt;string name="pref_about_deviceid">Device ID&lt;/string>
 <span class="lineno"> 127</span> &lt;/resources>
 </pre>
-<ul></ul><button id="Location50DivLink" onclick="reveal('Location50Div');" />+ 1 Additional Locations...</button>
-<div id="Location50Div" style="display: none">
+<ul></ul><button id="Location53DivLink" onclick="reveal('Location53Div');" />+ 1 Additional Locations...</button>
+<div id="Location53Div" style="display: none">
 Additional locations: <ul>
 <li> <span class="location"><a href="src/main/res/values-it/strings_activity_settings.xml">/Users/trhodes/workspace/android-uploader/app/src/main/res/values-it/strings_activity_settings.xml</a>:126</span>
 </ul>
@@ -1754,13 +1786,13 @@ This lint check looks for TextViews which are likely to be displaying data: view
 <div class="id"><a href="#" title="Return to top">ClickableViewAccessibility: Accessibility in Custom Views</a><div class="issueSeparator"></div>
 </div>
 <div class="warningslist">
-<span class="location"><a href="src/main/java/com/nightscout/android/ui/MonitorFragment.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/ui/MonitorFragment.java</a>:167</span>: <span class="message"><code>com/nightscout/android/ui/MonitorFragment$3#onTouch</code> should call <code>View#performClick</code> when a click is detected</span><br /><pre class="errorlines">
-<span class="lineno"> 164</span>         // disable scroll on touch
-<span class="lineno"> 165</span>         mWebView.setOnTouchListener(new View.OnTouchListener() {
-<span class="lineno"> 166</span>             @Override
-<span class="lineno"> 167</span>             public boolean <span class="errorspan">onTouch(View v, MotionEvent event) {</span>
-<span class="lineno"> 168</span>                 return (event.getAction() == MotionEvent.ACTION_MOVE);
-<span class="lineno"> 169</span>             }
+<span class="location"><a href="src/main/java/com/nightscout/android/ui/MonitorFragment.java">/Users/trhodes/workspace/android-uploader/app/src/main/java/com/nightscout/android/ui/MonitorFragment.java</a>:107</span>: <span class="message"><code>com/nightscout/android/ui/MonitorFragment$1#onTouch</code> should call <code>View#performClick</code> when a click is detected</span><br /><pre class="errorlines">
+<span class="lineno"> 104</span>         // disable scroll on touch
+<span class="lineno"> 105</span>         mWebView.setOnTouchListener(new View.OnTouchListener() {
+<span class="lineno"> 106</span>             @Override
+<span class="lineno"> 107</span>             public boolean <span class="errorspan">onTouch(View v, MotionEvent event) {</span>
+<span class="lineno"> 108</span>                 return (event.getAction() == MotionEvent.ACTION_MOVE);
+<span class="lineno"> 109</span>             }
 </pre>
 </div>
 <div class="metadata">Priority: 6 / 10<br/>

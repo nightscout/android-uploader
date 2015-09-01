@@ -1,11 +1,13 @@
-package com.nightscout.android.events;
+package com.nightscout.android.events.reporters;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.nightscout.core.events.EventReporter;
+import com.nightscout.android.events.EventsContract;
+import com.nightscout.android.events.EventsDbHelper;
+import com.nightscout.core.events.reporters.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
 

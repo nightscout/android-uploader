@@ -1,7 +1,7 @@
 package com.nightscout.core.drivers;
 
 import com.nightscout.core.Timestamped;
-import com.nightscout.core.events.EventReporter;
+import com.nightscout.core.events.reporters.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.v2.Download;

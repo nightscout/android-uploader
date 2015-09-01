@@ -2,14 +2,10 @@ package com.nightscout.android.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Fragment;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -21,12 +17,9 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.nightscout.android.CollectorService;
 import com.nightscout.android.Nightscout;
-import com.nightscout.android.ProcessorService;
 import com.nightscout.android.R;
 import com.nightscout.android.events.UserEventPanelActivity;
-import com.nightscout.core.BusProvider;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.drivers.DeviceConnectionStatus;
 import com.nightscout.core.drivers.DeviceType;
@@ -40,8 +33,6 @@ import com.nightscout.core.model.v2.converters.SensorGlucoseValueConverter;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.DexcomG4Utils;
 import com.nightscout.core.utils.ListUtils;
-import com.squareup.otto.Bus;
-import com.squareup.otto.Subscribe;
 import com.squareup.wire.Wire;
 
 import net.tribe7.common.base.Optional;
@@ -78,61 +69,11 @@ public class MonitorFragment extends Fragment {
 
     @InjectView(R.id.circularProgressbar)
     ProgressBar progressBar;
-    private Bus bus = BusProvider.getInstance();
 
     @Inject
     NightscoutPreferences preferences;
 
-    private CollectorService mCollectorService;
-    private ProcessorService mProcessorService;
-    private boolean mBound = false;
-
-    private ServiceConnection mCollectorConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            CollectorService.LocalBinder binder = (CollectorService.LocalBinder) service;
-            mCollectorService = binder.getService();
-            mBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-        }
-    };
-
-    private ServiceConnection mProcessorConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            ProcessorService.LocalBinder binder = (ProcessorService.LocalBinder) service;
-            mProcessorService = binder.getService();
-            mBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-        }
-    };
     private SensorGlucoseValue latestRecord;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        log.debug("onCreate called");
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        log.debug("onActivityCreate called");
-    }
 
     @SuppressLint("SetJavaScriptEnabled")
     @Nullable
@@ -143,7 +84,6 @@ public class MonitorFragment extends Fragment {
         Nightscout app = Nightscout.get(getActivity());
         app.inject(this);
         ButterKnife.inject(this, view);
-        bus.register(this);
 
         progressBar.setMax((int) Minutes.minutes(5).toStandardDuration().getMillis());
         progressBar.setProgress(0);
@@ -187,8 +127,6 @@ public class MonitorFragment extends Fragment {
         });
 
         refreshSettingBoundUis();
-
-        mHandler.post(updateProgress);
         return view;
     }
 
@@ -207,27 +145,11 @@ public class MonitorFragment extends Fragment {
       restoreSgvText();
     }
 
-    private Runnable updateProgress = new Runnable() {
-        @Override
-        public void run() {
-            Intent intent = new Intent(getActivity(), CollectorService.class);
-            getActivity().bindService(intent, mCollectorConnection, Context.BIND_AUTO_CREATE);
-            if (mBound) {
-                int progress = (int) mCollectorService.getNextPoll();
-                progressBar.setProgress(progress);
-                getActivity().unbindService(mCollectorConnection);
-            }
-            mHandler.removeCallbacks(updateProgress);
-            mHandler.postDelayed(updateProgress, 2000);
-        }
-    };
-
     @Override
     public void onPause() {
         mWebView.pauseTimers();
         mWebView.onPause();
         mHandler.removeCallbacks(updateTimeAgo);
-        mHandler.removeCallbacks(updateProgress);
         super.onPause();
     }
 
@@ -236,22 +158,8 @@ public class MonitorFragment extends Fragment {
         log.info("onResume called");
         mWebView.onResume();
         mWebView.resumeTimers();
-        Intent intent = new Intent(this.getActivity(), CollectorService.class);
-        getActivity().bindService(intent, mCollectorConnection, Context.BIND_AUTO_CREATE);
-        if (mBound) {
-            //setReceiverButtonRes(getReceiverRes(mCollectorService.getDeviceConnectionStatus()));
-            getActivity().unbindService(mCollectorConnection);
-        }
-        intent = new Intent(this.getActivity(), ProcessorService.class);
-        getActivity().bindService(intent, mProcessorConnection, Context.BIND_AUTO_CREATE);
-        if (mBound) {
-            //setUploaderButtonRes(getUploaderRes(lastUpload));
-            getActivity().unbindService(mProcessorConnection);
-
-        }
 
         mHandler.post(updateTimeAgo);
-        mHandler.post(updateProgress);
         refreshSettingBoundUis();
         super.onResume();
     }
@@ -291,21 +199,6 @@ public class MonitorFragment extends Fragment {
         super.onViewStateRestored(savedInstanceState);
         // Restore the state of the WebView
         mWebView.restoreState(savedInstanceState);
-    }
-
-    @Subscribe
-    public void incomingData(final DeviceConnectionStatus status) {
-        if (getActivity() == null) {
-            log.error("Activity is null!");
-            return;
-        }
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                setReceiverButtonRes(getReceiverRes(status));
-            }
-        });
-
     }
 
     private int getReceiverRes(DeviceConnectionStatus status) {
@@ -353,25 +246,6 @@ public class MonitorFragment extends Fragment {
         return R.drawable.ic_nocloud;
     }
 
-    @Subscribe
-    public void incomingData(final ProcessorService.ProcessorResponse status) {
-        if (getActivity() == null) {
-            log.info("Activity is null for ProcessorResponse");
-            return;
-        }
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                log.info("Incoming status: " + status.success);
-                int stat = (status.success) ? 1 : 2;
-                setUploaderButtonRes(getUploaderRes(stat));
-
-            }
-        });
-    }
-
-
-    @Subscribe
     public void incomingData(final Download uiDownload) {
         if (getActivity() == null) {
             log.info("Activity is null!");
@@ -414,12 +288,6 @@ public class MonitorFragment extends Fragment {
                 mTextTimestamp.setText(timeAgoStr);
             }
         });
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        bus.unregister(this);
     }
 
     public Runnable updateTimeAgo = new Runnable() {

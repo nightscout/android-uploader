@@ -1,21 +1,23 @@
 package com.nightscout.android.wearables;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
-import com.nightscout.android.drivers.AndroidUploaderDeviceDevice;
+import com.nightscout.android.drivers.AndroidUploaderDevice;
 import com.nightscout.core.dexcom.TrendArrow;
 import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.utils.GlucoseReading;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
 public class Pebble {
+    private static final Logger log = LoggerFactory.getLogger(Pebble.class);
     //    CGM_ICON_KEY = 0x0,		// TUPLE_CSTRING, MAX 2 BYTES (10)
     //    CGM_BG_KEY = 0x1,		// TUPLE_CSTRING, MAX 4 BYTES (253 OR 22.2)
     //    CGM_TCGM_KEY = 0x2,		// TUPLE_INT, 4 BYTES (CGM TIME)
@@ -31,7 +33,6 @@ public class Pebble {
     public static final int BG_DELTA_KEY = 4;
     public static final int UPLOADER_BATTERY_KEY = 5;
     public static final int NAME_KEY = 6;
-    private static final String TAG = Pebble.class.getSimpleName();
     private Context context;
     private PebbleDictionary currentReading;
     private GlucoseUnit units = GlucoseUnit.MGDL;
@@ -43,7 +44,7 @@ public class Pebble {
     private PebbleKit.PebbleDataReceiver dataReceiver = new PebbleKit.PebbleDataReceiver(PEBBLEAPP_UUID) {
         @Override
         public void receiveData(final Context mContext, final int transactionId, final PebbleDictionary data) {
-            Log.d(TAG, "Received query. data: " + data.size());
+            log.debug("Received query. data: {}.", data.size());
             PebbleKit.sendAckToPebble(mContext, transactionId);
             sendDownload(currentReading);
         }
@@ -69,10 +70,6 @@ public class Pebble {
         return dictionary;
     }
 
-    public void sendDownload(GlucoseReading reading, TrendArrow trend, long recordTime, Context cntx) {
-        sendDownload(reading, trend, recordTime, cntx, false);
-    }
-
     public void sendDownload(GlucoseReading reading, TrendArrow trend, long recordTime, Context cntx, boolean resend) {
         GlucoseReading delta = new GlucoseReading(0, GlucoseUnit.MGDL);
 
@@ -95,7 +92,7 @@ public class Pebble {
         lastTrend = trend;
         lastDelta = delta;
         recordTime = DateTimeZone.getDefault().convertUTCToLocal(recordTime);
-        int batLevel = AndroidUploaderDeviceDevice.getUploaderDevice(cntx).getBatteryLevel();
+        int batLevel = AndroidUploaderDevice.getUploaderDevice(cntx).getBatteryLevel();
         PebbleDictionary dictionary = buildDictionary(trend, bgStr, (int) (recordTime / 1000),
                 (int) (DateTimeZone.getDefault().convertUTCToLocal(new DateTime().getMillis()) / 1000), deltaStr,
                 String.valueOf(batLevel), pwdName);
@@ -112,7 +109,7 @@ public class Pebble {
     public void sendDownload(PebbleDictionary dictionary) {
         if (isConnected()) {
             if (dictionary != null && context != null) {
-                Log.d(TAG, "Sending data to pebble");
+                log.debug("Sending data to pebble");
                 PebbleKit.sendDataToPebble(context, PEBBLEAPP_UUID, dictionary);
             }
         }

@@ -2,11 +2,8 @@ package com.nightscout.desktop;
 
 import com.embeddedunveiled.serial.SerialComManager;
 import com.nightscout.core.drivers.DeviceTransport;
-import com.nightscout.core.drivers.DeviceConnectionState;
 
 import java.io.IOException;
-
-import rx.functions.Action1;
 
 public class DesktopSerialTransport implements DeviceTransport {
 
@@ -61,10 +58,5 @@ public class DesktopSerialTransport implements DeviceTransport {
   @Override
   public boolean isConnected() {
     return handle > -1;
-  }
-
-  @Override
-  public void registerConnectionListener(Action1<DeviceConnectionState> connectionListener) {
-    // no-op
   }
 }

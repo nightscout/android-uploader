@@ -66,21 +66,6 @@ public class NightscoutNavigationDrawer extends MaterialNavigationDrawer {
         });
         addSection(sync);
 
-        MaterialSection gapSync = newSection("Gap sync", new MaterialSectionListener() {
-            @Override
-            public void onClick(MaterialSection materialSection) {
-                setupGapSync();
-                Intent syncIntent = new Intent(getApplicationContext(), CollectorService.class);
-                syncIntent.setAction(CollectorService.ACTION_POLL);
-                syncIntent.putExtra(CollectorService.NUM_PAGES, 20);
-                syncIntent.putExtra(CollectorService.SYNC_TYPE, CollectorService.GAP_SYNC);
-                getApplicationContext().startService(syncIntent);
-
-
-            }
-        });
-        addSection(gapSync);
-
         MaterialSection allLog = newSection("Event logs", EventFragment.newAllLogPanel());
         addSection(allLog);
 

@@ -6,7 +6,9 @@ import net.tribe7.common.primitives.Longs;
 
 import org.joda.time.DateTime;
 
-public class TimestampedInstances {
+public final class TimestampedInstances {
+
+  private TimestampedInstances() {}
 
   private abstract static class AbstractTimestamped implements Timestamped {
     @Override

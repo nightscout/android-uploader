@@ -17,7 +17,7 @@ import java.util.List;
  * A class to manage barcode configuration of the uploader
  */
 public class NSBarcodeConfig {
-    protected static final Logger log = LoggerFactory.getLogger(NSBarcodeConfig.class);
+    private static final Logger log = LoggerFactory.getLogger(NSBarcodeConfig.class);
     private JSONObject config = new JSONObject();
 
     public NSBarcodeConfig(String decodeResults) {
@@ -31,7 +31,6 @@ public class NSBarcodeConfig {
         try {
             this.config = new JSONObject(jsonConfig);
         } catch (JSONException e) {
-            return;
         }
     }
 
@@ -40,13 +39,10 @@ public class NSBarcodeConfig {
         try {
             if (hasMongoConfig()) {
                 mongoUri = config.getJSONObject(NSBarcodeConfigKeys.MONGO_CONFIG).getString(NSBarcodeConfigKeys.MONGO_URI);
-            } else {
-                return Optional.absent();
             }
         } catch (JSONException e) {
-            return Optional.absent();
         }
-        return Optional.of(mongoUri);
+        return Optional.fromNullable(mongoUri);
     }
 
     public List<String> getApiUris() {
@@ -78,9 +74,9 @@ public class NSBarcodeConfig {
                 mqttUri = config.getJSONObject(NSBarcodeConfigKeys.MQTT_CONFIG).getString(NSBarcodeConfigKeys.MQTT_URI);
             }
         } catch (JSONException e) {
-            return Optional.fromNullable(mqttUri);
+            // empty
         }
-        return Optional.of(mqttUri);
+        return Optional.fromNullable(mqttUri);
     }
 
     public Optional<String> getMongoCollection() {

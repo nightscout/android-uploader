@@ -19,21 +19,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UpgradeReceiver extends BroadcastReceiver {
-    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+    private static final Logger log = LoggerFactory.getLogger(UpgradeReceiver.class);
 
     private AndroidPreferences preferences;
     private Context context;
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        if (intent.getDataString().contains("com.nightscout.android")) {
-            this.context = context;
-            Intent mainActivity = new Intent(context, NightscoutNavigationDrawer.class);
-            mainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            preferences = new AndroidPreferences(context);
-            performUpdates();
-            context.startActivity(mainActivity);
+        if (!intent.getDataString().contains("com.nightscout.android")) {
+            return;
         }
+        this.context = context;
+        this.preferences = new AndroidPreferences(this.context);
+        Intent mainActivity = new Intent(context, NightscoutNavigationDrawer.class);
+        mainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        performUpdates();
+        context.startActivity(mainActivity);
     }
 
     private void performUpdates() {

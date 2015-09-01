@@ -25,6 +25,7 @@ public class ProtoRecord extends SugarRecord<ProtoRecord> implements Timestamped
     this.md5Hash = Hashing.md5().hashBytes(serializedProtobuf).toString();
     this.serializedProtobuf = serializedProtobuf;
   }
+
   @Override
   public long getTimestampSec() {
     return timestampSec;
@@ -36,9 +37,14 @@ public class ProtoRecord extends SugarRecord<ProtoRecord> implements Timestamped
   }
 
   public enum Consumer {
-    MONGO_UPLOADER,
-    API_V2_UPLOADER,
-    API_LEGACY_UPLOADER
+    MONGO,
+    API_V1_1, // Support up to three API uploaders.
+    API_V1_2,
+    API_V1_3,
+    MQTT,
+    INTERNAL_UI,
+    PEBBLE,
+    BROADCAST
   }
 
   public enum RecordType {

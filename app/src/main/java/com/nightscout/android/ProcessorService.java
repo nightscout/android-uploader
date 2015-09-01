@@ -6,20 +6,14 @@ import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.util.Log;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.nightscout.android.events.AndroidEventReporter;
+import com.nightscout.android.events.reporters.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
-import com.nightscout.android.upload.Uploader;
 import com.nightscout.android.wearables.Pebble;
 import com.nightscout.core.model.G4Download;
-import com.nightscout.core.utils.RestUriUtils;
-import com.squareup.otto.Subscribe;
-
-import java.net.URI;
 
 public class ProcessorService extends Service {
 
@@ -29,8 +23,6 @@ public class ProcessorService extends Service {
     private AndroidPreferences preferences;
     private Tracker tracker;
     private final IBinder mBinder = new LocalBinder();
-    private Uploader uploader;
-
 
     @Override
     public void onCreate() {
@@ -44,7 +36,6 @@ public class ProcessorService extends Service {
             pebble.setPwdName(preferences.getPwdName());
         }
         tracker = ((Nightscout) getApplicationContext()).getTracker();
-        reportUploadMethods();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.OnSharedPreferenceChangeListener
             prefListener =
@@ -62,6 +53,7 @@ public class ProcessorService extends Service {
         prefs.registerOnSharedPreferenceChangeListener(prefListener);
     }
 
+    /*
     public void reportUploadMethods() {
         if (preferences.isRestApiEnabled()) {
             for (String url : preferences.getRestApiBaseUris()) {
@@ -75,7 +67,7 @@ public class ProcessorService extends Service {
         if (preferences.isMqttEnabled()) {
             tracker.send(new HitBuilders.EventBuilder("Upload", "MQTT").build());
         }
-    }
+    }*/
 
     @Override
     public void onDestroy() {
@@ -102,7 +94,6 @@ public class ProcessorService extends Service {
         }
     }
 
-    @Subscribe
     public void incomingData(G4Download download) {
         reportDeviceTypes();
         if (download.sgv.size() <= 0) {
@@ -140,18 +131,6 @@ public class ProcessorService extends Service {
                 reporter.report(EventType.UPLOADER, EventSeverity.ERROR, "Expected MQTT to be connected but it is not");
                 uploadSuccess &= false;
             }*/
-
-        /*if (preferences.isBroadcastEnabled()) {
-            // TODO: make this work for gap sync or a way to request for data (having a db for this would be great)
-            Intent broadcastIntent = new Intent();
-            broadcastIntent.setAction("com.nightscout.action.PROCESS_RESPONSE");
-            broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-            SensorGlucoseValueEntry sgv = download.sgv.get(download.sgv.size() - 1);
-            EGVRecord currentEGVrecord = new EGVRecord(sgv, rcvrTime, refTime);
-            broadcastIntent.putExtra("nsSgv", currentEGVrecord.getBgMgdl());
-            broadcastIntent.putExtra("nsTimestampMs", currentEGVrecord.getDisplayTime().getMillis());
-            sendBroadcast(broadcastIntent);
-        }*/
     }
 
 

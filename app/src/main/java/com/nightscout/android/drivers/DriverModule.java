@@ -31,7 +31,7 @@ public class DriverModule {
 
   @Provides
   @Named("dexcomDriverSupplier")
-  public Supplier<DeviceTransport> provideDexcomDriverSupplier() {
+  public Supplier<DeviceTransport> providesDexcomDriverSupplier() {
     return new DexcomDriverSupplier(application.getApplicationContext(), preferences);
   }
 }

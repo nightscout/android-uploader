@@ -6,8 +6,6 @@ import android.content.Context;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.nightscout.android.ui.ActivityHierarchyServer;
-import com.nightscout.core.BusProvider;
-import com.orm.Database;
 
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
@@ -39,7 +37,6 @@ public class Nightscout extends Application {
     super.onCreate();
     buildObjectGraph();
     ActivityHierarchyServer activityHierarchyServer = objectGraph.get(ActivityHierarchyServer.class);
-    BusProvider.getInstance();
     registerActivityLifecycleCallbacks(activityHierarchyServer);
   }
 

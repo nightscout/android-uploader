@@ -20,12 +20,12 @@ import android.os.Build;
 import android.util.Log;
 
 import com.nightscout.android.R;
-import com.nightscout.android.events.AndroidEventReporter;
+import com.nightscout.android.events.reporters.AndroidEventReporter;
 import com.nightscout.android.preferences.AndroidPreferences;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DeviceConnectionState;
-import com.nightscout.core.events.EventReporter;
+import com.nightscout.core.events.reporters.EventReporter;
 import com.nightscout.core.events.EventSeverity;
 import com.nightscout.core.events.EventType;
 

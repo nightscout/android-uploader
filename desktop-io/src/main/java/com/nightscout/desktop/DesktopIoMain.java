@@ -1,13 +1,16 @@
 package com.nightscout.desktop;
 
 import com.embeddedunveiled.serial.SerialComManager;
-import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.TimestampedInstances;
 import com.nightscout.core.drivers.DeviceTransport;
 import com.nightscout.core.drivers.DexcomG4;
 import com.nightscout.core.drivers.DeviceType;
-import com.nightscout.core.events.LoggingEventReporter;
+import com.nightscout.core.events.reporters.LoggingEventReporter;
 import com.nightscout.core.preferences.TestPreferences;
 import com.squareup.wire.Message;
+
+import net.tribe7.common.base.Optional;
+import net.tribe7.common.base.Suppliers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,15 +40,9 @@ public class DesktopIoMain {
     preferences.setMeterUploadEnabled(true);
     preferences.setInsertionUploadEnabled(true);
 
-    DexcomG4 dexcomG4 = new DexcomG4(transport, preferences, new AbstractUploaderDevice() {
-      @Override
-      public int getBatteryLevel() {
-        return 100;
-      }
-    });
-    dexcomG4.setNumOfPages(20);
-    dexcomG4.setReporter(new LoggingEventReporter());
-    Message download = dexcomG4.download();
+    DexcomG4 dexcomG4 = new DexcomG4(Suppliers.ofInstance(transport), new LoggingEventReporter());
+
+    Message download = dexcomG4.downloadAllAfter(Optional.of(TimestampedInstances.epoch()));
 
     log.info("Results: {}", download.toString());
     transport.close();

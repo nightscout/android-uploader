@@ -21,17 +21,7 @@ public class G4UsbReceiver extends BroadcastReceiver {
                 if (!isConnected(context)) {
                     Log.d(TAG, "Stopping syncing on USB attached...");
                     Intent syncIntent = new Intent(context, CollectorService.class);
-//                    syncIntent.putExtra(CollectorService.SYNC_TYPE, CollectorService.NON_SYNC);
                     context.stopService(syncIntent);
-                }
-                break;
-            case UsbManager.ACTION_USB_DEVICE_ATTACHED:
-                if (isConnected(context)) {
-                    Log.d(TAG, "Starting syncing on USB attached...");
-                    Intent syncIntent = new Intent(context, CollectorService.class);
-                    syncIntent.putExtra(CollectorService.SYNC_TYPE, CollectorService.STD_SYNC);
-                    syncIntent.putExtra(CollectorService.NUM_PAGES, 1);
-                    context.startService(syncIntent);
                 }
                 break;
         }

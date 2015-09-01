@@ -1,9 +1,12 @@
-package com.nightscout.core.events;
+package com.nightscout.core.events.reporters;
+
+import com.nightscout.core.events.EventSeverity;
+import com.nightscout.core.events.EventType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LoggingEventReporter implements EventReporter {
+public class LoggingEventReporter implements com.nightscout.core.events.reporters.EventReporter {
 
   private static final Logger log = LoggerFactory.getLogger(LoggingEventReporter.class);
 

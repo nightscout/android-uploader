@@ -37,7 +37,7 @@ public final class DbUtils {
     }
   }
 
-  public static ProtoRecord.RecordType getTypeFromClass(Class clazz) {
+  private static ProtoRecord.RecordType getTypeFromClass(Class clazz) {
     if (clazz == G4Metadata.class) {
       return ProtoRecord.RecordType.G4_METADATA;
     } else if (clazz == Insertion.class) {
