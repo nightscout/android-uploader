@@ -104,7 +104,7 @@ public class MongoUploaderTest {
                 captor.capture(),
                 eq(true),
                 eq(false),
-                eq(WriteConcern.UNACKNOWLEDGED))).thenReturn(result);
+                eq(WriteConcern.ACKNOWLEDGED))).thenReturn(result);
         validateMockitoUsage();
     }
 
