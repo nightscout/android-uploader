@@ -144,15 +144,4 @@ public class MongoUploaderTest {
         mongoUploader.uploadDeviceStatus(deviceStatus);
         verifyDeviceStatus(deviceStatus);
     }
-
-    @Test
-    public void testReturnFalseWithInvalidURI() {
-        mongoUploader = new MongoUploader(
-                preferences,
-                new MongoClientURI("mongodb://foobar/db"),
-                "collection",
-                "dsCollection");
-        AbstractUploaderDevice deviceStatus = mockDeviceStatus();
-        assertThat(mongoUploader.uploadDeviceStatus(deviceStatus), is(false));
-    }
 }
