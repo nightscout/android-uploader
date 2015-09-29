@@ -98,13 +98,13 @@ public class MongoUploaderTest {
     public void setUpUpsertCapture() {
         captor = ArgumentCaptor.forClass(BasicDBObject.class);
         WriteResult result = mock(WriteResult.class);
-        when(result.getError()).thenReturn(null);
+        when(result.wasAcknowledged()).thenReturn(true);
         when(mockCollection.update(
                 any(DBObject.class),
                 captor.capture(),
                 eq(true),
                 eq(false),
-                eq(WriteConcern.UNACKNOWLEDGED))).thenReturn(result);
+                eq(WriteConcern.ACKNOWLEDGED))).thenReturn(result);
         validateMockitoUsage();
     }
 
@@ -143,16 +143,5 @@ public class MongoUploaderTest {
         AbstractUploaderDevice deviceStatus = mockDeviceStatus();
         mongoUploader.uploadDeviceStatus(deviceStatus);
         verifyDeviceStatus(deviceStatus);
-    }
-
-    @Test
-    public void testReturnFalseWithInvalidURI() {
-        mongoUploader = new MongoUploader(
-                preferences,
-                new MongoClientURI("mongodb://foobar/db"),
-                "collection",
-                "dsCollection");
-        AbstractUploaderDevice deviceStatus = mockDeviceStatus();
-        assertThat(mongoUploader.uploadDeviceStatus(deviceStatus), is(false));
     }
 }
