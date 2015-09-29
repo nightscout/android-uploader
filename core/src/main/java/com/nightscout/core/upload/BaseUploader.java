@@ -5,6 +5,7 @@ import com.nightscout.core.drivers.AbstractUploaderDevice;
 import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
+import com.nightscout.core.records.DeviceStatus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ public abstract class BaseUploader {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final NightscoutPreferences preferences;
+    protected String identifier;
 
     protected abstract boolean doUpload(GlucoseDataSet glucoseDataSet) throws IOException;
 
@@ -120,6 +122,10 @@ public abstract class BaseUploader {
             log.error("Error uploading device status", e);
             return false;
         }
+    }
+
+    public String getIdentifier() {
+        return identifier;
     }
 
     protected NightscoutPreferences getPreferences() {

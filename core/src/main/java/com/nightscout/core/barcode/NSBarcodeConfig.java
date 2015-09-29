@@ -22,8 +22,8 @@ public class NSBarcodeConfig {
         configureBarcode(decodeResults);
     }
 
-    public void configureBarcode(String jsonConfig){
-        if (jsonConfig == null){
+    public void configureBarcode(String jsonConfig) {
+        if (jsonConfig == null) {
             throw new IllegalArgumentException("Null barcode");
         }
         try {
@@ -86,8 +86,8 @@ public class NSBarcodeConfig {
         return Optional.fromNullable(mongoCollection);
     }
 
-    public Optional<String> getMongoDeviceStatusCollection(){
-        if (! config.has(NSBarcodeConfigKeys.MONGO_CONFIG)) {
+    public Optional<String> getMongoDeviceStatusCollection() {
+        if (!config.has(NSBarcodeConfigKeys.MONGO_CONFIG)) {
             return Optional.absent();
         }
         String deviceStatusCollection = null;
@@ -104,7 +104,7 @@ public class NSBarcodeConfig {
         return Optional.fromNullable(deviceStatusCollection);
     }
 
-    public boolean hasMongoConfig(){
+    public boolean hasMongoConfig() {
         try {
             return config.has(NSBarcodeConfigKeys.MONGO_CONFIG) &&
                     config.getJSONObject(NSBarcodeConfigKeys.MONGO_CONFIG).has(NSBarcodeConfigKeys.MONGO_URI);
@@ -113,7 +113,7 @@ public class NSBarcodeConfig {
         }
     }
 
-    public boolean hasApiConfig(){
+    public boolean hasApiConfig() {
         try {
             return config.has(NSBarcodeConfigKeys.API_CONFIG) &&
                     config.getJSONObject(NSBarcodeConfigKeys.API_CONFIG)

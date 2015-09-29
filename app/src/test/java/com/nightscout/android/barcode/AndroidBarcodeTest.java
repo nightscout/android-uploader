@@ -15,9 +15,7 @@ import com.nightscout.core.preferences.NightscoutPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowPreferenceManager;
 
@@ -27,7 +25,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 @Config(emulateSdk = 16)
-@RunWith(RobolectricTestRunner.class)
 public class AndroidBarcodeTest extends RobolectricTestBase {
     Activity activity;
     SharedPreferences sharedPrefs;

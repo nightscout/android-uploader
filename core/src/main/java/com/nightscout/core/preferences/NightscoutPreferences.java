@@ -1,5 +1,6 @@
 package com.nightscout.core.preferences;
 
+import com.nightscout.core.drivers.SupportedDevices;
 import com.nightscout.core.model.GlucoseUnit;
 
 import java.util.List;
@@ -39,6 +40,17 @@ public interface NightscoutPreferences {
 
     String getMongoDeviceStatusCollection();
 
+    boolean isMqttEnabled();
+
+    String getMqttEndpoint();
+
+    void setMqttEndpoint(String endpoint);
+
+    String getMqttUser();
+
+    // TODO: (klee) look into how to securely store this information
+    String getMqttPass();
+
     void setMongoDeviceStatusCollection(String deviceStatusCollection);
 
     boolean getIUnderstand();
@@ -56,4 +68,16 @@ public interface NightscoutPreferences {
     boolean hasAskedForData();
 
     void setAskedForData(boolean askedForData);
+
+    SupportedDevices getDeviceType();
+
+    void setBluetoothDevice(String btDeviceName, String btAddress);
+
+    String getBtAddress();
+
+    String getShareSerial();
+
+    void setShareSerial(String serialNumber);
+
+
 }

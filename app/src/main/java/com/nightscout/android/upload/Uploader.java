@@ -4,12 +4,17 @@ import android.content.Context;
 import android.util.Log;
 
 import com.mongodb.MongoClientURI;
+import com.mongodb.MongoException;
 import com.nightscout.android.R;
 import com.nightscout.android.ToastReceiver;
 import com.nightscout.android.drivers.AndroidUploaderDevice;
+import com.nightscout.android.events.AndroidEventReporter;
 import com.nightscout.core.dexcom.Utils;
 import com.nightscout.core.dexcom.records.GlucoseDataSet;
 import com.nightscout.core.drivers.AbstractUploaderDevice;
+import com.nightscout.core.events.EventReporter;
+import com.nightscout.core.events.EventSeverity;
+import com.nightscout.core.events.EventType;
 import com.nightscout.core.model.CalibrationEntry;
 import com.nightscout.core.model.DownloadResults;
 import com.nightscout.core.model.G4Download;
@@ -33,10 +38,15 @@ public class Uploader {
     private static final String LOG_TAG = Uploader.class.getSimpleName();
     private final List<BaseUploader> uploaders;
     private boolean allUploadersInitalized = true;
+    private EventReporter reporter;
     private Context context;
+    private NightscoutPreferences preferences;
 
     public Uploader(Context context, NightscoutPreferences preferences) {
         checkNotNull(context);
+        this.preferences = preferences;
+        this.context = context;
+        reporter = AndroidEventReporter.getReporter(context);
         uploaders = new ArrayList<>();
         if (preferences.isMongoUploadEnabled()) {
             allUploadersInitalized &= initializeMongoUploader(context, preferences);
@@ -57,10 +67,20 @@ public class Uploader {
         try {
             uri = new MongoClientURI(dbURI);
         } catch (IllegalArgumentException e) {
+            reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
+                    context.getString(R.string.unknown_mongo_host));
             Log.e(LOG_TAG, "Error creating mongo client uri for " + dbURI + ".", e);
             context.sendBroadcast(ToastReceiver.createIntent(context, R.string.unknown_mongo_host));
             return false;
         } catch (NullPointerException e) {
+            reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
+                    context.getString(R.string.unknown_mongo_host));
+            Log.e(LOG_TAG, "Error creating mongo client uri for null value.", e);
+            context.sendBroadcast(ToastReceiver.createIntent(context, R.string.unknown_mongo_host));
+            return false;
+        } catch (StringIndexOutOfBoundsException e) {
+            reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
+                    context.getString(R.string.unknown_mongo_host));
             Log.e(LOG_TAG, "Error creating mongo client uri for null value.", e);
             context.sendBroadcast(ToastReceiver.createIntent(context, R.string.unknown_mongo_host));
             return false;
@@ -79,6 +99,8 @@ public class Uploader {
             try {
                 baseUris.add(URI.create(baseUriString));
             } catch (IllegalArgumentException e) {
+                reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
+                        context.getString(R.string.illegal_rest_url));
                 Log.e(LOG_TAG, "Error creating rest uri from preferences.", e);
                 context.sendBroadcast(
                         ToastReceiver.createIntent(context, R.string.illegal_rest_url));
@@ -139,12 +161,35 @@ public class Uploader {
         for (BaseUploader uploader : uploaders) {
             // TODO(klee): capture any exceptions here so that all configured uploaders will attempt
             // to upload
-            allSuccessful &= uploader.uploadRecords(glucoseDataSets, meterRecords, calRecords, deviceStatus);
+            try {
+                allSuccessful &= uploader.uploadRecords(glucoseDataSets, meterRecords, calRecords, deviceStatus);
+                reporter.report(EventType.UPLOADER, EventSeverity.INFO,
+                        String.format(context.getString(R.string.event_success_upload),
+                                uploader.getIdentifier()));
+            } catch (MongoException e) {
+                // Credentials error - user name or password is incorrect.
+                if (e.getCode() == 18) {
+                    reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
+                            context.getString(R.string.event_mongo_invalid_credentials));
+                } else {
+                    reporter.report(EventType.UPLOADER, EventSeverity.ERROR,
+                            String.format(context.getString(R.string.event_fail_upload),
+                                    uploader.getIdentifier()));
+                }
+                allSuccessful &= false;
+            }
+        }
+
+        // Quick hack to prevent MQTT only from reporting not uploading to cloud
+        int otherUploaders = (preferences.isMqttEnabled()) ? 1 : 0;
+
+        if (uploaders.size() + otherUploaders == 0) {
+            reporter.report(EventType.UPLOADER, EventSeverity.WARN, context.getString(R.string.no_uploaders));
         }
 
         // Force a failure if an uploader was not properly initialized, but only after the other
         // uploaders were executed.
-        return allUploadersInitalized && allSuccessful && (uploaders.size() != 0);
+        return allUploadersInitalized && allSuccessful && (uploaders.size() + otherUploaders != 0);
     }
 
     protected List<BaseUploader> getUploaders() {

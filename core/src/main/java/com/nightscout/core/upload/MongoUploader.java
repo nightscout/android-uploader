@@ -16,7 +16,6 @@ import com.nightscout.core.model.MeterEntry;
 import com.nightscout.core.preferences.NightscoutPreferences;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.Date;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -37,6 +36,7 @@ public class MongoUploader extends BaseUploader {
         checkNotNull(dbURI);
         checkNotNull(collectionName);
         checkNotNull(dsCollectionName);
+        this.identifier = "MongoDB";
         this.dbUri = dbURI;
         this.collectionName = collectionName.trim();
         this.dsCollectionName = dsCollectionName.trim();
@@ -48,7 +48,7 @@ public class MongoUploader extends BaseUploader {
         }
         try {
             this.client = new MongoClient(dbUri);
-        } catch (UnknownHostException e) {
+        } catch (Exception e) {
             throw new IOException("Error connecting to mongo host " + dbUri.getURI(), e);
         }
         return this.client;
@@ -149,7 +149,7 @@ public class MongoUploader extends BaseUploader {
     private boolean upsert(DBCollection collection, DBObject dbObject) {
         WriteResult result = collection.update(dbObject, dbObject, true, false,
                 WriteConcern.UNACKNOWLEDGED);
-        return result.getError() == null;
+        return result.getUpsertedId() != null;
     }
 
     @Override

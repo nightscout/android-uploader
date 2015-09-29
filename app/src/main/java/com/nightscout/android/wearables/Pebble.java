@@ -55,10 +55,6 @@ public class Pebble {
         init();
     }
 
-    public void close() {
-        context.unregisterReceiver(dataReceiver);
-    }
-
     public PebbleDictionary buildDictionary(TrendArrow trend, String bgValue, int recordTime, int uploaderTimeSec,
                                             String delta, String uploaderBattery, String name) {
         PebbleDictionary dictionary = new PebbleDictionary();
@@ -120,6 +116,10 @@ public class Pebble {
                 PebbleKit.sendDataToPebble(context, PEBBLEAPP_UUID, dictionary);
             }
         }
+    }
+
+    public void close() {
+        context.unregisterReceiver(dataReceiver);
     }
 
     private void init() {

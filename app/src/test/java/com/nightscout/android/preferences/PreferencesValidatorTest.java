@@ -22,6 +22,12 @@ public class PreferencesValidatorTest extends RobolectricTestBase {
     }
 
     @Test
+    public void testValidateMongoUriSyntax_EmptyPassword() {
+        assertThat(PreferencesValidator.validateMongoUriSyntax(getContext(), "mongodb://a@b.com/db").get(),
+               is(getContext().getString(R.string.illegal_mongo_uri, "mongodb://a@b.com/db")));
+    }
+
+    @Test
     public void testValidateMongoUriSyntax_Valid() {
         assertThat(PreferencesValidator.validateMongoUriSyntax(getContext(), "mongodb://test/db")
                         .isPresent(),
@@ -53,4 +59,17 @@ public class PreferencesValidatorTest extends RobolectricTestBase {
                         .get(),
                 is(getContext().getString(R.string.rest_uri_missing_token, "http://test.com/v1")));
     }
+
+    @Test
+    public void testValidateMqttEndpointSyntax_Valid() {
+        assertThat(PreferencesValidator.validateMqttEndpointSyntax(getContext(),
+                "mqtt://m10.cloudmqtt.com:23966").isPresent(), is(false));
+    }
+
+    @Test
+    public void testValidateMqttUriSyntax_Invalid() {
+        assertThat(PreferencesValidator.validateMqttEndpointSyntax(getContext(), "\\invalid").get(),
+                is(getContext().getString(R.string.invalid_mqtt_endpoint, "\\invalid")));
+    }
+
 }

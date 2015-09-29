@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 
 import com.google.common.base.Joiner;
 import com.nightscout.android.R;
+import com.nightscout.core.drivers.SupportedDevices;
 import com.nightscout.core.model.GlucoseUnit;
 import com.nightscout.core.preferences.NightscoutPreferences;
 import com.nightscout.core.utils.RestUriUtils;
@@ -78,9 +79,6 @@ public class AndroidPreferences implements NightscoutPreferences {
 
     @Override
     public String getMongoCollection() {
-//        String result = preferences.getString(PreferenceKeys.MONGO_COLLECTION,
-//                getDefaultMongoCollection());
-//        return result.equals("")?getDefaultMongoCollection():result;
         return preferences.getString(PreferenceKeys.MONGO_COLLECTION,
                 getDefaultMongoCollection());
     }
@@ -90,6 +88,31 @@ public class AndroidPreferences implements NightscoutPreferences {
         String result = preferences.getString(PreferenceKeys.MONGO_DEVICE_STATUS_COLLECTION,
                 getDefaultMongoDeviceStatusCollection());
         return result.equals("") ? getDefaultMongoDeviceStatusCollection() : result;
+    }
+
+    @Override
+    public boolean isMqttEnabled() {
+        return preferences.getBoolean(PreferenceKeys.MQTT_ENABLED, false);
+    }
+
+    @Override
+    public String getMqttEndpoint() {
+        return preferences.getString(PreferenceKeys.MQTT_ENDPOINT, "");
+    }
+
+    @Override
+    public void setMqttEndpoint(String endpoint) {
+        preferences.edit().putString(PreferenceKeys.MQTT_ENDPOINT, endpoint).apply();
+    }
+
+    @Override
+    public String getMqttUser() {
+        return preferences.getString(PreferenceKeys.MQTT_USER, "");
+    }
+
+    @Override
+    public String getMqttPass() {
+        return preferences.getString(PreferenceKeys.MQTT_PASS, "");
     }
 
     /**
@@ -184,4 +207,65 @@ public class AndroidPreferences implements NightscoutPreferences {
     public void setRootEnabled(boolean enabled) {
         preferences.edit().putBoolean(PreferenceKeys.ROOT_ENABLED, enabled).apply();
     }
+
+    public void setLastEgvMqttUpload(long timestamp) {
+        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_EGV_TIME, timestamp).apply();
+    }
+
+    public void setLastSensorMqttUpload(long timestamp) {
+        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_SENSOR_TIME, timestamp).apply();
+    }
+
+    public void setLastCalMqttUpload(long timestamp) {
+        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_CAL_TIME, timestamp).apply();
+    }
+
+    public void setLastMeterMqttUpload(long timestamp) {
+        preferences.edit().putLong(PreferenceKeys.MQTT_LAST_METER_TIME, timestamp).apply();
+    }
+
+    public long getLastEgvMqttUpload() {
+        return preferences.getLong(PreferenceKeys.MQTT_LAST_EGV_TIME, 0);
+    }
+
+    public long getLastSensorMqttUpload() {
+        return preferences.getLong(PreferenceKeys.MQTT_LAST_SENSOR_TIME, 0);
+    }
+
+    public long getLastCalMqttUpload() {
+        return preferences.getLong(PreferenceKeys.MQTT_LAST_CAL_TIME, 0);
+    }
+
+    public long getLastMeterMqttUpload() {
+        return preferences.getLong(PreferenceKeys.MQTT_LAST_METER_TIME, 0);
+    }
+
+    @Override
+    public void setBluetoothDevice(String btDeviceName, String btAddress) {
+        preferences.edit().putString(PreferenceKeys.BLUETOOTH_DEVICE, btDeviceName).apply();
+        preferences.edit().putString(PreferenceKeys.BLUETOOTH_ADDRESS, btAddress).apply();
+    }
+
+    @Override
+    public String getBtAddress() {
+        return preferences.getString(PreferenceKeys.BLUETOOTH_ADDRESS, "");
+    }
+
+    @Override
+    public SupportedDevices getDeviceType() {
+        return preferences.getString(PreferenceKeys.DEXCOM_DEVICE_TYPE, "0").equals("0") ?
+                SupportedDevices.DEXCOM_G4 : SupportedDevices.DEXCOM_G4_SHARE;
+    }
+
+    @Override
+    public String getShareSerial() {
+        return preferences.getString(PreferenceKeys.SHARE_SERIAL, "");
+    }
+
+    @Override
+    public void setShareSerial(String serialNumber) {
+        preferences.edit().putString(PreferenceKeys.SHARE_SERIAL, serialNumber).apply();
+    }
+
+
 }

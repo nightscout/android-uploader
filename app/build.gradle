@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.robolectric:robolectric-gradle-plugin:0.14.0'
+        classpath 'org.robolectric:robolectric-gradle-plugin:0.14.1'
     }
 }
 
@@ -15,15 +15,17 @@ def gitSha = 'git rev-parse --short HEAD'.execute([], project.rootDir).text.trim
 def buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'", TimeZone.getTimeZone("UTC"))
 def codeName = "Dreamsicle"
 
+def isTravis = "true".equals(System.getenv("TRAVIS"))
+
 android {
     compileSdkVersion 21
     buildToolsVersion '21.1.1'
     defaultConfig {
         applicationId "com.nightscout.android"
-        minSdkVersion 12
+        minSdkVersion 18
         targetSdkVersion 18
         versionCode 22
-        versionName "0.1.13"
+        versionName "0.2.0-dev"
         buildConfigField "String", "GIT_SHA", "\"${gitSha}\""
         buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
         buildConfigField "String", "VERSION_CODENAME", "\"${codeName}\""
@@ -43,6 +45,8 @@ android {
     packagingOptions {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/LICENSE.txt'
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/NOTICE'
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
@@ -61,7 +65,10 @@ robolectric {
 }
 
 repositories {
-    maven { url "https://raw.github.com/embarkmobile/zxing-android-minimal/mvn-repo/maven-repository/" }
+    maven { url "https://repo.eclipse.org/content/repositories/paho-releases/" }
+    maven {
+        url "https://raw.github.com/embarkmobile/zxing-android-minimal/mvn-repo/maven-repository/"
+    }
     maven { url "https://oss.sonatype.org/content/groups/public/" }
 }
 
@@ -74,25 +81,29 @@ dependencies {
         exclude group: 'joda-time', module: 'joda-time'
     }
     compile 'ch.acra:acra:4.6.1'
-    compile 'com.android.support:appcompat-v7:20.0.0'
-    compile 'com.android.support:support-v4:20.0.0'
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support:support-v4:21.0.3'
     compile 'com.google.android.gms:play-services-base:6.5.87'
     compile 'org.mongodb:mongo-java-driver:2.10.1'
     compile 'net.danlew:android.joda:2.6.0'
     compile 'com.google.guava:guava:18.0'
-//    compile 'com.noveogroup.android:android-logger:1.3.4'
+    compile 'org.eclipse.paho:mqtt-client:0.4.0'
+    compile 'com.noveogroup.android:android-logger:1.3.4'
+    compile 'com.squareup.dagger:dagger:1.2.1'
+    provided 'com.squareup.dagger:dagger-compiler:1.2.1'
+    compile 'com.jakewharton:butterknife:4.0.1'
+    compile 'com.squareup:otto:1.3.5'
     compile 'com.embarkmobile:zxing-android-minimal:2.0.0@aar'
     compile 'com.embarkmobile:zxing-android-legacy:2.0.0@aar'
     compile 'com.embarkmobile:zxing-android-integration:2.0.0@aar'
-    compile 'com.google.zxing:core:3.0.1'
+    compile 'com.google.zxing:core:3.1.0'
     compile 'com.getpebble:pebblekit:2.6.0@aar'
+    compile 'io.reactivex:rxjava:1.0.0'
     androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
-    androidTestCompile 'org.mockito:mockito-core:1.9.5'
-    androidTestCompile('junit:junit:4.11') {
+    androidTestCompile 'org.mockito:mockito-core:1.10.17'
+    androidTestCompile('junit:junit:4.12') {
         exclude module: 'hamcrest-core'
     }
-    androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
-    androidTestCompile 'org.mockito:mockito-core:1.9.5'
     androidTestCompile('org.robolectric:robolectric:2.4') {
         exclude module: 'classworlds'
         exclude module: 'commons-logging'
@@ -141,7 +152,7 @@ def coverageSourceDirs = [
         '../app/src/main/java'
 ]
 
-task jacocoTestReport(type:JacocoReport, dependsOn: "testDebug") {
+task jacocoTestReport(type: JacocoReport, dependsOn: "testDebug") {
     group = "Reporting"
 
     description = "Generate Jacoco app coverage reports"

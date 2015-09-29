@@ -5,8 +5,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.nightscout.android.MainActivity"
-    android:background="#ff000000">
+    tools:context="com.nightscout.android.MainActivity">
 
     <TextView
         android:layout_width="fill_parent"
@@ -45,114 +44,31 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/timeAgo"
-        android:layout_alignRight="@+id/timeAgo"
         android:layout_alignEnd="@+id/timeAgo"
+        android:layout_alignRight="@+id/timeAgo"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="false"
         android:layout_marginBottom="45dp" />
 
-    <TableLayout
-        android:layout_width="fill_parent"
+    <ImageButton
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="#ff006578">
+        android:id="@+id/syncButton"
+        android:background="@drawable/ic_nocloud"
+        android:adjustViewBounds="false"
+        android:baselineAlignBottom="false"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/imageViewUSB"
-                android:src="@drawable/ic_usb_disconnected"
-                android:layout_column="1"
-                android:layout_weight="1"
-                android:layout_marginTop="5dp"
-                tools:ignore="ContentDescription" />
-
-            <ImageView
-                android:id="@+id/imageViewUploadStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_upload_fail"
-                android:layout_column="2"
-                android:layout_weight="1"
-                android:layout_marginTop="5dp"
-                tools:ignore="ContentDescription" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/imageViewRcvrBattery"
-                android:layout_column="3"
-                android:layout_weight="1"
-                android:src="@drawable/battery"
-                android:layout_marginTop="5dp"
-                tools:ignore="ContentDescription" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/imageViewTimeIndicator"
-                android:layout_column="4"
-                android:layout_weight="1"
-                android:src="@drawable/ic_clock_bad"
-                android:layout_marginTop="5dp"
-                tools:ignore="ContentDescription" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/USBLabelText"
-                android:textSize="12sp"
-                android:layout_column="1"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:layout_marginBottom="5dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/UploadLabelText"
-                android:minLines="1"
-                android:textSize="12sp"
-                android:layout_column="2"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:layout_marginBottom="5dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/rcvrBatteryLabel"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/DexBatteryLabelText"
-                android:textSize="12sp"
-                android:layout_column="3"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:layout_marginBottom="5dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/TimeSyncLabelText"
-                android:textSize="12sp"
-                android:layout_column="4"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:layout_marginBottom="5dp" />
-        </TableRow>
-    </TableLayout>
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/usbButton"
+        android:background="@drawable/ic_nousb"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

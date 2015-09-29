@@ -96,7 +96,11 @@ public class DexcomG4 extends AbstractDevice {
                 systemTime = readData.readSystemTime();
                 // FIXME: readData.readBatteryLevel() seems to flake out on battery level reads.
                 // Removing for now.
-                batLevel = 100;
+                if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4) {
+                    batLevel = 100;
+                } else if (preferences.getDeviceType() == SupportedDevices.DEXCOM_G4_SHARE) {
+                    batLevel = readData.readBatteryLevel();
+                }
                 // TODO pull in other exceptions once we have the analytics/acra reporters
             } catch (IOException e) {
                 //TODO record this in the event log later

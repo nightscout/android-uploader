@@ -9,6 +9,7 @@ import android.preference.PreferenceFragment;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.common.base.Optional;
@@ -71,25 +72,33 @@ public class SettingsActivity extends FragmentActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         NightscoutPreferences prefs = new AndroidPreferences(this);
-        if (scanResult != null && scanResult.getContents() != null) {
-            NSBarcodeConfig barcode = new NSBarcodeConfig(scanResult.getContents());
-            if (barcode.hasMongoConfig()) {
-                prefs.setMongoUploadEnabled(true);
-                if (barcode.getMongoUri().isPresent()) {
-                    prefs.setMongoClientUri(barcode.getMongoUri().get());
-                    prefs.setMongoCollection(barcode.getMongoCollection().orNull());
-                    prefs.setMongoDeviceStatusCollection(
-                            barcode.getMongoDeviceStatusCollection().orNull());
+        if (scanResult.getFormatName().equals("QR_CODE")) {
+            if (scanResult != null && scanResult.getContents() != null) {
+                NSBarcodeConfig barcode = new NSBarcodeConfig(scanResult.getContents());
+                if (barcode.hasMongoConfig()) {
+                    prefs.setMongoUploadEnabled(true);
+                    if (barcode.getMongoUri().isPresent()) {
+                        prefs.setMongoClientUri(barcode.getMongoUri().get());
+                        prefs.setMongoCollection(barcode.getMongoCollection().orNull());
+                        prefs.setMongoDeviceStatusCollection(
+                                barcode.getMongoDeviceStatusCollection().orNull());
+                    }
+                } else {
+                    prefs.setMongoUploadEnabled(false);
                 }
-            } else {
-                prefs.setMongoUploadEnabled(false);
+                if (barcode.hasApiConfig()) {
+                    prefs.setRestApiEnabled(true);
+                    prefs.setRestApiBaseUris(barcode.getApiUris());
+                } else {
+                    prefs.setRestApiEnabled(false);
+                }
+                refreshFragments();
             }
-            if (barcode.hasApiConfig()) {
-                prefs.setRestApiEnabled(true);
-                prefs.setRestApiBaseUris(barcode.getApiUris());
-            } else {
-                prefs.setRestApiEnabled(false);
-            }
+        } else if (scanResult.getFormatName().equals("CODE_128")) {
+            // TODO Assuming this is a share receiver. May get messy when medtronic devices are added
+            // consider refactoring
+            Log.d("XXX", "Setting serial number to: " + scanResult.getContents());
+            prefs.setShareSerial(scanResult.getContents());
             refreshFragments();
         }
     }
@@ -99,9 +108,11 @@ public class SettingsActivity extends FragmentActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_main);
-            setupBarcodeScanner();
+            setupBarcodeConfigScanner();
+            setupBarcodeShareScanner();
             setupValidation();
             setupVersionNumbers();
+            setupBtScanner();
         }
 
         private void setupVersionNumbers() {
@@ -112,7 +123,7 @@ public class SettingsActivity extends FragmentActivity {
                     Settings.Secure.ANDROID_ID));
         }
 
-        private void setupBarcodeScanner() {
+        private void setupBarcodeConfigScanner() {
             findPreference("auto_configure").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
@@ -121,6 +132,29 @@ public class SettingsActivity extends FragmentActivity {
                 }
             });
         }
+
+        private void setupBtScanner() {
+            findPreference("bt_scan_share2").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    Intent intent = new Intent(getActivity().getApplicationContext(), BluetoothScanActivity.class);
+                    startActivity(intent);
+                    return true;
+                }
+            });
+
+        }
+
+        private void setupBarcodeShareScanner() {
+            findPreference("scan_share2_barcode").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    new AndroidBarcode(getActivity()).scan();
+                    return true;
+                }
+            });
+        }
+
 
         private void setupValidation() {
             findPreference(PreferenceKeys.API_URIS).setOnPreferenceChangeListener(
@@ -154,6 +188,22 @@ public class SettingsActivity extends FragmentActivity {
                             return true;
                         }
                     });
+            findPreference(PreferenceKeys.MQTT_ENDPOINT).setOnPreferenceChangeListener(
+                    new Preference.OnPreferenceChangeListener() {
+                        @Override
+                        public boolean onPreferenceChange(Preference preference, Object newValue) {
+                            String mqttEndpoint = (String) newValue;
+                            Optional<String> error = PreferencesValidator.validateMqttEndpointSyntax(
+                                    getActivity(), mqttEndpoint);
+                            if (error.isPresent()) {
+                                showValidationError(getActivity(), error.get());
+                                return false;
+                            }
+                            return true;
+                        }
+                    });
+
+
         }
     }
 }

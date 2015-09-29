@@ -15,6 +15,65 @@
             android:title="@string/auto_configure_title"
             android:key="auto_configure"
             android:summary="@string/prefs_auto_config_summary" />
+
+        <ListPreference
+            android:title="@string/pref_title_device_type"
+            android:key="dexcom_device_type"
+            android:entries="@array/pref_options_type"
+            android:entryValues="@array/pref_options_type_values"
+            android:defaultValue="0"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null" />
+
+        <com.nightscout.android.settings.SummaryBoundEditTextPreference
+            android:title="@string/pref_share2_serial_number"
+            android:key="share2_serial"
+            android:dialogTitle="@string/pref_share2_serial_number"
+            android:defaultValue="SM00000000" />
+
+        <PreferenceScreen
+            android:title="@string/bt_scan_share2"
+            android:key="bt_scan_share2"
+            android:summary="@string/prefs_bt_scan__summary" />
+
+        <PreferenceScreen
+            android:title="@string/scan_share2_barcode"
+            android:key="scan_share2_barcode"
+            android:summary="@string/prefs_share2_scan_barcode_summary" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="cloud_storage_mqtt"
+        android:title="@string/pref_title_mqtt"
+        android:summary="@string/pref_summary_mqtt_enabled">
+        <com.nightscout.android.settings.CustomSwitchPreference
+            android:title="@string/pref_title_mqtt_enabled"
+            android:key="cloud_storage_mqtt_enable"
+            android:disableDependentsState="false"
+            android:summary="@string/pref_summary_mqtt_enabled" />
+        <EditTextPreference
+            android:dependency="cloud_storage_mqtt_enable"
+            android:title="@string/pref_title_mqtt_endpoint"
+            android:key="cloud_storage_mqtt_endpoint"
+            android:dialogTitle="@string/pref_dialog_mqtt_endpoint"
+            android:dialogMessage="@string/pref_message_mqtt_endpoint"
+            android:defaultValue="@string/pref_default_mqtt_endpoint" />
+        <EditTextPreference
+            android:dependency="cloud_storage_mqtt_enable"
+            android:title="@string/pref_title_mqtt_user"
+            android:key="cloud_storage_mqtt_user"
+            android:dialogTitle="@string/pref_dialog_mqtt_user"
+            android:dialogMessage="@string/pref_message_mqtt_user"
+            android:defaultValue="@string/pref_default_mqtt_user" />
+        <EditTextPreference
+            android:dependency="cloud_storage_mqtt_enable"
+            android:title="@string/pref_title_mqtt_pass"
+            android:password="true"
+            android:key="cloud_storage_mqtt_pass"
+            android:dialogTitle="@string/pref_dialog_mqtt_pass"
+            android:dialogMessage="@string/pref_message_mqtt_pass"
+            android:defaultValue="@string/pref_default_mqtt_pass" />
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -117,7 +176,7 @@
             android:entryValues="@array/pref_options_units_values"
             android:defaultValue="0"
             android:negativeButtonText="@null"
-            android:positiveButtonText="@null"></ListPreference>
+            android:positiveButtonText="@null" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_header_about">
@@ -176,6 +235,6 @@
             android:title="@string/pref_title_root"
             android:key="root_support_enabled"
             android:defaultValue="false"
-            android:summary="@string/pref_summary_root"></com.nightscout.android.settings.CustomSwitchPreference>
+            android:summary="@string/pref_summary_root" />
     </PreferenceCategory>
 </PreferenceScreen>
