@@ -24,7 +24,7 @@ android {
         minSdkVersion 12
         targetSdkVersion 18
         versionCode 23
-        versionName "0.1.14-alpha"
+        versionName "0.1.14-beta"
         buildConfigField "String", "GIT_SHA", "\"${gitSha}\""
         buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
         buildConfigField "String", "VERSION_CODENAME", "\"${codeName}\""
