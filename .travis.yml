@@ -13,8 +13,8 @@ cache:
 
 android:
   components:
-  - build-tools-21.1.1
-  - android-19
+  - build-tools-23.0.0
+  - android-23
   - sysimg-19
   - extra-android-support
 
