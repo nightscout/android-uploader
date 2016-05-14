@@ -32,7 +32,7 @@ public class EGVRecord extends GenericTimestampRecord {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
                     ". Expected size: " + G4_RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
         }
-        else if (recordVersion == 4 && packet.length != G5_RECORD_SIZE) {
+        else if (recordVersion >= 4 && packet.length != G5_RECORD_SIZE) {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
                     ". Expected size: " + G5_RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
         }

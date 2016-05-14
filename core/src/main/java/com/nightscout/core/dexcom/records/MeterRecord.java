@@ -25,7 +25,7 @@ public class MeterRecord extends GenericTimestampRecord {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
                     ". Expected size: " + G4_RECORD_SIZE + " record: " + Utils.bytesToHex(packet));
         }
-        else if (recordVersion == 3 && packet.length != G5_RECORD_SIZE) {
+        else if (recordVersion >= 3 && packet.length != G5_RECORD_SIZE) {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
                     ". Expected size: " + G5_RECORD_SIZE + " record: " + Utils.bytesToHex(packet));
         }
@@ -34,7 +34,7 @@ public class MeterRecord extends GenericTimestampRecord {
         if(recordVersion < 3) {
             meterTime = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(10);
         }
-        else if (recordVersion == 3) {
+        else {
             //The Dexcom G5 has added an entryType field after the meterValue byte field, which must be skipped for this
             meterTime = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(11);
         }
