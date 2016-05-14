@@ -12,19 +12,33 @@ import java.util.Date;
 import java.util.List;
 
 public class MeterRecord extends GenericTimestampRecord {
-    public final static int RECORD_SIZE = 15;
+    public final static int G4_RECORD_SIZE = 15;
+    public final static int G5_RECORD_SIZE = 20;
     private int meterTime;
     private GlucoseReading reading;
+    private int recordVersion = 0;
 
-    public MeterRecord(byte[] packet) {
+    public MeterRecord(byte[] packet, int recordVersion) {
         super(packet);
-        if (packet.length != RECORD_SIZE) {
+        this.recordVersion = recordVersion;
+        if (recordVersion < 3 && packet.length != G4_RECORD_SIZE) {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
-                    ". Expected size: " + RECORD_SIZE + " record: " + Utils.bytesToHex(packet));
+                    ". Expected size: " + G4_RECORD_SIZE + " record: " + Utils.bytesToHex(packet));
+        }
+        else if (recordVersion == 3 && packet.length != G5_RECORD_SIZE) {
+            throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
+                    ". Expected size: " + G5_RECORD_SIZE + " record: " + Utils.bytesToHex(packet));
         }
         int meterBG = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8);
         reading = new GlucoseReading(meterBG, GlucoseUnit.MGDL);
-        meterTime = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(10);
+        if(recordVersion < 3) {
+            meterTime = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(10);
+        }
+        else if (recordVersion == 3) {
+            //The Dexcom G5 has added an entryType field after the meterValue byte field, which must be skipped for this
+            meterTime = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getInt(11);
+        }
+
     }
 
     public MeterRecord(int meterBgMgdl, int meterTime, Date displayTime, Date systemTime) {

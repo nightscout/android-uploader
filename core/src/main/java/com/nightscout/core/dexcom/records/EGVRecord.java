@@ -18,20 +18,35 @@ import java.util.Date;
 import java.util.List;
 
 public class EGVRecord extends GenericTimestampRecord {
-    public final static int RECORD_SIZE = 12;
+    public final static int G4_RECORD_SIZE = 12;
+    public final static int G5_RECORD_SIZE = 22;
     private GlucoseReading reading;
     private TrendArrow trend;
     private G4Noise noiseMode;
+    private int recordVersion = 0;
 
-    public EGVRecord(byte[] packet) {
+    public EGVRecord(byte[] packet, int recordVersion) {
         super(packet);
-        if (packet.length != RECORD_SIZE) {
+        this.recordVersion = recordVersion;
+        if (recordVersion < 4 && packet.length != G4_RECORD_SIZE) {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
-                    ". Expected size: " + RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
+                    ". Expected size: " + G4_RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
+        }
+        else if (recordVersion == 4 && packet.length != G5_RECORD_SIZE) {
+            throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
+                    ". Expected size: " + G5_RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
         }
         int bGValue = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8) & Constants.EGV_VALUE_MASK;
         reading = new GlucoseReading(bGValue, GlucoseUnit.MGDL);
-        byte trendAndNoise = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).get(10);
+        byte trendAndNoise;
+        if(recordVersion < 4) {
+            trendAndNoise = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).get(10);
+        }
+        else {
+            //A G5 has 'systemTimeSeconds' (4 bytes), 'transmitterTimeSeconds' (4 bytes), and 'filteredRateByte' (1 byte) before the trendArrowAndNoiseMode byte
+            trendAndNoise = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).get(19);
+        }
+
         int trendValue = trendAndNoise & Constants.EGV_TREND_ARROW_MASK;
         byte noiseValue = (byte) ((trendAndNoise & Constants.EGV_NOISE_MASK) >> 4);
         trend = TrendArrow.values()[trendValue];
