@@ -236,8 +236,21 @@ public class ReadData {
                 int startIdx;
                 switch (pageHeader.getRecordType()) {
                     case EGV_DATA:
-                        startIdx = PageHeader.HEADER_SIZE + (EGVRecord.RECORD_SIZE + 1) * i;
-                        records.add(clazz.cast(new EGVRecord(Arrays.copyOfRange(data, startIdx, startIdx + EGVRecord.RECORD_SIZE))));
+
+                        if(pageHeader.getRevision() == 0x5) {
+                            //This is a record from a Dexcom G5 Touch device
+                            startIdx = PageHeader.HEADER_SIZE + (EGVRecord.G5_TOUCH_RECORD_SIZE + 1) * i;
+                            records.add(clazz.cast(new EGVRecord(Arrays.copyOfRange(data, startIdx, startIdx + EGVRecord.G5_TOUCH_RECORD_SIZE),pageHeader.getRevision())));
+                        }
+                        else if(pageHeader.getRevision() == 0x4) {
+                            //This is a record from a Dexcom G5 device
+                            startIdx = PageHeader.HEADER_SIZE + (EGVRecord.G5_RECORD_SIZE + 1) * i;
+                            records.add(clazz.cast(new EGVRecord(Arrays.copyOfRange(data, startIdx, startIdx + EGVRecord.G5_RECORD_SIZE),pageHeader.getRevision())));
+                        }
+                        else {
+                            startIdx = PageHeader.HEADER_SIZE + (EGVRecord.G4_RECORD_SIZE + 1) * i;
+                            records.add(clazz.cast(new EGVRecord(Arrays.copyOfRange(data, startIdx, startIdx + EGVRecord.G4_RECORD_SIZE),pageHeader.getRevision())));
+                        }
                         break;
                     case CAL_SET:
                         int recordLength = (pageHeader.getRevision() <= 2) ? CalRecord.RECORD_SIZE : CalRecord.RECORD_V2_SIZE;
@@ -245,8 +258,14 @@ public class ReadData {
                         records.add(clazz.cast(new CalRecord(Arrays.copyOfRange(data, startIdx, startIdx + recordLength))));
                         break;
                     case METER_DATA:
-                        startIdx = PageHeader.HEADER_SIZE + (MeterRecord.RECORD_SIZE + 1) * i;
-                        records.add(clazz.cast(new MeterRecord(Arrays.copyOfRange(data, startIdx, startIdx + MeterRecord.RECORD_SIZE))));
+                        if(pageHeader.getRevision() == 0x03) {
+                            //This is a record from a Dexcom G5 device
+                            startIdx = PageHeader.HEADER_SIZE + (MeterRecord.G5_RECORD_SIZE + 1) * i;
+                            records.add(clazz.cast(new MeterRecord(Arrays.copyOfRange(data, startIdx, startIdx + MeterRecord.G5_RECORD_SIZE),pageHeader.getRevision())));
+                        }else {
+                            startIdx = PageHeader.HEADER_SIZE + (MeterRecord.G4_RECORD_SIZE + 1) * i;
+                            records.add(clazz.cast(new MeterRecord(Arrays.copyOfRange(data, startIdx, startIdx + MeterRecord.G4_RECORD_SIZE),pageHeader.getRevision())));
+                        }
                         break;
                     case SENSOR_DATA:
                         startIdx = PageHeader.HEADER_SIZE + (SensorRecord.RECORD_SIZE + 1) * i;
