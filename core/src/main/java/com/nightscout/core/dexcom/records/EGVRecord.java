@@ -20,6 +20,7 @@ import java.util.List;
 public class EGVRecord extends GenericTimestampRecord {
     public final static int G4_RECORD_SIZE = 12;
     public final static int G5_RECORD_SIZE = 22;
+    public final static int G5_TOUCH_RECORD_SIZE = 24;
     private GlucoseReading reading;
     private TrendArrow trend;
     private G4Noise noiseMode;
@@ -32,9 +33,13 @@ public class EGVRecord extends GenericTimestampRecord {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
                     ". Expected size: " + G4_RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
         }
-        else if (recordVersion >= 4 && packet.length != G5_RECORD_SIZE) {
+        else if (recordVersion == 4 && packet.length != G5_RECORD_SIZE) {
             throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
                     ". Expected size: " + G5_RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
+        }
+        else if (recordVersion == 5 && packet.length != G5_TOUCH_RECORD_SIZE) {
+            throw new InvalidRecordLengthException("Unexpected record size: " + packet.length +
+                    ". Expected size: " + G5_TOUCH_RECORD_SIZE + ". Unparsed record: " + Utils.bytesToHex(packet));
         }
         int bGValue = ByteBuffer.wrap(packet).order(ByteOrder.LITTLE_ENDIAN).getShort(8) & Constants.EGV_VALUE_MASK;
         reading = new GlucoseReading(bGValue, GlucoseUnit.MGDL);

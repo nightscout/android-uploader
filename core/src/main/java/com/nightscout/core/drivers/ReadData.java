@@ -237,7 +237,12 @@ public class ReadData {
                 switch (pageHeader.getRecordType()) {
                     case EGV_DATA:
 
-                        if(pageHeader.getRevision() == 0x04) {
+                        if(pageHeader.getRevision() == 0x5) {
+                            //This is a record from a Dexcom G5 Touch device
+                            startIdx = PageHeader.HEADER_SIZE + (EGVRecord.G5_TOUCH_RECORD_SIZE + 1) * i;
+                            records.add(clazz.cast(new EGVRecord(Arrays.copyOfRange(data, startIdx, startIdx + EGVRecord.G5_TOUCH_RECORD_SIZE),pageHeader.getRevision())));
+                        }
+                        else if(pageHeader.getRevision() == 0x4) {
                             //This is a record from a Dexcom G5 device
                             startIdx = PageHeader.HEADER_SIZE + (EGVRecord.G5_RECORD_SIZE + 1) * i;
                             records.add(clazz.cast(new EGVRecord(Arrays.copyOfRange(data, startIdx, startIdx + EGVRecord.G5_RECORD_SIZE),pageHeader.getRevision())));
